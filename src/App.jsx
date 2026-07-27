@@ -46,20 +46,20 @@ export default function App() {
       isCoffee ? 'bg-espresso-950 text-cream-soft' : 'bg-slate-950 text-cream-soft'
     }`}>
       
-      {/* Full-Page Dynamic Method Background Image with Parallax Vignette (Scrolls across entire app) */}
+      {/* Full-Page Dynamic Method Background Image (Vivid & Clear Photography Backdrop) */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <img
           key={heroImage}
           src={heroImage}
           alt={activeMethod.name}
-          className="w-full h-full object-cover object-center transform scale-110 filter brightness-[0.42] contrast-125 transition-all duration-1000 ease-in-out"
+          className="w-full h-full object-cover object-center transform scale-105 filter brightness-[0.72] contrast-115 transition-all duration-1000 ease-in-out"
         />
         <div className={`absolute inset-0 ${
           isCoffee
-            ? 'bg-gradient-to-b from-espresso-950/75 via-espresso-950/85 to-espresso-950'
-            : 'bg-gradient-to-b from-slate-950/75 via-slate-950/85 to-slate-950'
+            ? 'bg-gradient-to-b from-espresso-950/40 via-espresso-950/60 to-espresso-950/85'
+            : 'bg-gradient-to-b from-slate-950/40 via-slate-950/60 to-slate-950/85'
         }`} />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-transparent via-black/40 to-black/80" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-transparent via-black/20 to-black/70" />
       </div>
 
       {/* App Main Body Layer */}
@@ -126,7 +126,7 @@ export default function App() {
             setActiveVideo={setActiveVideo}
           />
 
-          {/* 5. BrewCraft University: Terroir & Origin Atlas */}
+          {/* 5. BrewCraft University: Terroir, Agronomy Science & Sourced Brands */}
           <UniversityHub trackMode={trackMode} />
 
           {/* 6. Extraction Nuance & Troubleshooting Hub */}
