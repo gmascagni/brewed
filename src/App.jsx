@@ -3,6 +3,7 @@ import Header from './components/Header';
 import HeroBanner from './components/HeroBanner';
 import PrecisionCalculator from './components/PrecisionCalculator';
 import MultiPhaseTimer from './components/MultiPhaseTimer';
+import GrindVisualGuide from './components/GrindVisualGuide';
 import MasterclassHub from './components/MasterclassHub';
 import UniversityHub from './components/UniversityHub';
 import TroubleshootingHub from './components/TroubleshootingHub';
@@ -117,7 +118,10 @@ export default function App() {
             unitSystem={unitSystem}
           />
 
-          {/* 4. Integrated Masterclass Video Hub & Split Screen */}
+          {/* 4. Coffee Grind Coarseness Visual Reference Guide (Coffee Track Only) */}
+          {isCoffee && <GrindVisualGuide activeMethod={activeMethod} />}
+
+          {/* 5. Integrated Masterclass Video Hub & Split Screen */}
           <MasterclassHub
             trackMode={trackMode}
             activeMethod={activeMethod}
@@ -127,10 +131,10 @@ export default function App() {
             setActiveVideo={setActiveVideo}
           />
 
-          {/* 5. BrewCraft University: Terroir, Agronomy Science & Sourced Brands */}
+          {/* 6. BrewCraft University: Terroir, Agronomy Science & Sourced Brands */}
           <UniversityHub trackMode={trackMode} />
 
-          {/* 6. Extraction Nuance & Troubleshooting Hub */}
+          {/* 7. Extraction Nuance & Troubleshooting Hub */}
           <TroubleshootingHub trackMode={trackMode} />
 
         </main>

@@ -61,6 +61,26 @@ export const BREW_METHODS = {
       ]
     },
     {
+      id: 'moka_pot',
+      name: 'Moka Pot (Stovetop Espresso)',
+      category: 'coffee',
+      featured: false,
+      heroImage: './tea_kettle.jpg',
+      ratio: 10, // 1:10 ratio
+      defaultCupMl: 120,
+      tempC: 95,
+      tempF: 203,
+      grind: 'Fine / Medium-Fine',
+      micron: '350 - 500 µm',
+      description: 'Rich, concentrated stovetop extraction using steam expansion to yield intense, full-bodied coffee with velvet crema.',
+      preferredCoffeeTypes: 'Medium to Medium-Dark Roasts. Italian Roast blends, Santos Brazil, and Colombian Huila for dark cocoa, toasted walnut, and syrupy strength.',
+      phases: [
+        { name: 'Water Reservoir Fill & Basket Prep', durationSec: 30, waterMultiplier: 1.0, instruction: 'Fill lower chamber with boiling water to safety valve. Level grounds in funnel without packing tightly.' },
+        { name: 'Stovetop Low Heat Heating', durationSec: 180, waterMultiplier: 1.0, instruction: 'Place on medium-low heat with lid open. Steam pressure forces water upward through basket.' },
+        { name: 'Crema Sputter & Cold Towel Stop', durationSec: 45, waterMultiplier: 1.0, instruction: 'When honey-gold stream turns pale and begins sputtering, remove from burner immediately and wrap base in cold wet towel.' }
+      ]
+    },
+    {
       id: 'espresso',
       name: 'Espresso (Manual/Semi-Auto)',
       category: 'coffee',
@@ -198,6 +218,63 @@ export const BREW_METHODS = {
   ]
 };
 
+export const GRIND_VISUAL_GUIDE = [
+  {
+    id: 'extra_fine',
+    name: 'Extra Fine',
+    micron: '200 - 300 µm',
+    textureComparison: 'Powdered Sugar / Flour',
+    visualDensity: 'Ultra-Dense Fine Dust',
+    suitableMethods: ['Espresso (9-Bar)', 'Turkish Ibrik'],
+    sensoryImpact: 'High pressure surface area for rapid 25s extraction and rich hazelnut crema.'
+  },
+  {
+    id: 'fine',
+    name: 'Fine',
+    micron: '350 - 500 µm',
+    textureComparison: 'Table Salt',
+    visualDensity: 'Granular Table Salt Grains',
+    suitableMethods: ['Moka Pot (Stovetop)', 'AeroPress Short Brew'],
+    sensoryImpact: 'Ideal for stovetop steam pressure, creating rich cocoa body without funneled channeling.'
+  },
+  {
+    id: 'medium_fine',
+    name: 'Medium-Fine',
+    micron: '400 - 600 µm',
+    textureComparison: 'Fine Beach Sand / Kosher Salt',
+    visualDensity: 'Gritty Fine Sand Grains',
+    suitableMethods: ['Pour-Over (V60)', 'Chemex Paper Filter', 'AeroPress Standard'],
+    sensoryImpact: 'Balances paper filter drawdown flow rate with high citric acidity & floral clarity.'
+  },
+  {
+    id: 'medium',
+    name: 'Medium',
+    micron: '600 - 750 µm',
+    textureComparison: 'Coarse Sand / Ground Black Pepper',
+    visualDensity: 'Distinct Uniform Sand Grains',
+    suitableMethods: ['Automatic Drip Maker', 'Siphon Brewer'],
+    sensoryImpact: 'Optimized for showerhead batch brewing, preventing papery over-extraction.'
+  },
+  {
+    id: 'medium_coarse',
+    name: 'Medium-Coarse',
+    micron: '750 - 900 µm',
+    textureComparison: 'Coarse Sea Salt',
+    visualDensity: 'Visible Coarse Rock Grains',
+    suitableMethods: ['Chemex Thick Filter', 'Clever Coffee Dripper'],
+    sensoryImpact: 'Ensures steady flow through heavy paper filters without clogging or stalling.'
+  },
+  {
+    id: 'coarse',
+    name: 'Coarse',
+    micron: '800 - 1000 µm',
+    textureComparison: 'Cracked Black Pepper / Potting Soil',
+    visualDensity: 'Large Chunks & Flakes',
+    suitableMethods: ['French Press Immersion', 'Cold Brew Steep (16-24h)'],
+    sensoryImpact: 'Allows long 4+ minute immersion without fine silt slipping past metal mesh filters.'
+  }
+];
+
 export const COFFEE_BELT_OVERVIEW = {
   title: 'The Coffee Belt',
   description: 'Coffee beans grow worldwide in a tropical zone called the "Coffee Belt," positioned between the Tropics of Cancer (23.5° N) and Capricorn (23.5° S).',
@@ -260,7 +337,7 @@ export const TERROIR_ATLAS = {
       acidProfile: 'Low Mellow Citric Acidity',
       agronomyDeepDive: 'Brazil is the world’s largest coffee producer. Grown on rolling plateau hills, dry sunny harvests allow cherries to dry naturally on trees and patios. The seed absorbs sweet fruit mucilage, imparting Brazil’s signature chocolate-hazelnut sweetness, low acidity, and creamy body.',
       roastPairing: 'Medium to Medium-Dark Roast',
-      recommendedMethod: 'Automatic Drip & Espresso',
+      recommendedMethod: 'Automatic Drip, Moka Pot & Espresso',
       sourcedBrands: [
         { name: "Peet's Coffee", offering: 'Brazil Minas Naturais & Major Dickason Blend', note: 'Sun-dried natural with sweet hazelnut, milk chocolate, and smooth finish.' },
         { name: 'Stumptown Coffee Roasters', offering: 'Brazil Fazenda Rainha Yellow Bourbon', note: 'Pulped natural with roasted peanut butter, caramel, and chocolate sweetness.' },
@@ -282,7 +359,7 @@ export const TERROIR_ATLAS = {
       acidProfile: 'Medium-High Malic & Tartaric Acidity',
       agronomyDeepDive: 'Famous for high-grown, mild Arabica beans with balanced fruit and caramel notes. Cultivated along high ridges of the Andes cordilleras. Porous volcanic ash soils foster sucrose development, yielding Colombia’s trademark harmony of creamy chocolate body with crisp apple acidity.',
       roastPairing: 'Medium Roast',
-      recommendedMethod: 'Automatic Drip Maker & French Press',
+      recommendedMethod: 'Automatic Drip Maker, Moka Pot & French Press',
       sourcedBrands: [
         { name: 'Blue Bottle Coffee', offering: 'Single Origin Colombia Tres Santos', note: 'Huila washed Caturra with sweet brown sugar, toasted almond, and red apple acidity.' },
         { name: 'Stumptown Coffee Roasters', offering: 'Colombia El Jordan & San Augustin', note: 'Nariño high-grown lot featuring milk chocolate sweetness and crisp cherry finish.' },
@@ -376,7 +453,7 @@ export const TERROIR_ATLAS = {
       acidProfile: 'Pungent Rustic Malic Acidity',
       agronomyDeepDive: 'Yemen is the historic producer of deep, earthy, and wild-tasting traditional coffees. Grown on ancient stone mountain terraces built over 1,000 years ago, severe water scarcity forces trees to concentrate deep spice, dried fruit, cardamom, and dark chocolate flavor notes into tiny, dense seeds.',
       roastPairing: 'Medium Roast',
-      recommendedMethod: 'French Press & Turkish Brew',
+      recommendedMethod: 'Moka Pot, French Press & Turkish Brew',
       sourcedBrands: [
         { name: 'George Howell Coffee', offering: 'Yemen Haraaz Red Mahal Aqeeq', note: 'Historic terraced lot featuring wild dried fig, cardamom spice, and bittersweet cocoa.' },
         { name: 'Equator Coffees', offering: 'Yemen Mocha Matari', note: 'Traditional dry natural with deep earthiness, dark chocolate, and rustic winey body.' },
@@ -398,7 +475,7 @@ export const TERROIR_ATLAS = {
       acidProfile: 'Very Low Acidity',
       agronomyDeepDive: 'Vietnam is the top global producer of Robusta beans, providing a strong, dark, and bitter profile. Grown in the volcanic red soils of the Central Highlands, Vietnam’s high-caffeine Robusta beans produce heavy crema, bold chocolate body, and woody strength—the backbone of traditional Vietnamese Phin iced coffee.',
       roastPairing: 'Dark Roast',
-      recommendedMethod: 'Vietnamese Phin Filter & French Press',
+      recommendedMethod: 'Moka Pot & Vietnamese Phin Filter',
       sourcedBrands: [
         { name: 'Nguyen Coffee Supply', offering: 'Loyal 100% Robusta & Grit Blend', note: 'Brooklyn roaster pioneering specialty Vietnamese Robusta with hazelnut, scotch, and thick crema.' },
         { name: 'Copper Cow Coffee', offering: 'Vietnamese Classic Pour-Over', note: 'Sourced directly from Đà Lạt farmers with dark chocolate and roasted nut strength.' }
@@ -419,7 +496,7 @@ export const TERROIR_ATLAS = {
       acidProfile: 'Low Acidity with Heavy Lipids',
       agronomyDeepDive: 'Famous for heavy-bodied, low-acidity, earthy, and spicy profiles. Indonesia’s iconic Giling Basah (wet-hulling) technique hulls parchment at 30-50% moisture. The green beans dry exposed directly to humid tropical air, undergoing unique microbial action that mutes acidity and imparts heavy cedar, cocoa, and dense syrupy mouthfeel.',
       roastPairing: 'Medium-Dark to Dark Roast',
-      recommendedMethod: 'French Press (Immersion)',
+      recommendedMethod: 'French Press & Moka Pot',
       sourcedBrands: [
         { name: "Peet's Coffee", offering: 'Sumatra Reserve Single Origin & Major Dickason\'s', note: 'Classic Giling Basah profile with deep herbal cedar, dark cocoa, and thick syrupy body.' },
         { name: 'La Colombe Coffee Roasters', offering: 'Sumatra Mandheling Single Origin', note: 'Dark roast Gayo lot featuring pipe tobacco, dark chocolate truffle, and zero harshness.' },
@@ -442,7 +519,7 @@ export const TERROIR_ATLAS = {
       acidProfile: 'Ultra-Low Acidity',
       agronomyDeepDive: 'India’s coffee is grown under monsoon shades (intercropped with cardamom, pepper, and cinnamon), offering mild and low-acid cups. In Monsooned Malabar processing, dry beans are exposed to humid monsoon winds for 3-4 months, expanding the beans and turning them golden while reducing acidity to near zero.',
       roastPairing: 'Medium Roast',
-      recommendedMethod: 'French Press & Drip Coffee Maker',
+      recommendedMethod: 'Moka Pot & French Press',
       sourcedBrands: [
         { name: 'Blue Tokai Coffee Roasters', offering: 'India Monsooned Malabar & Attikan Estate', note: 'India’s leading specialty roaster with mild cocoa, warm nutmeg, and velvety low acidity.' },
         { name: 'Josuma Coffee', offering: 'Super Malabar Monsooned Arabica', note: 'Specialty Monsooned Malabar with rich crema, baker’s chocolate, and sweet spice finish.' }
@@ -452,6 +529,37 @@ export const TERROIR_ATLAS = {
 };
 
 export const MASTERCLASSES = [
+  // Moka Pot Videos (methodId: 'moka_pot')
+  {
+    id: 'mc_mokapot_bialetti',
+    methodId: 'moka_pot',
+    method: 'Moka Pot',
+    title: 'Mastering the Stovetop Moka Pot (Bialetti Technique & Water Preheat)',
+    duration: '5:15',
+    thumbnail: './tea_kettle.jpg',
+    embedId: 'ry9z3bNbu8E',
+    description: 'Learn how preheating water in the lower chamber and stopping extraction with a cold towel prevents metallic burnt bitterness in Moka Pot coffee.',
+    keyTakeaways: [
+      'Fill lower chamber with boiling water to prevent overheating coffee grounds',
+      'Do not tamp grounds tightly in funnel basket',
+      'Wrap base in cold wet towel immediately when sputtering begins'
+    ]
+  },
+  {
+    id: 'mc_mokapot_beans',
+    methodId: 'moka_pot',
+    method: 'Moka Pot',
+    title: 'Preferred Coffee Beans & Fine-Medium Grind for Moka Pot',
+    duration: '4:20',
+    thumbnail: './tea_kettle.jpg',
+    embedId: 'ry9z3bNbu8E',
+    description: 'Why medium-dark Italian roasts, Brazilian Yellow Bourbon, and 350-500 µm table salt grinds produce rich crema and syrupy espresso-like body.',
+    keyTakeaways: [
+      'Grind slightly coarser than espresso (table salt texture)',
+      'Choose low-acidity beans rich in dark chocolate & toasted hazelnut notes'
+    ]
+  },
+
   // French Press Videos (methodId: 'french_press')
   {
     id: 'mc_frenchpress_hoffmann',
@@ -532,20 +640,6 @@ export const MASTERCLASSES = [
       'Use filtered water with 120-150 ppm mineral content'
     ]
   },
-  {
-    id: 'mc_drip_beans',
-    methodId: 'drip_brewer',
-    method: 'Automatic Drip',
-    title: 'Preferred Medium Roasts for Batch Drip Brewers',
-    duration: '4:30',
-    thumbnail: './drip_brewer.jpg',
-    embedId: '8d-9Y2S92v0',
-    description: 'Why Colombian Nariño and Central American medium roasts produce sweet caramel and milk chocolate notes in batch brewers.',
-    keyTakeaways: [
-      'Select medium roasts with balanced malic & caramel sweetness',
-      'Use 1:16 ratio for balanced extraction without bitterness'
-    ]
-  },
 
   // Espresso Videos (methodId: 'espresso')
   {
@@ -563,20 +657,6 @@ export const MASTERCLASSES = [
       'Aim for 1:2 yield ratio in 25-30 seconds'
     ]
   },
-  {
-    id: 'mc_espresso_beans',
-    methodId: 'espresso',
-    method: 'Espresso',
-    title: 'Preferred Espresso Blends & Dialing-in Crema',
-    duration: '5:15',
-    thumbnail: './coffee_setup.jpg',
-    embedId: '1U_4OqUo_pE',
-    description: 'How medium-dark Brazilian Yellow Bourbon and specialty espresso blends produce thick hazelnut crema and sweet cocoa notes.',
-    keyTakeaways: [
-      'Select beans 7-14 days post-roast for optimal CO2 crema off-gassing',
-      'Maintain 9-bar pump pressure during extraction'
-    ]
-  },
 
   // AeroPress Videos (methodId: 'aeropress')
   {
@@ -592,20 +672,6 @@ export const MASTERCLASSES = [
       'Steep inverted for 60 seconds with 10 vigorous stirs',
       'Attach filter cap and flip carefully onto sturdy mug',
       'Plunge slowly over 30 seconds until subtle hiss'
-    ]
-  },
-  {
-    id: 'mc_aeropress_beans',
-    methodId: 'aeropress',
-    method: 'AeroPress',
-    title: 'Preferred Light-Medium Roasts for AeroPress',
-    duration: '4:05',
-    thumbnail: './coffee_setup.jpg',
-    embedId: 'j6VlT_jUVPc',
-    description: 'Why Costa Rican Honey Process and Pink Bourbon cultivars thrive under AeroPress hybrid immersion pressure.',
-    keyTakeaways: [
-      'Medium-fine grind size allows rapid 60-second agitation',
-      'Low temperature 88°C brewing preserves delicate stone fruit sweetness'
     ]
   },
 
