@@ -9,7 +9,8 @@ export default defineConfig({
     assetsDir: 'static', // Prevents GitHub Pages Jekyll /assets/ folder routing conflict
   },
   server: {
-    port: 3000,
+    port: 3005,
+    host: '127.0.0.1',
     open: false
   }
 })
