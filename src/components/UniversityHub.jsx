@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GraduationCap, MapPin, Sparkles, Award, Compass, Store, ShoppingBag, Mountain, MountainSnow, ShieldCheck, Flame, BookOpen } from 'lucide-react';
+import { GraduationCap, MapPin, Sparkles, Award, Compass, Store, ShoppingBag, Mountain, BookOpen, ChevronRight } from 'lucide-react';
 import { TERROIR_ATLAS } from '../data/brewData';
 
 export default function UniversityHub({ trackMode }) {
@@ -20,7 +20,7 @@ export default function UniversityHub({ trackMode }) {
             <span>BrewCraft University • Terroir, Agronomy & Brand Atlas</span>
           </div>
           <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light drop-shadow-md">
-            {isCoffee ? 'Coffee Growing Origins, Soil Science & Sourced Brands' : 'Specialty Tea Terroirs, Leaf Agronomy & Famous Tea Houses'}
+            {isCoffee ? 'Coffee Origins, Terroirs & Sourced Brands' : 'Specialty Tea Terroirs & Sourced Tea Houses'}
           </h3>
           <p className="text-xs md:text-sm text-cream-soft/70 mt-1">
             {isCoffee
@@ -42,7 +42,7 @@ export default function UniversityHub({ trackMode }) {
       <div className="mb-8">
         <label className="block text-xs uppercase tracking-widest font-extrabold text-cream-soft/70 mb-3.5 flex items-center justify-between">
           <span>Select Growing Origin / Nation:</span>
-          <span className="text-[11px] font-mono text-amber-gold">Click to Explore Origin</span>
+          <span className="text-[11px] font-mono text-amber-gold">Click Country to Change Origin</span>
         </label>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -103,7 +103,54 @@ export default function UniversityHub({ trackMode }) {
             </div>
           </div>
 
-          {/* 2. Flavor Notes & Sensory Profile Grid */}
+          {/* 2. PROMINENT FAMOUS BRANDS & SPECIALTY ROASTERS GRID (MOVED HIGH FOR INSTANT VISIBILITY) */}
+          <div className="p-5 md:p-6 rounded-2xl bg-black/60 border border-amber-gold/40 shadow-2xl mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-white/10">
+              <div className="flex items-center space-x-2 text-sm uppercase font-extrabold tracking-wider text-amber-gold">
+                <Store className="w-5 h-5 text-amber-gold" />
+                <span>Famous Brands & Specialty Roasters Sourced From {activeOrigin.country}:</span>
+              </div>
+              <span className="text-[11px] font-mono text-cream-soft/60">
+                {isCoffee ? 'Curated Specialty Roasters' : 'Curated Specialty Tea Houses'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activeOrigin.sourcedBrands.map((brand, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-amber-gold/50 hover:bg-white/10 transition-all duration-300 flex flex-col justify-between group shadow-md"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-extrabold text-cream-light group-hover:text-amber-gold transition-colors">
+                        {brand.name}
+                      </span>
+                      <ShoppingBag className="w-3.5 h-3.5 text-amber-gold/80" />
+                    </div>
+                    
+                    <div className="text-xs font-bold text-amber-gold/90 mb-2">
+                      {brand.offering}
+                    </div>
+
+                    <p className="text-[11px] text-cream-soft/80 font-medium leading-relaxed">
+                      {brand.note}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-cream-soft/50">
+                    <span>Direct Single-Origin Sourcing</span>
+                    <span className="text-amber-gold font-bold flex items-center gap-1">
+                      <span>Featured</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. Flavor Notes & Sensory Profile Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
             
             {/* Box 1: Signature Flavor Notes */}
@@ -172,8 +219,8 @@ export default function UniversityHub({ trackMode }) {
 
           </div>
 
-          {/* 3. Deep Agronomy, Soil Geology & Terroir Science Note */}
-          <div className="p-5 rounded-2xl bg-white/5 border border-white/15 text-xs text-cream-soft/90 font-medium leading-relaxed shadow-inner mb-7">
+          {/* 4. Deep Agronomy, Soil Geology & Terroir Science Note */}
+          <div className="p-5 rounded-2xl bg-white/5 border border-white/15 text-xs text-cream-soft/90 font-medium leading-relaxed shadow-inner">
             <div className="flex items-center space-x-2 text-amber-gold font-extrabold uppercase tracking-wider mb-2 text-xs">
               <BookOpen className="w-4 h-4" />
               <span>Deep Terroir & Agronomy Science Insight:</span>
@@ -190,53 +237,6 @@ export default function UniversityHub({ trackMode }) {
                 <strong className="text-cream-light font-bold">{isCoffee ? 'Microclimate Diurnal Swings: ' : 'Harvest Method: '}</strong>
                 <span>{isCoffee ? activeOrigin.climate : activeOrigin.steepStyle}</span>
               </div>
-            </div>
-          </div>
-
-          {/* 4. Famous Brands & Specialty Roasters Sourced From This Region */}
-          <div className="p-6 rounded-2xl bg-black/60 border border-amber-gold/40 shadow-2xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-white/10">
-              <div className="flex items-center space-x-2 text-sm uppercase font-extrabold tracking-wider text-amber-gold">
-                <Store className="w-5 h-5 text-amber-gold" />
-                <span>Famous Brands & Specialty Roasters Sourced From {activeOrigin.country}:</span>
-              </div>
-              <span className="text-[11px] font-mono text-cream-soft/60">
-                {isCoffee ? 'Curated Specialty Roasters' : 'Curated Specialty Tea Houses'}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {activeOrigin.sourcedBrands.map((brand, idx) => (
-                <div
-                  key={idx}
-                  className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-amber-gold/50 hover:bg-white/10 transition-all duration-300 flex flex-col justify-between group shadow-md"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-extrabold text-cream-light group-hover:text-amber-gold transition-colors">
-                        {brand.name}
-                      </span>
-                      <ShoppingBag className="w-3.5 h-3.5 text-amber-gold/80" />
-                    </div>
-                    
-                    <div className="text-xs font-bold text-amber-gold/90 mb-2">
-                      {brand.offering}
-                    </div>
-
-                    <p className="text-[11px] text-cream-soft/80 font-medium leading-relaxed">
-                      {brand.note}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-cream-soft/50">
-                    <span>Direct Single-Origin Sourcing</span>
-                    <span className="text-amber-gold font-bold flex items-center gap-1">
-                      <span>Explore</span>
-                      <ChevronRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
 
