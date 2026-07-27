@@ -81,7 +81,7 @@ export default function UniversityHub({ trackMode }) {
       {isCoffee && (
         <div className="mb-8 p-6 rounded-3xl bg-black/50 border border-white/15 shadow-2xl">
           <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-white/10">
-            <Dna className="w-5 h-5 text-emerald-400" />
+            <Dna className="w-5 h-5 text-amber-gold" />
             <h4 className="font-serif text-lg font-extrabold text-cream-light">
               Botanical Species: Arabica vs. Robusta
             </h4>
@@ -106,10 +106,10 @@ export default function UniversityHub({ trackMode }) {
             </div>
 
             {/* Robusta Specie */}
-            <div className="p-5 rounded-2xl bg-white/5 border border-emerald-500/30">
+            <div className="p-5 rounded-2xl bg-white/5 border border-amber-gold/30">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-emerald-400 uppercase tracking-wider">{BOTANICAL_COMPARISON.robusta.name}</span>
-                <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full font-bold">{BOTANICAL_COMPARISON.robusta.share}</span>
+                <span className="text-xs font-extrabold text-amber-gold uppercase tracking-wider">{BOTANICAL_COMPARISON.robusta.name}</span>
+                <span className="text-[10px] font-mono bg-amber-gold/20 text-amber-gold px-2.5 py-0.5 rounded-full font-bold">{BOTANICAL_COMPARISON.robusta.share}</span>
               </div>
               <div className="space-y-1.5 text-xs text-cream-soft/90 mb-3">
                 <div><strong className="text-cream-light">Elevation:</strong> {BOTANICAL_COMPARISON.robusta.elevation}</div>
@@ -118,7 +118,7 @@ export default function UniversityHub({ trackMode }) {
                 <div><strong className="text-cream-light">Antioxidants:</strong> {BOTANICAL_COMPARISON.robusta.sugarsLipids}</div>
               </div>
               <p className="text-[11px] text-cream-soft/80 bg-black/30 p-2.5 rounded-xl border border-white/5">
-                <strong className="text-emerald-400">Sensory Cup:</strong> {BOTANICAL_COMPARISON.robusta.flavorProfile}
+                <strong className="text-amber-gold">Sensory Cup:</strong> {BOTANICAL_COMPARISON.robusta.flavorProfile}
               </p>
             </div>
           </div>
