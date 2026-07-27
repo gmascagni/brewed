@@ -4,6 +4,7 @@ import HeroBanner from './components/HeroBanner';
 import PrecisionCalculator from './components/PrecisionCalculator';
 import MultiPhaseTimer from './components/MultiPhaseTimer';
 import MasterclassHub from './components/MasterclassHub';
+import UniversityHub from './components/UniversityHub';
 import TroubleshootingHub from './components/TroubleshootingHub';
 import { BREW_METHODS, MASTERCLASSES } from './data/brewData';
 
@@ -125,7 +126,10 @@ export default function App() {
             setActiveVideo={setActiveVideo}
           />
 
-          {/* 5. Extraction Nuance & Troubleshooting Hub */}
+          {/* 5. BrewCraft University: Terroir & Origin Atlas */}
+          <UniversityHub trackMode={trackMode} />
+
+          {/* 6. Extraction Nuance & Troubleshooting Hub */}
           <TroubleshootingHub trackMode={trackMode} />
 
         </main>

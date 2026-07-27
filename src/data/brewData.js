@@ -188,6 +188,140 @@ export const BREW_METHODS = {
   ]
 };
 
+export const TERROIR_ATLAS = {
+  coffee: [
+    {
+      id: 'ethiopia',
+      country: 'Ethiopia',
+      flag: '🇪🇹',
+      regions: 'Yirgacheffe, Sidama, Guji',
+      altitude: '1,800 - 2,200m',
+      processing: 'Washed & Natural (Sun-dried on raised beds)',
+      flavorNotes: ['Jasmine Floral', 'Bergamot', 'Wild Blueberry', 'Bright Citrus', 'Tea-like Body'],
+      roastPairing: 'Light to Medium-Light Roast',
+      recommendedMethod: 'Pour-Over (V60)',
+      terroirOverview: 'The birthplace of coffee. Ethiopian high-altitude volcanic soils produce delicate, floral, and highly complex berry-forward cups with sparkling acidity.'
+    },
+    {
+      id: 'colombia',
+      country: 'Colombia',
+      flag: '🇨🇴',
+      regions: 'Huila, Nariño, Antioquia',
+      altitude: '1,500 - 2,100m',
+      processing: 'Fully Washed',
+      flavorNotes: ['Milk Chocolate', 'Caramel', 'Red Apple Acidity', 'Toasted Pecan', 'Silky Body'],
+      roastPairing: 'Medium Roast',
+      recommendedMethod: 'Automatic Drip Maker & French Press',
+      terroirOverview: 'Renowned for world-class balance and consistency. Colombian coffees offer rich cocoa sweetness with crisp apple acidity and a velvet mouthfeel.'
+    },
+    {
+      id: 'kenya',
+      country: 'Kenya',
+      flag: '🇰🇪',
+      regions: 'Nyeri, Kirinyaga, Mount Kenya',
+      altitude: '1,700 - 2,100m',
+      processing: 'Double Washed (SL-28 & SL-34 Varietals)',
+      flavorNotes: ['Blackcurrant', 'Juicy Grapefruit', 'Complex Winey Acidity', 'Cane Sugar'],
+      roastPairing: 'Light to Medium-Light Roast',
+      recommendedMethod: 'Pour-Over (Chemex/V60)',
+      terroirOverview: 'Famous for punchy, juicy blackcurrant and savory fruit acidity. Rich red volcanic soil produces some of the most vibrant coffees in the world.'
+    },
+    {
+      id: 'guatemala',
+      country: 'Guatemala',
+      flag: '🇬🇹',
+      regions: 'Antigua, Huehuetenango, Atitlán',
+      altitude: '1,500 - 2,000m',
+      processing: 'Washed',
+      flavorNotes: ['Dark Cocoa', 'Roasted Hazelnut', 'Orange Zest', 'Spicy Cinnamon Finish'],
+      roastPairing: 'Medium to Dark Roast',
+      recommendedMethod: 'French Press & Drip Coffee Maker',
+      terroirOverview: 'Shaded volcanic microclimates yield rich chocolate notes with bright orange citrus acidity and a comforting spicy finish.'
+    },
+    {
+      id: 'costa_rica',
+      country: 'Costa Rica',
+      flag: '🇨🇷',
+      regions: 'Tarrazú, Central Valley',
+      altitude: '1,400 - 1,900m',
+      processing: 'Honey & Washed Process',
+      flavorNotes: ['Wild Honey', 'Crisp Green Apple', 'White Floral', 'Clean Balanced Body'],
+      roastPairing: 'Medium Roast',
+      recommendedMethod: 'Pour-Over & AeroPress',
+      terroirOverview: 'Pioneers of honey processing, where coffee mucilage is left on the bean during drying to impart sweet, honeyed fruit clarity.'
+    },
+    {
+      id: 'indonesia',
+      country: 'Indonesia',
+      flag: '🇮🇩',
+      regions: 'Sumatra (Gayo/Mandheling), Java, Sulawesi',
+      altitude: '1,100 - 1,600m',
+      processing: 'Wet-Hulled (Giling Basah)',
+      flavorNotes: ['Earthy Cedar', 'Dark Chocolate', 'Tobacco', 'Low Acidity', 'Syrupy Heavy Body'],
+      roastPairing: 'Medium-Dark to Dark Roast',
+      recommendedMethod: 'French Press (Immersion)',
+      terroirOverview: 'Traditional Giling Basah processing creates iconic low-acidity coffees with deep earthiness, spicy cedar notes, and heavy coat-your-mouth body.'
+    }
+  ],
+  tea: [
+    {
+      id: 'china',
+      country: 'China',
+      flag: '🇨🇳',
+      regions: 'Fujian (Wuyi/Anxi), Zhejiang, Yunnan',
+      famousTeas: ['Longjing (Dragonwell Green)', 'Da Hong Pao (Wuyi Oolong)', 'Pu-erh', 'Lapsang Souchong'],
+      flavorNotes: ['Roasted Chestnut', 'Orchid Floral', 'Sweet Mineral', 'Earthy Dark Chocolate'],
+      steepStyle: 'Gongfu & Western Infusion',
+      recommendedMethod: 'Oolong & Green Tea Tracks',
+      terroirOverview: 'The historical origin of tea culture. Chinese mountain terroirs yield immense variety—from pan-fired nutty greens to roasted cliff oolongs and aged fermented Pu-erh.'
+    },
+    {
+      id: 'japan',
+      country: 'Japan',
+      flag: '🇯🇵',
+      regions: 'Shizuoka, Uji (Kyoto), Kagoshima',
+      famousTeas: ['Sencha', 'Gyokuro (Shaded Green)', 'Matcha', 'Hojicha (Roasted)'],
+      flavorNotes: ['Rich Umami', 'Steamed Spinach', 'Marine Sea Breeze', 'Sweet Grassy Finish'],
+      steepStyle: 'Steam Processed Whole Leaf',
+      recommendedMethod: 'Specialty Green Tea Track (75°C - 80°C)',
+      terroirOverview: 'Japanese teas are steam-processed immediately after harvesting to stop oxidation, creating intense emerald liqueur with deep savory umami and fresh oceanic sweetness.'
+    },
+    {
+      id: 'india',
+      country: 'India',
+      flag: '🇮🇳',
+      regions: 'Darjeeling (Himalayas), Assam, Nilgiri',
+      famousTeas: ['First Flush Darjeeling', 'Assam Black Tea', 'Nilgiri Frost Tea'],
+      flavorNotes: ['Muscatel Grape', 'Crisp Stone Fruit', 'Bold Malty Cocoa', 'Citrus Astringency'],
+      steepStyle: 'Orthodox Full Leaf Steeping',
+      recommendedMethod: 'Full-Leaf Black Tea Track (96°C)',
+      terroirOverview: 'Darjeeling ("Champagne of Teas") offers high-altitude muscatel grape notes, while tropical lowland Assam delivers bold, comforting maltiness for milk or straight drinking.'
+    },
+    {
+      id: 'taiwan',
+      country: 'Taiwan',
+      flag: '🇹🇼',
+      regions: 'Nantou, Alishan High Mountain, Dong Ding',
+      famousTeas: ['High Mountain Oolong (Gaoshan)', 'Oriental Beauty', 'Dong Ding Oolong'],
+      flavorNotes: ['Creamy Butter', 'White Peach', 'Wild Honey', 'Lingering Throat Resonance (Hui Gan)'],
+      steepStyle: 'Hand-Rolled Gongfu Infusion',
+      recommendedMethod: 'Oolong Tea Track (88°C)',
+      terroirOverview: 'High elevation mists above 1,000 meters produce tightly hand-rolled oolongs with legendary buttery floral aromas and long-lasting sweet throat resonance.'
+    },
+    {
+      id: 'sri_lanka',
+      country: 'Sri Lanka (Ceylon)',
+      flag: '🇱🇰',
+      regions: 'Nuwara Eliya, Uva, Dimbula',
+      famousTeas: ['Ceylon High Grown Black Tea', 'Silver Tips White Tea'],
+      flavorNotes: ['Crisp Lemon Zest', 'Eucalyptus', 'Golden Liqueur', 'Refreshing Crisp Finish'],
+      steepStyle: 'High Elevation Whole Leaf',
+      recommendedMethod: 'Black & White Tea Tracks',
+      terroirOverview: 'Ceylon teas grown in tropical mountain microclimates are famed for their bright citrus clarity, golden copper liqueur, and invigorating crisp character.'
+    }
+  ]
+};
+
 export const MASTERCLASSES = [
   {
     id: 'mc_pourover',
