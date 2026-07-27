@@ -76,17 +76,10 @@ export default function App() {
         />
 
         {/* Main Workspace Container */}
-        <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+        <main className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
           
-          {/* 2. Hero Editorial Banner */}
-          <HeroBanner
-            trackMode={trackMode}
-            activeMethod={activeMethod}
-            unitSystem={unitSystem}
-          />
-
-          {/* 3. Core Calculator & Multi-Phase Timer Layout */}
-          <div className={`grid grid-cols-1 ${isSplitScreen ? 'lg:grid-cols-12 gap-6' : 'lg:grid-cols-2 gap-8'}`}>
+          {/* 2. Core Calculator & Multi-Phase Timer Layout (Moved to Top for Immediate Access) */}
+          <div className={`mb-8 grid grid-cols-1 ${isSplitScreen ? 'lg:grid-cols-12 gap-6' : 'lg:grid-cols-2 gap-8'}`}>
             
             {/* Left Pane: Precision Ratio & Cup Scaling Calculator */}
             <div className={isSplitScreen ? 'lg:col-span-5' : ''}>
@@ -116,6 +109,13 @@ export default function App() {
             </div>
 
           </div>
+
+          {/* 3. Hero Editorial Banner */}
+          <HeroBanner
+            trackMode={trackMode}
+            activeMethod={activeMethod}
+            unitSystem={unitSystem}
+          />
 
           {/* 4. Integrated Masterclass Video Hub & Split Screen */}
           <MasterclassHub
