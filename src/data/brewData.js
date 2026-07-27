@@ -5,7 +5,7 @@ export const BREW_METHODS = {
       name: 'Pour-Over (V60 / Chemex)',
       category: 'coffee',
       featured: false,
-      heroImage: './coffee_setup.jpg',
+      heroImage: './pour_over_hero.jpg',
       ratio: 15, // 1:15 ratio (1g coffee to 15ml water)
       defaultCupMl: 240,
       tempC: 94,
@@ -65,7 +65,7 @@ export const BREW_METHODS = {
       name: 'Moka Pot (Stovetop Espresso)',
       category: 'coffee',
       featured: false,
-      heroImage: './tea_kettle.jpg',
+      heroImage: './moka_pot_hero.jpg',
       ratio: 10, // 1:10 ratio
       defaultCupMl: 120,
       tempC: 95,
@@ -85,7 +85,7 @@ export const BREW_METHODS = {
       name: 'Espresso (Manual/Semi-Auto)',
       category: 'coffee',
       featured: false,
-      heroImage: './coffee_setup.jpg',
+      heroImage: './espresso_hero.jpg',
       ratio: 2, // 1:2 yield ratio (18g in -> 36g out)
       defaultCupMl: 36,
       tempC: 93,
@@ -104,7 +104,7 @@ export const BREW_METHODS = {
       name: 'AeroPress (Inverted Method)',
       category: 'coffee',
       featured: false,
-      heroImage: './coffee_setup.jpg',
+      heroImage: './aeropress_hero.jpg',
       ratio: 13,
       defaultCupMl: 220,
       tempC: 88,
@@ -548,7 +548,7 @@ export const MASTERCLASSES = [
     method: 'Moka Pot',
     title: 'Mastering the Stovetop Moka Pot (Bialetti Technique & Water Preheat)',
     duration: '5:15',
-    thumbnail: './tea_kettle.jpg',
+    thumbnail: './moka_pot_hero.jpg',
     embedId: 'ry9z3bNbu8E',
     description: 'Learn how preheating water in the lower chamber and stopping extraction with a cold towel prevents metallic burnt bitterness in Moka Pot coffee.',
     keyTakeaways: [
@@ -563,7 +563,7 @@ export const MASTERCLASSES = [
     method: 'Moka Pot',
     title: 'Preferred Coffee Beans & Fine-Medium Grind for Moka Pot',
     duration: '4:20',
-    thumbnail: './tea_kettle.jpg',
+    thumbnail: './moka_pot_hero.jpg',
     embedId: 'ry9z3bNbu8E',
     description: 'Why medium-dark Italian roasts, Brazilian Yellow Bourbon, and 350-500 µm table salt grinds produce rich crema and syrupy espresso-like body.',
     keyTakeaways: [
@@ -611,7 +611,7 @@ export const MASTERCLASSES = [
     method: 'Pour-Over',
     title: 'Pour-Over Concentric Pouring & V60 Technique',
     duration: '4:15',
-    thumbnail: './coffee_setup.jpg',
+    thumbnail: './pour_over_hero.jpg',
     embedId: '1oB1oDrDkHM',
     description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in V60 and Chemex drippers.',
     keyTakeaways: [
@@ -626,7 +626,7 @@ export const MASTERCLASSES = [
     method: 'Pour-Over',
     title: 'Preferred Single-Origin Beans for Pour-Over Clarity',
     duration: '5:04',
-    thumbnail: './coffee_setup.jpg',
+    thumbnail: './pour_over_hero.jpg',
     embedId: 'JgV6qL0Fi6E',
     description: 'Discover why high-altitude washed Ethiopian Yirgacheffe and Kenyan SL-28 excel under paper filter filtration.',
     keyTakeaways: [
@@ -660,7 +660,7 @@ export const MASTERCLASSES = [
     method: 'Espresso',
     title: 'Espresso Puck Prep, WDT & 9-Bar Extraction',
     duration: '6:20',
-    thumbnail: './coffee_setup.jpg',
+    thumbnail: './espresso_hero.jpg',
     embedId: '1U_4OqUo_pE',
     description: 'Master WDT needle distribution, level tamping, and dialing-in 1:2 extraction yields.',
     keyTakeaways: [
@@ -677,7 +677,7 @@ export const MASTERCLASSES = [
     method: 'AeroPress',
     title: 'Inverted AeroPress Champion Technique',
     duration: '4:40',
-    thumbnail: './coffee_setup.jpg',
+    thumbnail: './aeropress_hero.jpg',
     embedId: 'j6VlT_jUVPc',
     description: 'The inverted steep and gentle press method for sweet, zero-acidity cups.',
     keyTakeaways: [
