@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
-import { HelpCircle, Droplet, Gauge, Flame, AlertCircle, ChevronRight, CheckCircle2, RefreshCw } from 'lucide-react';
+import { HelpCircle, Droplet, Gauge, Flame, AlertCircle, ChevronRight, CheckCircle2, RefreshCw, Eye, X, Sparkles } from 'lucide-react';
 import { TROUBLESHOOTING_GUIDE } from '../data/brewData';
 
 export default function TroubleshootingHub({ trackMode }) {
   const isCoffee = trackMode === 'coffee';
   const guides = TROUBLESHOOTING_GUIDE[trackMode] || TROUBLESHOOTING_GUIDE.coffee;
   const [selectedSymptomId, setSelectedSymptomId] = useState(guides[0]?.id || 'sour');
+  const [activePhotoModalItem, setActivePhotoModalItem] = useState(null);
 
   const selectedGuide = guides.find((g) => g.id === selectedSymptomId) || guides[0];
 
   const GRIND_MATRIX = [
-    { level: 'Extra Fine', range: '200 - 300 µm', idealFor: 'Espresso / Turkish Coffee', visual: 'Powder / Flour-like texture' },
-    { level: 'Fine / Medium-Fine', range: '400 - 550 µm', idealFor: 'Pour-Over (V60) / AeroPress', visual: 'Table salt texture' },
-    { level: 'Medium', range: '600 - 750 µm', idealFor: 'Automatic Drip Coffee Maker / Flat Drippers', visual: 'Regular beach sand texture' },
-    { level: 'Medium-Coarse', range: '750 - 900 µm', idealFor: 'Chemex / Clever Dripper', visual: 'Rough sand / Kosher salt' },
-    { level: 'Coarse', range: '900 - 1100 µm', idealFor: 'French Press / Cold Brew', visual: 'Coarse sea salt / Breadcrumb' }
+    { level: 'Extra Fine', range: '200 - 300 µm', idealFor: 'Espresso / Turkish Coffee', visual: 'Powder / Flour-like texture', image: './extra_fine_grind.jpg', burrTip: 'Baratza Encore #1-3, Fellow Ode Gen 2 with SSP burrs' },
+    { level: 'Fine / Medium-Fine', range: '350 - 500 µm', idealFor: 'Moka Pot / Pour-Over (V60)', visual: 'Table salt texture', image: './fine_grind.jpg', burrTip: 'Baratza Encore #4-8, Fellow Ode #2-4' },
+    { level: 'Medium', range: '600 - 750 µm', idealFor: 'Automatic Drip Maker / Siphon', visual: 'Regular beach sand texture', image: './medium_grind.jpg', burrTip: 'Baratza Encore #15-20, Fellow Ode #5-7' },
+    { level: 'Medium-Coarse', range: '750 - 900 µm', idealFor: 'Chemex / Clever Dripper', visual: 'Rough sand / Kosher salt', image: './medium_coarse_grind.jpg', burrTip: 'Baratza Encore #21-26, Fellow Ode #8-9' },
+    { level: 'Coarse', range: '900 - 1100 µm', idealFor: 'French Press / Cold Brew', visual: 'Coarse sea salt / Breadcrumb', image: './coarse_grind.jpg', burrTip: 'Baratza Encore #27-35, Fellow Ode #10-11' }
   ];
 
   return (
-    <section className="mt-12 p-7 md:p-9 rounded-3xl glass-panel shadow-2xl transition-all duration-500">
+    <section className="mt-12 p-7 md:p-9 rounded-3xl glass-panel shadow-2xl transition-all duration-500 relative">
       
       {/* Section Header */}
       <div className="mb-8 pb-4 border-b border-white/10">
@@ -95,28 +96,44 @@ export default function TroubleshootingHub({ trackMode }) {
           )}
         </div>
 
-        {/* Right Column: Burr Grinder Settings Visualizer & Water Filtration */}
+        {/* Right Column: Burr Grinder Settings Visualizer with Interactive Buttons & Photo Popups */}
         <div className="space-y-6">
           
           {/* Burr Grinder Visual Settings Card */}
           <div className="p-6 rounded-3xl bg-espresso-900/70 border border-white/15 shadow-2xl">
-            <h4 className="text-sm uppercase tracking-wider font-extrabold text-cream-light mb-4 flex items-center gap-2 drop-shadow">
-              <Gauge className="w-4 h-4 text-amber-gold" />
-              <span>Burr Grinder Setting & Micron Guide</span>
-            </h4>
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm uppercase tracking-wider font-extrabold text-cream-light flex items-center gap-2 drop-shadow">
+                <Gauge className="w-4 h-4 text-amber-gold" />
+                <span>Burr Grinder Setting & Micron Guide</span>
+              </h4>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-gold bg-amber-gold/20 px-2.5 py-1 rounded-full border border-amber-gold/30">
+                Click Row for Macro Photo Bubble
+              </span>
+            </div>
 
-            <div className="space-y-2.5 text-xs">
+            <div className="space-y-3 text-xs">
               {GRIND_MATRIX.map((item, idx) => (
-                <div key={idx} className="p-3 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-between shadow-inner">
-                  <div>
-                    <div className="font-extrabold text-cream-light">{item.level}</div>
-                    <div className="text-[11px] text-cream-soft/60 font-medium">{item.visual}</div>
+                <button
+                  key={idx}
+                  onClick={() => setActivePhotoModalItem(item)}
+                  className="w-full p-3.5 rounded-2xl bg-black/50 border border-white/10 hover:border-amber-gold/60 hover:bg-white/10 transition-all duration-300 text-left flex items-center justify-between shadow-inner group active:scale-98"
+                >
+                  <div className="pr-2">
+                    <div className="font-extrabold text-cream-light group-hover:text-amber-gold flex items-center gap-2">
+                      <span>{item.level}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30 text-[10px] font-extrabold flex items-center gap-1">
+                        <Eye className="w-3 h-3 fill-current" />
+                        <span>Photo Bubble</span>
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-cream-soft/70 font-medium mt-0.5">{item.visual}</div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-mono text-amber-gold font-extrabold">{item.range}</div>
-                    <div className="text-[10px] text-cream-soft/50 font-medium">{item.idealFor}</div>
+
+                  <div className="text-right flex-shrink-0">
+                    <div className="font-mono text-amber-gold font-extrabold text-sm">{item.range}</div>
+                    <div className="text-[10px] text-cream-soft/60 font-medium">{item.idealFor}</div>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -145,6 +162,65 @@ export default function TroubleshootingHub({ trackMode }) {
         </div>
 
       </div>
+
+      {/* MACRO PHOTO BUBBLE MODAL POPUP FOR DIAGNOSTICS BURR GRINDER GUIDE */}
+      {activePhotoModalItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
+          
+          <div className="relative max-w-lg w-full rounded-3xl bg-espresso-950 border-2 border-amber-gold p-6 shadow-2xl overflow-hidden">
+            
+            {/* Modal Close Button */}
+            <button
+              onClick={() => setActivePhotoModalItem(null)}
+              className="absolute top-4 right-4 p-2.5 rounded-full bg-white/10 text-cream-light hover:text-amber-gold hover:bg-white/20 transition-all border border-white/15"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center space-x-2 text-xs font-extrabold uppercase tracking-widest text-amber-gold mb-2">
+              <Sparkles className="w-4 h-4 animate-pulse" />
+              <span>Macro Photo Bubble • {activePhotoModalItem.range}</span>
+            </div>
+
+            <h3 className="font-serif text-2xl font-extrabold text-cream-light mb-1">
+              {activePhotoModalItem.level} Ground Coffee Photo
+            </h3>
+            <p className="text-xs text-cream-soft/80 mb-4 font-medium">
+              Texture Comparison: <strong className="text-amber-gold">{activePhotoModalItem.visual}</strong>
+            </p>
+
+            {/* High-Definition Macro Photo Container */}
+            <div className="aspect-square w-full rounded-2xl overflow-hidden border-2 border-amber-gold/40 shadow-2xl mb-5 relative group">
+              <img
+                src={activePhotoModalItem.image}
+                alt={activePhotoModalItem.level}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl bg-black/80 backdrop-blur-md text-xs font-mono font-bold text-amber-gold border border-amber-gold/30">
+                Ideal For: {activePhotoModalItem.idealFor}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 mb-5 text-xs text-cream-soft/90 font-medium space-y-2">
+              <div>
+                <strong className="text-amber-gold">Recommended Burr Settings:</strong> {activePhotoModalItem.burrTip}
+              </div>
+              <div>
+                <strong className="text-amber-gold">Micron Range:</strong> {activePhotoModalItem.range}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setActivePhotoModalItem(null)}
+              className="w-full py-3 rounded-2xl btn-tactile-amber text-espresso-950 text-xs font-extrabold shadow-xl active:scale-95"
+            >
+              Close Photo Bubble
+            </button>
+
+          </div>
+
+        </div>
+      )}
 
     </section>
   );
