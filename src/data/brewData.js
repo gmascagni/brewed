@@ -452,7 +452,7 @@ export const TERROIR_ATLAS = {
 };
 
 export const MASTERCLASSES = [
-  // French Press Videos
+  // French Press Videos (methodId: 'french_press')
   {
     id: 'mc_frenchpress_hoffmann',
     methodId: 'french_press',
@@ -484,7 +484,7 @@ export const MASTERCLASSES = [
     ]
   },
 
-  // Pour-Over Videos
+  // Pour-Over Videos (methodId: 'pour_over')
   {
     id: 'mc_pourover_v60',
     methodId: 'pour_over',
@@ -516,7 +516,7 @@ export const MASTERCLASSES = [
     ]
   },
 
-  // Drip Coffee Maker Videos
+  // Drip Coffee Maker Videos (methodId: 'drip_brewer')
   {
     id: 'mc_drip_home',
     methodId: 'drip_brewer',
@@ -532,8 +532,22 @@ export const MASTERCLASSES = [
       'Use filtered water with 120-150 ppm mineral content'
     ]
   },
+  {
+    id: 'mc_drip_beans',
+    methodId: 'drip_brewer',
+    method: 'Automatic Drip',
+    title: 'Preferred Medium Roasts for Batch Drip Brewers',
+    duration: '4:30',
+    thumbnail: './drip_brewer.jpg',
+    embedId: '8d-9Y2S92v0',
+    description: 'Why Colombian Nariño and Central American medium roasts produce sweet caramel and milk chocolate notes in batch brewers.',
+    keyTakeaways: [
+      'Select medium roasts with balanced malic & caramel sweetness',
+      'Use 1:16 ratio for balanced extraction without bitterness'
+    ]
+  },
 
-  // Espresso Videos
+  // Espresso Videos (methodId: 'espresso')
   {
     id: 'mc_espresso_prep',
     methodId: 'espresso',
@@ -549,8 +563,22 @@ export const MASTERCLASSES = [
       'Aim for 1:2 yield ratio in 25-30 seconds'
     ]
   },
+  {
+    id: 'mc_espresso_beans',
+    methodId: 'espresso',
+    method: 'Espresso',
+    title: 'Preferred Espresso Blends & Dialing-in Crema',
+    duration: '5:15',
+    thumbnail: './coffee_setup.jpg',
+    embedId: '1U_4OqUo_pE',
+    description: 'How medium-dark Brazilian Yellow Bourbon and specialty espresso blends produce thick hazelnut crema and sweet cocoa notes.',
+    keyTakeaways: [
+      'Select beans 7-14 days post-roast for optimal CO2 crema off-gassing',
+      'Maintain 9-bar pump pressure during extraction'
+    ]
+  },
 
-  // AeroPress Videos
+  // AeroPress Videos (methodId: 'aeropress')
   {
     id: 'mc_aeropress_inverted',
     methodId: 'aeropress',
@@ -566,23 +594,22 @@ export const MASTERCLASSES = [
       'Plunge slowly over 30 seconds until subtle hiss'
     ]
   },
-
-  // Tea Videos
   {
-    id: 'mc_gongfu_oolong',
-    methodId: 'oolong_tea',
-    method: 'Oolong Tea',
-    title: 'Gongfu Tea Washing & Flash Infusions',
-    duration: '4:50',
-    thumbnail: './tea_ceremony.jpg',
-    embedId: 'L6N463xM4R4',
-    description: 'Understand leaf awakening, gaiwan handling, temperature drop, and timing multi-steep oolongs.',
+    id: 'mc_aeropress_beans',
+    methodId: 'aeropress',
+    method: 'AeroPress',
+    title: 'Preferred Light-Medium Roasts for AeroPress',
+    duration: '4:05',
+    thumbnail: './coffee_setup.jpg',
+    embedId: 'j6VlT_jUVPc',
+    description: 'Why Costa Rican Honey Process and Pink Bourbon cultivars thrive under AeroPress hybrid immersion pressure.',
     keyTakeaways: [
-      'Rinse leaves for 5-10s to open rolled tea balls',
-      'Pour water down gaiwan rim to avoid burning delicate leaves',
-      'Increase steep time by 5-10 seconds per subsequent infusion'
+      'Medium-fine grind size allows rapid 60-second agitation',
+      'Low temperature 88°C brewing preserves delicate stone fruit sweetness'
     ]
   },
+
+  // Green Tea Videos (methodId: 'green_tea')
   {
     id: 'mc_green_steeping',
     methodId: 'green_tea',
@@ -596,6 +623,71 @@ export const MASTERCLASSES = [
       'Never use boiling water on green tea leaves',
       'Steep for 2 minutes untouched',
       'Decant completely between infusions'
+    ]
+  },
+
+  // White Tea Videos (methodId: 'white_tea')
+  {
+    id: 'mc_white_needle',
+    methodId: 'white_tea',
+    method: 'White Tea',
+    title: 'White Tea & Silver Needle Steeping Masterclass',
+    duration: '4:25',
+    thumbnail: './tea_kettle.jpg',
+    embedId: 'XpZ1ZpQ4pQE',
+    description: 'Unlocking honeysuckle floral essential oils in Fujian Silver Needle (Bai Hao Yin Zhen) leaves.',
+    keyTakeaways: [
+      'Steep at 83°C for 3 minutes without leaf agitation',
+      'Whole unoxidized buds release delicate melon sweetness'
+    ]
+  },
+
+  // Oolong Tea Videos (methodId: 'oolong_tea')
+  {
+    id: 'mc_gongfu_oolong',
+    methodId: 'oolong_tea',
+    method: 'Oolong Tea',
+    title: 'Gongfu Oolong Tea Washing & Flash Infusions',
+    duration: '4:50',
+    thumbnail: './tea_ceremony.jpg',
+    embedId: 'L6N463xM4R4',
+    description: 'Understand leaf awakening, gaiwan handling, temperature drop, and timing multi-steep oolongs.',
+    keyTakeaways: [
+      'Rinse leaves for 5-10s to open rolled tea balls',
+      'Pour water down gaiwan rim to avoid burning delicate leaves',
+      'Increase steep time by 5-10 seconds per subsequent infusion'
+    ]
+  },
+
+  // Black Tea Videos (methodId: 'black_tea')
+  {
+    id: 'mc_black_darjeeling',
+    methodId: 'black_tea',
+    method: 'Black Tea',
+    title: 'Full-Leaf Black Tea & Himalayan Darjeeling Masterclass',
+    duration: '4:45',
+    thumbnail: './tea_kettle.jpg',
+    embedId: 'XpZ1ZpQ4pQE',
+    description: 'Steeping Himalayan First Flush Darjeeling for muscatel grape clarity and Assam for malty cocoa body.',
+    keyTakeaways: [
+      'Steep Orthodox black tea leaves at 96°C for 4 minutes',
+      'Preheat ceramic teapot to retain high steeping thermal mass'
+    ]
+  },
+
+  // Herbal & Pu-erh Videos (methodId: 'herbal_puerh')
+  {
+    id: 'mc_puerh_herbal',
+    methodId: 'herbal_puerh',
+    method: 'Herbal & Pu-erh',
+    title: 'Aged Pu-erh Tea Cake Washing & Botanical Infusions',
+    duration: '5:10',
+    thumbnail: './tea_ceremony.jpg',
+    embedId: 'L6N463xM4R4',
+    description: 'Flash boiling rinse for compressed Yunnan Pu-erh tea cakes and long botanical chamomile steepings.',
+    keyTakeaways: [
+      'Boiling 98°C flash rinse to hydrate compressed tea cakes',
+      'Steep 5 full minutes for deep earthy and botanical extraction'
     ]
   }
 ];

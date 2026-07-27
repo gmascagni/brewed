@@ -12,10 +12,10 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
     );
   };
 
-  // Filter videos dynamically for the active method selected
+  // Filter videos STRICTLY for the active method selected
   const activeMethodId = activeMethod?.id;
   const filteredVideos = MASTERCLASSES.filter(
-    (item) => item.methodId === activeMethodId || item.methodId === 'pour_over'
+    (item) => item.methodId === activeMethodId
   );
 
   const displayVideos = filteredVideos.length > 0 ? filteredVideos : MASTERCLASSES;
@@ -28,13 +28,13 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
         <div>
           <div className="inline-flex items-center space-x-2 text-xs font-extrabold uppercase tracking-widest text-amber-gold mb-1.5">
             <Sparkles className="w-4 h-4 animate-pulse" />
-            <span>Method Help Videos • {activeMethod?.name || 'Selected Method'}</span>
+            <span>Method Video Tutorials • {activeMethod?.name || 'Selected Method'}</span>
           </div>
           <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light drop-shadow-md">
-            Video Help & Masterclasses for {activeMethod?.name}
+            Help Videos for {activeMethod?.name}
           </h3>
           <p className="text-xs md:text-sm text-cream-soft/70 mt-1">
-            Step-by-step visual guides on preferred coffee types, pouring technique, crust skimming, and extraction
+            Curated video tutorials on preferred roasts, origins, pouring technique, and extraction for {activeMethod?.name}
           </p>
         </div>
 
@@ -153,7 +153,7 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
               <div className="p-5 flex-1 flex flex-col justify-between">
                 <div>
                   <div className="text-[10px] font-extrabold uppercase tracking-widest text-amber-gold mb-1.5">
-                    {item.method} Help Video
+                    {item.method} Tutorial
                   </div>
                   <h4 className="font-serif text-sm font-bold text-cream-light mb-2 line-clamp-2 drop-shadow">
                     {item.title}
@@ -168,7 +168,7 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
                   className="mt-5 w-full py-2.5 rounded-2xl bg-white/10 border border-white/15 hover:bg-white/20 text-xs font-extrabold text-cream-light transition-all shadow active:scale-95 flex items-center justify-center gap-2"
                 >
                   <Play className="w-3.5 h-3.5 fill-current text-amber-gold" />
-                  <span>Watch {item.method} Guide</span>
+                  <span>Watch {item.method} Video</span>
                 </button>
               </div>
             </div>
