@@ -72,10 +72,10 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
           {/* Responsive YouTube Masterclass Video Embed Player */}
           <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black mb-5 border border-white/15 shadow-2xl">
             <iframe
-              src={`https://www.youtube-nocookie.com/embed/${activeVideo.embedId}?autoplay=1&rel=0`}
+              src={`https://www.youtube-nocookie.com/embed/${activeVideo.embedId}?autoplay=0&rel=0`}
               title={activeVideo.title}
               className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
           </div>
