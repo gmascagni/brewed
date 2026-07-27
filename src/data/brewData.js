@@ -194,111 +194,135 @@ export const TERROIR_ATLAS = {
       id: 'ethiopia',
       country: 'Ethiopia',
       flag: '🇪🇹',
-      regions: 'Yirgacheffe, Sidama, Guji',
-      altitude: '1,800 - 2,200m',
-      processing: 'Washed & Natural (Sun-dried on raised beds)',
-      flavorNotes: ['Jasmine Floral', 'Bergamot', 'Wild Blueberry', 'Bright Citrus', 'Tea-like Body'],
-      roastPairing: 'Light to Medium-Light Roast',
-      recommendedMethod: 'Pour-Over (V60)',
+      regions: 'Yirgacheffe, Sidama, Guji, Harar',
+      altitude: '1,800 - 2,200 meters',
+      soilType: 'Iron-Rich Volcanic Nitisols & Deep Forest Organic Humus',
+      climate: 'Subtropical highland with extreme diurnal temperature swings (25°C days / 8°C nights)',
+      genetics: 'Indigenous Wild Heirloom Arabica Landraces (Kurume, Dega, Wolisho)',
+      processing: 'Fully Washed (citric clarity) & Natural Sun-Dried on Raised African Beds (intense berry sweetness)',
+      flavorNotes: ['Jasmine Floral', 'Bergamot Citrus', 'Wild Blueberry', 'Peach Nectar', 'Tea-like Body'],
+      acidProfile: 'High Citric & Floral Phosphoric Acidity',
+      agronomyDeepDive: 'Extreme altitude slows cherry maturation to over 9 months. Cold mountain nights cause coffee trees to store dense sugars and complex organic acids inside the seed. Combined with iron-rich volcanic soils and thousands of uncatalogued wild heirloom varieties, Ethiopian coffees yield unmatched floral bergamot density and tea-like elegance.',
+      roastPairing: 'Light to Medium-Light Roast (Nordic / Modern Specialty)',
+      recommendedMethod: 'Pour-Over (V60 / Chemex)',
       sourcedBrands: [
-        { name: 'Counter Culture Coffee', offering: 'Apollo & Ethiopia Yirgacheffe Single Origin' },
-        { name: 'Stumptown Coffee Roasters', offering: 'Ethiopia Mordecofe & Duromina' },
-        { name: 'Blue Bottle Coffee', offering: 'Single Origin Ethiopia Guji & Three Africas' },
-        { name: 'Onyx Coffee Lab', offering: 'Ethiopia Tropical Weather & Worka Sakaro' },
-        { name: 'Intelligentsia Coffee', offering: 'Organic Ethiopia Kurimi' }
-      ],
-      terroirOverview: 'The birthplace of coffee. Ethiopian high-altitude volcanic soils produce delicate, floral, and highly complex berry-forward cups with sparkling acidity.'
+        { name: 'Counter Culture Coffee', offering: 'Apollo & Single Origin Ethiopia Yirgacheffe', note: 'Clean washed lot featuring sparkling Meyer lemon, jasmine floral aroma, and bergamot finish.' },
+        { name: 'Stumptown Coffee Roasters', offering: 'Ethiopia Mordecofe & Duromina', note: 'Washed Yirgacheffe with peach tea clarity and delicate floral honeysuckle finish.' },
+        { name: 'Blue Bottle Coffee', offering: 'Single Origin Ethiopia Guji & Three Africas', note: 'Sun-dried natural processed Guji with intense wild blueberry jam sweetness and syrupy body.' },
+        { name: 'Onyx Coffee Lab', offering: 'Ethiopia Tropical Weather & Worka Sakaro', note: 'Anaerobic & double-fermented heirloom cherries boasting candied papaya and jasmine.' },
+        { name: 'Intelligentsia Coffee', offering: 'Organic Ethiopia Kurimi', note: 'Clean washed Sidama with crisp citric acidity, nectarine, and floral bergamot.' }
+      ]
     },
     {
       id: 'colombia',
       country: 'Colombia',
       flag: '🇨🇴',
-      regions: 'Huila, Nariño, Antioquia',
-      altitude: '1,500 - 2,100m',
-      processing: 'Fully Washed',
+      regions: 'Huila, Nariño, Antioquia, Tolima',
+      altitude: '1,500 - 2,100 meters',
+      soilType: 'Andean Volcanic Ash Soils (Andisols) rich in Potassium & Phosphorus',
+      climate: 'Equatorial mountain microclimates with dual harvesting seasons (Mitaca harvest)',
+      genetics: 'Caturra, Castillo, Colombia, Pink Bourbon, Geisha',
+      processing: 'Traditional Fully Washed with 18-36 hour tank fermentation',
       flavorNotes: ['Milk Chocolate', 'Caramel', 'Red Apple Acidity', 'Toasted Pecan', 'Silky Body'],
+      acidProfile: 'Medium-High Malic & Tartaric Acidity',
+      agronomyDeepDive: 'Cultivated along the high ridges of the Andes cordilleras. The porous volcanic ash soils (Andisols) provide exceptional moisture retention and high potassium content, fostering sucrose development. This yields Colombia’s trademark harmony of creamy chocolate body with crisp red apple malic acidity.',
       roastPairing: 'Medium Roast',
       recommendedMethod: 'Automatic Drip Maker & French Press',
       sourcedBrands: [
-        { name: 'Blue Bottle Coffee', offering: 'Single Origin Colombia Tres Santos' },
-        { name: 'Stumptown Coffee Roasters', offering: 'Colombia El Jordan & San Augustin' },
-        { name: 'Intelligentsia Coffee', offering: 'Colombia Tres Santos / La Mota' },
-        { name: 'La Colombe Coffee Roasters', offering: 'Colombia Corsica & Nariño Reserve' },
-        { name: "Peet's Coffee", offering: 'Colombia San Sebastian Single Origin' }
-      ],
-      terroirOverview: 'Renowned for world-class balance and consistency. Colombian coffees offer rich cocoa sweetness with crisp apple acidity and a velvet mouthfeel.'
+        { name: 'Blue Bottle Coffee', offering: 'Single Origin Colombia Tres Santos', note: 'Huila washed Caturra with sweet brown sugar, toasted almond, and red apple acidity.' },
+        { name: 'Stumptown Coffee Roasters', offering: 'Colombia El Jordan & San Augustin', note: 'Nariño high-grown lot featuring milk chocolate sweetness and crisp cherry finish.' },
+        { name: 'Intelligentsia Coffee', offering: 'Colombia Tres Santos / La Mota', note: 'Washed Pink Bourbon cultivar with delicate pink grapefruit and panela sweetness.' },
+        { name: 'La Colombe Coffee Roasters', offering: 'Colombia Corsica & Nariño Reserve', note: 'Smooth medium roast with cocoa nib, dried plum, and velvety mouthfeel.' },
+        { name: "Peet's Coffee", offering: 'Colombia San Sebastian Single Origin', note: 'Classic Huila profile with deep milk chocolate, toasted walnut, and balanced body.' }
+      ]
     },
     {
       id: 'kenya',
       country: 'Kenya',
       flag: '🇰🇪',
-      regions: 'Nyeri, Kirinyaga, Mount Kenya',
-      altitude: '1,700 - 2,100m',
-      processing: 'Double Washed (SL-28 & SL-34 Varietals)',
-      flavorNotes: ['Blackcurrant', 'Juicy Grapefruit', 'Complex Winey Acidity', 'Cane Sugar'],
+      regions: 'Nyeri, Kirinyaga, Mount Kenya, Murang’a',
+      altitude: '1,700 - 2,100 meters',
+      soilType: 'Deep Red Volcanic Clay Soils (Rhodic Nitisols) rich in Phosphoric Acid',
+      climate: 'Bimodal rainfall pattern with distinct hot sun and cool mountain mist cycles',
+      genetics: 'SL-28, SL-34 (Scott Laboratories selections), Ruiru 11, Batian',
+      processing: 'Kenyan 72-Hour Double Washed Process with soaking stage',
+      flavorNotes: ['Blackcurrant', 'Juicy Grapefruit', 'Complex Winey Acidity', 'Cane Sugar', 'Tomato Leaf'],
+      acidProfile: 'Pungent Phosphoric & Tartaric Acidity',
+      agronomyDeepDive: 'Kenya’s red volcanic clay soils are packed with accessible phosphoric acid. The legendary SL-28 and SL-34 Bourbon cultivars combined with the 72-hour double washing process (where beans are fermented, washed, and soaked overnight under clean water) create Kenya’s world-famous sparkling blackcurrant flavor, juicy grapefruit acidity, and winey complexity.',
       roastPairing: 'Light to Medium-Light Roast',
-      recommendedMethod: 'Pour-Over (Chemex/V60)',
+      recommendedMethod: 'Pour-Over (Chemex / V60)',
       sourcedBrands: [
-        { name: 'Onyx Coffee Lab', offering: 'Kenya Gakuyu-ini & Nyeri Hill AA' },
-        { name: 'Square Mile Coffee Roasters', offering: 'Kenya AA Karatu & Kiandu' },
-        { name: 'Counter Culture Coffee', offering: 'Kenya Baragwi & Kabingara' },
-        { name: 'George Howell Coffee', offering: 'Kenya Mamuto AA Single Origin' }
-      ],
-      terroirOverview: 'Famous for punchy, juicy blackcurrant and savory fruit acidity. Rich red volcanic soil produces some of the most vibrant coffees in the world.'
+        { name: 'Onyx Coffee Lab', offering: 'Kenya Gakuyu-ini & Nyeri Hill AA', note: 'Double-washed SL-28 with exploding blackcurrant, ruby red grapefruit, and cane sugar.' },
+        { name: 'Square Mile Coffee Roasters', offering: 'Kenya AA Karatu & Kiandu', note: 'London roaster classic with juicy blackberry, savory tomato leaf, and sparkling acidity.' },
+        { name: 'Counter Culture Coffee', offering: 'Kenya Baragwi & Kabingara', note: 'Bright Nyeri lot with red currant, tart cherry, and complex winey structure.' },
+        { name: 'George Howell Coffee', offering: 'Kenya Mamuto AA Single Origin', note: 'Ultra-clean single estate Kenya with dense blackcurrant jam and grapefruit zest.' }
+      ]
     },
     {
       id: 'guatemala',
       country: 'Guatemala',
       flag: '🇬🇹',
-      regions: 'Antigua, Huehuetenango, Atitlán',
-      altitude: '1,500 - 2,000m',
-      processing: 'Washed',
-      flavorNotes: ['Dark Cocoa', 'Roasted Hazelnut', 'Orange Zest', 'Spicy Cinnamon Finish'],
+      regions: 'Antigua, Huehuetenango, Atitlán, Fraijanes',
+      altitude: '1,500 - 2,000 meters',
+      soilType: 'Active Volcanic Ash (Pumice) from Fuego & Acatenango volcanoes',
+      climate: 'Microclimates created by mountain barrier walls and warm Pacific air currents',
+      genetics: 'Bourbon, Caturra, Catuai, Pache, Typica',
+      processing: 'Fully Washed with patio sun drying',
+      flavorNotes: ['Dark Cocoa', 'Roasted Hazelnut', 'Orange Zest', 'Spicy Cinnamon', 'Smoky Cocoa'],
+      acidProfile: 'Balanced Citric & Malic Acidity',
+      agronomyDeepDive: 'In Antigua, three surrounding volcanoes continuously deposit mineral-rich pumice ash into the soil. The pumice retains optimal humidity in dry months. Combined with cool night air from high mountain ranges, Guatemalan beans develop a dense cell structure resulting in bittersweet chocolate depth, hazelnut sweetness, and a pleasant orange zest bite.',
       roastPairing: 'Medium to Dark Roast',
       recommendedMethod: 'French Press & Drip Coffee Maker',
       sourcedBrands: [
-        { name: 'Intelligentsia Coffee', offering: 'Guatemala Los Inmortales & Flecha de Oro' },
-        { name: "Peet's Coffee", offering: 'Guatemala San Sebastián Antigua' },
-        { name: 'Stumptown Coffee Roasters', offering: 'Guatemala El Injerto & Bella Vista' },
-        { name: 'Starbucks Reserve', offering: 'Guatemala Antigua Single Origin' }
-      ],
-      terroirOverview: 'Shaded volcanic microclimates yield rich chocolate notes with bright orange citrus acidity and a comforting spicy finish.'
+        { name: 'Intelligentsia Coffee', offering: 'Guatemala Los Inmortales & Flecha de Oro', note: 'Antigua Bourbon with dark chocolate fudge, toasted hazelnut, and orange blossom.' },
+        { name: "Peet's Coffee", offering: 'Guatemala San Sebastián Antigua', note: 'High volcanic elevation profile with rich bittersweet cocoa, spicy cinnamon, and heavy body.' },
+        { name: 'Stumptown Coffee Roasters', offering: 'Guatemala El Injerto & Bella Vista', note: 'Huehuetenango washed Caturra with sweet milk chocolate and crisp clementine.' },
+        { name: 'Starbucks Reserve', offering: 'Guatemala Antigua Single Origin', note: 'Classic volcanic ash profile featuring cocoa nibs, warm spice, and citrus finish.' }
+      ]
     },
     {
       id: 'costa_rica',
       country: 'Costa Rica',
       flag: '🇨🇷',
-      regions: 'Tarrazú, Central Valley',
-      altitude: '1,400 - 1,900m',
-      processing: 'Honey & Washed Process',
-      flavorNotes: ['Wild Honey', 'Crisp Green Apple', 'White Floral', 'Clean Balanced Body'],
+      regions: 'Tarrazú, Central Valley, West Valley, Orosi',
+      altitude: '1,400 - 1,900 meters',
+      soilType: 'Enriched Volcanic Loam with high organic content',
+      climate: 'Pacific & Atlantic climate influences with strict wet/dry seasonality',
+      genetics: 'Caturra, Villa Sarchi, Geisha, SL-28',
+      processing: 'Pioneering Honey Process (Yellow, Red, Black Honey) & Washed',
+      flavorNotes: ['Wild Honey', 'Crisp Green Apple', 'White Floral', 'Stone Fruit', 'Clean Body'],
+      acidProfile: 'Refined Citric & Apple Malic Acidity',
+      agronomyDeepDive: 'Costa Rica is the birthplace of micro-mill innovation and Honey Processing. In Honey processing, precise percentages of sweet fruit mucilage are left on the parchment bean while sun-drying on raised beds. The sugars naturally ferment into the bean, yielding clean fruit sweetness, honeyed mouthfeel, and green apple clarity.',
       roastPairing: 'Medium Roast',
       recommendedMethod: 'Pour-Over & AeroPress',
       sourcedBrands: [
-        { name: 'Blue Bottle Coffee', offering: 'Costa Rica Hermosa Honey Process' },
-        { name: 'Counter Culture Coffee', offering: 'Costa Rica Perla del Café' },
-        { name: 'Verve Coffee Roasters', offering: 'Costa Rica Las Lajas Honey' },
-        { name: 'Ritual Coffee Roasters', offering: 'Costa Rica La Minita Tarrazú' }
-      ],
-      terroirOverview: 'Pioneers of honey processing, where coffee mucilage is left on the bean during drying to impart sweet, honeyed fruit clarity.'
+        { name: 'Blue Bottle Coffee', offering: 'Costa Rica Hermosa Honey Process', note: 'Red Honey processed micro-lot with wildflower honey, nectarine, and silky texture.' },
+        { name: 'Counter Culture Coffee', offering: 'Costa Rica Perla del Café', note: 'Yellow Honey Villa Sarchi with golden delicious apple and honeyed sweetness.' },
+        { name: 'Verve Coffee Roasters', offering: 'Costa Rica Las Lajas Honey', note: 'Black Honey pioneer estate with intense stone fruit, cherry, and raw sugar syrup.' },
+        { name: 'Ritual Coffee Roasters', offering: 'Costa Rica La Minita Tarrazú', note: 'Famous estate washed lot with immaculate balance, green apple, and sweet cream.' }
+      ]
     },
     {
       id: 'indonesia',
       country: 'Indonesia',
       flag: '🇮🇩',
-      regions: 'Sumatra (Gayo/Mandheling), Java, Sulawesi',
-      altitude: '1,100 - 1,600m',
-      processing: 'Wet-Hulled (Giling Basah)',
-      flavorNotes: ['Earthy Cedar', 'Dark Chocolate', 'Tobacco', 'Low Acidity', 'Syrupy Heavy Body'],
+      regions: 'Sumatra (Gayo Highlands/Mandheling), Java, Toraja Sulawesi',
+      altitude: '1,100 - 1,600 meters',
+      soilType: 'Volcanic Tropical Humus with clay subsoil',
+      climate: 'Equatorial tropical rainforest with year-round high humidity & heavy rainfall',
+      genetics: 'Ateng, Tim Tim, Bergendal, Line S795 (Arabica Hybrids)',
+      processing: 'Traditional Wet-Hulled (Giling Basah) Process',
+      flavorNotes: ['Earthy Cedar', 'Dark Chocolate', 'Pipe Tobacco', 'Low Acidity', 'Syrupy Heavy Body'],
+      acidProfile: 'Low Acidity with Heavy Lipids',
+      agronomyDeepDive: 'Indonesia’s iconic Giling Basah (wet-hulling) technique was created to overcome equatorial humidity. Smallholders hull the parchment off the bean at 30-50% moisture (rather than 10-12%). The bare green beans dry exposed directly to humid air, undergoing unique microbial action that mutes acidity and imparts heavy cedar, dark cocoa, pipe tobacco, and dense syrupy mouthfeel.',
       roastPairing: 'Medium-Dark to Dark Roast',
       recommendedMethod: 'French Press (Immersion)',
       sourcedBrands: [
-        { name: "Peet's Coffee", offering: 'Sumatra Reserve Single Origin & Major Dickason\'s' },
-        { name: 'La Colombe Coffee Roasters', offering: 'Sumatra Mandheling Single Origin' },
-        { name: 'Starbucks Reserve', offering: 'Sumatra Aged Single Origin' },
-        { name: 'Stumptown Coffee Roasters', offering: 'Sumatra Bies Penantan' }
-      ],
-      terroirOverview: 'Traditional Giling Basah processing creates iconic low-acidity coffees with deep earthiness, spicy cedar notes, and heavy coat-your-mouth body.'
+        { name: "Peet's Coffee", offering: 'Sumatra Reserve Single Origin & Major Dickason\'s', note: 'Classic Giling Basah profile with deep herbal cedar, dark cocoa, and thick syrupy body.' },
+        { name: 'La Colombe Coffee Roasters', offering: 'Sumatra Mandheling Single Origin', note: 'Dark roast Gayo lot featuring pipe tobacco, dark chocolate truffle, and zero harshness.' },
+        { name: 'Starbucks Reserve', offering: 'Sumatra Aged Single Origin', note: 'Aged 3-5 years in Singapore warehouses to develop deep rustic spice and wood notes.' },
+        { name: 'Stumptown Coffee Roasters', offering: 'Sumatra Bies Penantan', note: 'Organic Gayo Highlands washed & wet-hulled hybrid with cedar, grapefruit rind, and cacao.' }
+      ]
     }
   ],
   tea: [
@@ -306,86 +330,101 @@ export const TERROIR_ATLAS = {
       id: 'china',
       country: 'China',
       flag: '🇨🇳',
-      regions: 'Fujian (Wuyi/Anxi), Zhejiang, Yunnan',
-      famousTeas: ['Longjing (Dragonwell Green)', 'Da Hong Pao (Wuyi Oolong)', 'Pu-erh', 'Lapsang Souchong'],
-      flavorNotes: ['Roasted Chestnut', 'Orchid Floral', 'Sweet Mineral', 'Earthy Dark Chocolate'],
-      steepStyle: 'Gongfu & Western Infusion',
+      regions: 'Fujian (Wuyi Mountains/Anxi), Zhejiang (West Lake), Yunnan',
+      famousTeas: ['Longjing (Dragonwell Green)', 'Da Hong Pao (Wuyi Cliff Oolong)', 'Pu-erh (Shou & Sheng)', 'Lapsang Souchong'],
+      soilType: 'Granite Rock Mineral Soil (Wuyi Rocks) & Red Forest Clay',
+      botanicals: 'Camellia sinensis var. sinensis (Small Leaf Bush)',
+      processing: 'Pan-firing (Green), Charcoal Roasting (Oolong), Microbial Fermentation (Pu-erh)',
+      flavorNotes: ['Roasted Chestnut', 'Orchid Floral', 'Rock Mineral (Yan Yun)', 'Earthy Dark Chocolate'],
+      steepStyle: 'Gongfu High-Leaf Ratio & Western Infusion',
       recommendedMethod: 'Oolong & Green Tea Tracks',
       sourcedBrands: [
-        { name: 'Vahdam Teas', offering: 'Imperial Chinese Loose Leaf Collection' },
-        { name: 'Mei Leaf Tea House', offering: 'Imperial Longjing & Wuyi Cliff Oolongs' },
-        { name: 'Harney & Sons', offering: 'Dragon Pearl Jasmine & Imperial Pu-erh' },
-        { name: 'The Tao of Tea', offering: 'Organic Dragonwell & Yunnan Black Tea' }
+        { name: 'Vahdam Teas', offering: 'Imperial Chinese Loose Leaf Collection', note: 'Authentic West Lake Longjing and Yunnan Black tea selections.' },
+        { name: 'Mei Leaf Tea House', offering: 'Imperial Longjing & Wuyi Cliff Oolongs', note: 'Direct-farm sourced competition grade Wuyi Rock Da Hong Pao with heavy Yan Yun mineral notes.' },
+        { name: 'Harney & Sons', offering: 'Dragon Pearl Jasmine & Imperial Pu-erh', note: 'Hand-rolled jasmine tea pearls and aged cooked Pu-erh tea cakes.' },
+        { name: 'The Tao of Tea', offering: 'Organic Dragonwell & Yunnan Golden Tip', note: 'Pan-fired Hangzhou green tea with rich toasted chestnut and sweet finish.' }
       ],
-      terroirOverview: 'The historical origin of tea culture. Chinese mountain terroirs yield immense variety—from pan-fired nutty greens to roasted cliff oolongs and aged fermented Pu-erh.'
+      terroirOverview: 'The birthplace of tea culture. In Fujian’s Wuyi Mountains, tea bushes grow directly out of granite rock cliffs. The roots absorb rich rock minerals, producing the famous "Yan Yun" (Rock Rhythm)—a combination of floral orchid aroma, roasted mineral depth, and lingering throat sweetness.'
     },
     {
       id: 'japan',
       country: 'Japan',
       flag: '🇯🇵',
-      regions: 'Shizuoka, Uji (Kyoto), Kagoshima',
-      famousTeas: ['Sencha', 'Gyokuro (Shaded Green)', 'Matcha', 'Hojicha (Roasted)'],
+      regions: 'Shizuoka, Uji (Kyoto), Kagoshima, Yame',
+      famousTeas: ['Sencha', 'Gyokuro (Shaded Green)', 'Matcha (Stone-Ground)', 'Hojicha (Roasted)'],
+      soilType: 'Volcanic Ash Soil (Kuroboku) rich in organic matter',
+      botanicals: 'Yabukita, Saemidori, Okumidori Cultivars',
+      processing: 'Deep Steam Process (Fukamushi) & Bamboo Net Canopy Shading (Kabuse)',
       flavorNotes: ['Rich Umami', 'Steamed Spinach', 'Marine Sea Breeze', 'Sweet Grassy Finish'],
-      steepStyle: 'Steam Processed Whole Leaf',
-      recommendedMethod: 'Specialty Green Tea Track (75°C - 80°C)',
+      steepStyle: 'Steam Processed Whole Leaf (Low Temp 70-80°C)',
+      recommendedMethod: 'Specialty Green Tea Track (78°C)',
       sourcedBrands: [
-        { name: 'Ippodo Tea Co. (Kyoto since 1717)', offering: 'Sayaka & Ummon Ceremonial Matcha, Gyokuro' },
-        { name: 'Harney & Sons', offering: 'Japanese Sencha & Genmaicha' },
-        { name: 'Rishi Tea & Botanicals', offering: 'Organic Teahouse Matcha & Sencha Fukuoka' },
-        { name: 'Encha Organic Matcha', offering: 'Uji First Harvest Ceremonial Matcha' }
+        { name: 'Ippodo Tea Co. (Kyoto since 1717)', offering: 'Sayaka & Ummon Ceremonial Matcha, Gyokuro Kanro', note: '300-year-old Kyoto teahouse supplying stone-ground ceremonial matcha rich in umami.' },
+        { name: 'Harney & Sons', offering: 'Japanese Sencha & Genmaicha', note: 'Steamed Shizuoka green tea blended with roasted toasted brown rice.' },
+        { name: 'Rishi Tea & Botanicals', offering: 'Organic Teahouse Matcha & Sencha Fukuoka', note: 'First harvest ceremonial matcha from Kagoshima volcanic soils.' },
+        { name: 'Encha Organic Matcha', offering: 'Uji First Harvest Ceremonial Matcha', note: 'Shaded Uji matcha with deep emerald color, zero bitterness, and creamy umami.' }
       ],
-      terroirOverview: 'Japanese teas are steam-processed immediately after harvesting to stop oxidation, creating intense emerald liqueur with deep savory umami and fresh oceanic sweetness.'
+      terroirOverview: 'Japanese teas are steam-processed within hours of picking to halt oxidation. For Gyokuro and Matcha, tea bushes are shaded with black bamboo nets for 20-30 days before harvest. Shading blocks sunlight, preventing the conversion of L-theanine amino acids into bitter catechins, generating Japan’s iconic savory umami and sweet marine sea breeze flavor.'
     },
     {
       id: 'india',
       country: 'India',
       flag: '🇮🇳',
-      regions: 'Darjeeling (Himalayas), Assam, Nilgiri',
-      famousTeas: ['First Flush Darjeeling', 'Assam Black Tea', 'Nilgiri Frost Tea'],
+      regions: 'Darjeeling (Himalayan Foothills), Assam (Brahmaputra Valley), Nilgiri',
+      famousTeas: ['First Flush Darjeeling ("Champagne of Teas")', 'Bold Assam CTC & Orthodox', 'Nilgiri Frost Tea'],
+      soilType: 'Himalayan Silt & Fertile Alluvial River Plain Soils',
+      botanicals: 'Camellia sinensis var. assamica (Large Leaf Tree)',
+      processing: 'Orthodox Full Leaf Oxidation & Heavy CTC Rolling',
       flavorNotes: ['Muscatel Grape', 'Crisp Stone Fruit', 'Bold Malty Cocoa', 'Citrus Astringency'],
-      steepStyle: 'Orthodox Full Leaf Steeping',
+      steepStyle: 'Orthodox Full Leaf Steeping (96°C)',
       recommendedMethod: 'Full-Leaf Black Tea Track (96°C)',
       sourcedBrands: [
-        { name: 'Vahdam Teas (New Delhi)', offering: 'First Flush Darjeeling & Imperial Assam' },
-        { name: 'Twinings of London', offering: 'Darjeeling & English Breakfast Assam' },
-        { name: 'Harney & Sons', offering: 'Darjeeling First Flush & Assam Superior' },
-        { name: 'Fortnum & Mason (London)', offering: 'Darjeeling Broken Orange Pekoe & Assam' }
+        { name: 'Vahdam Teas (New Delhi)', offering: 'First Flush Darjeeling & Imperial Assam', note: 'Direct-from-estate Himalayan first harvest Darjeeling featuring muscatel grape clarity.' },
+        { name: 'Twinings of London', offering: 'Darjeeling & English Breakfast Assam', note: 'Classic British blend sourcing malty Assam leaves from the Brahmaputra valley.' },
+        { name: 'Harney & Sons', offering: 'Darjeeling First Flush & Assam Superior', note: 'Spring harvest Himalayan Darjeeling with peach, muscatel grape, and crisp finish.' },
+        { name: 'Fortnum & Mason (London)', offering: 'Darjeeling Broken Orange Pekoe & Assam', note: 'Iconic Piccadilly tea house offering high-grade Himalayan single estate flushes.' }
       ],
-      terroirOverview: 'Darjeeling ("Champagne of Teas") offers high-altitude muscatel grape notes, while tropical lowland Assam delivers bold, comforting maltiness for milk or straight drinking.'
+      terroirOverview: 'In Darjeeling, tea bushes cling to steep Himalayan slopes at up to 2,000 meters. The cool mountain air and intense UV light create the coveted "Muscatel" flavor—a natural aroma reminiscent of muscat grapes and stone fruit. Down in tropical Assam, hot river plains yield bold, malty teas ideal with milk.'
     },
     {
       id: 'taiwan',
       country: 'Taiwan',
       flag: '🇹🇼',
-      regions: 'Nantou, Alishan High Mountain, Dong Ding',
-      famousTeas: ['High Mountain Oolong (Gaoshan)', 'Oriental Beauty', 'Dong Ding Oolong'],
+      regions: 'Nantou, Alishan High Mountain, Dong Ding, Shan Lin Xi',
+      famousTeas: ['High Mountain Oolong (Gaoshan)', 'Oriental Beauty (Dongfang Meiren)', 'Dong Ding Oolong'],
+      soilType: 'High-Altitude Slate & Sandstone Mountain Soil',
+      botanicals: 'Qingxin Oolong, Jin Xuan (Milk Oolong), Ruby 18',
+      processing: 'Tightly Hand-Rolled Ball Oolong & Charcoal Baking',
       flavorNotes: ['Creamy Butter', 'White Peach', 'Wild Honey', 'Lingering Throat Resonance (Hui Gan)'],
-      steepStyle: 'Hand-Rolled Gongfu Infusion',
+      steepStyle: 'Hand-Rolled Gongfu Infusion (88°C)',
       recommendedMethod: 'Oolong Tea Track (88°C)',
       sourcedBrands: [
-        { name: 'Ten Ren Tea Co. (Taipei)', offering: 'High Mountain Alishan Oolong' },
-        { name: 'Mei Leaf Tea House', offering: 'Alishan Cream & High Mountain Floral Oolongs' },
-        { name: 'The Tao of Tea', offering: 'Formosa Oolong & Amber Dong Ding' },
-        { name: 'Rishi Tea & Botanicals', offering: 'Organic Ruby 18 & Formosa Dong Ding' }
+        { name: 'Ten Ren Tea Co. (Taipei)', offering: 'High Mountain Alishan Oolong & King’s Tea', note: 'Taipei’s premier tea master sourcing tightly rolled Alishan leaves with floral butter aroma.' },
+        { name: 'Mei Leaf Tea House', offering: 'Alishan Cream & High Mountain Floral Oolongs', note: 'Jin Xuan cultivar oolong offering natural creamy butter and lilac floral notes.' },
+        { name: 'The Tao of Tea', offering: 'Formosa Oolong & Amber Dong Ding', note: 'Traditional charcoal-roasted Taiwanese oolong with honey and toasted warm amber notes.' },
+        { name: 'Rishi Tea & Botanicals', offering: 'Organic Ruby 18 & Formosa Dong Ding', note: 'Famous Taiwanese Wild Red Tea cultivar boasting cinnamon and mint aroma.' }
       ],
-      terroirOverview: 'High elevation mists above 1,000 meters produce tightly hand-rolled oolongs with legendary buttery floral aromas and long-lasting sweet throat resonance.'
+      terroirOverview: 'Taiwan’s High Mountain (Gaoshan) oolongs grow above 1,000 meters in perpetual mountain mist. Heavy fog limits sunlight, making leaf cell walls thick and soft. Hand-rolled into tight green spheres, these leaves release legendary aromas of creamy butter, white peach, and a sweet throat resonance ("Hui Gan") that lasts for hours.'
     },
     {
       id: 'sri_lanka',
       country: 'Sri Lanka (Ceylon)',
       flag: '🇱🇰',
-      regions: 'Nuwara Eliya, Uva, Dimbula',
-      famousTeas: ['Ceylon High Grown Black Tea', 'Silver Tips White Tea'],
+      regions: 'Nuwara Eliya, Uva, Dimbula, Kandy',
+      famousTeas: ['Ceylon High Grown Black Tea', 'Uva Seasonal Flush', 'Silver Tips White Tea'],
+      soilType: 'Monsoonal Tropical Mountain Loam',
+      botanicals: 'High-Grown Orthodox Camellia Sinensis',
+      processing: 'Orthodox Wither, Roll, Ferment, and Fire',
       flavorNotes: ['Crisp Lemon Zest', 'Eucalyptus', 'Golden Liqueur', 'Refreshing Crisp Finish'],
-      steepStyle: 'High Elevation Whole Leaf',
+      steepStyle: 'High Elevation Whole Leaf (96°C)',
       recommendedMethod: 'Black & White Tea Tracks',
       sourcedBrands: [
-        { name: 'Dilmah Ceylon Tea (Sri Lanka)', offering: 'Single Origin Pure Ceylon Nuwara Eliya' },
-        { name: 'Twinings of London', offering: 'Pure Ceylon Single Origin' },
-        { name: 'Harney & Sons', offering: 'Ceylon OP & Nuwara Eliya High Grown' },
-        { name: 'Fortnum & Mason (London)', offering: 'Royal Blend Ceylon Black' }
+        { name: 'Dilmah Ceylon Tea (Sri Lanka)', offering: 'Single Origin Pure Ceylon Nuwara Eliya', note: 'Sri Lanka’s family-owned single origin tea maker offering high-grown bright citrus tea.' },
+        { name: 'Twinings of London', offering: 'Pure Ceylon Single Origin', note: 'Golden copper liqueur with refreshing lemon zest astringency.' },
+        { name: 'Harney & Sons', offering: 'Ceylon OP & Nuwara Eliya High Grown', note: 'High altitude Central Province black tea with crisp eucalyptus and golden liquor.' },
+        { name: 'Fortnum & Mason (London)', offering: 'Royal Blend Ceylon Black', note: 'Classic blend of high-grown Ceylon and malty Assam created for King Edward VII.' }
       ],
-      terroirOverview: 'Ceylon teas grown in tropical mountain microclimates are famed for their bright citrus clarity, golden copper liqueur, and invigorating crisp character.'
+      terroirOverview: 'Ceylon teas grown in Nuwara Eliya (above 1,800 meters) benefit from dry, cool mountain winds that sweep across the valleys during monsoons. This causes the tea bush to produce high levels of aromatic essential oils, yielding Ceylon’s famous golden copper liqueur and crisp lemon zest finish.'
     }
   ]
 };
