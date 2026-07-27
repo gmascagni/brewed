@@ -188,35 +188,80 @@ export const BREW_METHODS = {
   ]
 };
 
+export const COFFEE_BELT_OVERVIEW = {
+  title: 'The Coffee Belt',
+  description: 'Coffee beans grow worldwide in a tropical zone called the "Coffee Belt," positioned between the Tropics of Cancer (23.5° N) and Capricorn (23.5° S).',
+  macroRegions: [
+    {
+      name: 'Latin America',
+      leader: 'Led by Brazil & Colombia',
+      characteristics: 'Nutty, chocolatey, smooth low-acidity to high-grown mild Arabica with balanced fruit, caramel, and volcanic soil brightness.'
+    },
+    {
+      name: 'Africa & Middle East',
+      leader: 'Led by Ethiopia, Kenya & Yemen',
+      characteristics: 'Historic birthplace of Arabica yielding complex wine-like, floral bergamot, savory tomato-like, and wild earthy profiles.'
+    },
+    {
+      name: 'Asia & Pacific',
+      leader: 'Led by Vietnam, Indonesia & India',
+      characteristics: 'Top Robusta producer Vietnam, heavy-bodied earthy Sumatran wet-hulled beans, and monsoon-shaded low-acid Indian cups.'
+    }
+  ]
+};
+
+export const BOTANICAL_COMPARISON = {
+  title: 'Arabica vs. Robusta Beans',
+  description: 'Understanding the genetics, chemical composition, and sensory differences between Arabica and Robusta coffee species.',
+  arabica: {
+    name: 'Arabica (Coffea arabica)',
+    share: '60 - 70% of Global Production',
+    elevation: '1,200 - 2,200 meters',
+    chromosomes: '44 Chromosomes (Tetraploid)',
+    caffeine: '1.2% Caffeine content',
+    sugarsLipids: '60% More Lipids & Natural Sugars',
+    flavorProfile: 'Sweet, floral, fruit-forward acidity, complex aromatics, smooth body.'
+  },
+  robusta: {
+    name: 'Robusta (Coffea canephora)',
+    share: '30 - 40% of Global Production',
+    elevation: '0 - 800 meters',
+    chromosomes: '22 Chromosomes (Diploid)',
+    caffeine: '2.7% Caffeine content (Double Strength)',
+    sugarsLipids: 'High Chlorogenic Antioxidants, Lower Sugars',
+    flavorProfile: 'Strong, dark, bitter chocolate, woody, heavy crema, high body strength.'
+  }
+};
+
 export const TERROIR_ATLAS = {
   coffee: [
     {
-      id: 'ethiopia',
-      country: 'Ethiopia',
-      flag: '🇪🇹',
-      regions: 'Yirgacheffe, Sidama, Guji, Harar',
-      altitude: '1,800 - 2,200 meters',
-      soilType: 'Iron-Rich Volcanic Nitisols & Deep Forest Organic Humus',
-      climate: 'Subtropical highland with extreme diurnal temperature swings (25°C days / 8°C nights)',
-      genetics: 'Indigenous Wild Heirloom Arabica Landraces (Kurume, Dega, Wolisho)',
-      processing: 'Fully Washed (citric clarity) & Natural Sun-Dried on Raised African Beds (intense berry sweetness)',
-      flavorNotes: ['Jasmine Floral', 'Bergamot Citrus', 'Wild Blueberry', 'Peach Nectar', 'Tea-like Body'],
-      acidProfile: 'High Citric & Floral Phosphoric Acidity',
-      agronomyDeepDive: 'Extreme altitude slows cherry maturation to over 9 months. Cold mountain nights cause coffee trees to store dense sugars and complex organic acids inside the seed. Combined with iron-rich volcanic soils and thousands of uncatalogued wild heirloom varieties, Ethiopian coffees yield unmatched floral bergamot density and tea-like elegance.',
-      roastPairing: 'Light to Medium-Light Roast (Nordic / Modern Specialty)',
-      recommendedMethod: 'Pour-Over (V60 / Chemex)',
+      id: 'brazil',
+      country: 'Brazil',
+      flag: '🇧🇷',
+      macroRegion: 'Latin America (World’s #1 Producer)',
+      regions: 'Sul de Minas, Cerrado Mineiro, Mogiana',
+      altitude: '800 - 1,200 meters',
+      soilType: 'Clay Loam & Terra Rossa Soils',
+      climate: 'Stable tropical plateau climate with warm sunny drying weather',
+      genetics: 'Bourbon, Mundo Novo, Catuai, Icatu',
+      processing: 'Natural Sun-Dried & Pulped Natural (Honey)',
+      flavorNotes: ['Nutty Hazelnut', 'Milk Chocolate', 'Sweet Caramel', 'Low Acidity', 'Smooth Creamy Body'],
+      acidProfile: 'Low Mellow Citric Acidity',
+      agronomyDeepDive: 'Brazil is the world’s largest coffee producer. Grown on rolling plateau hills, dry sunny harvests allow cherries to dry naturally on trees and patios. The seed absorbs sweet fruit mucilage, imparting Brazil’s signature chocolate-hazelnut sweetness, low acidity, and creamy body.',
+      roastPairing: 'Medium to Medium-Dark Roast',
+      recommendedMethod: 'Automatic Drip & Espresso',
       sourcedBrands: [
-        { name: 'Counter Culture Coffee', offering: 'Apollo & Single Origin Ethiopia Yirgacheffe', note: 'Clean washed lot featuring sparkling Meyer lemon, jasmine floral aroma, and bergamot finish.' },
-        { name: 'Stumptown Coffee Roasters', offering: 'Ethiopia Mordecofe & Duromina', note: 'Washed Yirgacheffe with peach tea clarity and delicate floral honeysuckle finish.' },
-        { name: 'Blue Bottle Coffee', offering: 'Single Origin Ethiopia Guji & Three Africas', note: 'Sun-dried natural processed Guji with intense wild blueberry jam sweetness and syrupy body.' },
-        { name: 'Onyx Coffee Lab', offering: 'Ethiopia Tropical Weather & Worka Sakaro', note: 'Anaerobic & double-fermented heirloom cherries boasting candied papaya and jasmine.' },
-        { name: 'Intelligentsia Coffee', offering: 'Organic Ethiopia Kurimi', note: 'Clean washed Sidama with crisp citric acidity, nectarine, and floral bergamot.' }
+        { name: "Peet's Coffee", offering: 'Brazil Minas Naturais & Major Dickason Blend', note: 'Sun-dried natural with sweet hazelnut, milk chocolate, and smooth finish.' },
+        { name: 'Stumptown Coffee Roasters', offering: 'Brazil Fazenda Rainha Yellow Bourbon', note: 'Pulped natural with roasted peanut butter, caramel, and chocolate sweetness.' },
+        { name: 'La Colombe Coffee Roasters', offering: 'Brazil Bleu Single Origin', note: 'Creamy medium roast with cocoa nibs, toasted almond, and low acidity.' }
       ]
     },
     {
       id: 'colombia',
       country: 'Colombia',
       flag: '🇨🇴',
+      macroRegion: 'Latin America (Famous High-Grown Arabica)',
       regions: 'Huila, Nariño, Antioquia, Tolima',
       altitude: '1,500 - 2,100 meters',
       soilType: 'Andean Volcanic Ash Soils (Andisols) rich in Potassium & Phosphorus',
@@ -225,7 +270,7 @@ export const TERROIR_ATLAS = {
       processing: 'Traditional Fully Washed with 18-36 hour tank fermentation',
       flavorNotes: ['Milk Chocolate', 'Caramel', 'Red Apple Acidity', 'Toasted Pecan', 'Silky Body'],
       acidProfile: 'Medium-High Malic & Tartaric Acidity',
-      agronomyDeepDive: 'Cultivated along the high ridges of the Andes cordilleras. The porous volcanic ash soils (Andisols) provide exceptional moisture retention and high potassium content, fostering sucrose development. This yields Colombia’s trademark harmony of creamy chocolate body with crisp red apple malic acidity.',
+      agronomyDeepDive: 'Famous for high-grown, mild Arabica beans with balanced fruit and caramel notes. Cultivated along high ridges of the Andes cordilleras. Porous volcanic ash soils foster sucrose development, yielding Colombia’s trademark harmony of creamy chocolate body with crisp apple acidity.',
       roastPairing: 'Medium Roast',
       recommendedMethod: 'Automatic Drip Maker & French Press',
       sourcedBrands: [
@@ -237,18 +282,66 @@ export const TERROIR_ATLAS = {
       ]
     },
     {
+      id: 'central_america',
+      country: 'Central America (Honduras, Guatemala, Costa Rica)',
+      flag: '🇭🇳',
+      macroRegion: 'Latin America (Volcanic Soil & Bright Acidity)',
+      regions: 'Antigua (Guatemala), Tarrazú (Costa Rica), Copán (Honduras)',
+      altitude: '1,400 - 2,000 meters',
+      soilType: 'Active Volcanic Pumice Ash & Volcanic Loam',
+      climate: 'Shaded volcanic slopes with cool mountain air currents',
+      genetics: 'Bourbon, Caturra, Catuai, Pache, Villa Sarchi',
+      processing: 'Fully Washed & Honey Processed',
+      flavorNotes: ['Bright Citric Acidity', 'Crisp Orange Zest', 'Bittersweet Cocoa', 'Wild Honey', 'Spicy Cinnamon'],
+      acidProfile: 'Bright Sparkling Citric Acidity',
+      agronomyDeepDive: 'Central America is noted for bright acidity, crisp citrus notes, and rich volcanic-soil profiles. Volcanoes continuously deposit mineral-rich pumice ash. Combined with cool night air, Guatemalan, Honduran, and Costa Rican beans develop dense cell structure yielding bittersweet chocolate depth and orange zest bite.',
+      roastPairing: 'Medium Roast',
+      recommendedMethod: 'Pour-Over (V60) & French Press',
+      sourcedBrands: [
+        { name: 'Intelligentsia Coffee', offering: 'Guatemala Los Inmortales & Honduras Santa Barbara', note: 'Antigua Bourbon with dark chocolate fudge, toasted hazelnut, and orange blossom.' },
+        { name: "Peet's Coffee", offering: 'Guatemala San Sebastián Antigua', note: 'High volcanic elevation profile with rich bittersweet cocoa, spicy cinnamon, and heavy body.' },
+        { name: 'Blue Bottle Coffee', offering: 'Costa Rica Hermosa Honey Process', note: 'Red Honey processed micro-lot with wildflower honey, nectarine, and silky texture.' },
+        { name: 'Verve Coffee Roasters', offering: 'Honduras San Vicente & Costa Rica Honey', note: 'Vibrant clementine acidity, dried apricot, and raw honey sweetness.' }
+      ]
+    },
+    {
+      id: 'ethiopia',
+      country: 'Ethiopia',
+      flag: '🇪🇹',
+      macroRegion: 'Africa & Middle East (Birthplace of Arabica)',
+      regions: 'Yirgacheffe, Sidama, Guji, Harar',
+      altitude: '1,800 - 2,200 meters',
+      soilType: 'Iron-Rich Volcanic Nitisols & Deep Forest Organic Humus',
+      climate: 'Subtropical highland with extreme diurnal temperature swings (25°C days / 8°C nights)',
+      genetics: 'Indigenous Wild Heirloom Arabica Landraces (Kurume, Dega, Wolisho)',
+      processing: 'Fully Washed (citric clarity) & Natural Sun-Dried on Raised African Beds (berry fruitiness)',
+      flavorNotes: ['Jasmine Floral', 'Bergamot Citrus', 'Wild Blueberry', 'Peach Nectar', 'Tea-like Body'],
+      acidProfile: 'High Citric & Floral Phosphoric Acidity',
+      agronomyDeepDive: 'The historic birthplace of Arabica coffee, yielding complex, wine-like, floral, and bright berry flavors. Extreme altitude slows cherry maturation to over 9 months. Cold mountain nights cause coffee trees to store dense sugars and complex organic acids, producing unmatched bergamot density and tea-like elegance.',
+      roastPairing: 'Light to Medium-Light Roast (Nordic / Modern Specialty)',
+      recommendedMethod: 'Pour-Over (V60 / Chemex)',
+      sourcedBrands: [
+        { name: 'Counter Culture Coffee', offering: 'Apollo & Single Origin Ethiopia Yirgacheffe', note: 'Clean washed lot featuring sparkling Meyer lemon, jasmine floral aroma, and bergamot finish.' },
+        { name: 'Stumptown Coffee Roasters', offering: 'Ethiopia Mordecofe & Duromina', note: 'Washed Yirgacheffe with peach tea clarity and delicate floral honeysuckle finish.' },
+        { name: 'Blue Bottle Coffee', offering: 'Single Origin Ethiopia Guji & Three Africas', note: 'Sun-dried natural processed Guji with intense wild blueberry jam sweetness and syrupy body.' },
+        { name: 'Onyx Coffee Lab', offering: 'Ethiopia Tropical Weather & Worka Sakaro', note: 'Anaerobic & double-fermented heirloom cherries boasting candied papaya and jasmine.' },
+        { name: 'Intelligentsia Coffee', offering: 'Organic Ethiopia Kurimi', note: 'Clean washed Sidama with crisp citric acidity, nectarine, and floral bergamot.' }
+      ]
+    },
+    {
       id: 'kenya',
       country: 'Kenya',
       flag: '🇰🇪',
+      macroRegion: 'Africa & Middle East (Savory & Vibrant Citrus)',
       regions: 'Nyeri, Kirinyaga, Mount Kenya, Murang’a',
       altitude: '1,700 - 2,100 meters',
       soilType: 'Deep Red Volcanic Clay Soils (Rhodic Nitisols) rich in Phosphoric Acid',
       climate: 'Bimodal rainfall pattern with distinct hot sun and cool mountain mist cycles',
       genetics: 'SL-28, SL-34 (Scott Laboratories selections), Ruiru 11, Batian',
       processing: 'Kenyan 72-Hour Double Washed Process with soaking stage',
-      flavorNotes: ['Blackcurrant', 'Juicy Grapefruit', 'Complex Winey Acidity', 'Cane Sugar', 'Tomato Leaf'],
+      flavorNotes: ['Blackcurrant', 'Juicy Grapefruit', 'Savory Tomato-like Note', 'Complex Winey Acidity', 'Cane Sugar'],
       acidProfile: 'Pungent Phosphoric & Tartaric Acidity',
-      agronomyDeepDive: 'Kenya’s red volcanic clay soils are packed with accessible phosphoric acid. The legendary SL-28 and SL-34 Bourbon cultivars combined with the 72-hour double washing process (where beans are fermented, washed, and soaked overnight under clean water) create Kenya’s world-famous sparkling blackcurrant flavor, juicy grapefruit acidity, and winey complexity.',
+      agronomyDeepDive: 'Renowned for savory, tomato-like, and vibrant citrus-heavy flavor profiles. Kenya’s red volcanic clay soils are packed with accessible phosphoric acid. The legendary SL-28 and SL-34 Bourbon cultivars combined with 72-hour double washing create Kenya’s world-famous sparkling blackcurrant flavor and winey complexity.',
       roastPairing: 'Light to Medium-Light Roast',
       recommendedMethod: 'Pour-Over (Chemex / V60)',
       sourcedBrands: [
@@ -259,62 +352,62 @@ export const TERROIR_ATLAS = {
       ]
     },
     {
-      id: 'guatemala',
-      country: 'Guatemala',
-      flag: '🇬🇹',
-      regions: 'Antigua, Huehuetenango, Atitlán, Fraijanes',
-      altitude: '1,500 - 2,000 meters',
-      soilType: 'Active Volcanic Ash (Pumice) from Fuego & Acatenango volcanoes',
-      climate: 'Microclimates created by mountain barrier walls and warm Pacific air currents',
-      genetics: 'Bourbon, Caturra, Catuai, Pache, Typica',
-      processing: 'Fully Washed with patio sun drying',
-      flavorNotes: ['Dark Cocoa', 'Roasted Hazelnut', 'Orange Zest', 'Spicy Cinnamon', 'Smoky Cocoa'],
-      acidProfile: 'Balanced Citric & Malic Acidity',
-      agronomyDeepDive: 'In Antigua, three surrounding volcanoes continuously deposit mineral-rich pumice ash into the soil. The pumice retains optimal humidity in dry months. Combined with cool night air from high mountain ranges, Guatemalan beans develop a dense cell structure resulting in bittersweet chocolate depth, hazelnut sweetness, and a pleasant orange zest bite.',
-      roastPairing: 'Medium to Dark Roast',
-      recommendedMethod: 'French Press & Drip Coffee Maker',
+      id: 'yemen',
+      country: 'Yemen',
+      flag: '🇾🇪',
+      macroRegion: 'Africa & Middle East (Historic Ancient Mocha)',
+      regions: 'Bani Mattar, Haraaz, Dhamar',
+      altitude: '1,800 - 2,400 meters',
+      soilType: 'Dry Arid Terraced Mountain Soil',
+      climate: 'Arid high-mountain climate with extreme water scarcity',
+      genetics: 'Ancient Mocha Heirloom Landraces (Udaini, Dawairi, Jaadi)',
+      processing: 'Traditional Dry Natural Sun-Drying on stone rooftops',
+      flavorNotes: ['Deep Earthy Cedar', 'Wild Cardamom Spice', 'Dark Bittersweet Cocoa', 'Dried Fig', 'Winey Depth'],
+      acidProfile: 'Pungent Rustic Malic Acidity',
+      agronomyDeepDive: 'Yemen is the historic producer of deep, earthy, and wild-tasting traditional coffees. Grown on ancient stone mountain terraces built over 1,000 years ago, severe water scarcity forces trees to concentrate deep spice, dried fruit, cardamom, and dark chocolate flavor notes into tiny, dense seeds.',
+      roastPairing: 'Medium Roast',
+      recommendedMethod: 'French Press & Turkish Brew',
       sourcedBrands: [
-        { name: 'Intelligentsia Coffee', offering: 'Guatemala Los Inmortales & Flecha de Oro', note: 'Antigua Bourbon with dark chocolate fudge, toasted hazelnut, and orange blossom.' },
-        { name: "Peet's Coffee", offering: 'Guatemala San Sebastián Antigua', note: 'High volcanic elevation profile with rich bittersweet cocoa, spicy cinnamon, and heavy body.' },
-        { name: 'Stumptown Coffee Roasters', offering: 'Guatemala El Injerto & Bella Vista', note: 'Huehuetenango washed Caturra with sweet milk chocolate and crisp clementine.' },
-        { name: 'Starbucks Reserve', offering: 'Guatemala Antigua Single Origin', note: 'Classic volcanic ash profile featuring cocoa nibs, warm spice, and citrus finish.' }
+        { name: 'George Howell Coffee', offering: 'Yemen Haraaz Red Mahal Aqeeq', note: 'Historic terraced lot featuring wild dried fig, cardamom spice, and bittersweet cocoa.' },
+        { name: 'Equator Coffees', offering: 'Yemen Mocha Matari', note: 'Traditional dry natural with deep earthiness, dark chocolate, and rustic winey body.' },
+        { name: 'Portola Coffee Roasters', offering: 'Yemen Bani Mattar Single Origin', note: 'Exotic ancient landrace with clove, dried date, and complex pungent acidity.' }
       ]
     },
     {
-      id: 'costa_rica',
-      country: 'Costa Rica',
-      flag: '🇨🇷',
-      regions: 'Tarrazú, Central Valley, West Valley, Orosi',
-      altitude: '1,400 - 1,900 meters',
-      soilType: 'Enriched Volcanic Loam with high organic content',
-      climate: 'Pacific & Atlantic climate influences with strict wet/dry seasonality',
-      genetics: 'Caturra, Villa Sarchi, Geisha, SL-28',
-      processing: 'Pioneering Honey Process (Yellow, Red, Black Honey) & Washed',
-      flavorNotes: ['Wild Honey', 'Crisp Green Apple', 'White Floral', 'Stone Fruit', 'Clean Body'],
-      acidProfile: 'Refined Citric & Apple Malic Acidity',
-      agronomyDeepDive: 'Costa Rica is the birthplace of micro-mill innovation and Honey Processing. In Honey processing, precise percentages of sweet fruit mucilage are left on the parchment bean while sun-drying on raised beds. The sugars naturally ferment into the bean, yielding clean fruit sweetness, honeyed mouthfeel, and green apple clarity.',
-      roastPairing: 'Medium Roast',
-      recommendedMethod: 'Pour-Over & AeroPress',
+      id: 'vietnam',
+      country: 'Vietnam',
+      flag: '🇻🇳',
+      macroRegion: 'Asia & Pacific (Top Global Robusta Producer)',
+      regions: 'Central Highlands (Buôn Ma Thuột, Đắk Lắk, Lâm Đồng)',
+      altitude: '500 - 1,000 meters',
+      soilType: 'Basaltic Volcanic Red Soils',
+      climate: 'Tropical monsoon climate with high heat and wet season humidity',
+      genetics: 'Coffea canephora (High-Caffeine Robusta Cultivars)',
+      processing: 'Natural Sun-Dried & Mechanical Drying',
+      flavorNotes: ['Strong Dark Chocolate', 'Roasted Walnut', 'Woody Cedar', 'Heavy Crema', 'Bold Bitter Strength'],
+      acidProfile: 'Very Low Acidity',
+      agronomyDeepDive: 'Vietnam is the top global producer of Robusta beans, providing a strong, dark, and bitter profile. Grown in the volcanic red soils of the Central Highlands, Vietnam’s high-caffeine Robusta beans produce heavy crema, bold chocolate body, and woody strength—the backbone of traditional Vietnamese Phin iced coffee.',
+      roastPairing: 'Dark Roast',
+      recommendedMethod: 'Vietnamese Phin Filter & French Press',
       sourcedBrands: [
-        { name: 'Blue Bottle Coffee', offering: 'Costa Rica Hermosa Honey Process', note: 'Red Honey processed micro-lot with wildflower honey, nectarine, and silky texture.' },
-        { name: 'Counter Culture Coffee', offering: 'Costa Rica Perla del Café', note: 'Yellow Honey Villa Sarchi with golden delicious apple and honeyed sweetness.' },
-        { name: 'Verve Coffee Roasters', offering: 'Costa Rica Las Lajas Honey', note: 'Black Honey pioneer estate with intense stone fruit, cherry, and raw sugar syrup.' },
-        { name: 'Ritual Coffee Roasters', offering: 'Costa Rica La Minita Tarrazú', note: 'Famous estate washed lot with immaculate balance, green apple, and sweet cream.' }
+        { name: 'Nguyen Coffee Supply', offering: 'Loyal 100% Robusta & Grit Blend', note: 'Brooklyn roaster pioneering specialty Vietnamese Robusta with hazelnut, scotch, and thick crema.' },
+        { name: 'Copper Cow Coffee', offering: 'Vietnamese Classic Pour-Over', note: 'Sourced directly from Đà Lạt farmers with dark chocolate and roasted nut strength.' }
       ]
     },
     {
       id: 'indonesia',
-      country: 'Indonesia',
+      country: 'Indonesia (Sumatra, Java)',
       flag: '🇮🇩',
+      macroRegion: 'Asia & Pacific (Heavy-Bodied Earthy Profiles)',
       regions: 'Sumatra (Gayo Highlands/Mandheling), Java, Toraja Sulawesi',
       altitude: '1,100 - 1,600 meters',
       soilType: 'Volcanic Tropical Humus with clay subsoil',
       climate: 'Equatorial tropical rainforest with year-round high humidity & heavy rainfall',
       genetics: 'Ateng, Tim Tim, Bergendal, Line S795 (Arabica Hybrids)',
       processing: 'Traditional Wet-Hulled (Giling Basah) Process',
-      flavorNotes: ['Earthy Cedar', 'Dark Chocolate', 'Pipe Tobacco', 'Low Acidity', 'Syrupy Heavy Body'],
+      flavorNotes: ['Earthy Cedar', 'Dark Cocoa', 'Pipe Tobacco', 'Low Acidity', 'Syrupy Heavy Body'],
       acidProfile: 'Low Acidity with Heavy Lipids',
-      agronomyDeepDive: 'Indonesia’s iconic Giling Basah (wet-hulling) technique was created to overcome equatorial humidity. Smallholders hull the parchment off the bean at 30-50% moisture (rather than 10-12%). The bare green beans dry exposed directly to humid air, undergoing unique microbial action that mutes acidity and imparts heavy cedar, dark cocoa, pipe tobacco, and dense syrupy mouthfeel.',
+      agronomyDeepDive: 'Famous for heavy-bodied, low-acidity, earthy, and spicy profiles. Indonesia’s iconic Giling Basah (wet-hulling) technique hulls parchment at 30-50% moisture. The green beans dry exposed directly to humid tropical air, undergoing unique microbial action that mutes acidity and imparts heavy cedar, cocoa, and dense syrupy mouthfeel.',
       roastPairing: 'Medium-Dark to Dark Roast',
       recommendedMethod: 'French Press (Immersion)',
       sourcedBrands: [
@@ -322,6 +415,27 @@ export const TERROIR_ATLAS = {
         { name: 'La Colombe Coffee Roasters', offering: 'Sumatra Mandheling Single Origin', note: 'Dark roast Gayo lot featuring pipe tobacco, dark chocolate truffle, and zero harshness.' },
         { name: 'Starbucks Reserve', offering: 'Sumatra Aged Single Origin', note: 'Aged 3-5 years in Singapore warehouses to develop deep rustic spice and wood notes.' },
         { name: 'Stumptown Coffee Roasters', offering: 'Sumatra Bies Penantan', note: 'Organic Gayo Highlands washed & wet-hulled hybrid with cedar, grapefruit rind, and cacao.' }
+      ]
+    },
+    {
+      id: 'india',
+      country: 'India',
+      flag: '🇮🇳',
+      macroRegion: 'Asia & Pacific (Monsoon-Shaded Low Acid Cups)',
+      regions: 'Baba Budangiri (Karnataka), Coorg, Nilgiri Hills',
+      altitude: '1,000 - 1,500 meters',
+      soilType: 'Rich Forest Loam with Spice Plantation Intercropping',
+      climate: 'Monsoon climate with shaded forest canopy microclimates',
+      genetics: 'S795, Selection 9, Kent Arabica',
+      processing: 'Monsooned Process (Monsooned Malabar) & Washed',
+      flavorNotes: ['Mild Low Acid', 'Warm Cardamom', 'Sweet Nutmeg', 'Malty Cocoa', 'Velvety Body'],
+      acidProfile: 'Ultra-Low Acidity',
+      agronomyDeepDive: 'India’s coffee is grown under monsoon shades (intercropped with cardamom, pepper, and cinnamon), offering mild and low-acid cups. In Monsooned Malabar processing, dry beans are exposed to humid monsoon winds for 3-4 months, expanding the beans and turning them golden while reducing acidity to near zero.',
+      roastPairing: 'Medium Roast',
+      recommendedMethod: 'French Press & Drip Coffee Maker',
+      sourcedBrands: [
+        { name: 'Blue Tokai Coffee Roasters', offering: 'India Monsooned Malabar & Attikan Estate', note: 'India’s leading specialty roaster with mild cocoa, warm nutmeg, and velvety low acidity.' },
+        { name: 'Josuma Coffee', offering: 'Super Malabar Monsooned Arabica', note: 'Specialty Monsooned Malabar with rich crema, baker’s chocolate, and sweet spice finish.' }
       ]
     }
   ],
