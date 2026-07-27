@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { GraduationCap, Globe, MapPin, Sparkles, Flame, CheckCircle2, ChevronRight, Award, Compass } from 'lucide-react';
+import { GraduationCap, MapPin, Sparkles, Award, Compass, ShoppingBag, Store, ExternalLink } from 'lucide-react';
 import { TERROIR_ATLAS } from '../data/brewData';
 
-export default function UniversityHub({ trackMode, onSelectRecommendedMethod }) {
+export default function UniversityHub({ trackMode }) {
   const isCoffee = trackMode === 'coffee';
   const origins = TERROIR_ATLAS[trackMode] || TERROIR_ATLAS.coffee;
   const [activeOriginId, setActiveOriginId] = useState(origins[0]?.id || 'ethiopia');
@@ -20,12 +20,12 @@ export default function UniversityHub({ trackMode, onSelectRecommendedMethod }) 
             <span>BrewCraft University • Terroir & Origin Atlas</span>
           </div>
           <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light drop-shadow-md">
-            {isCoffee ? 'Coffee Growing Origins & Flavor Terroirs' : 'Specialty Tea Growing Origins & Leaf Profiles'}
+            {isCoffee ? 'Coffee Origins, Terroirs & Sourced Brands' : 'Specialty Tea Terroirs & Sourced Tea Houses'}
           </h3>
           <p className="text-xs md:text-sm text-cream-soft/70 mt-1">
             {isCoffee
-              ? 'Explore high-altitude volcanic origins, processing styles, and signature flavor profiles'
-              : 'Explore historic mountain tea gardens, shading techniques, and cup characteristics'}
+              ? 'Explore high-altitude origins, flavor profiles, and famous roasters sourcing these beans'
+              : 'Explore historic mountain tea gardens and iconic tea houses offering these leaves'}
           </p>
         </div>
 
@@ -85,14 +85,14 @@ export default function UniversityHub({ trackMode, onSelectRecommendedMethod }) 
                 </h4>
                 <div className="text-xs text-amber-gold font-bold flex items-center gap-1.5 mt-0.5">
                   <MapPin className="w-3.5 h-3.5" />
-                  <span>Key Regions: {activeOrigin.regions}</span>
+                  <span>Key Growing Regions: {activeOrigin.regions}</span>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center space-x-2">
               <span className="text-xs font-mono font-bold bg-white/10 px-3 py-1.5 rounded-xl border border-white/15 text-cream-light">
-                {isCoffee ? `Elevation: ${activeOrigin.altitude}` : `Steep: ${activeOrigin.steepStyle}`}
+                {isCoffee ? `Elevation: ${activeOrigin.altitude}` : `Steep Style: ${activeOrigin.steepStyle}`}
               </span>
             </div>
           </div>
@@ -118,7 +118,7 @@ export default function UniversityHub({ trackMode, onSelectRecommendedMethod }) 
               </div>
             </div>
 
-            {/* Column 2: Famous Teas or Coffee Varieties */}
+            {/* Column 2: Processing & Cultivars */}
             <div className="p-4 rounded-2xl bg-black/40 border border-white/10 shadow-inner">
               <div className="text-xs font-extrabold uppercase tracking-wider text-cream-soft/80 mb-3 flex items-center gap-1.5">
                 <Award className="w-4 h-4 text-emerald-400" />
@@ -162,10 +162,35 @@ export default function UniversityHub({ trackMode, onSelectRecommendedMethod }) 
 
           </div>
 
+          {/* Sourced Brands & Specialty Roasters Section */}
+          <div className="p-5 rounded-2xl bg-black/50 border border-amber-gold/30 shadow-xl mb-6">
+            <div className="flex items-center space-x-2 text-xs uppercase font-extrabold tracking-wider text-amber-gold mb-3.5">
+              <Store className="w-4 h-4" />
+              <span>Famous Brands & Specialty Roasters Sourced From {activeOrigin.country}:</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {activeOrigin.sourcedBrands.map((brand, idx) => (
+                <div
+                  key={idx}
+                  className="p-3.5 rounded-xl bg-white/5 border border-white/10 hover:border-amber-gold/40 hover:bg-white/10 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-extrabold text-cream-light">{brand.name}</span>
+                    <ShoppingBag className="w-3.5 h-3.5 text-amber-gold/70" />
+                  </div>
+                  <div className="text-[11px] text-cream-soft/80 font-medium leading-snug">
+                    {brand.offering}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Terroir Master Overview Note */}
           <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-xs text-cream-soft/90 font-medium leading-relaxed shadow-inner">
             <strong className="text-amber-gold block uppercase tracking-wider mb-1 font-extrabold">
-              Terroir & Cultivation Insights:
+              Terroir & Harvest Insights:
             </strong>
             {activeOrigin.terroirOverview}
           </div>
