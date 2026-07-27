@@ -223,54 +223,66 @@ export const GRIND_VISUAL_GUIDE = [
     id: 'extra_fine',
     name: 'Extra Fine',
     micron: '200 - 300 µm',
+    image: './extra_fine_grind.jpg',
     textureComparison: 'Powdered Sugar / Flour',
     visualDensity: 'Ultra-Dense Fine Dust',
     suitableMethods: ['Espresso (9-Bar)', 'Turkish Ibrik'],
+    burrSettingTip: 'Setting 1 - 3 on most home burr grinders (Baratza Encore / Fellow Ode Gen 2 with SSP burrs).',
     sensoryImpact: 'High pressure surface area for rapid 25s extraction and rich hazelnut crema.'
   },
   {
     id: 'fine',
     name: 'Fine',
     micron: '350 - 500 µm',
+    image: './fine_grind.jpg',
     textureComparison: 'Table Salt',
     visualDensity: 'Granular Table Salt Grains',
     suitableMethods: ['Moka Pot (Stovetop)', 'AeroPress Short Brew'],
+    burrSettingTip: 'Setting 4 - 8 on home burr grinders.',
     sensoryImpact: 'Ideal for stovetop steam pressure, creating rich cocoa body without funneled channeling.'
   },
   {
     id: 'medium_fine',
     name: 'Medium-Fine',
     micron: '400 - 600 µm',
+    image: './medium_fine_grind.jpg',
     textureComparison: 'Fine Beach Sand / Kosher Salt',
     visualDensity: 'Gritty Fine Sand Grains',
     suitableMethods: ['Pour-Over (V60)', 'Chemex Paper Filter', 'AeroPress Standard'],
+    burrSettingTip: 'Setting 9 - 14 on home burr grinders.',
     sensoryImpact: 'Balances paper filter drawdown flow rate with high citric acidity & floral clarity.'
   },
   {
     id: 'medium',
     name: 'Medium',
     micron: '600 - 750 µm',
+    image: './medium_grind.jpg',
     textureComparison: 'Coarse Sand / Ground Black Pepper',
     visualDensity: 'Distinct Uniform Sand Grains',
     suitableMethods: ['Automatic Drip Maker', 'Siphon Brewer'],
+    burrSettingTip: 'Setting 15 - 20 on home burr grinders.',
     sensoryImpact: 'Optimized for showerhead batch brewing, preventing papery over-extraction.'
   },
   {
     id: 'medium_coarse',
     name: 'Medium-Coarse',
     micron: '750 - 900 µm',
+    image: './medium_coarse_grind.jpg',
     textureComparison: 'Coarse Sea Salt',
     visualDensity: 'Visible Coarse Rock Grains',
     suitableMethods: ['Chemex Thick Filter', 'Clever Coffee Dripper'],
+    burrSettingTip: 'Setting 21 - 26 on home burr grinders.',
     sensoryImpact: 'Ensures steady flow through heavy paper filters without clogging or stalling.'
   },
   {
     id: 'coarse',
     name: 'Coarse',
     micron: '800 - 1000 µm',
+    image: './coarse_grind.jpg',
     textureComparison: 'Cracked Black Pepper / Potting Soil',
     visualDensity: 'Large Chunks & Flakes',
     suitableMethods: ['French Press Immersion', 'Cold Brew Steep (16-24h)'],
+    burrSettingTip: 'Setting 27 - 35 on home burr grinders.',
     sensoryImpact: 'Allows long 4+ minute immersion without fine silt slipping past metal mesh filters.'
   }
 ];
