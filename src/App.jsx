@@ -120,6 +120,7 @@ export default function App() {
           {/* 4. Integrated Masterclass Video Hub & Split Screen */}
           <MasterclassHub
             trackMode={trackMode}
+            activeMethod={activeMethod}
             isSplitScreen={isSplitScreen}
             setIsSplitScreen={setIsSplitScreen}
             activeVideo={activeVideo}

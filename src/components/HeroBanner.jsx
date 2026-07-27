@@ -1,5 +1,5 @@
 import React from 'react';
-import { Thermometer, Gauge, Sparkles, Droplets } from 'lucide-react';
+import { Thermometer, Gauge, Sparkles, Droplets, HeartHandshake } from 'lucide-react';
 
 export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
   const isCoffee = trackMode === 'coffee';
@@ -32,19 +32,19 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
       <div className="relative z-10 p-8 md:p-12 lg:p-14 max-w-3xl">
         <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-xl text-xs uppercase tracking-widest font-extrabold mb-4 text-cream-light border border-white/20 shadow-lg">
           <Sparkles className={`w-3.5 h-3.5 ${isCoffee ? 'text-amber-gold' : 'text-sage-300'}`} />
-          <span>{isCoffee ? 'Home Specialty Coffee Track' : 'Fine Tea Steeping Track'}</span>
+          <span>{isCoffee ? 'Method Specifications & Preferred Beans' : 'Method Specifications & Preferred Leaves'}</span>
         </div>
 
         <h2 className="font-serif text-3xl md:text-5xl lg:text-6xl font-extrabold text-cream-light tracking-wide mb-4 leading-tight drop-shadow-lg">
           {activeMethod.name}
         </h2>
 
-        <p className="text-sm md:text-base text-cream-soft/90 leading-relaxed mb-8 max-w-xl font-medium drop-shadow-md">
+        <p className="text-sm md:text-base text-cream-soft/90 leading-relaxed mb-6 max-w-xl font-medium drop-shadow-md">
           {activeMethod.description}
         </p>
 
         {/* Quick Specs Raised Glass Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
           
           <div className="glass-panel p-4 rounded-2xl flex items-center space-x-3.5 hover:-translate-y-1 transition-all duration-300">
             <div className={`p-3 rounded-xl shadow-inner ${isCoffee ? 'bg-amber-gold/25 text-amber-gold border border-amber-gold/30' : 'bg-sage-500/25 text-sage-300 border border-sage-500/30'}`}>
@@ -79,6 +79,20 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
           </div>
 
         </div>
+
+        {/* PREFERRED COFFEE / TEA TYPES FOR THIS METHOD */}
+        {activeMethod.preferredCoffeeTypes && (
+          <div className="p-4 rounded-2xl bg-black/60 border border-amber-gold/30 shadow-xl backdrop-blur-md">
+            <div className="flex items-center space-x-2 text-xs font-extrabold uppercase tracking-wider text-amber-gold mb-1.5">
+              <HeartHandshake className="w-4 h-4 text-amber-gold" />
+              <span>{isCoffee ? `Preferred Coffee Beans & Origins for ${activeMethod.name}:` : `Preferred Tea Leaf Varieties for ${activeMethod.name}:`}</span>
+            </div>
+            <p className="text-xs text-cream-soft/90 font-medium leading-relaxed">
+              {activeMethod.preferredCoffeeTypes}
+            </p>
+          </div>
+        )}
+
       </div>
     </section>
   );

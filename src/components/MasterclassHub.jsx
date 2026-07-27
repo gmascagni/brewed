@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Video, Play, Columns, Bookmark, CheckCircle, Clock, Sparkles } from 'lucide-react';
 import { MASTERCLASSES } from '../data/brewData';
 
-export default function MasterclassHub({ trackMode, isSplitScreen, setIsSplitScreen, activeVideo, setActiveVideo }) {
+export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen, setIsSplitScreen, activeVideo, setActiveVideo }) {
   const isCoffee = trackMode === 'coffee';
   const [bookmarkedIds, setBookmarkedIds] = useState([]);
 
@@ -12,6 +12,14 @@ export default function MasterclassHub({ trackMode, isSplitScreen, setIsSplitScr
     );
   };
 
+  // Filter videos dynamically for the active method selected
+  const activeMethodId = activeMethod?.id;
+  const filteredVideos = MASTERCLASSES.filter(
+    (item) => item.methodId === activeMethodId || item.methodId === 'pour_over'
+  );
+
+  const displayVideos = filteredVideos.length > 0 ? filteredVideos : MASTERCLASSES;
+
   return (
     <section className="mt-12 p-7 md:p-9 rounded-3xl glass-panel shadow-2xl transition-all duration-500">
       
@@ -20,13 +28,13 @@ export default function MasterclassHub({ trackMode, isSplitScreen, setIsSplitScr
         <div>
           <div className="inline-flex items-center space-x-2 text-xs font-extrabold uppercase tracking-widest text-amber-gold mb-1.5">
             <Sparkles className="w-4 h-4 animate-pulse" />
-            <span>Integrated Video Masterclass Hub</span>
+            <span>Method Help Videos • {activeMethod?.name || 'Selected Method'}</span>
           </div>
           <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light drop-shadow-md">
-            Brewing Masterclasses & Techniques
+            Video Help & Masterclasses for {activeMethod?.name}
           </h3>
           <p className="text-xs md:text-sm text-cream-soft/70 mt-1">
-            Step-by-step visual guides on concentric pours, French press skimming, and tea washing
+            Step-by-step visual guides on preferred coffee types, pouring technique, crust skimming, and extraction
           </p>
         </div>
 
@@ -92,9 +100,9 @@ export default function MasterclassHub({ trackMode, isSplitScreen, setIsSplitScr
         </div>
       )}
 
-      {/* Video Masterclass Grid with Raised Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        {MASTERCLASSES.map((item) => {
+      {/* Video Masterclass Grid with Method-Filtered Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {displayVideos.map((item) => {
           const isBookmarked = bookmarkedIds.includes(item.id);
           const isActive = activeVideo?.id === item.id;
 
@@ -145,7 +153,7 @@ export default function MasterclassHub({ trackMode, isSplitScreen, setIsSplitScr
               <div className="p-5 flex-1 flex flex-col justify-between">
                 <div>
                   <div className="text-[10px] font-extrabold uppercase tracking-widest text-amber-gold mb-1.5">
-                    {item.method} Masterclass
+                    {item.method} Help Video
                   </div>
                   <h4 className="font-serif text-sm font-bold text-cream-light mb-2 line-clamp-2 drop-shadow">
                     {item.title}
@@ -157,9 +165,10 @@ export default function MasterclassHub({ trackMode, isSplitScreen, setIsSplitScr
 
                 <button
                   onClick={() => setActiveVideo(item)}
-                  className="mt-5 w-full py-2.5 rounded-2xl bg-white/10 border border-white/15 hover:bg-white/20 text-xs font-extrabold text-cream-light transition-all shadow active:scale-95"
+                  className="mt-5 w-full py-2.5 rounded-2xl bg-white/10 border border-white/15 hover:bg-white/20 text-xs font-extrabold text-cream-light transition-all shadow active:scale-95 flex items-center justify-center gap-2"
                 >
-                  Watch Tutorial
+                  <Play className="w-3.5 h-3.5 fill-current text-amber-gold" />
+                  <span>Watch {item.method} Guide</span>
                 </button>
               </div>
             </div>

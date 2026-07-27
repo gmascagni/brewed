@@ -13,6 +13,7 @@ export const BREW_METHODS = {
       grind: 'Medium-Fine',
       micron: '400 - 600 µm',
       description: 'Highlighting bright acidity, delicate floral notes, and crystal-clear body through controlled spiral pouring.',
+      preferredCoffeeTypes: 'Light to Medium-Light Roasts. Washed Ethiopian Yirgacheffe, Kenyan SL-28, and Guatemalan Antigua for bright citric, floral, and bergamot notes.',
       phases: [
         { name: 'Bloom Phase', durationSec: 45, waterMultiplier: 3, instruction: 'Pour 3x coffee weight in circular motion. Let coffee expand and off-gas CO2.' },
         { name: 'Main Concentric Pour', durationSec: 60, waterMultiplier: 0.6, instruction: 'Slow concentric pour from center outward. Keep water level steady.' },
@@ -32,6 +33,7 @@ export const BREW_METHODS = {
       grind: 'Coarse / Medium-Coarse',
       micron: '800 - 1000 µm',
       description: 'Rich, full-bodied immersion brew using the James Hoffmann no-press skimming technique for a silt-free cup.',
+      preferredCoffeeTypes: 'Medium-Dark to Dark Roasts. Sumatran Giling Basah, Brazilian Yellow Bourbon, and Colombian Huila for heavy chocolate, cedar, and syrupy body.',
       phases: [
         { name: 'Full Immersion Steep', durationSec: 240, waterMultiplier: 1.0, instruction: 'Pour all water aggressively over grounds. Place lid on top to retain heat.' },
         { name: 'Stir & Crust Skim', durationSec: 30, waterMultiplier: 1.0, instruction: 'Gently stir crust. Skim top foam and floating bits with two spoons.' },
@@ -51,6 +53,7 @@ export const BREW_METHODS = {
       grind: 'Medium',
       micron: '600 - 750 µm',
       description: 'The golden ratio optimization for home electric batch brewers. Maximize extraction clarity and consistency.',
+      preferredCoffeeTypes: 'Medium Roasts. Colombian Nariño, Costa Rican Tarrazú, and Central American blends for balanced milk chocolate, caramel, and clean sweetness.',
       phases: [
         { name: 'Filter Rinse & Reservoir Fill', durationSec: 30, waterMultiplier: 0, instruction: 'Pre-rinse paper filter with hot water. Fill reservoir with cold filtered water.' },
         { name: 'Showerhead Brew Cycle', durationSec: 180, waterMultiplier: 1.0, instruction: 'Start brew cycle. Ensure grounds bed is evenly saturated by showerhead.' },
@@ -70,6 +73,7 @@ export const BREW_METHODS = {
       grind: 'Extra Fine',
       micron: '200 - 300 µm',
       description: 'Concentrated high-pressure extraction yielding rich crema, heavy body, and intense flavor balance.',
+      preferredCoffeeTypes: 'Medium-Dark & Espresso Blends. Brazilian Bourbon & Central American blends for thick hazelnut crema, baker’s chocolate, and sweet caramel notes.',
       phases: [
         { name: 'Pre-Infusion', durationSec: 8, waterMultiplier: 0.5, instruction: 'Gentle low pressure saturation to prevent puck channeling.' },
         { name: 'Main Pressure Extraction', durationSec: 25, waterMultiplier: 1.0, instruction: 'Full 9-bar pressure extraction aiming for 1:2 yield ratio.' }
@@ -88,6 +92,7 @@ export const BREW_METHODS = {
       grind: 'Medium-Fine',
       micron: '450 - 550 µm',
       description: 'Versatile hybrid immersion and pressure extraction delivering sweet, clean, low-acidity coffee.',
+      preferredCoffeeTypes: 'Light to Medium Roasts. Costa Rican Honey Process, Ethiopian Sidama, and Pink Bourbon for stone fruit, floral, and raw honey sweetness.',
       phases: [
         { name: 'Steep & Agitate', durationSec: 60, waterMultiplier: 1.0, instruction: 'Pour hot water, stir vigorously 10 times, let steep inverted.' },
         { name: 'Cap & Flip Rest', durationSec: 30, waterMultiplier: 1.0, instruction: 'Attach filter cap, carefully flip onto sturdy mug.' },
@@ -108,6 +113,7 @@ export const BREW_METHODS = {
       tempF: 172,
       leafGrade: 'Whole Leaf',
       description: 'Delicate low-temp steeping to preserve fresh umami, sweet grassy aromas, and avoid bitter tannins.',
+      preferredCoffeeTypes: 'Japanese Sencha & Gyokuro, Chinese West Lake Longjing. Steamed & pan-fired green leaves high in L-theanine amino acids.',
       phases: [
         { name: 'Vessel Preheat', durationSec: 15, waterMultiplier: 0, instruction: 'Warm teapot or glass with warm water, then discard water.' },
         { name: '1st Steeping Infusion', durationSec: 120, waterMultiplier: 1.0, instruction: 'Pour 78°C water gently over leaves. Do not agitate.' },
@@ -126,6 +132,7 @@ export const BREW_METHODS = {
       tempF: 181,
       leafGrade: 'Buds & Young Leaves',
       description: 'Subtle, sweet, and velvety texture with notes of honeysuckle and soft melon.',
+      preferredCoffeeTypes: 'Fujian Silver Needle (Bai Hao Yin Zhen) & White Peony. Whole unoxidized buds rich in delicate melon and honeysuckle floral oils.',
       phases: [
         { name: 'Vessel Preheat', durationSec: 15, waterMultiplier: 0, instruction: 'Warm ceramic teapot with warm water.' },
         { name: 'Long Floral Infusion', durationSec: 180, waterMultiplier: 1.0, instruction: 'Steep untouched at 83°C to unlock delicate essential oils.' },
@@ -144,6 +151,7 @@ export const BREW_METHODS = {
       tempF: 190,
       leafGrade: 'Tightly Rolled Leaf',
       description: 'High-leaf ratio Gongfu steeping revealing evolving layers of orchid florals and roasted honey over multiple infusions.',
+      preferredCoffeeTypes: 'Taiwanese High Mountain Alishan, Wuyi Rock Da Hong Pao, Dong Ding Oolong. Hand-rolled oolongs releasing floral butter, lilac, and rock mineral depth.',
       phases: [
         { name: 'Leaf Wash Rinse', durationSec: 10, waterMultiplier: 1.0, instruction: 'Quick 10-second flash pour to wake rolled leaves; discard liquid.' },
         { name: '1st Infusion', durationSec: 45, waterMultiplier: 1.0, instruction: 'Steep 45 seconds at 88°C for rich aroma peak.' },
@@ -162,6 +170,7 @@ export const BREW_METHODS = {
       tempF: 205,
       leafGrade: 'Orthodox Black Leaf',
       description: 'Bold, comforting malt aromas, crisp stone fruit notes, and rich amber liqueur.',
+      preferredCoffeeTypes: 'Himalayan First Flush Darjeeling & Brahmaputra Valley Assam. Orthodox whole black leaf offering muscatel grape clarity and rich malty cocoa.',
       phases: [
         { name: 'Warm Teapot', durationSec: 20, waterMultiplier: 0, instruction: 'Rinse teapot with near-boiling water.' },
         { name: 'Full Extraction Steep', durationSec: 240, waterMultiplier: 1.0, instruction: 'Steep at 96°C for 4 minutes for robust body without harshness.' },
@@ -180,6 +189,7 @@ export const BREW_METHODS = {
       tempF: 208,
       leafGrade: 'Botanicals / Compressed Cakes',
       description: 'Deep, grounding earthiness or soothing caffeine-free botanical infusions.',
+      preferredCoffeeTypes: 'Yunnan Aged Cooked Pu-erh (Shou), Chamomile, Peppermint. Deeply fermented tea cakes and whole organic botanicals.',
       phases: [
         { name: 'Boiling Rinse', durationSec: 15, waterMultiplier: 1.0, instruction: 'Flash rinse to hydrate herbs/fermented leaves; discard liquid.' },
         { name: 'Deep Infusion', durationSec: 300, waterMultiplier: 1.0, instruction: 'Steep 5 minutes with boiling water for full extraction.' }
@@ -438,130 +448,16 @@ export const TERROIR_ATLAS = {
         { name: 'Josuma Coffee', offering: 'Super Malabar Monsooned Arabica', note: 'Specialty Monsooned Malabar with rich crema, baker’s chocolate, and sweet spice finish.' }
       ]
     }
-  ],
-  tea: [
-    {
-      id: 'china',
-      country: 'China',
-      flag: '🇨🇳',
-      regions: 'Fujian (Wuyi Mountains/Anxi), Zhejiang (West Lake), Yunnan',
-      famousTeas: ['Longjing (Dragonwell Green)', 'Da Hong Pao (Wuyi Cliff Oolong)', 'Pu-erh (Shou & Sheng)', 'Lapsang Souchong'],
-      soilType: 'Granite Rock Mineral Soil (Wuyi Rocks) & Red Forest Clay',
-      botanicals: 'Camellia sinensis var. sinensis (Small Leaf Bush)',
-      processing: 'Pan-firing (Green), Charcoal Roasting (Oolong), Microbial Fermentation (Pu-erh)',
-      flavorNotes: ['Roasted Chestnut', 'Orchid Floral', 'Rock Mineral (Yan Yun)', 'Earthy Dark Chocolate'],
-      steepStyle: 'Gongfu High-Leaf Ratio & Western Infusion',
-      recommendedMethod: 'Oolong & Green Tea Tracks',
-      sourcedBrands: [
-        { name: 'Vahdam Teas', offering: 'Imperial Chinese Loose Leaf Collection', note: 'Authentic West Lake Longjing and Yunnan Black tea selections.' },
-        { name: 'Mei Leaf Tea House', offering: 'Imperial Longjing & Wuyi Cliff Oolongs', note: 'Direct-farm sourced competition grade Wuyi Rock Da Hong Pao with heavy Yan Yun mineral notes.' },
-        { name: 'Harney & Sons', offering: 'Dragon Pearl Jasmine & Imperial Pu-erh', note: 'Hand-rolled jasmine tea pearls and aged cooked Pu-erh tea cakes.' },
-        { name: 'The Tao of Tea', offering: 'Organic Dragonwell & Yunnan Golden Tip', note: 'Pan-fired Hangzhou green tea with rich toasted chestnut and sweet finish.' }
-      ],
-      terroirOverview: 'The birthplace of tea culture. In Fujian’s Wuyi Mountains, tea bushes grow directly out of granite rock cliffs. The roots absorb rich rock minerals, producing the famous "Yan Yun" (Rock Rhythm)—a combination of floral orchid aroma, roasted mineral depth, and lingering throat sweetness.'
-    },
-    {
-      id: 'japan',
-      country: 'Japan',
-      flag: '🇯🇵',
-      regions: 'Shizuoka, Uji (Kyoto), Kagoshima, Yame',
-      famousTeas: ['Sencha', 'Gyokuro (Shaded Green)', 'Matcha (Stone-Ground)', 'Hojicha (Roasted)'],
-      soilType: 'Volcanic Ash Soil (Kuroboku) rich in organic matter',
-      botanicals: 'Yabukita, Saemidori, Okumidori Cultivars',
-      processing: 'Deep Steam Process (Fukamushi) & Bamboo Net Canopy Shading (Kabuse)',
-      flavorNotes: ['Rich Umami', 'Steamed Spinach', 'Marine Sea Breeze', 'Sweet Grassy Finish'],
-      steepStyle: 'Steam Processed Whole Leaf (Low Temp 70-80°C)',
-      recommendedMethod: 'Specialty Green Tea Track (78°C)',
-      sourcedBrands: [
-        { name: 'Ippodo Tea Co. (Kyoto since 1717)', offering: 'Sayaka & Ummon Ceremonial Matcha, Gyokuro Kanro', note: '300-year-old Kyoto teahouse supplying stone-ground ceremonial matcha rich in umami.' },
-        { name: 'Harney & Sons', offering: 'Japanese Sencha & Genmaicha', note: 'Steamed Shizuoka green tea blended with roasted toasted brown rice.' },
-        { name: 'Rishi Tea & Botanicals', offering: 'Organic Teahouse Matcha & Sencha Fukuoka', note: 'First harvest ceremonial matcha from Kagoshima volcanic soils.' },
-        { name: 'Encha Organic Matcha', offering: 'Uji First Harvest Ceremonial Matcha', note: 'Shaded Uji matcha with deep emerald color, zero bitterness, and creamy umami.' }
-      ],
-      terroirOverview: 'Japanese teas are steam-processed within hours of picking to halt oxidation. For Gyokuro and Matcha, tea bushes are shaded with black bamboo nets for 20-30 days before harvest. Shading blocks sunlight, preventing the conversion of L-theanine amino acids into bitter catechins, generating Japan’s iconic savory umami and sweet marine sea breeze flavor.'
-    },
-    {
-      id: 'india',
-      country: 'India',
-      flag: '🇮🇳',
-      regions: 'Darjeeling (Himalayan Foothills), Assam (Brahmaputra Valley), Nilgiri',
-      famousTeas: ['First Flush Darjeeling ("Champagne of Teas")', 'Bold Assam CTC & Orthodox', 'Nilgiri Frost Tea'],
-      soilType: 'Himalayan Silt & Fertile Alluvial River Plain Soils',
-      botanicals: 'Camellia sinensis var. assamica (Large Leaf Tree)',
-      processing: 'Orthodox Full Leaf Oxidation & Heavy CTC Rolling',
-      flavorNotes: ['Muscatel Grape', 'Crisp Stone Fruit', 'Bold Malty Cocoa', 'Citrus Astringency'],
-      steepStyle: 'Orthodox Full Leaf Steeping (96°C)',
-      recommendedMethod: 'Full-Leaf Black Tea Track (96°C)',
-      sourcedBrands: [
-        { name: 'Vahdam Teas (New Delhi)', offering: 'First Flush Darjeeling & Imperial Assam', note: 'Direct-from-estate Himalayan first harvest Darjeeling featuring muscatel grape clarity.' },
-        { name: 'Twinings of London', offering: 'Darjeeling & English Breakfast Assam', note: 'Classic British blend sourcing malty Assam leaves from the Brahmaputra valley.' },
-        { name: 'Harney & Sons', offering: 'Darjeeling First Flush & Assam Superior', note: 'Spring harvest Himalayan Darjeeling with peach, muscatel grape, and crisp finish.' },
-        { name: 'Fortnum & Mason (London)', offering: 'Darjeeling Broken Orange Pekoe & Assam', note: 'Iconic Piccadilly tea house offering high-grade Himalayan single estate flushes.' }
-      ],
-      terroirOverview: 'In Darjeeling, tea bushes cling to steep Himalayan slopes at up to 2,000 meters. The cool mountain air and intense UV light create the coveted "Muscatel" flavor—a natural aroma reminiscent of muscat grapes and stone fruit. Down in tropical Assam, hot river plains yield bold, malty teas ideal with milk.'
-    },
-    {
-      id: 'taiwan',
-      country: 'Taiwan',
-      flag: '🇹🇼',
-      regions: 'Nantou, Alishan High Mountain, Dong Ding, Shan Lin Xi',
-      famousTeas: ['High Mountain Oolong (Gaoshan)', 'Oriental Beauty (Dongfang Meiren)', 'Dong Ding Oolong'],
-      soilType: 'High-Altitude Slate & Sandstone Mountain Soil',
-      botanicals: 'Qingxin Oolong, Jin Xuan (Milk Oolong), Ruby 18',
-      processing: 'Tightly Hand-Rolled Ball Oolong & Charcoal Baking',
-      flavorNotes: ['Creamy Butter', 'White Peach', 'Wild Honey', 'Lingering Throat Resonance (Hui Gan)'],
-      steepStyle: 'Hand-Rolled Gongfu Infusion (88°C)',
-      recommendedMethod: 'Oolong Tea Track (88°C)',
-      sourcedBrands: [
-        { name: 'Ten Ren Tea Co. (Taipei)', offering: 'High Mountain Alishan Oolong & King’s Tea', note: 'Taipei’s premier tea master sourcing tightly rolled Alishan leaves with floral butter aroma.' },
-        { name: 'Mei Leaf Tea House', offering: 'Alishan Cream & High Mountain Floral Oolongs', note: 'Jin Xuan cultivar oolong offering natural creamy butter and lilac floral notes.' },
-        { name: 'The Tao of Tea', offering: 'Formosa Oolong & Amber Dong Ding', note: 'Traditional charcoal-roasted Taiwanese oolong with honey and toasted warm amber notes.' },
-        { name: 'Rishi Tea & Botanicals', offering: 'Organic Ruby 18 & Formosa Dong Ding', note: 'Famous Taiwanese Wild Red Tea cultivar boasting cinnamon and mint aroma.' }
-      ],
-      terroirOverview: 'Taiwan’s High Mountain (Gaoshan) oolongs grow above 1,000 meters in perpetual mountain mist. Heavy fog limits sunlight, making leaf cell walls thick and soft. Hand-rolled into tight green spheres, these leaves release legendary aromas of creamy butter, white peach, and a sweet throat resonance ("Hui Gan") that lasts for hours.'
-    },
-    {
-      id: 'sri_lanka',
-      country: 'Sri Lanka (Ceylon)',
-      flag: '🇱🇰',
-      regions: 'Nuwara Eliya, Uva, Dimbula, Kandy',
-      famousTeas: ['Ceylon High Grown Black Tea', 'Uva Seasonal Flush', 'Silver Tips White Tea'],
-      soilType: 'Monsoonal Tropical Mountain Loam',
-      botanicals: 'High-Grown Orthodox Camellia Sinensis',
-      processing: 'Orthodox Wither, Roll, Ferment, and Fire',
-      flavorNotes: ['Crisp Lemon Zest', 'Eucalyptus', 'Golden Liqueur', 'Refreshing Crisp Finish'],
-      steepStyle: 'High Elevation Whole Leaf (96°C)',
-      recommendedMethod: 'Black & White Tea Tracks',
-      sourcedBrands: [
-        { name: 'Dilmah Ceylon Tea (Sri Lanka)', offering: 'Single Origin Pure Ceylon Nuwara Eliya', note: 'Sri Lanka’s family-owned single origin tea maker offering high-grown bright citrus tea.' },
-        { name: 'Twinings of London', offering: 'Pure Ceylon Single Origin', note: 'Golden copper liqueur with refreshing lemon zest astringency.' },
-        { name: 'Harney & Sons', offering: 'Ceylon OP & Nuwara Eliya High Grown', note: 'High altitude Central Province black tea with crisp eucalyptus and golden liquor.' },
-        { name: 'Fortnum & Mason (London)', offering: 'Royal Blend Ceylon Black', note: 'Classic blend of high-grown Ceylon and malty Assam created for King Edward VII.' }
-      ],
-      terroirOverview: 'Ceylon teas grown in Nuwara Eliya (above 1,800 meters) benefit from dry, cool mountain winds that sweep across the valleys during monsoons. This causes the tea bush to produce high levels of aromatic essential oils, yielding Ceylon’s famous golden copper liqueur and crisp lemon zest finish.'
-    }
   ]
 };
 
 export const MASTERCLASSES = [
+  // French Press Videos
   {
-    id: 'mc_pourover',
-    title: 'Pour-Over Concentric Pouring & V60 Technique',
-    method: 'Pour-Over',
-    duration: '4:15',
-    thumbnail: './coffee_setup.jpg',
-    embedId: '1oB1oDrDkHM',
-    description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in V60 and Chemex drippers.',
-    keyTakeaways: [
-      'Pour gently in center-outward concentric spirals',
-      'Never hit the paper walls directly to prevent water bypass',
-      'Maintain steady thermal mass during bloom'
-    ]
-  },
-  {
-    id: 'mc_frenchpress',
-    title: 'Ultimate French Press: Crust Breaking & Silt Skimming',
+    id: 'mc_frenchpress_hoffmann',
+    methodId: 'french_press',
     method: 'French Press',
+    title: 'Ultimate French Press: Crust Breaking & Silt Skimming',
     duration: '5:30',
     thumbnail: './french_press.jpg',
     embedId: 'st571DYYTR8',
@@ -573,23 +469,110 @@ export const MASTERCLASSES = [
     ]
   },
   {
-    id: 'mc_drip',
-    title: 'Maximizing Your Home Drip Coffee Machine',
+    id: 'mc_frenchpress_roasts',
+    methodId: 'french_press',
+    method: 'French Press',
+    title: 'Preferred Coffee Beans & Roasts for French Press',
+    duration: '4:12',
+    thumbnail: './french_press.jpg',
+    embedId: 'T1U1XfF0EFA',
+    description: 'Learn why heavy-bodied Sumatran Giling Basah, Brazilian Yellow Bourbon, and medium-dark roasts shine best in immersion brewing.',
+    keyTakeaways: [
+      'Choose low-acidity beans rich in natural oils and cocoa depth',
+      'Coarse grind size prevents metal mesh clogging',
+      'Pairs best with dark chocolate & toasted nut profiles'
+    ]
+  },
+
+  // Pour-Over Videos
+  {
+    id: 'mc_pourover_v60',
+    methodId: 'pour_over',
+    method: 'Pour-Over',
+    title: 'Pour-Over Concentric Pouring & V60 Technique',
+    duration: '4:15',
+    thumbnail: './coffee_setup.jpg',
+    embedId: '1oB1oDrDkHM',
+    description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in V60 and Chemex drippers.',
+    keyTakeaways: [
+      'Pour gently in center-outward concentric spirals',
+      'Never hit paper walls directly to prevent water bypass',
+      'Maintain steady thermal mass during bloom'
+    ]
+  },
+  {
+    id: 'mc_pourover_beans',
+    methodId: 'pour_over',
+    method: 'Pour-Over',
+    title: 'Preferred Single-Origin Beans for Pour-Over Clarity',
+    duration: '5:04',
+    thumbnail: './coffee_setup.jpg',
+    embedId: 'JgV6qL0Fi6E',
+    description: 'Discover why high-altitude washed Ethiopian Yirgacheffe and Kenyan SL-28 excel under paper filter filtration.',
+    keyTakeaways: [
+      'Highlight sparkling citric acidity and jasmine bergamot florals',
+      'Paper filter captures oils for tea-like body clarity',
+      'Ideal for light to medium-light Nordic specialty roasts'
+    ]
+  },
+
+  // Drip Coffee Maker Videos
+  {
+    id: 'mc_drip_home',
+    methodId: 'drip_brewer',
     method: 'Automatic Drip',
+    title: 'Maximizing Your Home Drip Coffee Machine',
     duration: '3:45',
     thumbnail: './drip_brewer.jpg',
     embedId: '8d-9Y2S92v0',
     description: 'Simple tweaks to get cafe-quality batch brew from standard home electric coffee makers.',
     keyTakeaways: [
       'Pre-rinse paper filters to eliminate papery taste',
-      'Level coffee bed evenly before starting',
+      'Level coffee bed evenly before starting brew cycle',
       'Use filtered water with 120-150 ppm mineral content'
     ]
   },
+
+  // Espresso Videos
   {
-    id: 'mc_gongfu',
+    id: 'mc_espresso_prep',
+    methodId: 'espresso',
+    method: 'Espresso',
+    title: 'Espresso Puck Prep, WDT & 9-Bar Extraction',
+    duration: '6:20',
+    thumbnail: './coffee_setup.jpg',
+    embedId: '1U_4OqUo_pE',
+    description: 'Master WDT needle distribution, level tamping, and dialing-in 1:2 extraction yields.',
+    keyTakeaways: [
+      'Eliminate puck clumps with WDT needle distribution',
+      'Tamp level with 30 lbs of firm pressure',
+      'Aim for 1:2 yield ratio in 25-30 seconds'
+    ]
+  },
+
+  // AeroPress Videos
+  {
+    id: 'mc_aeropress_inverted',
+    methodId: 'aeropress',
+    method: 'AeroPress',
+    title: 'Inverted AeroPress Champion Technique',
+    duration: '4:40',
+    thumbnail: './coffee_setup.jpg',
+    embedId: 'j6VlT_jUVPc',
+    description: 'The inverted steep and gentle press method for sweet, zero-acidity cups.',
+    keyTakeaways: [
+      'Steep inverted for 60 seconds with 10 vigorous stirs',
+      'Attach filter cap and flip carefully onto sturdy mug',
+      'Plunge slowly over 30 seconds until subtle hiss'
+    ]
+  },
+
+  // Tea Videos
+  {
+    id: 'mc_gongfu_oolong',
+    methodId: 'oolong_tea',
+    method: 'Oolong Tea',
     title: 'Gongfu Tea Washing & Flash Infusions',
-    method: 'Fine Tea',
     duration: '4:50',
     thumbnail: './tea_ceremony.jpg',
     embedId: 'L6N463xM4R4',
@@ -598,6 +581,21 @@ export const MASTERCLASSES = [
       'Rinse leaves for 5-10s to open rolled tea balls',
       'Pour water down gaiwan rim to avoid burning delicate leaves',
       'Increase steep time by 5-10 seconds per subsequent infusion'
+    ]
+  },
+  {
+    id: 'mc_green_steeping',
+    methodId: 'green_tea',
+    method: 'Green Tea',
+    title: 'Specialty Green Tea & Sencha Steeping Masterclass',
+    duration: '4:10',
+    thumbnail: './tea_ceremony.jpg',
+    embedId: 'XpZ1ZpQ4pQE',
+    description: 'Low-temperature 78°C steeping to preserve sweet grassy umami and avoid bitter tannin extraction.',
+    keyTakeaways: [
+      'Never use boiling water on green tea leaves',
+      'Steep for 2 minutes untouched',
+      'Decant completely between infusions'
     ]
   }
 ];
