@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Video, Play, Columns, Bookmark, CheckCircle, Clock, Sparkles } from 'lucide-react';
 import { MASTERCLASSES } from '../data/brewData';
 
@@ -19,6 +19,9 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
   );
 
   const displayVideos = filteredVideos.length > 0 ? filteredVideos : MASTERCLASSES;
+
+  // SAFETY GUARD: Ensure activeVideo belongs ONLY to the currently selected method
+  const currentActiveVideo = (activeVideo && activeVideo.methodId === activeMethodId) ? activeVideo : null;
 
   return (
     <section className="mt-12 p-7 md:p-9 rounded-3xl glass-panel shadow-2xl transition-all duration-500">
@@ -53,13 +56,13 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
         </button>
       </div>
 
-      {/* Active Video Player Panel (If a video is selected) */}
-      {activeVideo && (
-        <div className="mb-10 p-5 rounded-3xl bg-espresso-950/95 border border-amber-gold/50 shadow-2xl overflow-hidden">
+      {/* Active Video Player Panel (Renders ONLY if video belongs to activeMethod) */}
+      {currentActiveVideo && (
+        <div className="mb-10 p-5 rounded-3xl bg-espresso-950/95 border border-amber-gold/50 shadow-2xl overflow-hidden animate-fade-in">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-serif text-xl font-bold text-cream-light flex items-center gap-2.5 drop-shadow">
               <Video className="w-6 h-6 text-amber-gold" />
-              <span>{activeVideo.title}</span>
+              <span>{currentActiveVideo.title}</span>
             </h4>
             <button
               onClick={() => setActiveVideo(null)}
@@ -72,8 +75,8 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
           {/* Responsive YouTube Masterclass Video Embed Player */}
           <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black mb-5 border border-white/15 shadow-2xl">
             <iframe
-              src={`https://www.youtube-nocookie.com/embed/${activeVideo.embedId}?autoplay=0&rel=0`}
-              title={activeVideo.title}
+              src={`https://www.youtube-nocookie.com/embed/${currentActiveVideo.embedId}?autoplay=0&rel=0`}
+              title={currentActiveVideo.title}
               className="w-full h-full border-0"
               allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -81,7 +84,7 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
           </div>
 
           <p className="text-xs md:text-sm text-cream-soft/90 mb-4 font-medium leading-relaxed">
-            {activeVideo.description}
+            {currentActiveVideo.description}
           </p>
 
           <div className="p-4 rounded-2xl bg-white/5 border border-white/10 shadow-inner">
@@ -89,7 +92,7 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
               Key Technique Takeaways:
             </div>
             <ul className="space-y-2 text-xs text-cream-soft/90 font-medium">
-              {activeVideo.keyTakeaways.map((takeaway, i) => (
+              {currentActiveVideo.keyTakeaways.map((takeaway, i) => (
                 <li key={i} className="flex items-center gap-2.5">
                   <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                   <span>{takeaway}</span>
@@ -104,7 +107,7 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {displayVideos.map((item) => {
           const isBookmarked = bookmarkedIds.includes(item.id);
-          const isActive = activeVideo?.id === item.id;
+          const isActive = currentActiveVideo?.id === item.id;
 
           return (
             <div
