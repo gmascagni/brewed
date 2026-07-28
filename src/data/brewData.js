@@ -549,7 +549,7 @@ export const MASTERCLASSES = [
     title: 'Mastering the Stovetop Moka Pot (Bialetti Technique & Water Preheat)',
     duration: '5:15',
     thumbnail: './moka_pot_hero.jpg',
-    embedId: 'rkgN3-8g854',
+    embedId: 'vFcS01wMSxM',
     description: 'Learn how preheating water in the lower chamber and stopping extraction with a cold towel prevents metallic burnt bitterness in Moka Pot coffee.',
     keyTakeaways: [
       'Fill lower chamber with boiling water to prevent overheating coffee grounds',
@@ -564,7 +564,7 @@ export const MASTERCLASSES = [
     title: 'Preferred Coffee Beans & Fine-Medium Grind for Moka Pot',
     duration: '4:20',
     thumbnail: './moka_pot_hero.jpg',
-    embedId: 'B2s0W4uFhT8',
+    embedId: 'vFcS01wMSxM',
     description: 'Why medium-dark Italian roasts, Brazilian Yellow Bourbon, and 350-500 µm table salt grinds produce rich crema and syrupy espresso-like body.',
     keyTakeaways: [
       'Grind slightly coarser than espresso (table salt texture)',

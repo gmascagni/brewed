@@ -18,7 +18,7 @@ export default function MasterclassHub({ trackMode, activeMethod, isSplitScreen,
     (item) => item.methodId === activeMethodId
   );
 
-  const displayVideos = filteredVideos.length > 0 ? filteredVideos : MASTERCLASSES;
+  const displayVideos = filteredVideos;
 
   // SAFETY GUARD: Ensure activeVideo belongs ONLY to the currently selected method
   const currentActiveVideo = (activeVideo && activeVideo.methodId === activeMethodId) ? activeVideo : null;
