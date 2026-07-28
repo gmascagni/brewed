@@ -7,7 +7,7 @@ import GrindVisualGuide from './components/GrindVisualGuide';
 import MasterclassHub from './components/MasterclassHub';
 import UniversityHub from './components/UniversityHub';
 import TroubleshootingHub from './components/TroubleshootingHub';
-import { BREW_METHODS, MASTERCLASSES } from './data/brewData';
+import { BREW_METHODS } from './data/brewData';
 
 export default function App() {
   // Main Application State
@@ -22,9 +22,9 @@ export default function App() {
   const [cupMl, setCupMl] = useState(240);
   const [customRatio, setCustomRatio] = useState(null);
 
-  // Masterclass & Split Screen State
+  // Masterclass & Split Screen State (Initial video player is closed until user clicks a tutorial card)
   const [isSplitScreen, setIsSplitScreen] = useState(false);
-  const [activeVideo, setActiveVideo] = useState(MASTERCLASSES[0]);
+  const [activeVideo, setActiveVideo] = useState(null);
 
   // Sync active method when track mode switches
   const handleTrackSwitch = (newTrack) => {
@@ -32,6 +32,14 @@ export default function App() {
     const newMethods = BREW_METHODS[newTrack];
     setActiveMethod(newMethods[0]);
     setCustomRatio(null);
+    setActiveVideo(null);
+  };
+
+  // Sync active method selection
+  const handleMethodSelect = (method) => {
+    setActiveMethod(method);
+    setCustomRatio(null);
+    setActiveVideo(null);
   };
 
   const isCoffee = trackMode === 'coffee';
@@ -88,7 +96,7 @@ export default function App() {
                 trackMode={trackMode}
                 methods={methods}
                 activeMethod={activeMethod}
-                setActiveMethod={setActiveMethod}
+                setActiveMethod={handleMethodSelect}
                 cupCount={cupCount}
                 setCupCount={setCupCount}
                 cupMl={cupMl}

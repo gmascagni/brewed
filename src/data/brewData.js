@@ -549,7 +549,7 @@ export const MASTERCLASSES = [
     title: 'Mastering the Stovetop Moka Pot (Bialetti Technique & Water Preheat)',
     duration: '5:15',
     thumbnail: './moka_pot_hero.jpg',
-    embedId: 'ry9z3bNbu8E',
+    embedId: 'rkgN3-8g854',
     description: 'Learn how preheating water in the lower chamber and stopping extraction with a cold towel prevents metallic burnt bitterness in Moka Pot coffee.',
     keyTakeaways: [
       'Fill lower chamber with boiling water to prevent overheating coffee grounds',
@@ -564,11 +564,43 @@ export const MASTERCLASSES = [
     title: 'Preferred Coffee Beans & Fine-Medium Grind for Moka Pot',
     duration: '4:20',
     thumbnail: './moka_pot_hero.jpg',
-    embedId: 'ry9z3bNbu8E',
+    embedId: 'B2s0W4uFhT8',
     description: 'Why medium-dark Italian roasts, Brazilian Yellow Bourbon, and 350-500 µm table salt grinds produce rich crema and syrupy espresso-like body.',
     keyTakeaways: [
       'Grind slightly coarser than espresso (table salt texture)',
       'Choose low-acidity beans rich in dark chocolate & toasted hazelnut notes'
+    ]
+  },
+
+  // Pour-Over Videos (methodId: 'pour_over')
+  {
+    id: 'mc_pourover_v60',
+    methodId: 'pour_over',
+    method: 'Pour-Over',
+    title: 'Pour-Over Concentric Pouring & V60 Technique',
+    duration: '4:15',
+    thumbnail: './pour_over_hero.jpg',
+    embedId: 'AI4ynXzkSQo',
+    description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in V60 and Chemex drippers.',
+    keyTakeaways: [
+      'Pour gently in center-outward concentric spirals',
+      'Never hit paper walls directly to prevent water bypass',
+      'Maintain steady thermal mass during bloom'
+    ]
+  },
+  {
+    id: 'mc_pourover_beans',
+    methodId: 'pour_over',
+    method: 'Pour-Over',
+    title: 'Preferred Single-Origin Beans for Pour-Over Clarity',
+    duration: '5:04',
+    thumbnail: './pour_over_hero.jpg',
+    embedId: '1oB1oDrDkHM',
+    description: 'Discover why high-altitude washed Ethiopian Yirgacheffe and Kenyan SL-28 excel under paper filter filtration.',
+    keyTakeaways: [
+      'Highlight sparkling citric acidity and jasmine bergamot florals',
+      'Paper filter captures oils for tea-like body clarity',
+      'Ideal for light to medium-light Nordic specialty roasts'
     ]
   },
 
@@ -601,38 +633,6 @@ export const MASTERCLASSES = [
       'Choose low-acidity beans rich in natural oils and cocoa depth',
       'Coarse grind size prevents metal mesh clogging',
       'Pairs best with dark chocolate & toasted nut profiles'
-    ]
-  },
-
-  // Pour-Over Videos (methodId: 'pour_over')
-  {
-    id: 'mc_pourover_v60',
-    methodId: 'pour_over',
-    method: 'Pour-Over',
-    title: 'Pour-Over Concentric Pouring & V60 Technique',
-    duration: '4:15',
-    thumbnail: './pour_over_hero.jpg',
-    embedId: '1oB1oDrDkHM',
-    description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in V60 and Chemex drippers.',
-    keyTakeaways: [
-      'Pour gently in center-outward concentric spirals',
-      'Never hit paper walls directly to prevent water bypass',
-      'Maintain steady thermal mass during bloom'
-    ]
-  },
-  {
-    id: 'mc_pourover_beans',
-    methodId: 'pour_over',
-    method: 'Pour-Over',
-    title: 'Preferred Single-Origin Beans for Pour-Over Clarity',
-    duration: '5:04',
-    thumbnail: './pour_over_hero.jpg',
-    embedId: 'JgV6qL0Fi6E',
-    description: 'Discover why high-altitude washed Ethiopian Yirgacheffe and Kenyan SL-28 excel under paper filter filtration.',
-    keyTakeaways: [
-      'Highlight sparkling citric acidity and jasmine bergamot florals',
-      'Paper filter captures oils for tea-like body clarity',
-      'Ideal for light to medium-light Nordic specialty roasts'
     ]
   },
 
