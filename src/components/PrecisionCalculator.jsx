@@ -30,10 +30,10 @@ export default function PrecisionCalculator({
   const doseDisplay = isMetric ? `${dryDoseGrams.toFixed(1)} g` : `${dryDoseOz} oz (${dryDoseGrams.toFixed(1)}g)`;
 
   const CUP_VOLUMES = [
-    { label: 'Small Cup (200 mL)', ml: 200 },
-    { label: 'Standard Mug (240 mL)', ml: 240 },
-    { label: 'Large Mug (300 mL)', ml: 300 },
-    { label: 'Travel Tumbler (350 mL)', ml: 350 },
+    { label: isMetric ? 'Small Cup (200 mL)' : 'Small Cup (6.7 fl oz)', ml: 200 },
+    { label: isMetric ? 'Standard Mug (240 mL)' : 'Standard Mug (8 fl oz)', ml: 240 },
+    { label: isMetric ? 'Large Mug (300 mL)' : 'Large Mug (10.1 fl oz)', ml: 300 },
+    { label: isMetric ? 'Travel Tumbler (360 mL)' : 'Travel Tumbler (12.2 fl oz)', ml: 360 }
   ];
 
   // Helper to format total duration of a method's phases

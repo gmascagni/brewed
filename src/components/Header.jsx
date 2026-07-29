@@ -61,7 +61,7 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
             title="Toggle Metric (grams/ml) vs Imperial (oz/fl oz)"
           >
             <Scale className="w-4 h-4 text-amber-gold" />
-            <span className="font-bold uppercase tracking-wider">{unitSystem}</span>
+            <span className="font-bold uppercase tracking-wider">{unitSystem === 'imperial' ? 'Imperial (oz/°F)' : 'Metric (g/°C)'}</span>
           </button>
 
           {/* Audio Mute Button */}
