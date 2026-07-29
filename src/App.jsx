@@ -92,7 +92,7 @@ export default function App() {
         />
 
         {/* Main Workspace Container */}
-        <main className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
+        <main key={trackMode} className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
           
           {/* 2. Core Calculator & Multi-Phase Timer Layout (Moved to Top for Immediate Access) */}
           <div className={`mb-8 grid grid-cols-1 ${isSplitScreen ? 'lg:grid-cols-12 gap-6' : 'lg:grid-cols-2 gap-8'}`}>
