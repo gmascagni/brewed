@@ -112,10 +112,10 @@ export default function UniversityHub({ trackMode }) {
             </div>
 
             {/* Robusta Specie */}
-            <div className="p-5 rounded-2xl bg-white/5 border border-amber-gold/30">
+            <div className="p-5 rounded-2xl bg-white/5 border border-white/15">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-amber-gold uppercase tracking-wider">{BOTANICAL_COMPARISON.robusta.name}</span>
-                <span className="text-[10px] font-mono bg-amber-gold/20 text-amber-gold px-2.5 py-0.5 rounded-full font-bold">{BOTANICAL_COMPARISON.robusta.share}</span>
+                <span className="text-xs font-extrabold text-cream-light uppercase tracking-wider">{BOTANICAL_COMPARISON.robusta.name}</span>
+                <span className="text-[10px] font-mono bg-white/10 text-cream-soft px-2.5 py-0.5 rounded-full font-bold">{BOTANICAL_COMPARISON.robusta.share}</span>
               </div>
               <div className="space-y-1.5 text-xs text-cream-soft/90 mb-3">
                 <div><strong className="text-cream-light">Elevation:</strong> {BOTANICAL_COMPARISON.robusta.elevation}</div>
@@ -134,13 +134,13 @@ export default function UniversityHub({ trackMode }) {
       {/* 4. Origin Country Selection Grid */}
       <div className="mb-8">
         <label className="block text-xs uppercase tracking-widest font-extrabold text-cream-soft/70 mb-3.5 flex items-center justify-between">
-          <span>Select Growing Origin / Nation:</span>
+          <span>{isCoffee ? 'Select Growing Origin / Nation:' : 'Select Specialty Tea Terroir:'}</span>
           <span className="text-[11px] font-mono text-amber-gold">Click Country to Explore</span>
         </label>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
           {origins.map((origin) => {
-            const isSelected = origin.id === activeOrigin.id;
+            const isSelected = origin.id === activeOrigin?.id;
             return (
               <button
                 key={origin.id}
@@ -154,9 +154,9 @@ export default function UniversityHub({ trackMode }) {
                 }`}
               >
                 <div className="text-2xl mb-1">{origin.flag}</div>
-                <div className="text-xs font-extrabold tracking-wide truncate drop-shadow">{origin.country.split(' ')[0]}</div>
+                <div className="text-xs font-extrabold tracking-wide truncate drop-shadow">{origin.country ? origin.country.split(' ')[0] : 'Terroir'}</div>
                 <div className={`text-[9px] mt-0.5 truncate ${isSelected ? 'opacity-90 font-bold' : 'text-cream-soft/60'}`}>
-                  {isCoffee ? (origin.macroRegion ? origin.macroRegion.split(' ')[0] : '') : (origin.famousTeas ? origin.famousTeas[0].split(' ')[0] : '')}
+                  {isCoffee ? (origin.macroRegion ? origin.macroRegion.split(' ')[0] : '') : (origin.famousTeas && origin.famousTeas[0] ? origin.famousTeas[0].split(' ')[0] : 'Tea')}
                 </div>
               </button>
             );
@@ -209,7 +209,7 @@ export default function UniversityHub({ trackMode }) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {activeOrigin.sourcedBrands.map((brand, idx) => (
+              {(activeOrigin.sourcedBrands || []).map((brand, idx) => (
                 <div
                   key={idx}
                   className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-amber-gold/50 hover:bg-white/10 transition-all duration-300 flex flex-col justify-between group shadow-md"
@@ -253,7 +253,7 @@ export default function UniversityHub({ trackMode }) {
                 <span>Signature Flavor Notes:</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {activeOrigin.flavorNotes.map((note, idx) => (
+                {(activeOrigin.flavorNotes || []).map((note, idx) => (
                   <span
                     key={idx}
                     className="px-2.5 py-1 rounded-lg bg-amber-gold/15 text-amber-gold border border-amber-gold/30 text-xs font-extrabold shadow-sm"
@@ -278,9 +278,9 @@ export default function UniversityHub({ trackMode }) {
                 </div>
               ) : (
                 <div className="space-y-1.5 text-xs text-cream-soft/90 font-medium">
-                  <div><strong className="text-cream-light">Botanical Bush:</strong> {activeOrigin.botanicals}</div>
+                  <div><strong className="text-cream-light">Cultivars:</strong> {activeOrigin.genetics || 'Camellia sinensis'}</div>
                   <div className="flex flex-wrap gap-1.5 mt-1">
-                    {activeOrigin.famousTeas.map((tea, idx) => (
+                    {(activeOrigin.famousTeas || []).map((tea, idx) => (
                       <span key={idx} className="px-2 py-0.5 rounded-md bg-sage-500/20 text-sage-300 border border-sage-500/30 text-[11px] font-semibold">
                         {tea}
                       </span>
