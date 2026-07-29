@@ -12,7 +12,7 @@ import { BREW_METHODS } from './data/brewData';
 export default function App() {
   // Main Application State
   const [trackMode, setTrackMode] = useState('coffee'); // 'coffee' | 'tea'
-  const [unitSystem, setUnitSystem] = useState('metric'); // 'metric' | 'imperial'
+  const [unitSystem, setUnitSystem] = useState('imperial'); // 'metric' | 'imperial'
   const [isMuted, setIsMuted] = useState(false);
 
   // Active Method & Scaling State
