@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GraduationCap, MapPin, Sparkles, Award, Compass, Store, ShoppingBag, Mountain, Globe, Dna, Layers, Sun, ChevronRight, BookOpen } from 'lucide-react';
 import { TERROIR_ATLAS, COFFEE_BELT_OVERVIEW, BOTANICAL_COMPARISON } from '../data/brewData';
 
@@ -6,6 +6,12 @@ export default function UniversityHub({ trackMode }) {
   const isCoffee = trackMode === 'coffee';
   const origins = TERROIR_ATLAS[trackMode] || TERROIR_ATLAS.coffee;
   const [activeOriginId, setActiveOriginId] = useState(origins[0]?.id || 'brazil');
+
+  // Reset selected origin when switching between Coffee and Tea tracks
+  useEffect(() => {
+    const currentOrigins = TERROIR_ATLAS[trackMode] || TERROIR_ATLAS.coffee;
+    setActiveOriginId(currentOrigins[0]?.id || 'brazil');
+  }, [trackMode]);
 
   const activeOrigin = origins.find((o) => o.id === activeOriginId) || origins[0];
 

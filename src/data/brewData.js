@@ -535,6 +535,127 @@ export const TERROIR_ATLAS = {
       sourcedBrands: [
         { name: 'Blue Tokai Coffee Roasters', offering: 'India Monsooned Malabar & Attikan Estate', note: 'India’s leading specialty roaster with mild cocoa, warm nutmeg, and velvety low acidity.' },
         { name: 'Josuma Coffee', offering: 'Super Malabar Monsooned Arabica', note: 'Specialty Monsooned Malabar with rich crema, baker’s chocolate, and sweet spice finish.' }
+    }
+  ],
+  tea: [
+    {
+      id: 'fujian_china',
+      country: 'Fujian Province, China',
+      flag: '🇨🇳',
+      macroRegion: 'East Asia (Birthplace of White & Oolong Tea)',
+      regions: 'Fuding, Zhenghe, Anxi County, Wuyi Mountains',
+      altitude: '600 - 1,400 meters',
+      soilType: 'Red Acidic Volcanic Clay & Rocky Granite Scree',
+      climate: 'Humid subtropical mist with heavy mountain dew cycles',
+      genetics: 'Fuding Da Bai, Zhenghe Da Bai, Anxi Tieguanyin Cultivars',
+      processing: 'Sun-Withered White Tea & Semi-Oxidized Rolled Oolong',
+      flavorNotes: ['Honeysuckle Floral', 'Fresh Melon', 'Orchid Blossom', 'Chestnut Sweetness', 'Velvety Body'],
+      acidProfile: 'Subtle Sweet L-Theanine Amino Acids',
+      agronomyDeepDive: 'Fujian is the historic birthplace of white tea and Gongfu oolong. Cool ocean mountain mists and iron-rich acidic soils encourage tea buds to develop dense silver trichome hairs packed with L-theanine and floral essential oils.',
+      roastPairing: 'Light Sun-Withered to Medium Charcoal Roast',
+      recommendedMethod: 'Specialty Green & White Tea (83°C)',
+      famousTeas: ['Silver Needle White Tea', 'Iron Goddess of Mercy (Tieguanyin)'],
+      steepStyle: '80°C - 88°C Gongfu Steeping',
+      sourcedBrands: [
+        { name: 'Ippodo Tea Co.', offering: 'Fuding Silver Needle & Imperial Jasmine', note: 'Hand-picked spring buds with honeysuckle nectar, fresh melon, and velvety clarity.' },
+        { name: 'In Pursuit of Tea', offering: 'Anxi Master Grade Autumn Tieguanyin', note: 'Traditional charcoal-roasted oolong with orchid aromatics and lingering sweet aftertaste.' },
+        { name: 'Verdant Tea', offering: 'Zhenghe First Flush White Peony (Bai Mu Dan)', note: 'Sun-dried whole buds and leaves releasing wild honey, apricot, and soft floral finish.' }
+      ]
+    },
+    {
+      id: 'uji_japan',
+      country: 'Uji, Kyoto, Japan',
+      flag: '🇯🇵',
+      macroRegion: 'East Asia (Shaded Gyokuro & Matcha Terroir)',
+      regions: 'Uji, Kyotanabe, Shirakawa, Wazuka Valley',
+      altitude: '200 - 600 meters',
+      soilType: 'Rich Alluvial River Basin Soil along the Uji River',
+      climate: 'Cool damp morning fog with high temperature swings between day & night',
+      genetics: 'Yabukita, Gokou, Samidori, Asahi Camellia sinensis Cultivars',
+      processing: '20-Day Tana Rice-Straw Shading, Steaming (Aracha), & Stone Milling',
+      flavorNotes: ['Deep Seaweed Umami', 'Sweet Buttered Edamame', 'Fresh Steamed Spinach', 'Zero Tannin Bitterness'],
+      acidProfile: 'High Glutamic Acid & Umami Sweetness',
+      agronomyDeepDive: 'Uji is Japan’s most revered tea terroir. Rice-straw shading mats (Tana) block 90% of sunlight for 20 days prior to spring harvest, preventing L-theanine amino acids from converting into astringent tannins and creating thick savory umami.',
+      roastPairing: 'Deep Steamed (Fukamushi) Green Tea',
+      recommendedMethod: 'Specialty Green Tea (75°C - 78°C)',
+      famousTeas: ['Uji Ceremonial Matcha', 'Gyokuro Shadow Green Tea'],
+      steepStyle: '60°C - 78°C Low-Temp Steeping',
+      sourcedBrands: [
+        { name: 'Ippodo Tea Co. Kyoto', offering: 'Uji Ceremonial Ummon Matcha & Kan-no-shiro', note: 'Kyoto stone-ground spring matcha with rich jade froth, brothy umami, and zero bitterness.' },
+        { name: 'Kettl Tea', offering: 'Wazuka Gokou Gyokuro Single Cultivar', note: 'Shaded 21 days with buttered edamame sweetness, oceanic breeze, and deep green liqueur.' },
+        { name: 'Den’s Tea', offering: 'Deep-Steamed Uji Sencha Extra Fine', note: 'Rich emerald green tea with sweet grassy notes and soothing savory mouthfeel.' }
+      ]
+    },
+    {
+      id: 'wuyi_china',
+      country: 'Wuyi Mountains, China',
+      flag: '🇨🇳',
+      macroRegion: 'East Asia (UNESCO Rock Oolong & Lapsang Souchong)',
+      regions: 'Wuyishan National Park, Zhengyan Inner Rock Escarpments',
+      altitude: '700 - 1,200 meters',
+      soilType: 'Red Conglomerate Sandstone & Weathered Volcanic Mineral Scree',
+      climate: 'Sheltered gorge microclimates with perpetual mountain springs',
+      genetics: 'Da Hong Pao, Rou Gui, Shui Xian, Lapsang Small Bush Cultivars',
+      processing: 'Pine-Smoked Black Tea & Multi-Stage Charcoal Pit Roasting',
+      flavorNotes: ['Mineral Rock Yan Yun', 'Roasted Honey', 'Smoky Pine Tar', 'Dried Longan Fruit', 'Spiced Cinnamon'],
+      acidProfile: 'Mineral-Rich Tannin Structure',
+      agronomyDeepDive: 'High in UNESCO-protected red sandstone gorges, Wuyi rock teas (Yancha) absorb volcanic minerals from cliff springs. Roasted over bamboo charcoal pits for up to 24 hours, they yield legendary "Yan Yun" (Rock Rhyme) depth.',
+      roastPairing: 'Heavy Charcoal Fire Roasted',
+      recommendedMethod: 'Oolong Tea Gongfu Style (88°C - 95°C)',
+      famousTeas: ['Da Hong Pao (Big Red Robe)', 'Smoky Lapsang Souchong'],
+      steepStyle: '90°C - 95°C Boiling Flash Infusion',
+      sourcedBrands: [
+        { name: 'Red Blossom Tea Company', offering: 'Zhengyan Master Da Hong Pao Rock Oolong', note: 'Cliff-grown hand-roasted Yancha with stone mineral depth, roasted peach, and Yan Yun finish.' },
+        { name: 'Song Tea & Ceramics', offering: 'Wuyi Cliffside Rou Gui (Cinnamon Oolong)', note: 'Intense spicy cinnamon aroma, toasted walnut, and persistent sweet throat resonance.' },
+        { name: 'Mei Leaf', offering: 'Traditional Pine-Smoked Lapsang Souchong', note: 'Smoked over wild Horsetail pine wood with dried longan fruit, sweet pipe resin, and malt.' }
+      ]
+    },
+    {
+      id: 'darjeeling_india',
+      country: 'Darjeeling, India',
+      flag: '🇮🇳',
+      macroRegion: 'South Asia (Champagne of Teas)',
+      regions: 'Himalayan Foothills, Kurseong Valley, Mirik, Kalimpong',
+      altitude: '1,200 - 2,000 meters',
+      soilType: 'Porous Mountain Loam rich in Organic Forest Leaf Residue',
+      climate: 'Chilly Himalayan mist currents with high ultraviolet sunlight radiation',
+      genetics: 'Sinensis & China Hybrid High-Altitude Bush Selections',
+      processing: 'Lightly Oxidized 1st Flush & Rich Muscatel 2nd Flush Harvests',
+      flavorNotes: ['Muscatel Grape', 'Crisp Peach Skin', 'Wildflower Honey', 'Brilliant Amber Liqueur', 'Citrus Zest'],
+      acidProfile: 'Crisp Sparkling Malic Acidity',
+      agronomyDeepDive: 'Perched on high Himalayan slopes facing Mt. Kanchenjunga, high UV light and mountain chill slow leaf growth. 1st Flush spring harvests produce pale green cups with sparkling muscatel grape clarity.',
+      roastPairing: 'Un-roasted Orthodox Whole Leaf',
+      recommendedMethod: 'Full-Leaf Black Tea (95°C)',
+      famousTeas: ['Darjeeling 1st Flush Spring Harvest', 'Darjeeling 2nd Flush Muscatel'],
+      steepStyle: '88°C - 96°C 4-Minute Steep',
+      sourcedBrands: [
+        { name: 'Vahdam India Direct', offering: 'Darjeeling Summer 2nd Flush Arya Estate', note: 'Single estate muscatel black tea with notes of ripe passionfruit, wild honey, and amber clarity.' },
+        { name: 'Fortnum & Mason London', offering: 'Famous Darjeeling Jungpana Estate 1st Flush', note: 'Iconic London tea merchant lot with delicate peach blossom, white grape, and crisp astringency.' },
+        { name: 'Harney & Sons', offering: 'Darjeeling Superfine Tippy Golden Flowery Orange Pekoe', note: 'Classic Himalayan tea with muscatel grape body, floral aroma, and smooth finish.' }
+      ]
+    },
+    {
+      id: 'yunnan_china',
+      country: 'Yunnan Province, China',
+      flag: '🇨🇳',
+      macroRegion: 'East Asia (Ancient Wild Tea Trees & Aged Pu-erh)',
+      regions: 'Xishuangbanna, Menghai, Lincang, Pu’er City',
+      altitude: '1,400 - 2,200 meters',
+      soilType: 'Deep Tropical Forest Humus & Red Clay',
+      climate: 'Subtropical monsoon jungle with 800-year-old ancient wild tea trees (Gushu)',
+      genetics: 'Camellia sinensis var. assamica (Large-Leaf Broad Cultivars)',
+      processing: 'Sun-Dried Sheng Raw Pu-erh & Pile-Fermented Shou Ripe Pu-erh Cakes',
+      flavorNotes: ['Damp Forest Floor', 'Rich Sweet Molasses', 'Camphor & Pipe Tobacco', 'Aged Plum', 'Dark Bittersweet Cocoa'],
+      acidProfile: 'Deep Earthy Low-Acidity Microbial Ferment',
+      agronomyDeepDive: 'Yunnan is home to 1,000-year-old wild tea trees. Leaves harvested from large-leaf Daye cultivars are compressed into tea cakes and aged for decades to develop deep earthiness, camphor, and dark cocoa sweetness.',
+      roastPairing: 'Wet Pile Microbial Post-Fermented',
+      recommendedMethod: 'Pu-erh & Herbal Infusions (98°C)',
+      famousTeas: ['Aged Shou Ripe Pu-erh Tea Cakes', 'Wild Spring Sheng Raw Pu-erh'],
+      steepStyle: '98°C Boiling Rinse & Multi-Steep',
+      sourcedBrands: [
+        { name: 'Yunnan Sourcing', offering: 'Menghai 10-Year Aged Shou Ripe Pu-erh Cake', note: 'Smooth post-fermented tea cake with sweet damp earth, camphor wood, and dark chocolate liqueur.' },
+        { name: 'White2Tea', offering: 'Ancient Tree Spring Sheng Raw Pu-erh (Gushu)', note: 'Hand-panned wild large leaf tea boasting stone fruit nectar, powerful Cha Qi energy, and honeysuckle.' },
+        { name: 'Global Tea Hut', offering: 'Lincang Wild Large-Leaf Dian Hong Black Tea', note: 'Golden tipped jungle black tea with rich malt, sweet yam, and floral cocoa complexity.' }
       ]
     }
   ]

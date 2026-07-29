@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HelpCircle, Droplet, Gauge, Flame, AlertCircle, ChevronRight, CheckCircle2, RefreshCw, Eye, X, Sparkles } from 'lucide-react';
 import { TROUBLESHOOTING_GUIDE } from '../data/brewData';
 
@@ -7,6 +7,12 @@ export default function TroubleshootingHub({ trackMode }) {
   const guides = TROUBLESHOOTING_GUIDE[trackMode] || TROUBLESHOOTING_GUIDE.coffee;
   const [selectedSymptomId, setSelectedSymptomId] = useState(guides[0]?.id || 'sour');
   const [activePhotoModalItem, setActivePhotoModalItem] = useState(null);
+
+  // Sync selected symptom when switching tracks
+  useEffect(() => {
+    const currentGuides = TROUBLESHOOTING_GUIDE[trackMode] || TROUBLESHOOTING_GUIDE.coffee;
+    setSelectedSymptomId(currentGuides[0]?.id || 'sour');
+  }, [trackMode]);
 
   const selectedGuide = guides.find((g) => g.id === selectedSymptomId) || guides[0];
 
