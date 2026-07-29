@@ -4,7 +4,7 @@ import { playPhaseChime, playCompletionChime } from '../utils/audioSynth';
 
 export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, isMuted }) {
   const isCoffee = trackMode === 'coffee';
-  const phases = activeMethod.phases || [];
+  const phases = activeMethod?.phases || [];
 
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(phases[0]?.durationSec || 60);

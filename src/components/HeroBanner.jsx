@@ -3,10 +3,12 @@ import { Thermometer, Gauge, Sparkles, Droplets, HeartHandshake } from 'lucide-r
 
 export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
   const isCoffee = trackMode === 'coffee';
-  const heroImage = activeMethod.heroImage || (isCoffee ? '/coffee_setup.jpg' : '/tea_kettle.jpg');
+  const heroImage = activeMethod?.heroImage || (isCoffee ? './coffee_setup.jpg' : './tea_kettle.jpg');
 
   const isMetric = unitSystem === 'metric';
-  const tempDisplay = isMetric ? `${activeMethod.tempC}°C` : `${activeMethod.tempF}°F`;
+  const tempDisplay = isMetric 
+    ? `${activeMethod?.tempC || 90}°C` 
+    : `${activeMethod?.tempF || 194}°F`;
 
   return (
     <section className={`relative overflow-hidden rounded-3xl mb-10 transition-all duration-700 shadow-2xl border ${
@@ -17,7 +19,7 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
         <img
           key={heroImage}
           src={heroImage}
-          alt={activeMethod.name}
+          alt={activeMethod?.name || 'Brewing Method'}
           className="w-full h-full object-cover object-center transform scale-105 filter brightness-[0.7] contrast-110 group-hover:scale-100 transition-transform duration-1000"
         />
         <div className={`absolute inset-0 ${
@@ -36,11 +38,11 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
         </div>
 
         <h2 className="font-serif text-3xl md:text-5xl lg:text-6xl font-extrabold text-cream-light tracking-wide mb-4 leading-tight drop-shadow-lg">
-          {activeMethod.name}
+          {activeMethod?.name || 'Specialty Extraction'}
         </h2>
 
         <p className="text-sm md:text-base text-cream-soft/90 leading-relaxed mb-6 max-w-xl font-medium drop-shadow-md">
-          {activeMethod.description}
+          {activeMethod?.description || 'Precision extraction guide and scaling parameters.'}
         </p>
 
         {/* Quick Specs Raised Glass Cards */}
@@ -73,7 +75,7 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
             <div>
               <div className="text-[10px] text-cream-soft/60 uppercase font-bold tracking-wider">Extraction Ratio</div>
               <div className="text-base font-extrabold text-cream-light font-mono">
-                {isCoffee ? `1 : ${activeMethod.ratio}` : `1g / ${activeMethod.ratio}ml`}
+                {isCoffee ? `1 : ${activeMethod?.ratio || 15}` : `1g / ${activeMethod?.ratio || 50}ml`}
               </div>
             </div>
           </div>
@@ -81,14 +83,14 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
         </div>
 
         {/* PREFERRED COFFEE / TEA TYPES FOR THIS METHOD */}
-        {activeMethod.preferredCoffeeTypes && (
+        {activeMethod?.preferredCoffeeTypes && (
           <div className="p-4 rounded-2xl bg-black/60 border border-amber-gold/30 shadow-xl backdrop-blur-md">
             <div className="flex items-center space-x-2 text-xs font-extrabold uppercase tracking-wider text-amber-gold mb-1.5">
               <HeartHandshake className="w-4 h-4 text-amber-gold" />
-              <span>{isCoffee ? `Preferred Coffee Beans & Origins for ${activeMethod.name}:` : `Preferred Tea Leaf Varieties for ${activeMethod.name}:`}</span>
+              <span>{isCoffee ? `Preferred Coffee Beans & Origins for ${activeMethod?.name}:` : `Preferred Tea Leaf Varieties for ${activeMethod?.name}:`}</span>
             </div>
             <p className="text-xs text-cream-soft/90 font-medium leading-relaxed">
-              {activeMethod.preferredCoffeeTypes}
+              {activeMethod?.preferredCoffeeTypes}
             </p>
           </div>
         )}

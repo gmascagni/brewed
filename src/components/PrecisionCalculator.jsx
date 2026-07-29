@@ -19,7 +19,7 @@ export default function PrecisionCalculator({
 
   // Math Calculations
   const totalWaterMl = cupCount * cupMl;
-  const currentRatio = customRatio || activeMethod.ratio;
+  const currentRatio = customRatio || activeMethod?.ratio || 15;
   const dryDoseGrams = totalWaterMl / currentRatio;
 
   // Conversion helpers for Imperial
