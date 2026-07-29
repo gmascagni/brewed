@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import HeroBanner from './components/HeroBanner';
 import PrecisionCalculator from './components/PrecisionCalculator';
@@ -29,7 +29,7 @@ export default function App() {
   // Sync active method when track mode switches
   const handleTrackSwitch = (newTrack) => {
     setTrackMode(newTrack);
-    const newMethods = BREW_METHODS[newTrack];
+    const newMethods = BREW_METHODS[newTrack] || BREW_METHODS.coffee;
     setActiveMethod(newMethods[0]);
     setCustomRatio(null);
     setActiveVideo(null);
@@ -37,17 +37,24 @@ export default function App() {
 
   // Sync active method selection
   const handleMethodSelect = (method) => {
-    setActiveMethod(method);
-    setCustomRatio(null);
-    setActiveVideo(null);
+    if (method) {
+      setActiveMethod(method);
+      setCustomRatio(null);
+      setActiveVideo(null);
+    }
   };
 
+  // Ensure activeMethod always belongs to current trackMode methods
+  const currentActiveMethod = (activeMethod && methods.some(m => m.id === activeMethod.id))
+    ? activeMethod
+    : (methods[0] || BREW_METHODS.coffee[0]);
+
   const isCoffee = trackMode === 'coffee';
-  const heroImage = activeMethod.heroImage || (isCoffee ? '/coffee_setup.jpg' : '/tea_kettle.jpg');
+  const heroImage = currentActiveMethod?.heroImage || (isCoffee ? './coffee_setup.jpg' : './tea_kettle.jpg');
 
   // Math for dry dose calculation
   const totalWaterMl = cupCount * cupMl;
-  const ratio = customRatio || activeMethod.ratio;
+  const ratio = customRatio || currentActiveMethod?.ratio || 15;
   const dryDoseGrams = totalWaterMl / ratio;
 
   return (
@@ -60,7 +67,7 @@ export default function App() {
         <img
           key={heroImage}
           src={heroImage}
-          alt={activeMethod.name}
+          alt={currentActiveMethod?.name || 'Brew Background'}
           className="w-full h-full object-cover object-center transform scale-105 filter brightness-[0.72] contrast-115 transition-all duration-1000 ease-in-out"
         />
         <div className={`absolute inset-0 ${
@@ -95,7 +102,7 @@ export default function App() {
               <PrecisionCalculator
                 trackMode={trackMode}
                 methods={methods}
-                activeMethod={activeMethod}
+                activeMethod={currentActiveMethod}
                 setActiveMethod={handleMethodSelect}
                 cupCount={cupCount}
                 setCupCount={setCupCount}
@@ -111,7 +118,7 @@ export default function App() {
             <div className={isSplitScreen ? 'lg:col-span-7' : ''}>
               <MultiPhaseTimer
                 trackMode={trackMode}
-                activeMethod={activeMethod}
+                activeMethod={currentActiveMethod}
                 dryDoseGrams={dryDoseGrams}
                 isMuted={isMuted}
               />
@@ -122,17 +129,17 @@ export default function App() {
           {/* 3. Hero Editorial Banner */}
           <HeroBanner
             trackMode={trackMode}
-            activeMethod={activeMethod}
+            activeMethod={currentActiveMethod}
             unitSystem={unitSystem}
           />
 
           {/* 4. Coffee Grind Coarseness Visual Reference Guide (Coffee Track Only) */}
-          {isCoffee && <GrindVisualGuide activeMethod={activeMethod} />}
+          {isCoffee && <GrindVisualGuide activeMethod={currentActiveMethod} />}
 
           {/* 5. Integrated Masterclass Video Hub & Split Screen */}
           <MasterclassHub
             trackMode={trackMode}
-            activeMethod={activeMethod}
+            activeMethod={currentActiveMethod}
             isSplitScreen={isSplitScreen}
             setIsSplitScreen={setIsSplitScreen}
             activeVideo={activeVideo}
