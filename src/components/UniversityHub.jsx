@@ -23,7 +23,7 @@ export default function UniversityHub({ trackMode }) {
         <div>
           <div className="inline-flex items-center space-x-2 text-xs font-extrabold uppercase tracking-widest text-amber-gold mb-1.5">
             <GraduationCap className="w-4 h-4 animate-pulse" />
-            <span>BrewCraft University • Terroir, Coffee Belt & Species Atlas</span>
+            <span>The Brew App University • Terroir, Coffee Belt & Species Atlas</span>
           </div>
           <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light drop-shadow-md">
             {isCoffee ? 'The Global Coffee Belt, Agronomy & Sourced Brands' : 'Specialty Tea Terroirs, Leaf Agronomy & Famous Tea Houses'}

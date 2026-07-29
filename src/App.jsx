@@ -139,7 +139,7 @@ export default function App() {
             setActiveVideo={setActiveVideo}
           />
 
-          {/* 6. BrewCraft University: Terroir, Agronomy Science & Sourced Brands */}
+          {/* 6. The Brew App University: Terroir, Agronomy Science & Sourced Brands */}
           <UniversityHub trackMode={trackMode} />
 
           {/* 7. Extraction Nuance & Troubleshooting Hub */}
@@ -151,7 +151,7 @@ export default function App() {
         <footer className="mt-16 border-t border-white/10 py-8 px-4 text-center text-xs text-cream-soft/50 backdrop-blur-xl bg-black/40">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <span className="font-serif font-bold text-cream-light text-sm">BrewCraft: The Art of Extraction</span>
+              <span className="font-serif font-bold text-cream-light text-sm">The Brew App: The Art of Extraction</span>
               <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
             </div>
             <div className="text-cream-soft/40">

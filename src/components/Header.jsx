@@ -19,7 +19,7 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
           </div>
           <div>
             <h1 className="font-serif text-2xl md:text-3xl font-extrabold tracking-wide text-cream-light flex items-center gap-2 drop-shadow-md">
-              BrewCraft <span className="text-[10px] uppercase tracking-widest font-sans px-2.5 py-1 rounded-full bg-white/10 text-cream-light border border-white/15 shadow-inner">Extraction Master</span>
+              The Brew App <span className="text-[10px] uppercase tracking-widest font-sans px-2.5 py-1 rounded-full bg-white/10 text-cream-light border border-white/15 shadow-inner">Extraction Master</span>
             </h1>
             <p className="text-xs text-cream-soft/70 font-medium">Precision Specialty Coffee & Fine Tea at Home</p>
           </div>
