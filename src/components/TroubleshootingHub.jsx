@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HelpCircle, Droplet, Gauge, Flame, AlertCircle, ChevronRight, CheckCircle2, RefreshCw, Eye, X, Sparkles } from 'lucide-react';
+import { HelpCircle, Droplet, Gauge, Flame, AlertCircle, ChevronRight, CheckCircle2, RefreshCw, Eye, X, Sparkles, Leaf } from 'lucide-react';
 import { TROUBLESHOOTING_GUIDE } from '../data/brewData';
 
 export default function TroubleshootingHub({ trackMode }) {
@@ -22,6 +22,14 @@ export default function TroubleshootingHub({ trackMode }) {
     { level: 'Medium', range: '600 - 750 µm', idealFor: 'Automatic Drip Maker / Siphon', visual: 'Regular beach sand texture', image: './medium_grind.jpg', burrTip: 'Baratza Encore #15-20, Fellow Ode #5-7' },
     { level: 'Medium-Coarse', range: '750 - 900 µm', idealFor: 'Chemex / Clever Dripper', visual: 'Rough sand / Kosher salt', image: './medium_coarse_grind.jpg', burrTip: 'Baratza Encore #21-26, Fellow Ode #8-9' },
     { level: 'Coarse', range: '900 - 1100 µm', idealFor: 'French Press / Cold Brew', visual: 'Coarse sea salt / Breadcrumb', image: './coarse_grind.jpg', burrTip: 'Baratza Encore #27-35, Fellow Ode #10-11' }
+  ];
+
+  const TEA_LEAF_MATRIX = [
+    { level: 'White Tea Buds', temp: '80°C - 83°C', idealFor: 'Silver Needle / White Peony', visual: 'Unoxidized Spring Buds' },
+    { level: 'Specialty Green Tea', temp: '75°C - 80°C', idealFor: 'Sencha / Gyokuro / Longjing', visual: 'Steamed / Pan-Fired Leaves' },
+    { level: 'Gongfu Oolong Tea', temp: '88°C - 92°C', idealFor: 'Tieguanyin / High Mountain Alishan', visual: 'Tightly Rolled Tea Balls' },
+    { level: 'Orthodox Black Tea', temp: '95°C - 98°C', idealFor: 'Darjeeling / Assam / Earl Grey', visual: 'Fully Oxidized Black Leaf' },
+    { level: 'Aged Pu-erh & Botanicals', temp: '98°C - 100°C', idealFor: 'Yunnan Tea Cakes / Chamomile', visual: 'Compressed Cakes / Herbs' }
   ];
 
   return (
@@ -77,7 +85,7 @@ export default function TroubleshootingHub({ trackMode }) {
             })}
           </div>
 
-          {/* Diagnosis Result 3D Card */}
+          {/* Diagnosis Result Card */}
           {selectedGuide && (
             <div className="p-6 rounded-3xl bg-espresso-950/95 border border-amber-gold/40 shadow-2xl">
               <div className="text-xs font-extrabold text-amber-gold uppercase tracking-wider mb-2">
@@ -102,47 +110,82 @@ export default function TroubleshootingHub({ trackMode }) {
           )}
         </div>
 
-        {/* Right Column: Burr Grinder Settings Visualizer with Interactive Buttons & Photo Popups */}
+        {/* Right Column: Burr Grinder Settings / Tea Leaf Infusion Guide */}
         <div className="space-y-6">
           
-          {/* Burr Grinder Visual Settings Card */}
-          <div className="p-6 rounded-3xl bg-espresso-900/70 border border-white/15 shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm uppercase tracking-wider font-extrabold text-cream-light flex items-center gap-2 drop-shadow">
-                <Gauge className="w-4 h-4 text-amber-gold" />
-                <span>Burr Grinder Setting & Micron Guide</span>
-              </h4>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-gold bg-amber-gold/20 px-2.5 py-1 rounded-full border border-amber-gold/30">
-                Click Row for Macro Photo Bubble
-              </span>
-            </div>
+          {/* Card: Coffee Burr Grinder or Tea Leaf Infusion Temperature Guide */}
+          {isCoffee ? (
+            <div className="p-6 rounded-3xl bg-espresso-900/70 border border-white/15 shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-sm uppercase tracking-wider font-extrabold text-cream-light flex items-center gap-2 drop-shadow">
+                  <Gauge className="w-4 h-4 text-amber-gold" />
+                  <span>Burr Grinder Setting & Micron Guide</span>
+                </h4>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-gold bg-amber-gold/20 px-2.5 py-1 rounded-full border border-amber-gold/30">
+                  Click Row for Macro Photo Bubble
+                </span>
+              </div>
 
-            <div className="space-y-3 text-xs">
-              {GRIND_MATRIX.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActivePhotoModalItem(item)}
-                  className="w-full p-3.5 rounded-2xl bg-black/50 border border-white/10 hover:border-amber-gold/60 hover:bg-white/10 transition-all duration-300 text-left flex items-center justify-between shadow-inner group active:scale-98"
-                >
-                  <div className="pr-2">
-                    <div className="font-extrabold text-cream-light group-hover:text-amber-gold flex items-center gap-2">
-                      <span>{item.level}</span>
-                      <span className="px-2 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30 text-[10px] font-extrabold flex items-center gap-1">
-                        <Eye className="w-3 h-3 fill-current" />
-                        <span>Photo Bubble</span>
-                      </span>
+              <div className="space-y-3 text-xs">
+                {GRIND_MATRIX.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActivePhotoModalItem(item)}
+                    className="w-full p-3.5 rounded-2xl bg-black/50 border border-white/10 hover:border-amber-gold/60 hover:bg-white/10 transition-all duration-300 text-left flex items-center justify-between shadow-inner group active:scale-98"
+                  >
+                    <div className="pr-2">
+                      <div className="font-extrabold text-cream-light group-hover:text-amber-gold flex items-center gap-2">
+                        <span>{item.level}</span>
+                        <span className="px-2 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30 text-[10px] font-extrabold flex items-center gap-1">
+                          <Eye className="w-3 h-3 fill-current" />
+                          <span>Photo Bubble</span>
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-cream-soft/70 font-medium mt-0.5">{item.visual}</div>
                     </div>
-                    <div className="text-[11px] text-cream-soft/70 font-medium mt-0.5">{item.visual}</div>
-                  </div>
 
-                  <div className="text-right flex-shrink-0">
-                    <div className="font-mono text-amber-gold font-extrabold text-sm">{item.range}</div>
-                    <div className="text-[10px] text-cream-soft/60 font-medium">{item.idealFor}</div>
-                  </div>
-                </button>
-              ))}
+                    <div className="text-right flex-shrink-0">
+                      <div className="font-mono text-amber-gold font-extrabold text-sm">{item.range}</div>
+                      <div className="text-[10px] text-cream-soft/60 font-medium">{item.idealFor}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="p-6 rounded-3xl bg-slate-900/80 border border-sage-500/30 shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-sm uppercase tracking-wider font-extrabold text-cream-light flex items-center gap-2 drop-shadow">
+                  <Leaf className="w-4 h-4 text-sage-300" />
+                  <span>Tea Leaf Category & Infusion Temp Guide</span>
+                </h4>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-sage-300 bg-sage-500/20 px-2.5 py-1 rounded-full border border-sage-500/30">
+                  Thermal Precision
+                </span>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                {TEA_LEAF_MATRIX.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="w-full p-3.5 rounded-2xl bg-black/50 border border-white/10 flex items-center justify-between shadow-inner"
+                  >
+                    <div className="pr-2">
+                      <div className="font-extrabold text-cream-light text-sage-300">
+                        {item.level}
+                      </div>
+                      <div className="text-[11px] text-cream-soft/70 font-medium mt-0.5">{item.visual}</div>
+                    </div>
+
+                    <div className="text-right flex-shrink-0">
+                      <div className="font-mono text-sage-300 font-extrabold text-sm">{item.temp}</div>
+                      <div className="text-[10px] text-cream-soft/60 font-medium">{item.idealFor}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Water Quality & Filter Card */}
           <div className="p-6 rounded-3xl bg-espresso-900/70 border border-white/15 shadow-2xl">
@@ -151,7 +194,7 @@ export default function TroubleshootingHub({ trackMode }) {
               <span>Water Chemistry & Filtration at Home</span>
             </h4>
             <p className="text-xs text-cream-soft/80 font-medium leading-relaxed">
-              Water accounts for 98.5% of your brewed cup. Standard tap water with high calcium/scale mutes acidity, while pure distilled zero-TDS water yields flat, sour notes.
+              Water accounts for 98.5% of coffee and 99.5% of tea. Standard tap water with high scale mutes acidity and tannins, while pure distilled zero-TDS water yields flat notes.
             </p>
             <div className="mt-4 grid grid-cols-2 gap-3 text-xs font-mono">
               <div className="p-3 rounded-2xl bg-black/40 border border-white/10 shadow-inner">
