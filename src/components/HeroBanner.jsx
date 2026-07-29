@@ -62,7 +62,7 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
             </div>
             <div>
               <div className="text-[10px] text-cream-soft/60 uppercase font-bold tracking-wider">{isCoffee ? 'Grind Size' : 'Leaf Style'}</div>
-              <div className="text-sm font-bold text-cream-light">{isCoffee ? activeMethod.grind : activeMethod.leafGrade}</div>
+              <div className="text-sm font-bold text-cream-light">{isCoffee ? (activeMethod?.grind || 'Medium-Fine') : (activeMethod?.leafGrade || 'Whole Leaf')}</div>
             </div>
           </div>
 
