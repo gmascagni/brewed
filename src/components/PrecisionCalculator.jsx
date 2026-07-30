@@ -38,15 +38,6 @@ export default function PrecisionCalculator({
     { label: isMetric ? 'Travel Tumbler (360 mL)' : 'Travel Tumbler (12.2 fl oz)', ml: 360 }
   ];
 
-  // Helper to format total duration of a method's phases
-  const getTotalDurationString = (phases = []) => {
-    const totalSec = phases.reduce((acc, p) => acc + (p.durationSec || 0), 0);
-    const mins = Math.floor(totalSec / 60);
-    const secs = totalSec % 60;
-    if (mins === 0) return `${secs}s`;
-    return `${mins}m ${secs > 0 ? `${secs}s` : ''}`;
-  };
-
   return (
     <div className={`p-7 rounded-3xl ${isCoffee ? 'glass-panel-amber' : 'glass-panel-sage'} shadow-2xl transition-all duration-500`}>
       
@@ -100,7 +91,7 @@ export default function PrecisionCalculator({
       </div>
 
       {/* 2. Interactive Cup Quantity & Mug Size Stepper Card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 bg-black/40 p-5 rounded-2xl border border-white/10 shadow-inner">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 bg-black/40 p-5 rounded-2xl border border-white/10 shadow-inner">
         
         {/* Cup Slider */}
         <div>
@@ -160,78 +151,78 @@ export default function PrecisionCalculator({
 
       </div>
 
-      {/* 3. Output Display Cards (Dry Grounds & Water Volume) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+      {/* 3. Output Display Cards (Dry Grounds with Integrated Ratio Slider & Water Volume) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
         
-        {/* Dry Dose Output Card */}
-        <div className="p-6 rounded-2xl bg-espresso-950/90 border border-amber-gold/40 shadow-2xl relative overflow-hidden group">
-          <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-widest text-amber-gold mb-2">
-            <span className="flex items-center gap-1.5">
-              <Scale className="w-4 h-4" />
-              <span>{isCoffee ? 'Dry Coffee Grounds' : 'Tea Leaves'}</span>
-            </span>
-            <span className="text-[10px] font-mono opacity-80">Dose Weight</span>
+        {/* Dry Dose Output Card with Integrated Fine-Tune Ratio Slider */}
+        <div className="p-6 rounded-2xl bg-espresso-950/90 border border-amber-gold/40 shadow-2xl relative overflow-hidden group flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-widest text-amber-gold mb-2">
+              <span className="flex items-center gap-1.5">
+                <Scale className="w-4 h-4" />
+                <span>{isCoffee ? 'Dry Coffee Grounds' : 'Tea Leaves'}</span>
+              </span>
+              <span className="text-[10px] font-mono opacity-80">Dose Weight</span>
+            </div>
+
+            <div className="text-3xl lg:text-4xl font-extrabold font-mono text-cream-light drop-shadow-md my-1">
+              {doseDisplay}
+            </div>
           </div>
 
-          <div className="text-3xl lg:text-4xl font-extrabold font-mono text-cream-light drop-shadow-md my-1">
-            {doseDisplay}
-          </div>
+          {/* Integrated Fine-Tune Ratio Slider */}
+          <div className="mt-4 pt-3 border-t border-white/10">
+            <div className="flex items-center justify-between text-[11px] text-cream-soft/80 font-medium mb-1.5">
+              <span className="flex items-center gap-1">
+                <Sliders className="w-3.5 h-3.5 text-amber-gold" />
+                <span>Target Ratio: <strong className="text-amber-gold font-mono">{isCoffee ? `1 : ${currentRatio}` : `1g / ${currentRatio}mL`}</strong></span>
+              </span>
+              {customRatio && (
+                <button
+                  onClick={() => setCustomRatio(null)}
+                  className="text-[10px] text-amber-gold font-bold underline hover:text-cream-light"
+                >
+                  Reset Default
+                </button>
+              )}
+            </div>
 
-          <div className="text-[11px] text-cream-soft/70 font-medium">
-            Based on <strong className="text-amber-gold">1 : {currentRatio}</strong> extraction ratio
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min={isCoffee ? "10" : "20"}
+                max={isCoffee ? "20" : "70"}
+                step="1"
+                value={currentRatio}
+                onChange={(e) => setCustomRatio(parseInt(e.target.value))}
+                className="w-full h-2.5 bg-slate-900 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
           </div>
         </div>
 
         {/* Water Volume Output Card */}
-        <div className="p-6 rounded-2xl bg-espresso-950/90 border border-amber-gold/40 shadow-2xl relative overflow-hidden group">
-          <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-widest text-cyan-400 mb-2">
-            <span className="flex items-center gap-1.5">
-              <CupSoda className="w-4 h-4" />
-              <span>Total Hot Water</span>
-            </span>
-            <span className="text-[10px] font-mono opacity-80">Target Liquid</span>
+        <div className="p-6 rounded-2xl bg-espresso-950/90 border border-amber-gold/40 shadow-2xl relative overflow-hidden group flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-widest text-cyan-400 mb-2">
+              <span className="flex items-center gap-1.5">
+                <CupSoda className="w-4 h-4" />
+                <span>Total Hot Water</span>
+              </span>
+              <span className="text-[10px] font-mono opacity-80">Target Liquid</span>
+            </div>
+
+            <div className="text-3xl lg:text-4xl font-extrabold font-mono text-cream-light drop-shadow-md my-1">
+              {waterDisplay}
+            </div>
           </div>
 
-          <div className="text-3xl lg:text-4xl font-extrabold font-mono text-cream-light drop-shadow-md my-1">
-            {waterDisplay}
-          </div>
-
-          <div className="text-[11px] text-cream-soft/70 font-medium">
-            Ideal brew temp: <strong className="text-cyan-400 font-mono">{isMetric ? `${activeMethod?.tempC || 90}°C` : `${activeMethod?.tempF || 194}°F`}</strong>
+          <div className="mt-4 pt-3 border-t border-white/10 text-[11px] text-cream-soft/70 font-medium flex items-center justify-between">
+            <span>Ideal brew temperature:</span>
+            <strong className="text-cyan-400 font-mono text-xs">{isMetric ? `${activeMethod?.tempC || 90}°C` : `${activeMethod?.tempF || 194}°F`}</strong>
           </div>
         </div>
 
-      </div>
-
-      {/* Fine-Tune Ratio Slider */}
-      <div className="mt-6 pt-5 border-t border-white/10 flex items-center justify-between">
-        <div className="flex items-center space-x-2 text-xs text-cream-soft/80">
-          <Sliders className="w-4 h-4 text-amber-gold" />
-          <span className="font-semibold">Fine-Tune Ratio Target:</span>
-          <span className="font-extrabold text-cream-light font-mono text-sm bg-white/10 px-2 py-0.5 rounded border border-white/10">
-            {isCoffee ? `1 : ${currentRatio}` : `1g / ${currentRatio}mL`}
-          </span>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <input
-            type="range"
-            min={isCoffee ? "10" : "20"}
-            max={isCoffee ? "20" : "70"}
-            step="1"
-            value={currentRatio}
-            onChange={(e) => setCustomRatio(parseInt(e.target.value))}
-            className="w-28 sm:w-40 h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer"
-          />
-          {customRatio && (
-            <button
-              onClick={() => setCustomRatio(null)}
-              className="text-xs text-amber-gold font-bold underline hover:text-cream-light"
-            >
-              Reset
-            </button>
-          )}
-        </div>
       </div>
 
       {/* Step Navigation Controls */}
