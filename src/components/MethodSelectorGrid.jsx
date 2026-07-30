@@ -1,5 +1,5 @@
 import React from 'react';
-import { Thermometer, Clock, CheckCircle2, ChevronRight, Sparkles, Coffee, Leaf } from 'lucide-react';
+import { Thermometer, Clock, CheckCircle2, ChevronRight, Sparkles, Coffee, Leaf, Gauge } from 'lucide-react';
 
 export default function MethodSelectorGrid({ trackMode, methods, activeMethod, setActiveMethod, onNextStep, unitSystem }) {
   const isCoffee = trackMode === 'coffee';
@@ -100,6 +100,23 @@ export default function MethodSelectorGrid({ trackMode, methods, activeMethod, s
                     {totalDurationStr}
                   </span>
                 </div>
+                {isCoffee && method.grind && (
+                  <div className="flex items-center justify-between pt-1 border-t border-current/10">
+                    <span className="opacity-70 uppercase text-[10px]">Grind Type:</span>
+                    <span className="flex items-center gap-1 font-bold">
+                      <Gauge className="w-3.5 h-3.5 opacity-80" />
+                      {method.grind}
+                    </span>
+                  </div>
+                )}
+                {!isCoffee && method.leafGrade && (
+                  <div className="flex items-center justify-between pt-1 border-t border-current/10">
+                    <span className="opacity-70 uppercase text-[10px]">Leaf Style:</span>
+                    <span className="flex items-center gap-1 font-bold">
+                      {method.leafGrade}
+                    </span>
+                  </div>
+                )}
               </div>
             </button>
           );
