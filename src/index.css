@@ -5,59 +5,69 @@
 @layer base {
   body {
     transition: background-color 0.5s ease, color 0.5s ease;
+    background-color: #0A0908;
+    color: #F8F5F1;
     background-attachment: fixed;
+    font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: 'Cinzel', 'Playfair Display', serif;
+    letter-spacing: 0.02em;
   }
 }
 
-/* Luxury Glassmorphism & Tactile Bevel Utilities */
+/* Luxury Editorial Glassmorphism & Tactile Utilities */
 .glass-panel {
-  background: linear-gradient(135deg, rgba(35, 40, 48, 0.75) 0%, rgba(20, 24, 30, 0.85) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(22, 18, 15, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15),
-    0 20px 40px -15px rgba(0, 0, 0, 0.8),
-    0 0 15px 0 rgba(0, 0, 0, 0.5);
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
+    0 24px 48px -12px rgba(0, 0, 0, 0.85),
+    0 0 20px 0 rgba(0, 0, 0, 0.5);
 }
 
 .glass-panel-amber {
-  background: linear-gradient(135deg, rgba(42, 30, 24, 0.8) 0%, rgba(18, 14, 12, 0.9) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(212, 140, 70, 0.3);
+  background: linear-gradient(145deg, rgba(36, 26, 20, 0.88) 0%, rgba(18, 14, 12, 0.94) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(212, 140, 70, 0.22);
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 215, 170, 0.2),
-    0 20px 40px -15px rgba(18, 14, 12, 0.9),
-    0 0 25px -5px rgba(212, 140, 70, 0.15);
+    inset 0 1px 1px 0 rgba(255, 215, 170, 0.18),
+    0 24px 48px -12px rgba(10, 8, 7, 0.95),
+    0 0 35px -5px rgba(212, 140, 70, 0.15);
 }
 
 .glass-panel-sage {
-  background: linear-gradient(135deg, rgba(28, 40, 33, 0.8) 0%, rgba(15, 22, 18, 0.9) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(94, 126, 106, 0.35);
+  background: linear-gradient(145deg, rgba(24, 34, 28, 0.88) 0%, rgba(14, 20, 16, 0.94) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(143, 168, 153, 0.25);
   box-shadow: 
-    inset 0 1px 1px 0 rgba(200, 230, 210, 0.2),
-    0 20px 40px -15px rgba(15, 22, 18, 0.9),
-    0 0 25px -5px rgba(94, 126, 106, 0.15);
+    inset 0 1px 1px 0 rgba(200, 230, 210, 0.18),
+    0 24px 48px -12px rgba(14, 20, 16, 0.95),
+    0 0 35px -5px rgba(143, 168, 153, 0.15);
 }
 
-/* Tactile 3D Button Bevel Effect */
+/* Tactile Craft 3D Gold Accent Button */
 .btn-tactile-amber {
   background: linear-gradient(180deg, #E29D56 0%, #D48C46 50%, #B8722E 100%);
   box-shadow: 
     inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
-    inset 0 -2px 0 0 rgba(0, 0, 0, 0.3),
-    0 8px 20px -4px rgba(212, 140, 70, 0.5);
-  border: 1px solid rgba(255, 200, 150, 0.3);
+    inset 0 -2px 0 0 rgba(0, 0, 0, 0.35),
+    0 10px 25px -4px rgba(212, 140, 70, 0.45);
+  border: 1px solid rgba(255, 200, 150, 0.35);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-tactile-amber:hover {
   background: linear-gradient(180deg, #EEA962 0%, #E29D56 50%, #C67F3A 100%);
   box-shadow: 
     inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
-    0 12px 25px -4px rgba(212, 140, 70, 0.65);
+    0 14px 30px -4px rgba(212, 140, 70, 0.6);
+  transform: translateY(-2px);
 }
 
 .btn-tactile-amber:active {
@@ -71,16 +81,18 @@
   background: linear-gradient(180deg, #6F967E 0%, #5E7E6A 50%, #476352 100%);
   box-shadow: 
     inset 0 1px 0 0 rgba(255, 255, 255, 0.35),
-    inset 0 -2px 0 0 rgba(0, 0, 0, 0.3),
-    0 8px 20px -4px rgba(94, 126, 106, 0.5);
-  border: 1px solid rgba(180, 220, 195, 0.3);
+    inset 0 -2px 0 0 rgba(0, 0, 0, 0.35),
+    0 10px 25px -4px rgba(94, 126, 106, 0.45);
+  border: 1px solid rgba(180, 220, 195, 0.35);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-tactile-sage:hover {
   background: linear-gradient(180deg, #7FA88F 0%, #6F967E 50%, #51715E 100%);
   box-shadow: 
     inset 0 1px 0 0 rgba(255, 255, 255, 0.45),
-    0 12px 25px -4px rgba(94, 126, 106, 0.65);
+    0 14px 30px -4px rgba(94, 126, 106, 0.6);
+  transform: translateY(-2px);
 }
 
 .btn-tactile-sage:active {
@@ -92,7 +104,7 @@
 
 /* Metallic Shimmer Text */
 .text-shimmer-amber {
-  background: linear-gradient(135deg, #FFF5EB 0%, #D48C46 50%, #FFF5EB 100%);
+  background: linear-gradient(135deg, #FFF8F0 0%, #D48C46 50%, #FFF8F0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -100,20 +112,20 @@
 /* Custom Styled Range Sliders */
 input[type=range] {
   -webkit-appearance: none;
-  background: rgba(0, 0, 0, 0.4);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+  background: rgba(10, 8, 7, 0.6);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 20px;
-  width: 20px;
+  height: 22px;
+  width: 22px;
   border-radius: 50%;
   background: linear-gradient(180deg, #FFFFFF 0%, #D48C46 100%);
   box-shadow: 
-    0 0 10px rgba(212, 140, 70, 0.8),
-    0 4px 8px rgba(0, 0, 0, 0.6);
+    0 0 12px rgba(212, 140, 70, 0.9),
+    0 4px 8px rgba(0, 0, 0, 0.7);
   cursor: pointer;
   border: 2px solid #FFFFFF;
 }
@@ -124,12 +136,12 @@ input[type=range]::-webkit-slider-thumb {
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #0C0908;
+  background: #0A0908;
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #2C3036 0%, #1E2228 100%);
+  background: linear-gradient(180deg, #241F1A 0%, #171412 100%);
   border-radius: 6px;
-  border: 2px solid #0C0908;
+  border: 2px solid #0A0908;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #D48C46;
@@ -138,10 +150,10 @@ input[type=range]::-webkit-slider-thumb {
 /* Glowing Pulse Ring Animation */
 @keyframes pulse-glow {
   0% {
-    box-shadow: 0 0 0 0 rgba(212, 140, 70, 0.6);
+    box-shadow: 0 0 0 0 rgba(212, 140, 70, 0.5);
   }
   70% {
-    box-shadow: 0 0 0 14px rgba(212, 140, 70, 0);
+    box-shadow: 0 0 0 18px rgba(212, 140, 70, 0);
   }
   100% {
     box-shadow: 0 0 0 0 rgba(212, 140, 70, 0);
@@ -149,5 +161,5 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 .animate-pulse-glow {
-  animation: pulse-glow 2s infinite;
+  animation: pulse-glow 2.5s infinite;
 }

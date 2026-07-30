@@ -15,25 +15,29 @@ export default function MethodSelectorGrid({ trackMode, methods, activeMethod, s
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Step Header */}
-      <div className="p-6 md:p-8 rounded-3xl glass-panel shadow-2xl relative overflow-hidden">
-        <div className="inline-flex items-center space-x-2 text-xs font-extrabold uppercase tracking-widest text-amber-gold mb-2">
-          <Sparkles className="w-4 h-4 animate-pulse" />
-          <span>Step 01 of 04 • {isCoffee ? 'Coffee Device Selection' : 'Specialty Tea Selection'}</span>
+    <div className="space-y-10 md:space-y-12 animate-fade-in">
+      {/* Step Header with Radial Ambient Glow */}
+      <div className="p-8 md:p-10 lg:p-12 rounded-3xl glass-panel-amber relative overflow-hidden shadow-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] text-amber-gold mb-3">
+          <Sparkles className="w-4 h-4 animate-pulse text-amber-gold" />
+          <span>Step 01 of 04 • Atelier Selection</span>
         </div>
-        <h2 className="font-serif text-3xl md:text-4xl font-extrabold text-cream-light mb-2">
-          {isCoffee ? 'Choose Your Coffee Extraction Device' : 'Choose Your Specialty Tea Type'}
+
+        <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-extrabold text-cream-light mb-3 leading-tight drop-shadow">
+          {isCoffee ? 'Select Your Craft Extraction Vessel' : 'Select Your Specialty Tea Varietal'}
         </h2>
-        <p className="text-xs md:text-sm text-cream-soft/80 max-w-2xl leading-relaxed">
+        
+        <p className="text-xs md:text-sm text-stone-300 max-w-3xl leading-relaxed font-normal">
           {isCoffee
-            ? 'Select a brewing method below to customize your water ratio, grind coarseness, roast recommendations, and step-by-step extraction timer.'
-            : 'Select a tea category below to customize steeping temperatures, vessel preheating, and leaf-to-water infusion ratios.'}
+            ? 'Each specialty brewing device governs fluid dynamics, paper filtration friction, and steep geometry. Choose below to tailor water ratios, burr coarseness, and phase-by-phase extraction timers.'
+            : 'Select a tea category to calibrate leaf-to-water ratios, gaiwan preheating, and exact temperature steep cycles.'}
         </p>
       </div>
 
       {/* Grid of Devices / Teas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
         {methods.map((method) => {
           const isSelected = activeMethod?.id === method.id;
           const totalDurationStr = getTotalDurationString(method.phases);
@@ -43,77 +47,73 @@ export default function MethodSelectorGrid({ trackMode, methods, activeMethod, s
             <button
               key={method.id}
               onClick={() => setActiveMethod(method)}
-              className={`p-6 rounded-3xl border text-left transition-all duration-500 relative flex flex-col justify-between group shadow-xl hover:-translate-y-1.5 ${
+              className={`p-8 md:p-9 rounded-3xl border text-left transition-all duration-300 relative flex flex-col justify-between group shadow-xl hover:-translate-y-1.5 ${
                 isSelected
                   ? isCoffee
-                    ? 'btn-tactile-amber text-espresso-950 scale-102 ring-2 ring-amber-gold'
-                    : 'btn-tactile-sage text-cream-light scale-102 ring-2 ring-sage-400'
-                  : 'bg-espresso-900/80 border-white/15 text-cream-soft hover:bg-white/10 hover:border-white/30'
+                    ? 'bg-amber-500/15 border-amber-400/60 text-cream-light ring-1 ring-amber-400/40 shadow-[0_15px_40px_-10px_rgba(212,140,70,0.25)] backdrop-blur-xl'
+                    : 'bg-emerald-500/15 border-emerald-400/60 text-cream-light ring-1 ring-emerald-400/40 shadow-[0_15px_40px_-10px_rgba(143,168,153,0.25)] backdrop-blur-xl'
+                  : 'bg-[#14110E]/80 border-white/[0.08] text-stone-300 hover:bg-[#1C1814] hover:border-white/20'
               }`}
             >
               {/* Method Card Header */}
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-2xl ${
+                <div className="flex items-center justify-between mb-5">
+                  <div className={`p-3.5 rounded-2xl transition-all ${
                     isSelected
-                      ? 'bg-black/20 text-current'
-                      : 'bg-white/10 text-amber-gold'
+                      ? isCoffee
+                        ? 'bg-amber-gold text-espresso-950 shadow-[0_0_15px_rgba(212,140,70,0.5)] font-bold'
+                        : 'bg-sage-300 text-slate-950 shadow-[0_0_15px_rgba(143,168,153,0.5)] font-bold'
+                      : 'bg-white/[0.06] text-amber-gold border border-white/[0.08]'
                   }`}>
                     {isCoffee ? <Coffee className="w-6 h-6" /> : <Leaf className="w-6 h-6" />}
                   </div>
 
                   {isSelected && (
-                    <span className="px-3 py-1 rounded-full bg-black/30 text-current text-xs font-extrabold flex items-center gap-1 border border-current/20 shadow-inner">
-                      <CheckCircle2 className="w-4 h-4" />
+                    <span className="px-3.5 py-1 rounded-full bg-amber-400/20 text-amber-gold text-[10px] font-mono tracking-[0.15em] font-extrabold uppercase border border-amber-400/30 flex items-center gap-1.5 shadow-inner">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Active</span>
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-serif text-xl font-extrabold mb-2 leading-snug drop-shadow">
+                <h3 className="font-serif text-2xl font-bold mb-2.5 leading-snug drop-shadow text-cream-light">
                   {method.name}
                 </h3>
-                <p className={`text-xs leading-relaxed mb-6 font-medium ${
-                  isSelected ? 'opacity-95' : 'text-cream-soft/70'
-                }`}>
+                
+                <p className="text-xs text-stone-400 leading-relaxed mb-6 font-normal">
                   {method.description}
                 </p>
               </div>
 
               {/* Specs Pills Row */}
-              <div className={`pt-4 border-t ${isSelected ? 'border-current/20' : 'border-white/10'} space-y-2 text-xs font-mono font-extrabold`}>
+              <div className={`pt-5 border-t ${isSelected ? 'border-white/15' : 'border-white/[0.08]'} space-y-2.5 text-xs font-mono font-medium`}>
                 <div className="flex items-center justify-between">
-                  <span className="opacity-70 uppercase text-[10px]">Ratio:</span>
-                  <span>{isCoffee ? `1 : ${method.ratio}` : `1g / ${method.ratio}mL`}</span>
+                  <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-stone-400">Ratio Target:</span>
+                  <span className="font-bold text-cream-light">{isCoffee ? `1 : ${method.ratio}` : `1g / ${method.ratio}mL`}</span>
                 </div>
+
                 <div className="flex items-center justify-between">
-                  <span className="opacity-70 uppercase text-[10px]">Target Temp:</span>
-                  <span className="flex items-center gap-1">
+                  <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-stone-400">Water Temp:</span>
+                  <span className="flex items-center gap-1.5 font-bold text-cyan-300">
                     <Thermometer className="w-3.5 h-3.5 opacity-80" />
                     {tempStr}
                   </span>
                 </div>
+
                 <div className="flex items-center justify-between">
-                  <span className="opacity-70 uppercase text-[10px]">{isCoffee ? 'Brew Time:' : 'Steep Time:'}</span>
-                  <span className="flex items-center gap-1">
+                  <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-stone-400">{isCoffee ? 'Brew Duration:' : 'Steep Duration:'}</span>
+                  <span className="flex items-center gap-1.5 font-bold text-cream-light">
                     <Clock className="w-3.5 h-3.5 opacity-80" />
                     {totalDurationStr}
                   </span>
                 </div>
+
                 {isCoffee && method.grind && (
-                  <div className="flex items-center justify-between pt-1 border-t border-current/10">
-                    <span className="opacity-70 uppercase text-[10px]">Grind Type:</span>
-                    <span className="flex items-center gap-1 font-bold">
+                  <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
+                    <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-amber-gold/90">Grind Size:</span>
+                    <span className="flex items-center gap-1.5 font-bold text-amber-gold">
                       <Gauge className="w-3.5 h-3.5 opacity-80" />
                       {method.grind}
-                    </span>
-                  </div>
-                )}
-                {!isCoffee && method.leafGrade && (
-                  <div className="flex items-center justify-between pt-1 border-t border-current/10">
-                    <span className="opacity-70 uppercase text-[10px]">Leaf Style:</span>
-                    <span className="flex items-center gap-1 font-bold">
-                      {method.leafGrade}
                     </span>
                   </div>
                 )}
@@ -124,14 +124,14 @@ export default function MethodSelectorGrid({ trackMode, methods, activeMethod, s
       </div>
 
       {/* Step Navigation Action Footer */}
-      <div className="flex items-center justify-between pt-6 border-t border-white/10">
-        <div className="text-xs text-cream-soft/70 font-medium">
-          Selected: <strong className="text-cream-light font-bold">{activeMethod?.name}</strong>
+      <div className="flex items-center justify-between pt-8 border-t border-white/[0.08]">
+        <div className="text-xs text-stone-400 font-medium">
+          Active Selection: <strong className="text-cream-light font-serif font-bold text-sm ml-1">{activeMethod?.name}</strong>
         </div>
 
         <button
           onClick={onNextStep}
-          className="py-3.5 px-8 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all"
+          className="py-4 px-9 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs tracking-wider uppercase flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all"
         >
           <span>Step 02: Ratio & Scaler</span>
           <ChevronRight className="w-4 h-4" />

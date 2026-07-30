@@ -39,47 +39,47 @@ export default function PrecisionCalculator({
   ];
 
   return (
-    <div className={`p-7 rounded-3xl ${isCoffee ? 'glass-panel-amber' : 'glass-panel-sage'} shadow-2xl transition-all duration-500`}>
+    <div className={`p-8 md:p-10 lg:p-12 rounded-3xl ${isCoffee ? 'glass-panel-amber' : 'glass-panel-sage'} shadow-2xl transition-all duration-500`}>
       
       {/* 1. Header Bar with Device Switcher Pills */}
-      <div className="mb-6 pb-4 border-b border-white/10">
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <div className="inline-flex items-center space-x-2 text-xs font-extrabold uppercase tracking-widest text-amber-gold">
+      <div className="mb-8 pb-6 border-b border-white/[0.08]">
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] text-amber-gold">
             <Sparkles className="w-4 h-4 animate-pulse" />
-            <span>Step 02 of 04 • {isCoffee ? 'Coffee Ratio & Cup Scaler' : 'Tea Steeping & Mug Scaler'}</span>
+            <span>Step 02 of 04 • Dose & Volumetric Scaler</span>
           </div>
-          <span className="text-xs font-mono font-bold bg-white/10 px-3 py-1 rounded-full text-cream-light border border-white/15">
+          <span className="text-xs font-mono font-bold bg-white/[0.06] px-3.5 py-1 rounded-full text-cream-light border border-white/[0.12] shadow-inner">
             Active: {activeMethod?.name}
           </span>
         </div>
 
-        <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light drop-shadow-md">
+        <h3 className="font-serif text-3xl md:text-4xl font-extrabold text-cream-light drop-shadow-md">
           {isCoffee ? 'Precision Coffee Ratio & Dose Scaler' : 'Precision Tea Infusion Scaler'}
         </h3>
-        <p className="text-xs text-cream-soft/70 mt-1">
+        <p className="text-xs md:text-sm text-stone-300 mt-1.5 leading-relaxed font-normal">
           {isCoffee
-            ? 'Calculates exact dry coffee ground weight (oz/g) and hot water volume (fl oz/mL) based on target cups.'
+            ? 'Calculates exact dry coffee ground weight (oz/g) and hot water volume (fl oz/mL) scaled to your target cup count.'
             : 'Calculates exact tea leaf weight (oz/g) and hot water volume (fl oz/mL) for ideal steep strength.'}
         </p>
 
         {/* Horizontal Scroll Method Picker Quick Tabs */}
-        <div className="mt-4 pt-4 border-t border-white/10">
-          <label className="block text-[10px] uppercase font-mono tracking-widest font-extrabold text-cream-soft/70 mb-2">
-            Switch Method:
+        <div className="mt-6 pt-5 border-t border-white/[0.08]">
+          <label className="block text-[10px] uppercase font-mono tracking-[0.2em] font-extrabold text-amber-gold/90 mb-2.5">
+            Switch Extraction Method:
           </label>
-          <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
+          <div className="flex items-center space-x-2.5 overflow-x-auto pb-1 no-scrollbar">
             {methods.map((method) => {
               const isSelected = activeMethod?.id === method.id;
               return (
                 <button
                   key={method.id}
                   onClick={() => setActiveMethod(method)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
                     isSelected
                       ? isCoffee
-                        ? 'bg-amber-gold text-espresso-950 border-amber-gold font-extrabold shadow-md'
-                        : 'bg-sage-400 text-slate-950 border-sage-400 font-extrabold shadow-md'
-                      : 'bg-black/30 text-cream-soft/70 border-white/10 hover:bg-white/10 hover:text-cream-light'
+                        ? 'bg-amber-gold text-espresso-950 border-amber-gold font-extrabold shadow-[0_0_15px_rgba(212,140,70,0.4)]'
+                        : 'bg-sage-300 text-slate-950 border-sage-300 font-extrabold shadow-[0_0_15px_rgba(143,168,153,0.4)]'
+                      : 'bg-black/30 text-stone-400 border-white/[0.08] hover:bg-white/[0.08] hover:text-cream-light'
                   }`}
                 >
                   {method.name}
@@ -91,16 +91,16 @@ export default function PrecisionCalculator({
       </div>
 
       {/* 2. Interactive Cup Quantity & Mug Size Stepper Card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 bg-black/40 p-5 rounded-2xl border border-white/10 shadow-inner">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 bg-[#0F0D0C]/80 p-6 md:p-8 rounded-3xl border border-white/[0.08] shadow-inner">
         
         {/* Cup Slider */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-xs uppercase tracking-wider font-extrabold text-cream-soft/80 flex items-center gap-1.5">
+          <div className="flex items-center justify-between mb-3.5">
+            <label className="text-xs uppercase tracking-[0.15em] font-mono font-extrabold text-stone-300 flex items-center gap-2">
               <CupSoda className="w-4 h-4 text-amber-gold" />
-              <span>Cup Quantity ({cupCount} {cupCount === 1 ? 'Cup' : 'Cups'})</span>
+              <span>Target Serving ({cupCount} {cupCount === 1 ? 'Cup' : 'Cups'})</span>
             </label>
-            <span className="text-sm font-extrabold font-mono text-cream-light bg-amber-gold/20 px-3 py-1 rounded-xl border border-amber-gold/30 shadow">
+            <span className="text-sm font-extrabold font-mono text-cream-light bg-amber-400/20 px-3.5 py-1 rounded-xl border border-amber-400/30 shadow">
               {cupCount}
             </span>
           </div>
@@ -112,10 +112,10 @@ export default function PrecisionCalculator({
             step="1"
             value={cupCount}
             onChange={(e) => setCupCount(parseInt(e.target.value))}
-            className="w-full h-3 bg-slate-900 rounded-xl appearance-none cursor-pointer mb-3"
+            className="w-full h-3 bg-[#1A1613] rounded-xl appearance-none cursor-pointer mb-3.5"
           />
 
-          <div className="flex justify-between text-[11px] text-cream-soft/60 font-mono font-medium">
+          <div className="flex justify-between text-[11px] text-stone-400 font-mono font-medium">
             <span>1 Cup</span>
             <span>2 Cups</span>
             <span>3 Cups</span>
@@ -127,20 +127,20 @@ export default function PrecisionCalculator({
 
         {/* Mug Capacity Selector */}
         <div>
-          <label className="block text-xs uppercase tracking-wider font-extrabold text-cream-soft/80 mb-3">
+          <label className="block text-xs uppercase tracking-[0.15em] font-mono font-extrabold text-stone-300 mb-3.5">
             Mug Volume Capacity:
           </label>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-3">
             {CUP_VOLUMES.map((vol) => (
               <button
                 key={vol.ml}
                 onClick={() => setCupMl(vol.ml)}
-                className={`px-3 py-2.5 rounded-xl text-xs font-bold border transition-all active:scale-95 ${
+                className={`px-3.5 py-3 rounded-2xl text-xs font-bold border transition-all active:scale-95 ${
                   cupMl === vol.ml
                     ? isCoffee
-                      ? 'bg-amber-gold/30 border-amber-gold text-amber-gold font-extrabold shadow-lg shadow-amber-gold/10'
-                      : 'bg-sage-500/30 border-sage-300 text-sage-300 font-extrabold shadow-lg shadow-sage-500/10'
-                    : 'bg-black/50 border-white/10 text-cream-soft hover:bg-white/10 hover:border-white/20'
+                      ? 'bg-amber-500/25 border-amber-400 text-amber-gold font-extrabold shadow-[0_0_20px_rgba(212,140,70,0.2)]'
+                      : 'bg-emerald-500/25 border-sage-300 text-sage-300 font-extrabold shadow-[0_0_20px_rgba(143,168,153,0.2)]'
+                    : 'bg-black/40 border-white/[0.08] text-stone-400 hover:bg-white/[0.08] hover:border-white/20'
                 }`}
               >
                 {vol.label}
@@ -152,30 +152,30 @@ export default function PrecisionCalculator({
       </div>
 
       {/* 3. Output Display Cards (Dry Grounds with Integrated Ratio Slider & Water Volume) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
         
         {/* Dry Dose Output Card with Integrated Fine-Tune Ratio Slider */}
-        <div className="p-6 rounded-2xl bg-espresso-950/90 border border-amber-gold/40 shadow-2xl relative overflow-hidden group flex flex-col justify-between">
+        <div className="p-7 md:p-8 rounded-3xl bg-[#14110E]/90 border border-amber-gold/30 shadow-2xl relative overflow-hidden group flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-widest text-amber-gold mb-2">
-              <span className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-[0.15em] font-mono text-amber-gold mb-2.5">
+              <span className="flex items-center gap-2">
                 <Scale className="w-4 h-4" />
                 <span>{isCoffee ? 'Dry Coffee Grounds' : 'Tea Leaves'}</span>
               </span>
               <span className="text-[10px] font-mono opacity-80">Dose Weight</span>
             </div>
 
-            <div className="text-3xl lg:text-4xl font-extrabold font-mono text-cream-light drop-shadow-md my-1">
+            <div className="text-4xl lg:text-5xl font-extrabold font-mono text-cream-light drop-shadow-md my-2">
               {doseDisplay}
             </div>
           </div>
 
           {/* Integrated Fine-Tune Ratio Slider */}
-          <div className="mt-4 pt-3 border-t border-white/10">
-            <div className="flex items-center justify-between text-[11px] text-cream-soft/80 font-medium mb-1.5">
-              <span className="flex items-center gap-1">
+          <div className="mt-5 pt-4 border-t border-white/[0.08]">
+            <div className="flex items-center justify-between text-[11px] text-stone-300 font-medium mb-2">
+              <span className="flex items-center gap-1.5">
                 <Sliders className="w-3.5 h-3.5 text-amber-gold" />
-                <span>Target Ratio: <strong className="text-amber-gold font-mono">{isCoffee ? `1 : ${currentRatio}` : `1g / ${currentRatio}mL`}</strong></span>
+                <span>Extraction Ratio: <strong className="text-amber-gold font-mono">{isCoffee ? `1 : ${currentRatio}` : `1g / ${currentRatio}mL`}</strong></span>
               </span>
               {customRatio && (
                 <button
@@ -195,31 +195,31 @@ export default function PrecisionCalculator({
                 step="1"
                 value={currentRatio}
                 onChange={(e) => setCustomRatio(parseInt(e.target.value))}
-                className="w-full h-2.5 bg-slate-900 rounded-lg appearance-none cursor-pointer"
+                className="w-full h-2.5 bg-black/60 rounded-lg appearance-none cursor-pointer"
               />
             </div>
           </div>
         </div>
 
         {/* Water Volume Output Card */}
-        <div className="p-6 rounded-2xl bg-espresso-950/90 border border-amber-gold/40 shadow-2xl relative overflow-hidden group flex flex-col justify-between">
+        <div className="p-7 md:p-8 rounded-3xl bg-[#14110E]/90 border border-cyan-400/30 shadow-2xl relative overflow-hidden group flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-widest text-cyan-400 mb-2">
-              <span className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-[0.15em] font-mono text-cyan-400 mb-2.5">
+              <span className="flex items-center gap-2">
                 <CupSoda className="w-4 h-4" />
                 <span>Total Hot Water</span>
               </span>
               <span className="text-[10px] font-mono opacity-80">Target Liquid</span>
             </div>
 
-            <div className="text-3xl lg:text-4xl font-extrabold font-mono text-cream-light drop-shadow-md my-1">
+            <div className="text-4xl lg:text-5xl font-extrabold font-mono text-cream-light drop-shadow-md my-2">
               {waterDisplay}
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-white/10 text-[11px] text-cream-soft/70 font-medium flex items-center justify-between">
+          <div className="mt-5 pt-4 border-t border-white/[0.08] text-[11px] text-stone-300 font-medium flex items-center justify-between">
             <span>Ideal brew temperature:</span>
-            <strong className="text-cyan-400 font-mono text-xs">{isMetric ? `${activeMethod?.tempC || 90}°C` : `${activeMethod?.tempF || 194}°F`}</strong>
+            <strong className="text-cyan-300 font-mono text-xs font-bold">{isMetric ? `${activeMethod?.tempC || 90}°C` : `${activeMethod?.tempF || 194}°F`}</strong>
           </div>
         </div>
 
@@ -227,10 +227,10 @@ export default function PrecisionCalculator({
 
       {/* Step Navigation Controls */}
       {onPrevStep && onNextStep && (
-        <div className="flex items-center justify-between pt-6 mt-6 border-t border-white/10">
+        <div className="flex items-center justify-between pt-8 mt-8 border-t border-white/[0.08]">
           <button
             onClick={onPrevStep}
-            className="py-3 px-6 rounded-2xl bg-white/10 text-cream-light font-extrabold text-xs flex items-center gap-2 hover:bg-white/20 transition-all border border-white/15"
+            className="py-4 px-8 rounded-2xl bg-white/[0.08] text-cream-light font-extrabold text-xs uppercase tracking-wider flex items-center gap-2.5 hover:bg-white/[0.15] transition-all border border-white/[0.12]"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>Step 01: Choose Method</span>
@@ -238,7 +238,7 @@ export default function PrecisionCalculator({
 
           <button
             onClick={onNextStep}
-            className="py-3.5 px-8 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all"
+            className="py-4 px-9 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all"
           >
             <span>Step 03: Grind & Beans</span>
             <ChevronRight className="w-4 h-4" />

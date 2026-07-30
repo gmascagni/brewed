@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft } from 'lucide-react';
 import { playPhaseChime, playCompletionChime } from '../utils/audioSynth';
 
@@ -92,33 +92,36 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   const targetPhaseWaterMl = activePhase?.waterMultiplier ? Math.round(dryDoseGrams * activePhase.waterMultiplier) : null;
 
   return (
-    <div className={`p-7 rounded-3xl ${isCoffee ? 'glass-panel-amber' : 'glass-panel-sage'} shadow-2xl transition-all duration-500`}>
+    <div className={`p-8 md:p-10 lg:p-12 rounded-3xl ${isCoffee ? 'glass-panel-amber' : 'glass-panel-sage'} shadow-2xl transition-all duration-500 relative overflow-hidden`}>
       
-      {/* Title */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+      {/* Background Radial Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/[0.08]">
         <div>
-          <h3 className="font-serif text-2xl font-bold text-cream-light flex items-center gap-2.5 drop-shadow-md">
-            <TimerIcon className={`w-6 h-6 ${isCoffee ? 'text-amber-gold' : 'text-sage-300'}`} />
+          <h3 className="font-serif text-3xl font-bold text-cream-light flex items-center gap-3 drop-shadow-md">
+            <TimerIcon className={`w-7 h-7 ${isCoffee ? 'text-amber-gold' : 'text-sage-300'}`} />
             <span>Step 04 • Multi-Phase Extraction Timer</span>
           </h3>
-          <p className="text-xs text-cream-soft/70 mt-0.5">Audio/visual countdown guiding blooming & steep phases</p>
+          <p className="text-xs md:text-sm text-stone-300 mt-1">Audio/visual countdown guiding blooming, steep, and drawdown phases</p>
         </div>
 
-        <span className={`text-xs font-extrabold px-3.5 py-1.5 rounded-full border shadow-inner ${
+        <span className={`text-xs font-mono font-extrabold tracking-wider uppercase px-4 py-1.5 rounded-full border shadow-inner ${
           isRunning 
             ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 animate-pulse shadow-emerald-500/10' 
-            : 'bg-white/10 text-cream-soft border-white/15'
+            : 'bg-white/10 text-stone-300 border-white/15'
         }`}>
-          {isCompleted ? 'Brew Complete ✨' : isRunning ? 'Phase Active...' : 'Ready'}
+          {isCompleted ? 'Brew Complete ✨' : isRunning ? 'Extraction Active...' : 'Ready'}
         </span>
       </div>
 
       {/* Main Timer Dial Area with Glowing Ring */}
-      <div className="flex flex-col items-center justify-center my-4 relative">
+      <div className="flex flex-col items-center justify-center my-6 relative">
         
         {/* SVG Circular Progress Ring */}
-        <div className={`relative w-60 h-60 flex items-center justify-center rounded-full p-2 ${
-          isRunning ? (isCoffee ? 'animate-pulse-glow' : 'animate-pulse-glow') : ''
+        <div className={`relative w-64 h-64 flex items-center justify-center rounded-full p-2 ${
+          isRunning ? 'animate-pulse-glow' : ''
         }`}>
           <svg className="w-full h-full transform -rotate-90 filter drop-shadow-2xl" viewBox="0 0 200 200">
             {/* Background Track */}
@@ -126,7 +129,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
               cx="100"
               cy="100"
               r={radius}
-              className="stroke-slate-900/90"
+              className="stroke-[#14110E]"
               strokeWidth="12"
               fill="transparent"
             />
@@ -148,7 +151,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
           {/* Center Timer Display */}
           <div className="absolute flex flex-col items-center text-center">
-            <div className="text-xs font-mono uppercase tracking-widest font-extrabold text-cream-soft/70 mb-0.5">
+            <div className="text-[11px] font-mono uppercase tracking-[0.2em] font-extrabold text-amber-gold mb-1">
               Phase {currentPhaseIndex + 1} / {phases.length}
             </div>
 
@@ -158,32 +161,32 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
               {formatTime(timeLeft)}
             </div>
 
-            <div className="text-xs font-mono font-extrabold text-cream-soft/70 mt-1 bg-black/30 px-2.5 py-0.5 rounded-full border border-white/10">
+            <div className="text-xs font-mono font-bold text-stone-400 mt-1 bg-black/40 px-3 py-1 rounded-full border border-white/[0.08]">
               {Math.floor(timeLeft / 60)}m {timeLeft % 60}s remaining
             </div>
 
-            <div className="text-xs font-bold text-amber-gold mt-1.5 max-w-[150px] truncate">
+            <div className="text-xs font-serif font-bold text-amber-gold mt-2 max-w-[170px] truncate">
               {activePhase?.name}
             </div>
           </div>
         </div>
 
         {/* Phase Action Raised Card */}
-        <div className="w-full mt-6 p-5 rounded-2xl bg-espresso-950/90 border border-white/15 text-center shadow-2xl">
-          <div className="text-xs font-extrabold uppercase tracking-wider text-cream-soft/70 mb-1.5 flex items-center justify-center gap-1.5">
+        <div className="w-full mt-8 p-6 rounded-3xl bg-[#120F0D]/95 border border-white/[0.12] text-center shadow-2xl backdrop-blur-xl">
+          <div className="text-xs font-mono font-extrabold uppercase tracking-[0.2em] text-amber-gold mb-2 flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-gold animate-pulse" />
-            <span>Current Phase Instruction</span>
+            <span>Active Extraction Instruction</span>
           </div>
 
-          <p className="text-sm font-semibold text-cream-light leading-relaxed">
+          <p className="text-sm md:text-base font-semibold text-cream-light leading-relaxed">
             {isCompleted 
-              ? '🎉 Brew process complete! Pour into your pre-heated mug and enjoy.' 
+              ? '🎉 Brew process complete! Pour into your pre-heated ceramic vessel and savor.' 
               : activePhase?.instruction
             }
           </p>
 
           {targetPhaseWaterMl > 0 && !isCompleted && (
-            <div className="mt-3 text-xs font-mono font-extrabold text-amber-gold bg-amber-gold/15 py-1 px-4 rounded-full inline-block border border-amber-gold/30 shadow">
+            <div className="mt-3.5 text-xs font-mono font-extrabold text-amber-gold bg-amber-400/15 py-1.5 px-5 rounded-full inline-block border border-amber-400/30 shadow">
               Target Pour Water: ~{targetPhaseWaterMl} mL
             </div>
           )}
@@ -192,11 +195,11 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       </div>
 
       {/* Timer Controls Row with Tactile 3D Buttons */}
-      <div className="flex items-center justify-center space-x-5 mt-7">
+      <div className="flex items-center justify-center space-x-5 mt-8">
         
         <button
           onClick={handleReset}
-          className="p-4 rounded-2xl bg-white/10 text-cream-soft hover:text-cream-light hover:bg-white/20 transition-all border border-white/15 shadow-xl active:scale-95"
+          className="p-4 rounded-2xl bg-white/10 text-stone-300 hover:text-cream-light hover:bg-white/20 transition-all border border-white/15 shadow-xl active:scale-95"
           title="Reset Timer"
         >
           <RotateCcw className="w-5 h-5" />
@@ -204,7 +207,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
         <button
           onClick={() => setIsRunning(!isRunning)}
-          className={`px-10 py-4 rounded-2xl font-extrabold text-sm flex items-center gap-3 shadow-2xl transition-all hover:scale-105 active:scale-95 ${
+          className={`px-10 py-4.5 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-3 shadow-2xl transition-all hover:scale-105 active:scale-95 ${
             isRunning
               ? 'bg-amber-600 text-cream-light border border-amber-500 shadow-amber-600/30'
               : isCoffee
@@ -218,7 +221,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
         <button
           onClick={handleSkipPhase}
-          className="p-4 rounded-2xl bg-white/10 text-cream-soft hover:text-cream-light hover:bg-white/20 transition-all border border-white/15 shadow-xl active:scale-95"
+          className="p-4 rounded-2xl bg-white/10 text-stone-300 hover:text-cream-light hover:bg-white/20 transition-all border border-white/15 shadow-xl active:scale-95"
           title="Skip to Next Phase"
         >
           <FastForward className="w-5 h-5" />
@@ -227,36 +230,37 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       </div>
 
       {/* Phase Roadmap Progress Timeline */}
-      <div className="mt-9 pt-6 border-t border-white/10">
-        <label className="block text-xs uppercase tracking-widest font-extrabold text-cream-soft/70 mb-3.5">
+      <div className="mt-10 pt-8 border-t border-white/[0.08]">
+        <label className="block text-[11px] font-mono uppercase tracking-[0.2em] font-extrabold text-amber-gold mb-4">
           Extraction Phase Roadmap:
         </label>
         
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {phases.map((phase, idx) => {
             const isPast = idx < currentPhaseIndex || isCompleted;
             const isCurrent = idx === currentPhaseIndex && !isCompleted;
             return (
               <div
                 key={idx}
-                className={`p-3 rounded-2xl border flex items-center justify-between text-xs transition-all ${
+                className={`p-4 rounded-2xl border flex items-center justify-between text-xs transition-all ${
                   isCurrent
-                    ? 'bg-amber-gold/20 border-amber-gold text-cream-light font-bold shadow-lg shadow-amber-gold/10'
+                    ? 'bg-amber-500/20 border-amber-400/60 text-cream-light font-bold shadow-lg shadow-amber-gold/10 backdrop-blur-md'
                     : isPast
-                    ? 'bg-white/5 border-white/5 text-cream-soft/50 line-through'
-                    : 'bg-slate-900/60 border-white/10 text-cream-soft/70 shadow'
+                    ? 'bg-white/[0.03] border-white/[0.04] text-stone-500 line-through'
+                    : 'bg-[#120F0D] border-white/[0.08] text-stone-300 shadow'
                 }`}
               >
-                <div className="flex items-center space-x-2.5">
-                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-extrabold shadow ${
-                    isCurrent ? 'bg-amber-gold text-espresso-950' : 'bg-slate-800 text-cream-soft/70 border border-white/10'
+                <div className="flex items-center space-x-3">
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-extrabold shadow ${
+                    isCurrent ? 'bg-amber-gold text-espresso-950' : 'bg-slate-800 text-stone-400 border border-white/10'
                   }`}>
                     {idx + 1}
                   </span>
                   <span className="font-semibold">{phase.name}</span>
                 </div>
+
                 <div className="flex items-center space-x-3">
-                  <span className="font-mono text-[11px] bg-black/40 px-2.5 py-1 rounded-xl border border-white/10 font-bold shadow-inner">
+                  <span className="font-mono text-[11px] bg-black/50 px-3 py-1 rounded-xl border border-white/10 font-bold shadow-inner text-cream-light">
                     {formatDuration(phase.durationSec)}
                   </span>
                   {isPast && <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />}
@@ -269,10 +273,10 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
       {/* Step Navigation Controls */}
       {onPrevStep && (
-        <div className="flex items-center justify-between pt-6 mt-6 border-t border-white/10">
+        <div className="flex items-center justify-between pt-8 mt-8 border-t border-white/[0.08]">
           <button
             onClick={onPrevStep}
-            className="py-3 px-6 rounded-2xl bg-white/10 text-cream-light font-extrabold text-xs flex items-center gap-2 hover:bg-white/20 transition-all border border-white/15"
+            className="py-4 px-8 rounded-2xl bg-white/[0.08] text-cream-light font-extrabold text-xs uppercase tracking-wider flex items-center gap-2.5 hover:bg-white/[0.15] transition-all border border-white/[0.12]"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>Step 03: Grind & Beans</span>
