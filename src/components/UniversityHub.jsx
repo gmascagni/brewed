@@ -40,7 +40,7 @@ export default function UniversityHub({ trackMode }) {
             ? 'bg-amber-gold/20 text-amber-gold border-amber-gold/40 shadow-amber-gold/10' 
             : 'bg-sage-500/20 text-sage-300 border-sage-500/40 shadow-sage-500/10'
         }`}>
-          {isCoffee ? '9 Global Growing Nations' : '5 Famous Tea Terroirs'}
+          {isCoffee ? '12 Global Growing Nations' : '5 Famous Tea Terroirs'}
         </span>
       </div>
 
@@ -138,7 +138,7 @@ export default function UniversityHub({ trackMode }) {
           <span className="text-[11px] font-mono text-amber-gold">Click Country to Explore</span>
         </label>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
           {origins.map((origin) => {
             const isSelected = origin.id === activeOrigin?.id;
             return (

@@ -7,7 +7,8 @@ import HeroBanner from './components/HeroBanner';
 import GrindVisualGuide from './components/GrindVisualGuide';
 import MasterclassHub from './components/MasterclassHub';
 import MultiPhaseTimer from './components/MultiPhaseTimer';
-import EducationalDrawer from './components/EducationalDrawer';
+import KnowledgeBaseDrawer from './components/KnowledgeBaseDrawer';
+import DiagnosticsDrawer from './components/DiagnosticsDrawer';
 import { BREW_METHODS } from './data/brewData';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
@@ -195,8 +196,11 @@ export default function App() {
             </div>
           )}
 
-          {/* Expandable Knowledge Base Drawer (Terroir Atlas & Diagnostics) */}
-          <EducationalDrawer trackMode={trackMode} />
+          {/* 1. Dedicated Knowledge Base Drawer (Terroir Atlas & Agronomy) */}
+          <KnowledgeBaseDrawer trackMode={trackMode} />
+
+          {/* 2. Dedicated Diagnostics Drawer (Taste Troubleshooting & Water Chemistry) */}
+          <DiagnosticsDrawer trackMode={trackMode} />
 
         </main>
 
