@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from './components/Header';
-import HeroBanner from './components/HeroBanner';
+import StepIndicator from './components/StepIndicator';
+import MethodSelectorGrid from './components/MethodSelectorGrid';
 import PrecisionCalculator from './components/PrecisionCalculator';
-import MultiPhaseTimer from './components/MultiPhaseTimer';
+import HeroBanner from './components/HeroBanner';
 import GrindVisualGuide from './components/GrindVisualGuide';
 import MasterclassHub from './components/MasterclassHub';
-import UniversityHub from './components/UniversityHub';
-import TroubleshootingHub from './components/TroubleshootingHub';
+import MultiPhaseTimer from './components/MultiPhaseTimer';
+import EducationalDrawer from './components/EducationalDrawer';
 import { BREW_METHODS } from './data/brewData';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 export default function App() {
   // Main Application State
   const [trackMode, setTrackMode] = useState('coffee'); // 'coffee' | 'tea'
-  const [unitSystem, setUnitSystem] = useState('imperial'); // 'metric' | 'imperial'
+  const [unitSystem, setUnitSystem] = useState('imperial'); // 'imperial' | 'metric'
   const [isMuted, setIsMuted] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1); // 1 | 2 | 3 | 4
 
   // Active Method & Scaling State
   const methods = BREW_METHODS[trackMode] || BREW_METHODS.coffee;
@@ -22,7 +25,7 @@ export default function App() {
   const [cupMl, setCupMl] = useState(240);
   const [customRatio, setCustomRatio] = useState(null);
 
-  // Masterclass & Split Screen State (Initial video player is closed until user clicks a tutorial card)
+  // Masterclass & Split Screen State
   const [isSplitScreen, setIsSplitScreen] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
 
@@ -33,6 +36,7 @@ export default function App() {
     setActiveMethod(newMethods[0]);
     setCustomRatio(null);
     setActiveVideo(null);
+    setCurrentStep(1); // Reset to Step 1 on track switch
   };
 
   // Sync active method selection
@@ -62,7 +66,7 @@ export default function App() {
       isCoffee ? 'bg-espresso-950 text-cream-soft' : 'bg-slate-950 text-cream-soft'
     }`}>
       
-      {/* Full-Page Dynamic Method Background Image (Vivid & Clear Photography Backdrop) */}
+      {/* Full-Page Dynamic Method Background Image */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <img
           key={heroImage}
@@ -91,66 +95,108 @@ export default function App() {
           setIsMuted={setIsMuted}
         />
 
-        {/* Main Workspace Container */}
-        <main key={trackMode} className="max-w-7xl mx-auto px-4 lg:px-8 py-6">
+        {/* 2. Top Sticky 4-Step Indicator Bar */}
+        <StepIndicator
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+          trackMode={trackMode}
+        />
+
+        {/* 3. Guided Wizard Step Container */}
+        <main key={`${trackMode}-${currentStep}`} className="max-w-7xl mx-auto px-4 lg:px-8 py-4">
           
-          {/* 2. Core Calculator & Multi-Phase Timer Layout (Moved to Top for Immediate Access) */}
-          <div className={`mb-8 grid grid-cols-1 ${isSplitScreen ? 'lg:grid-cols-12 gap-6' : 'lg:grid-cols-2 gap-8'}`}>
-            
-            {/* Left Pane: Precision Ratio & Cup Scaling Calculator */}
-            <div className={isSplitScreen ? 'lg:col-span-5' : ''}>
-              <PrecisionCalculator
+          {/* STEP 01: CHOOSE METHOD */}
+          {currentStep === 1 && (
+            <MethodSelectorGrid
+              trackMode={trackMode}
+              methods={methods}
+              activeMethod={currentActiveMethod}
+              setActiveMethod={handleMethodSelect}
+              onNextStep={() => setCurrentStep(2)}
+              unitSystem={unitSystem}
+            />
+          )}
+
+          {/* STEP 02: RATIO & CUP SCALER */}
+          {currentStep === 2 && (
+            <PrecisionCalculator
+              trackMode={trackMode}
+              methods={methods}
+              activeMethod={currentActiveMethod}
+              setActiveMethod={handleMethodSelect}
+              cupCount={cupCount}
+              setCupCount={setCupCount}
+              cupMl={cupMl}
+              setCupMl={setCupMl}
+              customRatio={customRatio}
+              setCustomRatio={setCustomRatio}
+              unitSystem={unitSystem}
+              onPrevStep={() => setCurrentStep(1)}
+              onNextStep={() => setCurrentStep(3)}
+            />
+          )}
+
+          {/* STEP 03: GRIND & BEAN SPECS */}
+          {currentStep === 3 && (
+            <div className="space-y-8 animate-fade-in">
+              
+              {/* Method Specs & Preferred Roasts Hero Banner */}
+              <HeroBanner
                 trackMode={trackMode}
-                methods={methods}
                 activeMethod={currentActiveMethod}
-                setActiveMethod={handleMethodSelect}
-                cupCount={cupCount}
-                setCupCount={setCupCount}
-                cupMl={cupMl}
-                setCupMl={setCupMl}
-                customRatio={customRatio}
-                setCustomRatio={setCustomRatio}
                 unitSystem={unitSystem}
               />
-            </div>
 
-            {/* Right Pane: Multi-Phase Countdown Timer */}
-            <div className={isSplitScreen ? 'lg:col-span-7' : ''}>
+              {/* Coffee Grind Coarseness Visual Micron Reference (Coffee Track Only) */}
+              {isCoffee && <GrindVisualGuide activeMethod={currentActiveMethod} />}
+
+              {/* Video Tutorials & Masterclass Hub */}
+              <MasterclassHub
+                trackMode={trackMode}
+                activeMethod={currentActiveMethod}
+                isSplitScreen={isSplitScreen}
+                setIsSplitScreen={setIsSplitScreen}
+                activeVideo={activeVideo}
+                setActiveVideo={setActiveVideo}
+              />
+
+              {/* Step Navigation Controls */}
+              <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                <button
+                  onClick={() => setCurrentStep(2)}
+                  className="py-3 px-6 rounded-2xl bg-white/10 text-cream-light font-extrabold text-xs flex items-center gap-2 hover:bg-white/20 transition-all border border-white/15"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>Step 02: Ratio & Scaler</span>
+                </button>
+
+                <button
+                  onClick={() => setCurrentStep(4)}
+                  className="py-3.5 px-8 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all"
+                >
+                  <span>Step 04: Guided Brew Timer</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+            </div>
+          )}
+
+          {/* STEP 04: GUIDED BREW TIMER */}
+          {currentStep === 4 && (
+            <div className="animate-fade-in max-w-4xl mx-auto">
               <MultiPhaseTimer
                 trackMode={trackMode}
                 activeMethod={currentActiveMethod}
                 dryDoseGrams={dryDoseGrams}
                 isMuted={isMuted}
+                onPrevStep={() => setCurrentStep(3)}
               />
             </div>
+          )}
 
-          </div>
-
-          {/* 3. Hero Editorial Banner */}
-          <HeroBanner
-            trackMode={trackMode}
-            activeMethod={currentActiveMethod}
-            unitSystem={unitSystem}
-          />
-
-          {/* 4. Coffee Grind Coarseness Visual Reference Guide (Coffee Track Only) */}
-          {isCoffee && <GrindVisualGuide activeMethod={currentActiveMethod} />}
-
-          {/* 5. Integrated Masterclass Video Hub & Split Screen */}
-          <MasterclassHub
-            trackMode={trackMode}
-            activeMethod={currentActiveMethod}
-            isSplitScreen={isSplitScreen}
-            setIsSplitScreen={setIsSplitScreen}
-            activeVideo={activeVideo}
-            setActiveVideo={setActiveVideo}
-          />
-
-          {/* 6. The Brew App University: Terroir, Agronomy Science & Sourced Brands */}
-          <UniversityHub trackMode={trackMode} />
-
-          {/* 7. Extraction Nuance & Troubleshooting Hub */}
-          <TroubleshootingHub trackMode={trackMode} />
+          {/* Expandable Knowledge Base Drawer (Terroir Atlas & Diagnostics) */}
+          <EducationalDrawer trackMode={trackMode} />
 
         </main>
 
@@ -162,7 +208,7 @@ export default function App() {
               <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
             </div>
             <div className="text-cream-soft/40">
-              Designed for Home Brewing Excellence • Metric & Imperial Support
+              Guided 4-Step Brewing Wizard • Imperial & Metric Support
             </div>
           </div>
         </footer>

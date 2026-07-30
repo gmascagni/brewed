@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft } from 'lucide-react';
 import { playPhaseChime, playCompletionChime } from '../utils/audioSynth';
 
-export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, isMuted }) {
+export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, isMuted, onPrevStep }) {
   const isCoffee = trackMode === 'coffee';
   const phases = activeMethod?.phases || [];
 
@@ -50,18 +50,17 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   // Skip Phase handler
   const handleSkipPhase = () => {
     if (currentPhaseIndex < phases.length - 1) {
-      playPhaseChime(isMuted);
       const nextIdx = currentPhaseIndex + 1;
       setCurrentPhaseIndex(nextIdx);
       setTimeLeft(phases[nextIdx].durationSec);
+      setIsRunning(true);
     } else {
-      playCompletionChime(isMuted);
       setIsRunning(false);
       setIsCompleted(true);
     }
   };
 
-  // Reset handler
+  // Reset Timer handler
   const handleReset = () => {
     setIsRunning(false);
     setIsCompleted(false);
@@ -69,31 +68,28 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     setTimeLeft(phases[0]?.durationSec || 60);
   };
 
-  // Format mm:ss
+  // Format MM:SS display
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
-  // Format human readable duration (e.g. 4m 0s / 240s)
-  const formatDuration = (totalSec) => {
-    const mins = Math.floor(totalSec / 60);
-    const secs = totalSec % 60;
-    if (mins === 0) return `${secs}s`;
-    return `${mins}m ${secs > 0 ? `${secs}s` : ''} (${totalSec}s)`;
+  const formatDuration = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    if (m === 0) return `${s}s`;
+    return `${m}m ${s > 0 ? `${s}s` : ''}`;
   };
 
-  // Circular Progress Calculation
-  const progressPercent = ((totalPhaseTime - timeLeft) / totalPhaseTime) * 100;
+  const strokeDashoffset = totalPhaseTime > 0 
+    ? ((totalPhaseTime - timeLeft) / totalPhaseTime) * (2 * Math.PI * 80)
+    : 0;
+
   const radius = 80;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (progressPercent / 100) * circumference;
 
-  // Water Target for current phase if applicable
-  const targetPhaseWaterMl = activePhase?.waterMultiplier 
-    ? Math.round(dryDoseGrams * activePhase.waterMultiplier) 
-    : null;
+  const targetPhaseWaterMl = activePhase?.waterMultiplier ? Math.round(dryDoseGrams * activePhase.waterMultiplier) : null;
 
   return (
     <div className={`p-7 rounded-3xl ${isCoffee ? 'glass-panel-amber' : 'glass-panel-sage'} shadow-2xl transition-all duration-500`}>
@@ -103,7 +99,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
         <div>
           <h3 className="font-serif text-2xl font-bold text-cream-light flex items-center gap-2.5 drop-shadow-md">
             <TimerIcon className={`w-6 h-6 ${isCoffee ? 'text-amber-gold' : 'text-sage-300'}`} />
-            <span>Multi-Phase Extraction Timer</span>
+            <span>Step 04 • Multi-Phase Extraction Timer</span>
           </h3>
           <p className="text-xs text-cream-soft/70 mt-0.5">Audio/visual countdown guiding blooming & steep phases</p>
         </div>
@@ -198,43 +194,31 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       {/* Timer Controls Row with Tactile 3D Buttons */}
       <div className="flex items-center justify-center space-x-5 mt-7">
         
-        {/* Reset Button */}
         <button
           onClick={handleReset}
-          className="p-4 rounded-2xl bg-slate-800/90 border border-white/15 text-cream-soft hover:text-cream-light hover:border-amber-gold/50 shadow-lg active:scale-95 transition-all"
+          className="p-4 rounded-2xl bg-white/10 text-cream-soft hover:text-cream-light hover:bg-white/20 transition-all border border-white/15 shadow-xl active:scale-95"
           title="Reset Timer"
         >
           <RotateCcw className="w-5 h-5" />
         </button>
 
-        {/* Primary Start / Pause Button */}
         <button
-          onClick={() => {
-            if (isCompleted) handleReset();
-            setIsRunning(!isRunning);
-          }}
-          className={`flex items-center space-x-2.5 px-9 py-4 rounded-2xl font-extrabold text-base uppercase tracking-wider transition-all active:scale-95 ${
-            isCoffee ? 'btn-tactile-amber text-espresso-950' : 'btn-tactile-sage text-cream-light'
+          onClick={() => setIsRunning(!isRunning)}
+          className={`px-10 py-4 rounded-2xl font-extrabold text-sm flex items-center gap-3 shadow-2xl transition-all hover:scale-105 active:scale-95 ${
+            isRunning
+              ? 'bg-amber-600 text-cream-light border border-amber-500 shadow-amber-600/30'
+              : isCoffee
+              ? 'btn-tactile-amber text-espresso-950'
+              : 'btn-tactile-sage text-cream-light'
           }`}
         >
-          {isRunning ? (
-            <>
-              <Pause className="w-5 h-5 fill-current" />
-              <span>Pause</span>
-            </>
-          ) : (
-            <>
-              <Play className="w-5 h-5 fill-current" />
-              <span>{isCompleted ? 'Restart' : 'Start Timer'}</span>
-            </>
-          )}
+          {isRunning ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
+          <span>{isRunning ? 'Pause Timer' : 'Start Extraction'}</span>
         </button>
 
-        {/* Skip Phase Button */}
         <button
           onClick={handleSkipPhase}
-          disabled={isCompleted}
-          className="p-4 rounded-2xl bg-slate-800/90 border border-white/15 text-cream-soft hover:text-cream-light hover:border-amber-gold/50 shadow-lg active:scale-95 transition-all disabled:opacity-40"
+          className="p-4 rounded-2xl bg-white/10 text-cream-soft hover:text-cream-light hover:bg-white/20 transition-all border border-white/15 shadow-xl active:scale-95"
           title="Skip to Next Phase"
         >
           <FastForward className="w-5 h-5" />
@@ -282,6 +266,19 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
           })}
         </div>
       </div>
+
+      {/* Step Navigation Controls */}
+      {onPrevStep && (
+        <div className="flex items-center justify-between pt-6 mt-6 border-t border-white/10">
+          <button
+            onClick={onPrevStep}
+            className="py-3 px-6 rounded-2xl bg-white/10 text-cream-light font-extrabold text-xs flex items-center gap-2 hover:bg-white/20 transition-all border border-white/15"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span>Step 03: Grind & Beans</span>
+          </button>
+        </div>
+      )}
 
     </div>
   );
