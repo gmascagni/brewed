@@ -196,11 +196,11 @@ export default function App() {
             </div>
           )}
 
-          {/* 1. Dedicated Knowledge Base Drawer (Terroir Atlas & Agronomy) */}
-          <KnowledgeBaseDrawer trackMode={trackMode} />
-
-          {/* 2. Dedicated Diagnostics Drawer (Taste Troubleshooting & Water Chemistry) */}
+          {/* 1. Dedicated Diagnostics Drawer (Taste Troubleshooting & Water Chemistry) */}
           <DiagnosticsDrawer trackMode={trackMode} />
+
+          {/* 2. Dedicated Knowledge Base Drawer (Terroir Atlas & Agronomy) */}
+          <KnowledgeBaseDrawer trackMode={trackMode} />
 
         </main>
 

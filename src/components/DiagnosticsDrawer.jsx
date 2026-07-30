@@ -7,7 +7,7 @@ export default function DiagnosticsDrawer({ trackMode }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="mt-8 border-t border-white/[0.08] pt-8">
+    <div className="mt-14 border-t border-white/[0.08] pt-10">
       {/* Diagnostics Drawer Toggle Bar */}
       <div className="p-7 md:p-9 rounded-3xl bg-[#14110E]/90 border border-white/[0.12] shadow-2xl backdrop-blur-2xl flex flex-col sm:flex-row items-center justify-between gap-5">
         <div className="flex items-center space-x-4">
