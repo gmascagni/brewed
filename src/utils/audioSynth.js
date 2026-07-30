@@ -1,4 +1,4 @@
-// Web Audio API Synthesizer for BrewCraft
+// Web Audio API Synthesizer for The Brew App
 
 let audioCtx = null;
 
