@@ -159,16 +159,6 @@ export default function App() {
               {/* Coffee Grind Coarseness Visual Micron Reference (Coffee Track Only) */}
               {isCoffee && <GrindVisualGuide activeMethod={currentActiveMethod} />}
 
-              {/* Video Tutorials & Masterclass Hub */}
-              <MasterclassHub
-                trackMode={trackMode}
-                activeMethod={currentActiveMethod}
-                isSplitScreen={isSplitScreen}
-                setIsSplitScreen={setIsSplitScreen}
-                activeVideo={activeVideo}
-                setActiveVideo={setActiveVideo}
-              />
-
               {/* Step Navigation Controls */}
               <div className="flex items-center justify-between pt-6 border-t border-white/10">
                 <button
@@ -205,7 +195,19 @@ export default function App() {
             </div>
           )}
 
-          {/* 1. Dedicated Diagnostics Drawer (Taste Troubleshooting & Water Chemistry) */}
+          {/* Video Masterclass Tutorials for Selected Method (Positioned right above Diagnostics) */}
+          <div className="mt-14">
+            <MasterclassHub
+              trackMode={trackMode}
+              activeMethod={currentActiveMethod}
+              isSplitScreen={isSplitScreen}
+              setIsSplitScreen={setIsSplitScreen}
+              activeVideo={activeVideo}
+              setActiveVideo={setActiveVideo}
+            />
+          </div>
+
+          {/* 1. Dedicated Diagnostics Drawer (Taste Troubleshooting & Water Chemistry - Track-Specific) */}
           <DiagnosticsDrawer trackMode={trackMode} />
 
           {/* 2. Dedicated Knowledge Base Drawer (Terroir Atlas & Agronomy) */}
