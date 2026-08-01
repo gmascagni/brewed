@@ -27,6 +27,7 @@ export default function App() {
   const [cupCount, setCupCount] = useState(2);
   const [cupMl, setCupMl] = useState(240);
   const [customRatio, setCustomRatio] = useState(null);
+  const [customWaterMl, setCustomWaterMl] = useState(null);
 
   // Masterclass & Split Screen State
   const [isSplitScreen, setIsSplitScreen] = useState(false);
@@ -38,6 +39,7 @@ export default function App() {
     const newMethods = BREW_METHODS[newTrack] || BREW_METHODS.coffee;
     setActiveMethod(newMethods[0]);
     setCustomRatio(null);
+    setCustomWaterMl(null);
     setActiveVideo(null);
     setCurrentStep(1); // Reset to Step 1 on track switch
   };
@@ -47,6 +49,7 @@ export default function App() {
     if (method) {
       setActiveMethod(method);
       setCustomRatio(null);
+      setCustomWaterMl(null);
       setActiveVideo(null);
     }
   };
@@ -60,7 +63,7 @@ export default function App() {
   const heroImage = currentActiveMethod?.heroImage || (isCoffee ? './coffee_setup.jpg' : './tea_kettle.jpg');
 
   // Math for dry dose calculation
-  const totalWaterMl = cupCount * cupMl;
+  const totalWaterMl = customWaterMl !== null ? customWaterMl : (cupCount * cupMl);
   const ratio = customRatio || currentActiveMethod?.ratio || 15;
   const dryDoseGrams = totalWaterMl / ratio;
 
@@ -134,6 +137,8 @@ export default function App() {
               setCupMl={setCupMl}
               customRatio={customRatio}
               setCustomRatio={setCustomRatio}
+              customWaterMl={customWaterMl}
+              setCustomWaterMl={setCustomWaterMl}
               unitSystem={unitSystem}
               onPrevStep={() => setCurrentStep(1)}
               onNextStep={() => setCurrentStep(3)}

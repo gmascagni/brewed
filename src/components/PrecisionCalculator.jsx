@@ -12,6 +12,8 @@ export default function PrecisionCalculator({
   setCupMl,
   customRatio,
   setCustomRatio,
+  customWaterMl,
+  setCustomWaterMl,
   unitSystem,
   onPrevStep,
   onNextStep
@@ -20,7 +22,7 @@ export default function PrecisionCalculator({
   const isMetric = unitSystem === 'metric';
 
   // Math Calculations
-  const totalWaterMl = cupCount * cupMl;
+  const totalWaterMl = customWaterMl !== null ? customWaterMl : (cupCount * cupMl);
   const currentRatio = customRatio || activeMethod?.ratio || 15;
   const dryDoseGrams = totalWaterMl / currentRatio;
 
@@ -37,6 +39,16 @@ export default function PrecisionCalculator({
     { label: isMetric ? 'Large Mug (300 mL)' : 'Large Mug (10.1 fl oz)', ml: 300 },
     { label: isMetric ? 'Travel Tumbler (360 mL)' : 'Travel Tumbler (12.2 fl oz)', ml: 360 }
   ];
+
+  const handleCupCountChange = (count) => {
+    setCupCount(count);
+    if (customWaterMl !== null) setCustomWaterMl(null); // snap back to cup calculation
+  };
+
+  const handleCupMlChange = (ml) => {
+    setCupMl(ml);
+    if (customWaterMl !== null) setCustomWaterMl(null); // snap back to cup calculation
+  };
 
   return (
     <div className={`p-8 md:p-10 lg:p-12 rounded-3xl ${isCoffee ? 'glass-panel-amber' : 'glass-panel-sage'} shadow-2xl transition-all duration-500`}>
@@ -58,8 +70,8 @@ export default function PrecisionCalculator({
         </h3>
         <p className="text-xs md:text-sm text-stone-300 mt-1.5 leading-relaxed font-normal">
           {isCoffee
-            ? 'Calculates exact dry coffee ground weight (oz/g) and hot water volume (fl oz/mL) scaled to your target cup count.'
-            : 'Calculates exact tea leaf weight (oz/g) and hot water volume (fl oz/mL) for ideal steep strength.'}
+            ? 'Calculates exact dry coffee ground weight (oz/g) and hot water volume (fl oz/mL). Adjust cup count, mug size, or fine-tune water volume directly below.'
+            : 'Calculates exact tea leaf weight (oz/g) and hot water volume (fl oz/mL). Adjust cup count, mug size, or fine-tune water volume directly below.'}
         </p>
 
         {/* Horizontal Scroll Method Picker Quick Tabs */}
@@ -111,7 +123,7 @@ export default function PrecisionCalculator({
             max="6"
             step="1"
             value={cupCount}
-            onChange={(e) => setCupCount(parseInt(e.target.value))}
+            onChange={(e) => handleCupCountChange(parseInt(e.target.value))}
             className="w-full h-3 bg-[#1A1613] rounded-xl appearance-none cursor-pointer mb-3.5"
           />
 
@@ -134,9 +146,9 @@ export default function PrecisionCalculator({
             {CUP_VOLUMES.map((vol) => (
               <button
                 key={vol.ml}
-                onClick={() => setCupMl(vol.ml)}
+                onClick={() => handleCupMlChange(vol.ml)}
                 className={`px-3.5 py-3 rounded-2xl text-xs font-bold border transition-all active:scale-95 ${
-                  cupMl === vol.ml
+                  cupMl === vol.ml && customWaterMl === null
                     ? isCoffee
                       ? 'bg-amber-500/25 border-amber-400 text-amber-gold font-extrabold shadow-[0_0_20px_rgba(212,140,70,0.2)]'
                       : 'bg-emerald-500/25 border-sage-300 text-sage-300 font-extrabold shadow-[0_0_20px_rgba(143,168,153,0.2)]'
@@ -151,7 +163,7 @@ export default function PrecisionCalculator({
 
       </div>
 
-      {/* 3. Output Display Cards (Dry Grounds with Integrated Ratio Slider & Water Volume) */}
+      {/* 3. Output Display Cards (Dry Grounds with Integrated Ratio Slider & Water Volume with Integrated Manual Water Slider) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
         
         {/* Dry Dose Output Card with Integrated Fine-Tune Ratio Slider */}
@@ -201,7 +213,7 @@ export default function PrecisionCalculator({
           </div>
         </div>
 
-        {/* Water Volume Output Card */}
+        {/* Water Volume Output Card with Integrated Manual Water Volume Slider */}
         <div className="p-7 md:p-8 rounded-3xl bg-[#14110E]/90 border border-cyan-400/30 shadow-2xl relative overflow-hidden group flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-[0.15em] font-mono text-cyan-400 mb-2.5">
@@ -217,9 +229,34 @@ export default function PrecisionCalculator({
             </div>
           </div>
 
-          <div className="mt-5 pt-4 border-t border-white/[0.08] text-[11px] text-stone-300 font-medium flex items-center justify-between">
-            <span>Ideal brew temperature:</span>
-            <strong className="text-cyan-300 font-mono text-xs font-bold">{isMetric ? `${activeMethod?.tempC || 90}°C` : `${activeMethod?.tempF || 194}°F`}</strong>
+          {/* Integrated Manual Water Volume Fine-Tune Slider */}
+          <div className="mt-5 pt-4 border-t border-white/[0.08]">
+            <div className="flex items-center justify-between text-[11px] text-stone-300 font-medium mb-2">
+              <span className="flex items-center gap-1.5">
+                <Sliders className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Manual Water Adjustment:</span>
+              </span>
+              {customWaterMl !== null && (
+                <button
+                  onClick={() => setCustomWaterMl(null)}
+                  className="text-[10px] text-cyan-400 font-bold underline hover:text-cream-light"
+                >
+                  Reset to Cups
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min="100"
+                max="1500"
+                step="10"
+                value={totalWaterMl}
+                onChange={(e) => setCustomWaterMl(parseInt(e.target.value))}
+                className="w-full h-2.5 bg-black/60 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
           </div>
         </div>
 
