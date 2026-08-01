@@ -810,9 +810,9 @@ export const MASTERCLASSES = [
     methodId: 'french_press',
     method: 'French Press',
     title: 'Preferred Coffee Beans & Roasts for French Press',
-    duration: '4:12',
+    duration: '5:30',
     thumbnail: './french_press.jpg',
-    embedId: 'T1U1XfF0EFA',
+    embedId: 'st571DYYTR8',
     description: 'Learn why heavy-bodied Sumatran Giling Basah, Brazilian Yellow Bourbon, and medium-dark roasts shine best in immersion brewing.',
     keyTakeaways: [
       'Choose low-acidity beans rich in natural oils and cocoa depth',
