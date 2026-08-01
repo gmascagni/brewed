@@ -9,6 +9,7 @@ import MasterclassHub from './components/MasterclassHub';
 import MultiPhaseTimer from './components/MultiPhaseTimer';
 import KnowledgeBaseDrawer from './components/KnowledgeBaseDrawer';
 import DiagnosticsDrawer from './components/DiagnosticsDrawer';
+import BrewJournal from './components/BrewJournal';
 import { BREW_METHODS } from './data/brewData';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
@@ -18,6 +19,7 @@ export default function App() {
   const [unitSystem, setUnitSystem] = useState('imperial'); // 'imperial' | 'metric'
   const [isMuted, setIsMuted] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1 | 2 | 3 | 4
+  const [isJournalOpen, setIsJournalOpen] = useState(false);
 
   // Active Method & Scaling State
   const methods = BREW_METHODS[trackMode] || BREW_METHODS.coffee;
@@ -64,7 +66,7 @@ export default function App() {
 
   return (
     <div className={`min-h-screen relative transition-colors duration-500 ${
-      isCoffee ? 'bg-espresso-950 text-cream-soft' : 'bg-slate-950 text-cream-soft'
+      isCoffee ? 'bg-[#0A0908] text-cream-soft' : 'bg-slate-950 text-cream-soft'
     }`}>
       
       {/* Full-Page Dynamic Method Background Image */}
@@ -77,7 +79,7 @@ export default function App() {
         />
         <div className={`absolute inset-0 ${
           isCoffee
-            ? 'bg-gradient-to-b from-espresso-950/40 via-espresso-950/60 to-espresso-950/85'
+            ? 'bg-gradient-to-b from-[#0A0908]/40 via-[#0A0908]/60 to-[#0A0908]/85'
             : 'bg-gradient-to-b from-slate-950/40 via-slate-950/60 to-slate-950/85'
         }`} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-transparent via-black/20 to-black/70" />
@@ -94,6 +96,7 @@ export default function App() {
           setUnitSystem={setUnitSystem}
           isMuted={isMuted}
           setIsMuted={setIsMuted}
+          onOpenJournal={() => setIsJournalOpen(true)}
         />
 
         {/* 2. Top Sticky 4-Step Indicator Bar */}
@@ -192,6 +195,7 @@ export default function App() {
                 dryDoseGrams={dryDoseGrams}
                 isMuted={isMuted}
                 onPrevStep={() => setCurrentStep(3)}
+                onOpenJournal={() => setIsJournalOpen(true)}
               />
             </div>
           )}
@@ -201,6 +205,18 @@ export default function App() {
 
           {/* 2. Dedicated Knowledge Base Drawer (Terroir Atlas & Agronomy) */}
           <KnowledgeBaseDrawer trackMode={trackMode} />
+
+          {/* 3. Personal Tasting Journal & Golden Cup Log Modal */}
+          <BrewJournal
+            isOpen={isJournalOpen}
+            onClose={() => setIsJournalOpen(false)}
+            trackMode={trackMode}
+            activeMethod={currentActiveMethod}
+            cupCount={cupCount}
+            cupMl={cupMl}
+            customRatio={customRatio}
+            unitSystem={unitSystem}
+          />
 
         </main>
 
@@ -212,7 +228,7 @@ export default function App() {
               <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
             </div>
             <div className="text-cream-soft/40">
-              Guided 4-Step Brewing Wizard • Imperial & Metric Support
+              Guided 4-Step Brewing Wizard • Personal Tasting Journal • Imperial & Metric Support
             </div>
           </div>
         </footer>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft } from 'lucide-react';
+import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft, BookOpen } from 'lucide-react';
 import { playPhaseChime, playCompletionChime } from '../utils/audioSynth';
 
-export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, isMuted, onPrevStep }) {
+export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, isMuted, onPrevStep, onOpenJournal }) {
   const isCoffee = trackMode === 'coffee';
   const phases = activeMethod?.phases || [];
 
@@ -271,18 +271,28 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
         </div>
       </div>
 
-      {/* Step Navigation Controls */}
-      {onPrevStep && (
-        <div className="flex items-center justify-between pt-8 mt-8 border-t border-white/[0.08]">
+      {/* Step Navigation & Journal Controls */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-white/[0.08]">
+        {onPrevStep && (
           <button
             onClick={onPrevStep}
-            className="py-4 px-8 rounded-2xl bg-white/[0.08] text-cream-light font-extrabold text-xs uppercase tracking-wider flex items-center gap-2.5 hover:bg-white/[0.15] transition-all border border-white/[0.12]"
+            className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-white/[0.08] text-cream-light font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 hover:bg-white/[0.15] transition-all border border-white/[0.12]"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>Step 03: Grind & Beans</span>
           </button>
-        </div>
-      )}
+        )}
+
+        {onOpenJournal && (
+          <button
+            onClick={onOpenJournal}
+            className="w-full sm:w-auto py-4 px-9 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all"
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>Log This Brew to Journal</span>
+          </button>
+        )}
+      </div>
 
     </div>
   );
