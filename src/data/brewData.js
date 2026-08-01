@@ -809,15 +809,30 @@ export const MASTERCLASSES = [
     id: 'mc_frenchpress_roasts',
     methodId: 'french_press',
     method: 'French Press',
-    title: 'Preferred Coffee Beans & Roasts for French Press',
-    duration: '5:30',
+    title: 'French Press Bean Selection, Grind & Common Mistakes',
+    duration: '4:15',
     thumbnail: './french_press.jpg',
-    embedId: 'st571DYYTR8',
-    description: 'Learn why heavy-bodied Sumatran Giling Basah, Brazilian Yellow Bourbon, and medium-dark roasts shine best in immersion brewing.',
+    embedId: 'VFj3Y6lC9D4',
+    description: 'Learn why heavy-bodied Sumatran Giling Basah, Brazilian Yellow Bourbon, and medium-dark roasts shine best in immersion brewing, and how to avoid bitter over-extraction.',
     keyTakeaways: [
       'Choose low-acidity beans rich in natural oils and cocoa depth',
       'Coarse grind size prevents metal mesh clogging',
       'Pairs best with dark chocolate & toasted nut profiles'
+    ]
+  },
+  {
+    id: 'mc_frenchpress_coldbrew',
+    methodId: 'french_press',
+    method: 'French Press',
+    title: 'French Press Cold Brew & Concentrated Iced Immersion',
+    duration: '4:45',
+    thumbnail: './french_press.jpg',
+    embedId: '4W2p0i3W_K0',
+    description: 'Turn your French Press into an overnight 12-hour cold brew steep chamber to produce a smooth, chocolatey, low-acidity concentrate.',
+    keyTakeaways: [
+      'Use 1:8 coarse coffee-to-water ratio for cold brew concentrate',
+      'Steep at room temp for 12-16 hours before depressing plunger',
+      'Serve over ice with milk or cold foam'
     ]
   },
 
