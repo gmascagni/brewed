@@ -1,25 +1,28 @@
-// Google Analytics 4 (GA4) & Custom Event Helper
+// Google Analytics 4 (GA4) & Custom Event Helper for G-VT2YZ4KHHB
 
-export const initGA = (measurementId) => {
-  if (!measurementId || measurementId === 'G-XXXXXXXXXX') return;
+export const GA_MEASUREMENT_ID = 'G-VT2YZ4KHHB';
 
-  // Insert Google gtag.js script dynamically
-  const script1 = document.createElement('script');
-  script1.async = true;
-  script1.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  document.head.appendChild(script1);
+export const initGA = (measurementId = GA_MEASUREMENT_ID) => {
+  if (typeof window === 'undefined' || !measurementId) return;
 
-  const script2 = document.createElement('script');
-  script2.innerHTML = `
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', '${measurementId}', {
-      page_path: window.location.pathname,
-      send_page_view: true
-    });
-  `;
-  document.head.appendChild(script2);
+  // Check if gtag is already present from index.html
+  if (!window.gtag) {
+    const script1 = document.createElement('script');
+    script1.async = true;
+    script1.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+    document.head.appendChild(script1);
+
+    const script2 = document.createElement('script');
+    script2.innerHTML = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '${measurementId}', {
+        send_page_view: true
+      });
+    `;
+    document.head.appendChild(script2);
+  }
 };
 
 export const trackEvent = (eventName, params = {}) => {
