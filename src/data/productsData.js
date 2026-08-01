@@ -38,7 +38,7 @@ export const PRODUCTS_DATA = [
     topRated: true,
     asin: 'B0012LOQUQ',
     amazonUrl: `https://www.amazon.com/s?k=Mini+Precision+Digital+Gram+Scale+0.01g+Accuracy&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './espresso_pour_over.jpg',
+    image: './espresso_hero.jpg',
     description: 'Backlit LCD pocket scale with 0.01g micro-accuracy for dosing dry coffee beans, espresso shots, and fine tea leaves.'
   },
   {
@@ -81,7 +81,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$18 - $24',
     asin: 'B073X5P6P8',
     amazonUrl: `https://www.amazon.com/s?k=JoyJolt+Double+Wall+Insulated+Glass+Mugs+Set&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './espresso_pour_over.jpg',
+    image: './espresso_hero.jpg',
     description: 'Borosilicate double-walled floating glass design that keeps hot drinks piping hot while remaining cool to the touch.'
   },
 
@@ -199,7 +199,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$165 - $195',
     asin: 'B077JBQZPX',
     amazonUrl: `https://www.amazon.com/s?k=Fellow+Stagg+EKG+Electric+Gooseneck+Kettle&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './tea_kettle_gooseneck.jpg',
+    image: './tea_kettle.jpg',
     description: 'PID degree-by-degree temperature control (135°F - 212°F) with precision counterbalanced gooseneck pour spout.'
   },
   {
@@ -243,7 +243,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$52 - $59',
     asin: 'B0836F76D8',
     amazonUrl: `https://www.amazon.com/s?k=Timemore+Black+Mirror+Basic+Digital+Coffee+Scale&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './espresso_pour_over.jpg',
+    image: './espresso_hero.jpg',
     description: 'Ultra-fast 0.1g precision sensor with auto-starting brew timer, hidden LED display, and USB-C rechargeable battery.'
   },
   {
