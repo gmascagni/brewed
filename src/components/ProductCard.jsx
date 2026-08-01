@@ -1,13 +1,16 @@
 import React from 'react';
-import { ExternalLink, Star, ShoppingBag, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ExternalLink, Star, ShoppingBag, Sparkles, CheckCircle2, Award } from 'lucide-react';
 
 export default function ProductCard({ product, activeMethod }) {
   const isMethodMatched = product.methodIds && activeMethod && product.methodIds.includes(activeMethod.id);
+  const isTopRated = product.topRated || product.rating >= 4.9;
 
   return (
     <div className={`p-6 rounded-3xl border transition-all duration-300 relative flex flex-col justify-between group shadow-xl hover:-translate-y-1.5 ${
       isMethodMatched
         ? 'bg-amber-500/10 border-amber-400/50 text-cream-light ring-1 ring-amber-400/30 shadow-[0_15px_40px_-10px_rgba(212,140,70,0.2)] backdrop-blur-xl'
+        : isTopRated
+        ? 'bg-[#181411]/90 border-amber-500/30 text-stone-300 hover:border-amber-400/60 shadow-[0_10px_30px_-10px_rgba(212,140,70,0.15)]'
         : 'bg-[#14110E]/90 border-white/[0.08] text-stone-300 hover:bg-[#1A1613] hover:border-white/20'
     }`}>
       
@@ -27,13 +30,18 @@ export default function ProductCard({ product, activeMethod }) {
             </div>
           )}
 
-          {/* Method Match Badge Top Right */}
-          {isMethodMatched && (
+          {/* Method Match or Top Rated Badge Top Right */}
+          {isMethodMatched ? (
             <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-amber-gold text-espresso-950 text-[10px] font-mono font-extrabold uppercase tracking-wider flex items-center gap-1 shadow-lg">
               <CheckCircle2 className="w-3 h-3" />
               <span>{activeMethod?.name} Kit</span>
             </div>
-          )}
+          ) : isTopRated ? (
+            <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-gold border border-amber-400/40 text-[10px] font-mono font-extrabold uppercase tracking-wider flex items-center gap-1 shadow-md backdrop-blur-md">
+              <Star className="w-3 h-3 fill-current text-amber-gold" />
+              <span>Top Rated 4.9+</span>
+            </div>
+          ) : null}
         </div>
 
         {/* Rating & Price */}

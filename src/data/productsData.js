@@ -3,12 +3,88 @@ export const AMAZON_AFFILIATE_TAG = 'thebrewapp-20';
 export const PRODUCT_CATEGORIES = [
   { id: 'method_kit', label: 'Method Kit' },
   { id: 'universal', label: 'Universal Essentials' },
+  { id: 'top_rated', label: 'Top Rated ⭐ 4.9+' },
   { id: 'grinders_scales', label: 'Grinders & Scales' },
   { id: 'water_kettles', label: 'Water & Kettles' },
   { id: 'beans_tea', label: 'Beans & Teas' }
 ];
 
 export const PRODUCTS_DATA = [
+  // --- UNIVERSAL ESSENTIALS ---
+  {
+    id: 'tds_water_tester',
+    name: 'Digital TDS Water Quality Tester & Purity Meter',
+    category: 'universal',
+    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
+    badge: 'Water Profiler',
+    rating: 4.9,
+    reviewsCount: 14200,
+    priceRange: '$12 - $16',
+    topRated: true,
+    asin: 'B001E88GE0',
+    amazonUrl: `https://www.amazon.com/dp/B001E88GE0?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './tea_kettle.jpg',
+    description: 'Instant PPM (Parts Per Million) digital reader for testing home tap water, mineral content, and RO filtration profiles.'
+  },
+  {
+    id: 'pocket_gram_scale',
+    name: 'Mini Precision Digital Gram Scale (0.01g Accuracy with Tare)',
+    category: 'universal',
+    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
+    badge: 'Ultra Precision',
+    rating: 4.9,
+    reviewsCount: 28400,
+    priceRange: '$11 - $15',
+    topRated: true,
+    asin: 'B0012LOQUQ',
+    amazonUrl: `https://www.amazon.com/dp/B0012LOQUQ?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './espresso_pour_over.jpg',
+    description: 'Backlit LCD pocket scale with 0.01g micro-accuracy for dosing dry coffee beans, espresso shots, and fine tea leaves.'
+  },
+  {
+    id: 'measuring_spoons_set',
+    name: 'Heavy-Duty 304 Stainless Steel Coffee Scoops & Measuring Spoons (Set of 2)',
+    category: 'universal',
+    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
+    badge: 'Kitchen Staple',
+    rating: 4.9,
+    reviewsCount: 6800,
+    priceRange: '$9 - $12',
+    topRated: true,
+    asin: 'B07MZD72TY',
+    amazonUrl: `https://www.amazon.com/dp/B07MZD72TY?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './coffee_setup.jpg',
+    description: 'Ergonomic 15mL (1 tbsp) and 30mL (2 tbsp) solid stainless steel scoops engineered with engraved metric and imperial markings.'
+  },
+  {
+    id: 'airscape_canister',
+    name: 'Airscape Stainless Steel Vacuum Coffee Canister (1 lb / 64 oz)',
+    category: 'universal',
+    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress'],
+    badge: 'Fresher Coffee',
+    rating: 4.8,
+    reviewsCount: 11200,
+    priceRange: '$34 - $39',
+    asin: 'B00167XN14',
+    amazonUrl: `https://www.amazon.com/dp/B00167XN14?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './coffee_setup.jpg',
+    description: 'Patented inner plunger lid forces air out of the canister, locking out oxygen and preserving fresh roast aromas.'
+  },
+  {
+    id: 'double_wall_glasses',
+    name: 'JoyJolt Crystalline Double-Wall Insulated Glass Tumbler Mugs (13.5 oz Set of 2)',
+    category: 'universal',
+    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
+    badge: 'Thermal Glass',
+    rating: 4.8,
+    reviewsCount: 15400,
+    priceRange: '$18 - $24',
+    asin: 'B073X5P6P8',
+    amazonUrl: `https://www.amazon.com/dp/B073X5P6P8?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './espresso_pour_over.jpg',
+    description: 'Borosilicate double-walled floating glass design that keeps hot drinks piping hot while remaining cool to the touch.'
+  },
+
   // --- METHOD SPECIFIC GEAR ---
   {
     id: 'v60_dripper_kit',
@@ -19,6 +95,7 @@ export const PRODUCTS_DATA = [
     rating: 4.9,
     reviewsCount: 3420,
     priceRange: '$24 - $28',
+    topRated: true,
     asin: 'B002VUSWGQ',
     amazonUrl: `https://www.amazon.com/dp/B002VUSWGQ?tag=${AMAZON_AFFILIATE_TAG}`,
     image: './pour_over_hero.jpg',
@@ -89,6 +166,7 @@ export const PRODUCTS_DATA = [
     rating: 4.9,
     reviewsCount: 18900,
     priceRange: '$39 - $44',
+    topRated: true,
     asin: 'B0047BIWSK',
     amazonUrl: `https://www.amazon.com/dp/B0047BIWSK?tag=${AMAZON_AFFILIATE_TAG}`,
     image: './aeropress_hero.jpg',
@@ -109,7 +187,7 @@ export const PRODUCTS_DATA = [
     description: 'Traditional 150mL porcelain lidded Gaiwan set for precision multi-steep Gongfu tea infusions.'
   },
 
-  // --- UNIVERSAL GEAR & WATER KETTLER ---
+  // --- WATER KETTLER & REMINERALIZATION ---
   {
     id: 'fellow_stagg_ekg',
     name: 'Fellow Stagg EKG Electric Gooseneck Kettle (0.9L)',
@@ -183,7 +261,7 @@ export const PRODUCTS_DATA = [
     description: '64mm stainless steel flat burrs, anti-static technology, and single-dose hopper for high clarity pour-overs.'
   },
 
-  // --- BEANS & TEA SELECTIONS ---
+  // --- EXPANDED BEANS & SPECIALTY TEAS ---
   {
     id: 'onyx_tropical_weather',
     name: 'Onyx Coffee Lab Tropical Weather Ethiopian Whole Bean (10 oz)',
@@ -193,24 +271,98 @@ export const PRODUCTS_DATA = [
     rating: 4.9,
     reviewsCount: 920,
     priceRange: '$22 - $26',
+    topRated: true,
     asin: 'B08F9G2X9C',
     amazonUrl: `https://www.amazon.com/dp/B08F9G2X9C?tag=${AMAZON_AFFILIATE_TAG}`,
     image: './pour_over_hero.jpg',
     description: 'Washed and natural processed Ethiopian heirloom blend featuring wild blueberry jam, peach nectar, and floral bergamot.'
   },
   {
-    id: 'stumptown_hair_bender',
-    name: 'Stumptown Coffee Roasters Hair Bender Whole Bean (12 oz)',
+    id: 'blue_bottle_three_africas',
+    name: 'Blue Bottle Coffee Three Africas Organic Whole Bean (12 oz)',
     category: 'beans_tea',
-    methodIds: ['espresso', 'moka_pot', 'drip_brewer', 'french_press'],
-    badge: 'Specialty Classic',
-    rating: 4.7,
-    reviewsCount: 4200,
-    priceRange: '$16 - $19',
-    asin: 'B00647S986',
-    amazonUrl: `https://www.amazon.com/dp/B00647S986?tag=${AMAZON_AFFILIATE_TAG}`,
+    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'aeropress'],
+    badge: 'Cult Favorite',
+    rating: 4.9,
+    reviewsCount: 2310,
+    priceRange: '$19 - $23',
+    topRated: true,
+    asin: 'B01M333V4H',
+    amazonUrl: `https://www.amazon.com/dp/B01M333V4H?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './coffee_setup.jpg',
+    description: 'Blend of two Ethiopian single-origins and a Ugandan bean featuring golden raisin, dried blueberry, and dark chocolate.'
+  },
+  {
+    id: 'intelligentsia_frequency',
+    name: 'Intelligentsia Frequency Blend Medium Roast Whole Bean (12 oz)',
+    category: 'beans_tea',
+    methodIds: ['pour_over', 'drip_brewer', 'moka_pot', 'french_press'],
+    badge: 'Specialty Pioneer',
+    rating: 4.8,
+    reviewsCount: 1850,
+    priceRange: '$17 - $21',
+    asin: 'B007R98JCY',
+    amazonUrl: `https://www.amazon.com/dp/B007R98JCY?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './coffee_setup.jpg',
+    description: 'Balanced direct-trade blend of Central & South American beans with milk chocolate, lemongrass, and raw honey notes.'
+  },
+  {
+    id: 'la_colombe_corsica',
+    name: 'La Colombe Corsica Dark Roast Whole Bean Coffee (12 oz)',
+    category: 'beans_tea',
+    methodIds: ['french_press', 'espresso', 'moka_pot', 'drip_brewer'],
+    badge: 'Deep & Cocoa',
+    rating: 4.8,
+    reviewsCount: 6400,
+    priceRange: '$15 - $18',
+    asin: 'B00863L99I',
+    amazonUrl: `https://www.amazon.com/dp/B00863L99I?tag=${AMAZON_AFFILIATE_TAG}`,
     image: './espresso_hero.jpg',
-    description: 'Complex sweet blend of Indonesian, Latin American, and East African beans with dark chocolate, fudge, and citrus notes.'
+    description: 'Signature dark roast named after an island in the Mediterranean with deep baker’s chocolate, red wine, and cocoa nib notes.'
+  },
+  {
+    id: 'ippodo_matcha_ummon',
+    name: 'Ippodo Tea Ummon-no-mukai Ceremonial Grade Matcha (20g Tin)',
+    category: 'beans_tea',
+    methodIds: ['green_tea'],
+    badge: 'Kyoto Imperial',
+    rating: 4.9,
+    reviewsCount: 1150,
+    priceRange: '$38 - $44',
+    topRated: true,
+    asin: 'B015C3YXYO',
+    amazonUrl: `https://www.amazon.com/dp/B015C3YXYO?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './tea_ceremony.jpg',
+    description: 'First-harvest shade-grown green tea leaves stone-ground in Kyoto, Japan. Deep emerald foam with intense savory umami.'
+  },
+  {
+    id: 'harney_dragon_pearl',
+    name: 'Harney & Sons Supreme Dragon Pearl Jasmine Green Tea (20 Sachets)',
+    category: 'beans_tea',
+    methodIds: ['green_tea', 'white_tea'],
+    badge: 'Floral Excellence',
+    rating: 4.9,
+    reviewsCount: 5200,
+    priceRange: '$12 - $16',
+    topRated: true,
+    asin: 'B000RHXMYC',
+    amazonUrl: `https://www.amazon.com/dp/B000RHXMYC?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './tea_kettle.jpg',
+    description: 'Hand-rolled Fujian tea pearls infused multiple times with fresh night-blooming jasmine flowers for a sweet fragrant cup.'
+  },
+  {
+    id: 'vahdam_english_breakfast',
+    name: 'Vahdam Imperial English Breakfast Loose Leaf Black Tea (100g)',
+    category: 'beans_tea',
+    methodIds: ['black_tea', 'herbal_puerh'],
+    badge: '100% Single Origin',
+    rating: 4.8,
+    reviewsCount: 7800,
+    priceRange: '$14 - $17',
+    asin: 'B07B5N5Z2K',
+    amazonUrl: `https://www.amazon.com/dp/B07B5N5Z2K?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './tea_ceremony.jpg',
+    description: 'Robust blend of Assam second-flush orthodox black tea leaves delivering rich maltiness, amber cup, and bold body.'
   },
   {
     id: 'yunnan_sourcing_puerh',
@@ -221,6 +373,7 @@ export const PRODUCTS_DATA = [
     rating: 4.9,
     reviewsCount: 310,
     priceRange: '$24 - $29',
+    topRated: true,
     asin: 'B07M9P22X7',
     amazonUrl: `https://www.amazon.com/dp/B07M9P22X7?tag=${AMAZON_AFFILIATE_TAG}`,
     image: './tea_ceremony.jpg',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Sparkles, Filter, ShieldCheck, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, Sparkles, Filter, ShieldCheck, ExternalLink, CheckCircle2, Star } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { PRODUCTS_DATA, PRODUCT_CATEGORIES } from '../data/productsData';
 
@@ -11,6 +11,9 @@ export default function BrewShopSection({ trackMode, activeMethod }) {
   const filteredProducts = PRODUCTS_DATA.filter((product) => {
     if (activeCategory === 'method_kit') {
       return product.methodIds && activeMethod && product.methodIds.includes(activeMethod.id);
+    }
+    if (activeCategory === 'top_rated') {
+      return product.topRated || product.rating >= 4.9;
     }
     return product.category === activeCategory;
   });
@@ -36,7 +39,7 @@ export default function BrewShopSection({ trackMode, activeMethod }) {
           </h3>
 
           <p className="text-xs md:text-sm text-stone-300 mt-2 max-w-3xl leading-relaxed">
-            Handpicked specialty equipment, water mineral profiling packets, precision temperature goosenecks, burr grinders, and roaster-direct coffee & tea selections for home brewing mastery.
+            Handpicked specialty equipment, water TDS testing meters, precision micro-gram scales, heavy-duty scoops, temperature goosenecks, burr grinders, and specialty beans & teas.
           </p>
         </div>
 
@@ -71,19 +74,23 @@ export default function BrewShopSection({ trackMode, activeMethod }) {
 
           {PRODUCT_CATEGORIES.filter(c => c.id !== 'method_kit').map((cat) => {
             const isSelected = activeCategory === cat.id;
+            const isTopRatedPill = cat.id === 'top_rated';
             return (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-5 py-3 rounded-2xl text-xs font-extrabold whitespace-nowrap transition-all border ${
+                className={`px-5 py-3 rounded-2xl text-xs font-extrabold whitespace-nowrap transition-all border flex items-center gap-1.5 ${
                   isSelected
                     ? isCoffee
                       ? 'bg-amber-gold text-espresso-950 border-amber-gold shadow-[0_0_20px_rgba(212,140,70,0.3)]'
                       : 'bg-sage-300 text-slate-950 border-sage-300 shadow-[0_0_20px_rgba(143,168,153,0.3)]'
+                    : isTopRatedPill
+                    ? 'bg-amber-500/10 text-amber-gold border-amber-400/40 hover:bg-amber-400/20'
                     : 'bg-black/30 text-stone-400 border-white/[0.08] hover:bg-white/[0.08] hover:text-cream-light'
                 }`}
               >
-                {cat.label}
+                {isTopRatedPill && <Star className="w-3.5 h-3.5 fill-current text-amber-gold" />}
+                <span>{cat.label}</span>
               </button>
             );
           })}
