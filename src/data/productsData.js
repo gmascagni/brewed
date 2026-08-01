@@ -1,4 +1,4 @@
-export const AMAZON_AFFILIATE_TAG = 'thebrewapp-20';
+export const AMAZON_AFFILIATE_TAG = 'thebrewapp13-20';
 
 export const PRODUCT_CATEGORIES = [
   { id: 'method_kit', label: 'Method Kit' },
