@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import StepIndicator from './components/StepIndicator';
 import MethodSelectorGrid from './components/MethodSelectorGrid';
@@ -12,6 +12,7 @@ import DiagnosticsDrawer from './components/DiagnosticsDrawer';
 import ShopDrawer from './components/ShopDrawer';
 import BrewJournal from './components/BrewJournal';
 import { BREW_METHODS } from './data/brewData';
+import { initGA, trackEvent } from './utils/analytics';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 export default function App() {
@@ -34,6 +35,13 @@ export default function App() {
   const [isSplitScreen, setIsSplitScreen] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
 
+  // Initialize Analytics on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      initGA(window.GA_MEASUREMENT_ID || 'G-XXXXXXXXXX');
+    }
+  }, []);
+
   // Sync active method when track mode switches
   const handleTrackSwitch = (newTrack) => {
     setTrackMode(newTrack);
@@ -43,6 +51,7 @@ export default function App() {
     setCustomWaterMl(null);
     setActiveVideo(null);
     setCurrentStep(1); // Reset to Step 1 on track switch
+    trackEvent('switch_track', { track: newTrack });
   };
 
   // Sync active method selection
@@ -52,6 +61,7 @@ export default function App() {
       setCustomRatio(null);
       setCustomWaterMl(null);
       setActiveVideo(null);
+      trackEvent('select_method', { method_id: method.id, method_name: method.name });
     }
   };
 
@@ -60,6 +70,7 @@ export default function App() {
     if (shopElem) {
       shopElem.scrollIntoView({ behavior: 'smooth' });
     }
+    trackEvent('open_shop');
   };
 
   // Ensure activeMethod always belongs to current trackMode methods
@@ -252,7 +263,7 @@ export default function App() {
               <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
             </div>
             <div className="text-cream-soft/40">
-              Guided 4-Step Brewing Wizard • Amazon Affiliate Store • Personal Tasting Journal • Imperial & Metric Support
+              Guided 4-Step Brewing Wizard • Amazon Affiliate Store • Personal Tasting Journal • Analytics Enabled
             </div>
           </div>
         </footer>

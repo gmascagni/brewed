@@ -1,9 +1,18 @@
 import React from 'react';
 import { ExternalLink, Star, ShoppingBag, Sparkles, CheckCircle2, Award } from 'lucide-react';
+import { trackEvent } from '../utils/analytics';
 
 export default function ProductCard({ product, activeMethod }) {
   const isMethodMatched = product.methodIds && activeMethod && product.methodIds.includes(activeMethod.id);
   const isTopRated = product.topRated || product.rating >= 4.9;
+
+  const handleAmazonClick = () => {
+    trackEvent('amazon_click', {
+      product_id: product.id,
+      product_name: product.name,
+      method: activeMethod?.name
+    });
+  };
 
   return (
     <div className={`p-6 rounded-3xl border transition-all duration-300 relative flex flex-col justify-between group shadow-xl hover:-translate-y-1.5 ${
@@ -38,7 +47,7 @@ export default function ProductCard({ product, activeMethod }) {
             </div>
           ) : isTopRated ? (
             <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-gold border border-amber-400/40 text-[10px] font-mono font-extrabold uppercase tracking-wider flex items-center gap-1 shadow-md backdrop-blur-md">
-              <Star className="w-3 h-3 fill-current text-amber-gold" />
+              <Star className="w-3-3 fill-current text-amber-gold" />
               <span>Top Rated 4.9+</span>
             </div>
           ) : null}
@@ -73,6 +82,7 @@ export default function ProductCard({ product, activeMethod }) {
           href={product.amazonUrl}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={handleAmazonClick}
           className="w-full py-3.5 px-5 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl hover:scale-102 active:scale-95 transition-all"
         >
           <ShoppingBag className="w-4 h-4" />
