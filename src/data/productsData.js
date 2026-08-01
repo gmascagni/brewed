@@ -13,7 +13,7 @@ export const PRODUCTS_DATA = [
   // --- UNIVERSAL ESSENTIALS ---
   {
     id: 'tds_water_tester',
-    name: 'Digital TDS Water Quality Tester & Purity Meter',
+    name: 'Digital TDS Water Quality Tester Purity Meter',
     category: 'universal',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
     badge: 'Water Profiler',
@@ -22,13 +22,13 @@ export const PRODUCTS_DATA = [
     priceRange: '$12 - $16',
     topRated: true,
     asin: 'B001E88GE0',
-    amazonUrl: `https://www.amazon.com/dp/B001E88GE0?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Digital+TDS+Water+Quality+Tester+Purity+Meter&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './tea_kettle.jpg',
     description: 'Instant PPM (Parts Per Million) digital reader for testing home tap water, mineral content, and RO filtration profiles.'
   },
   {
     id: 'pocket_gram_scale',
-    name: 'Mini Precision Digital Gram Scale (0.01g Accuracy with Tare)',
+    name: 'Mini Precision Digital Gram Scale 0.01g Accuracy',
     category: 'universal',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
     badge: 'Ultra Precision',
@@ -37,13 +37,13 @@ export const PRODUCTS_DATA = [
     priceRange: '$11 - $15',
     topRated: true,
     asin: 'B0012LOQUQ',
-    amazonUrl: `https://www.amazon.com/dp/B0012LOQUQ?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Mini+Precision+Digital+Gram+Scale+0.01g+Accuracy&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './espresso_pour_over.jpg',
     description: 'Backlit LCD pocket scale with 0.01g micro-accuracy for dosing dry coffee beans, espresso shots, and fine tea leaves.'
   },
   {
     id: 'measuring_spoons_set',
-    name: 'Heavy-Duty 304 Stainless Steel Coffee Scoops & Measuring Spoons (Set of 2)',
+    name: 'Stainless Steel Coffee Scoops Measuring Spoons Set',
     category: 'universal',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
     badge: 'Kitchen Staple',
@@ -52,13 +52,13 @@ export const PRODUCTS_DATA = [
     priceRange: '$9 - $12',
     topRated: true,
     asin: 'B07MZD72TY',
-    amazonUrl: `https://www.amazon.com/dp/B07MZD72TY?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Stainless+Steel+Coffee+Scoops+Measuring+Spoons+Set&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './coffee_setup.jpg',
     description: 'Ergonomic 15mL (1 tbsp) and 30mL (2 tbsp) solid stainless steel scoops engineered with engraved metric and imperial markings.'
   },
   {
     id: 'airscape_canister',
-    name: 'Airscape Stainless Steel Vacuum Coffee Canister (1 lb / 64 oz)',
+    name: 'Airscape Stainless Steel Vacuum Coffee Canister',
     category: 'universal',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress'],
     badge: 'Fresher Coffee',
@@ -66,13 +66,13 @@ export const PRODUCTS_DATA = [
     reviewsCount: 11200,
     priceRange: '$34 - $39',
     asin: 'B00167XN14',
-    amazonUrl: `https://www.amazon.com/dp/B00167XN14?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Airscape+Stainless+Steel+Vacuum+Coffee+Canister&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './coffee_setup.jpg',
     description: 'Patented inner plunger lid forces air out of the canister, locking out oxygen and preserving fresh roast aromas.'
   },
   {
     id: 'double_wall_glasses',
-    name: 'JoyJolt Crystalline Double-Wall Insulated Glass Tumbler Mugs (13.5 oz Set of 2)',
+    name: 'JoyJolt Double Wall Insulated Glass Mugs Set',
     category: 'universal',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
     badge: 'Thermal Glass',
@@ -80,7 +80,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 15400,
     priceRange: '$18 - $24',
     asin: 'B073X5P6P8',
-    amazonUrl: `https://www.amazon.com/dp/B073X5P6P8?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=JoyJolt+Double+Wall+Insulated+Glass+Mugs+Set&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './espresso_pour_over.jpg',
     description: 'Borosilicate double-walled floating glass design that keeps hot drinks piping hot while remaining cool to the touch.'
   },
@@ -88,7 +88,7 @@ export const PRODUCTS_DATA = [
   // --- METHOD SPECIFIC GEAR ---
   {
     id: 'v60_dripper_kit',
-    name: 'Hario V60 Ceramic Coffee Dripper & Filter Starter Set',
+    name: 'Hario V60 Ceramic Coffee Dripper Starter Set',
     category: 'method_kit',
     methodIds: ['pour_over'],
     badge: 'Barista Choice',
@@ -97,13 +97,13 @@ export const PRODUCTS_DATA = [
     priceRange: '$24 - $28',
     topRated: true,
     asin: 'B002VUSWGQ',
-    amazonUrl: `https://www.amazon.com/dp/B002VUSWGQ?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Hario+V60+Ceramic+Coffee+Dripper+Starter+Set&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './pour_over_hero.jpg',
     description: 'The iconic 60-degree spiral ribbed ceramic pour-over cone for maximum flow rate control and pristine citric clarity.'
   },
   {
     id: 'v60_paper_filters',
-    name: 'Hario V60 Misarashi Natural Unbleached Paper Filters (100 Ct)',
+    name: 'Hario V60 Paper Filters Size 02 100 Count',
     category: 'method_kit',
     methodIds: ['pour_over'],
     badge: 'Essential',
@@ -111,13 +111,13 @@ export const PRODUCTS_DATA = [
     reviewsCount: 8900,
     priceRange: '$9 - $12',
     asin: 'B001U7EOYA',
-    amazonUrl: `https://www.amazon.com/dp/B001U7EOYA?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Hario+V60+Paper+Filters+Size+02+100+Count&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './pour_over_hero.jpg',
     description: 'High-density Japanese oxygen-bleached tabbed paper filters that trap sediment and oils for a tea-like body.'
   },
   {
     id: 'chemex_8cup',
-    name: 'Chemex Classic 8-Cup Glass Pour-Over Coffeemaker',
+    name: 'Chemex Classic 8 Cup Glass Pour Over Coffeemaker',
     category: 'method_kit',
     methodIds: ['pour_over'],
     badge: 'Design Icon',
@@ -125,13 +125,13 @@ export const PRODUCTS_DATA = [
     reviewsCount: 5120,
     priceRange: '$48 - $54',
     asin: 'B0000CF2UT',
-    amazonUrl: `https://www.amazon.com/dp/B0000CF2UT?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Chemex+Classic+8+Cup+Glass+Pour+Over+Coffeemaker&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './pour_over_hero.jpg',
     description: 'Non-porous Borosilicate glass carafe with polished wood collar and leather tie. Uses heavy Chemex bond filters.'
   },
   {
     id: 'bodum_french_press',
-    name: 'Bodum Chambord French Press Coffee Maker (34 oz / 1 Liter)',
+    name: 'Bodum Chambord French Press Coffee Maker 34 oz',
     category: 'method_kit',
     methodIds: ['french_press'],
     badge: 'Classic Benchmark',
@@ -139,13 +139,13 @@ export const PRODUCTS_DATA = [
     reviewsCount: 12450,
     priceRange: '$35 - $42',
     asin: 'B00005LM76',
-    amazonUrl: `https://www.amazon.com/dp/B00005LM76?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Bodum+Chambord+French+Press+Coffee+Maker+34+oz&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './french_press.jpg',
     description: 'Heat-resistant borosilicate glass with stainless steel frame and 3-part mesh plunger for heavy chocolate body.'
   },
   {
     id: 'bialetti_moka_express',
-    name: 'Bialetti Moka Express Stovetop Espresso Maker (6-Cup)',
+    name: 'Bialetti Moka Express Stovetop Espresso Maker 6 Cup',
     category: 'method_kit',
     methodIds: ['moka_pot'],
     badge: 'Italian Legend',
@@ -153,13 +153,13 @@ export const PRODUCTS_DATA = [
     reviewsCount: 21500,
     priceRange: '$38 - $45',
     asin: 'B0000CF3Q6',
-    amazonUrl: `https://www.amazon.com/dp/B0000CF3Q6?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Bialetti+Moka+Express+Stovetop+Espresso+Maker+6+Cup&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './moka_pot_hero.jpg',
     description: 'Octagonal food-grade aluminum body made in Italy. Generates 1.5 bar steam pressure for syrupy crema-rich coffee.'
   },
   {
     id: 'aeropress_original',
-    name: 'AeroPress Original Coffee & Espresso Maker with Tote Bag',
+    name: 'AeroPress Original Coffee and Espresso Maker',
     category: 'method_kit',
     methodIds: ['aeropress'],
     badge: 'Travel Champion',
@@ -168,13 +168,13 @@ export const PRODUCTS_DATA = [
     priceRange: '$39 - $44',
     topRated: true,
     asin: 'B0047BIWSK',
-    amazonUrl: `https://www.amazon.com/dp/B0047BIWSK?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=AeroPress+Original+Coffee+and+Espresso+Maker&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './aeropress_hero.jpg',
     description: 'Patented air-pressure immersion technology brewing zero-bitterness coffee in 60 seconds.'
   },
   {
     id: 'gaiwan_tea_set',
-    name: 'Gaiwan Gongfu Ceramic Teapot Set with Fair Cup & Cups',
+    name: 'Gongfu Ceramic Gaiwan Teapot Tea Set',
     category: 'method_kit',
     methodIds: ['green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
     badge: 'Ceremony Grade',
@@ -182,7 +182,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 840,
     priceRange: '$32 - $39',
     asin: 'B08F2B1QZP',
-    amazonUrl: `https://www.amazon.com/dp/B08F2B1QZP?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Gongfu+Ceramic+Gaiwan+Teapot+Tea+Set&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './tea_ceremony.jpg',
     description: 'Traditional 150mL porcelain lidded Gaiwan set for precision multi-steep Gongfu tea infusions.'
   },
@@ -190,7 +190,7 @@ export const PRODUCTS_DATA = [
   // --- WATER KETTLER & REMINERALIZATION ---
   {
     id: 'fellow_stagg_ekg',
-    name: 'Fellow Stagg EKG Electric Gooseneck Kettle (0.9L)',
+    name: 'Fellow Stagg EKG Electric Gooseneck Kettle 0.9L',
     category: 'water_kettles',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
     badge: 'Gold Standard',
@@ -198,13 +198,13 @@ export const PRODUCTS_DATA = [
     reviewsCount: 7800,
     priceRange: '$165 - $195',
     asin: 'B077JBQZPX',
-    amazonUrl: `https://www.amazon.com/dp/B077JBQZPX?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Fellow+Stagg+EKG+Electric+Gooseneck+Kettle&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './tea_kettle_gooseneck.jpg',
     description: 'PID degree-by-degree temperature control (135°F - 212°F) with precision counterbalanced gooseneck pour spout.'
   },
   {
     id: 'third_wave_water',
-    name: 'Third Wave Water Espresso & Coffee Mineral Packets (12-Pack)',
+    name: 'Third Wave Water Coffee Mineral Packets 12 Pack',
     category: 'water_kettles',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
     badge: 'SCA Mineral Profile',
@@ -212,7 +212,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 1650,
     priceRange: '$15 - $18',
     asin: 'B077J399B6',
-    amazonUrl: `https://www.amazon.com/dp/B077J399B6?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Third+Wave+Water+Coffee+Mineral+Packets&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './tea_kettle.jpg',
     description: 'Remineralizes distilled or RO water with exact magnesium, calcium, and sodium ratios to eliminate papery sourness.'
   },
@@ -228,13 +228,13 @@ export const PRODUCTS_DATA = [
     reviewsCount: 9400,
     priceRange: '$149 - $169',
     asin: 'B007F18CHC',
-    amazonUrl: `https://www.amazon.com/dp/B007F18CHC?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Baratza+Encore+Conical+Burr+Coffee+Grinder&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './medium_grind.jpg',
     description: '40 individual coarseness settings from 250 to 1200 microns. 40mm alloy steel burrs engineered in Europe.'
   },
   {
     id: 'timemore_black_mirror',
-    name: 'Timemore Black Mirror Basic+ Digital Coffee Scale with Timer',
+    name: 'Timemore Black Mirror Basic Digital Coffee Scale with Timer',
     category: 'grinders_scales',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
     badge: 'Precision 0.1g',
@@ -242,7 +242,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 3100,
     priceRange: '$52 - $59',
     asin: 'B0836F76D8',
-    amazonUrl: `https://www.amazon.com/dp/B0836F76D8?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Timemore+Black+Mirror+Basic+Digital+Coffee+Scale&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './espresso_pour_over.jpg',
     description: 'Ultra-fast 0.1g precision sensor with auto-starting brew timer, hidden LED display, and USB-C rechargeable battery.'
   },
@@ -256,15 +256,15 @@ export const PRODUCTS_DATA = [
     reviewsCount: 1420,
     priceRange: '$345 - $395',
     asin: 'B0B8P5Y8K4',
-    amazonUrl: `https://www.amazon.com/dp/B0B8P5Y8K4?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Fellow+Ode+Gen+2+Brew+Burr+Grinder&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './coarse_grind.jpg',
     description: '64mm stainless steel flat burrs, anti-static technology, and single-dose hopper for high clarity pour-overs.'
   },
 
-  // --- EXPANDED BEANS & SPECIALTY TEAS ---
+  // --- BEANS & SPECIALTY TEAS ---
   {
     id: 'onyx_tropical_weather',
-    name: 'Onyx Coffee Lab Tropical Weather Ethiopian Whole Bean (10 oz)',
+    name: 'Onyx Coffee Lab Tropical Weather Ethiopian Whole Bean 10 oz',
     category: 'beans_tea',
     methodIds: ['pour_over', 'french_press', 'aeropress'],
     badge: 'Roaster of the Year',
@@ -273,13 +273,13 @@ export const PRODUCTS_DATA = [
     priceRange: '$22 - $26',
     topRated: true,
     asin: 'B08F9G2X9C',
-    amazonUrl: `https://www.amazon.com/dp/B08F9G2X9C?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Onyx+Coffee+Lab+Tropical+Weather+Ethiopian+Whole+Bean&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './pour_over_hero.jpg',
     description: 'Washed and natural processed Ethiopian heirloom blend featuring wild blueberry jam, peach nectar, and floral bergamot.'
   },
   {
     id: 'blue_bottle_three_africas',
-    name: 'Blue Bottle Coffee Three Africas Organic Whole Bean (12 oz)',
+    name: 'Blue Bottle Coffee Three Africas Organic Whole Bean 12 oz',
     category: 'beans_tea',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'aeropress'],
     badge: 'Cult Favorite',
@@ -288,13 +288,13 @@ export const PRODUCTS_DATA = [
     priceRange: '$19 - $23',
     topRated: true,
     asin: 'B01M333V4H',
-    amazonUrl: `https://www.amazon.com/dp/B01M333V4H?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Blue+Bottle+Coffee+Three+Africas+Organic+Whole+Bean&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './coffee_setup.jpg',
     description: 'Blend of two Ethiopian single-origins and a Ugandan bean featuring golden raisin, dried blueberry, and dark chocolate.'
   },
   {
     id: 'intelligentsia_frequency',
-    name: 'Intelligentsia Frequency Blend Medium Roast Whole Bean (12 oz)',
+    name: 'Intelligentsia Frequency Blend Medium Roast Whole Bean 12 oz',
     category: 'beans_tea',
     methodIds: ['pour_over', 'drip_brewer', 'moka_pot', 'french_press'],
     badge: 'Specialty Pioneer',
@@ -302,13 +302,13 @@ export const PRODUCTS_DATA = [
     reviewsCount: 1850,
     priceRange: '$17 - $21',
     asin: 'B007R98JCY',
-    amazonUrl: `https://www.amazon.com/dp/B007R98JCY?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Intelligentsia+Frequency+Blend+Medium+Roast+Whole+Bean&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './coffee_setup.jpg',
     description: 'Balanced direct-trade blend of Central & South American beans with milk chocolate, lemongrass, and raw honey notes.'
   },
   {
     id: 'la_colombe_corsica',
-    name: 'La Colombe Corsica Dark Roast Whole Bean Coffee (12 oz)',
+    name: 'La Colombe Corsica Dark Roast Whole Bean Coffee 12 oz',
     category: 'beans_tea',
     methodIds: ['french_press', 'espresso', 'moka_pot', 'drip_brewer'],
     badge: 'Deep & Cocoa',
@@ -316,13 +316,13 @@ export const PRODUCTS_DATA = [
     reviewsCount: 6400,
     priceRange: '$15 - $18',
     asin: 'B00863L99I',
-    amazonUrl: `https://www.amazon.com/dp/B00863L99I?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=La+Colombe+Corsica+Dark+Roast+Whole+Bean+Coffee&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './espresso_hero.jpg',
     description: 'Signature dark roast named after an island in the Mediterranean with deep baker’s chocolate, red wine, and cocoa nib notes.'
   },
   {
     id: 'ippodo_matcha_ummon',
-    name: 'Ippodo Tea Ummon-no-mukai Ceremonial Grade Matcha (20g Tin)',
+    name: 'Ippodo Tea Ummon-no-mukai Ceremonial Grade Matcha 20g Tin',
     category: 'beans_tea',
     methodIds: ['green_tea'],
     badge: 'Kyoto Imperial',
@@ -331,13 +331,13 @@ export const PRODUCTS_DATA = [
     priceRange: '$38 - $44',
     topRated: true,
     asin: 'B015C3YXYO',
-    amazonUrl: `https://www.amazon.com/dp/B015C3YXYO?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Ippodo+Tea+Ummon-no-mukai+Ceremonial+Grade+Matcha&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './tea_ceremony.jpg',
     description: 'First-harvest shade-grown green tea leaves stone-ground in Kyoto, Japan. Deep emerald foam with intense savory umami.'
   },
   {
     id: 'harney_dragon_pearl',
-    name: 'Harney & Sons Supreme Dragon Pearl Jasmine Green Tea (20 Sachets)',
+    name: 'Harney and Sons Supreme Dragon Pearl Jasmine Green Tea',
     category: 'beans_tea',
     methodIds: ['green_tea', 'white_tea'],
     badge: 'Floral Excellence',
@@ -346,13 +346,13 @@ export const PRODUCTS_DATA = [
     priceRange: '$12 - $16',
     topRated: true,
     asin: 'B000RHXMYC',
-    amazonUrl: `https://www.amazon.com/dp/B000RHXMYC?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Harney+and+Sons+Supreme+Dragon+Pearl+Jasmine+Green+Tea&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './tea_kettle.jpg',
     description: 'Hand-rolled Fujian tea pearls infused multiple times with fresh night-blooming jasmine flowers for a sweet fragrant cup.'
   },
   {
     id: 'vahdam_english_breakfast',
-    name: 'Vahdam Imperial English Breakfast Loose Leaf Black Tea (100g)',
+    name: 'Vahdam Imperial English Breakfast Loose Leaf Black Tea 100g',
     category: 'beans_tea',
     methodIds: ['black_tea', 'herbal_puerh'],
     badge: '100% Single Origin',
@@ -360,13 +360,13 @@ export const PRODUCTS_DATA = [
     reviewsCount: 7800,
     priceRange: '$14 - $17',
     asin: 'B07B5N5Z2K',
-    amazonUrl: `https://www.amazon.com/dp/B07B5N5Z2K?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Vahdam+Imperial+English+Breakfast+Loose+Leaf+Black+Tea&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './tea_ceremony.jpg',
     description: 'Robust blend of Assam second-flush orthodox black tea leaves delivering rich maltiness, amber cup, and bold body.'
   },
   {
     id: 'yunnan_sourcing_puerh',
-    name: 'Yunnan Sourcing Aged Shou Ripe Pu-erh Tea Cake (100g)',
+    name: 'Yunnan Sourcing Aged Shou Ripe Pu-erh Tea Cake 100g',
     category: 'beans_tea',
     methodIds: ['herbal_puerh', 'black_tea'],
     badge: 'Aged Imperial',
@@ -375,7 +375,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$24 - $29',
     topRated: true,
     asin: 'B07M9P22X7',
-    amazonUrl: `https://www.amazon.com/dp/B07M9P22X7?tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/s?k=Yunnan+Sourcing+Aged+Shou+Ripe+Pu-erh+Tea+Cake&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './tea_ceremony.jpg',
     description: 'Post-fermented tea cake from Menghai with deep camphor wood, damp earth sweetness, and velvet chocolate body.'
   }
