@@ -9,6 +9,7 @@ import MasterclassHub from './components/MasterclassHub';
 import MultiPhaseTimer from './components/MultiPhaseTimer';
 import KnowledgeBaseDrawer from './components/KnowledgeBaseDrawer';
 import DiagnosticsDrawer from './components/DiagnosticsDrawer';
+import ShopDrawer from './components/ShopDrawer';
 import BrewJournal from './components/BrewJournal';
 import { BREW_METHODS } from './data/brewData';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
@@ -51,6 +52,13 @@ export default function App() {
       setCustomRatio(null);
       setCustomWaterMl(null);
       setActiveVideo(null);
+    }
+  };
+
+  const handleScrollToShop = () => {
+    const shopElem = document.getElementById('brew-shop-section');
+    if (shopElem) {
+      shopElem.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -100,6 +108,7 @@ export default function App() {
           isMuted={isMuted}
           setIsMuted={setIsMuted}
           onOpenJournal={() => setIsJournalOpen(true)}
+          onOpenShop={handleScrollToShop}
         />
 
         {/* 2. Top Sticky 4-Step Indicator Bar */}
@@ -195,7 +204,7 @@ export default function App() {
             </div>
           )}
 
-          {/* Video Masterclass Tutorials for Selected Method (Positioned right above Diagnostics) */}
+          {/* Video Masterclass Tutorials for Selected Method */}
           <div className="mt-14">
             <MasterclassHub
               trackMode={trackMode}
@@ -207,7 +216,15 @@ export default function App() {
             />
           </div>
 
-          {/* 1. Dedicated Diagnostics Drawer (Taste Troubleshooting & Water Chemistry - Track-Specific) */}
+          {/* Amazon Affiliate "Brew Essentials Kit & Shop" Section */}
+          <div id="brew-shop-section">
+            <ShopDrawer
+              trackMode={trackMode}
+              activeMethod={currentActiveMethod}
+            />
+          </div>
+
+          {/* 1. Dedicated Diagnostics Drawer (Taste Troubleshooting & Water Chemistry) */}
           <DiagnosticsDrawer trackMode={trackMode} />
 
           {/* 2. Dedicated Knowledge Base Drawer (Terroir Atlas & Agronomy) */}
@@ -235,7 +252,7 @@ export default function App() {
               <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
             </div>
             <div className="text-cream-soft/40">
-              Guided 4-Step Brewing Wizard • Personal Tasting Journal • Imperial & Metric Support
+              Guided 4-Step Brewing Wizard • Amazon Affiliate Store • Personal Tasting Journal • Imperial & Metric Support
             </div>
           </div>
         </footer>

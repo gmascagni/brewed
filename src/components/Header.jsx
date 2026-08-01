@@ -1,7 +1,7 @@
 import React from 'react';
-import { Coffee, Leaf, Volume2, VolumeX, Scale, BookOpen } from 'lucide-react';
+import { Coffee, Leaf, Volume2, VolumeX, Scale, BookOpen, ShoppingBag } from 'lucide-react';
 
-export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal }) {
+export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop }) {
   const isCoffee = trackMode === 'coffee';
 
   return (
@@ -52,8 +52,21 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
           </button>
         </div>
 
-        {/* Right Action Bar (Brew Journal, Unit Toggle & Mute) */}
+        {/* Right Action Bar (Brew Journal, Shop Gear, Unit Toggle & Mute) */}
         <div className="flex items-center space-x-3">
+          
+          {/* Shop Gear Button */}
+          {onOpenShop && (
+            <button
+              onClick={onOpenShop}
+              className="flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-amber-400/20 border border-amber-400/50 text-xs text-amber-gold font-extrabold hover:bg-amber-400/30 shadow-lg transition-all active:scale-95"
+              title="Shop Curated Brew Gear & Kits on Amazon"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span className="font-bold uppercase tracking-wider hidden sm:inline">Shop Gear 🛍️</span>
+            </button>
+          )}
+
           {/* Brew Journal Button */}
           <button
             onClick={onOpenJournal}
@@ -68,23 +81,19 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
           <button
             onClick={() => setUnitSystem(unitSystem === 'metric' ? 'imperial' : 'metric')}
             className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#1A1613] border border-white/[0.12] text-xs text-stone-300 hover:border-amber-gold/60 hover:text-cream-light shadow-lg transition-all active:scale-95"
-            title="Toggle Metric (grams/ml) vs Imperial (oz/fl oz)"
+            title="Switch Imperial (oz/°F) / Metric (g/mL/°C)"
           >
             <Scale className="w-4 h-4 text-amber-gold" />
-            <span className="font-bold uppercase tracking-wider">{unitSystem === 'imperial' ? 'Imperial (oz/°F)' : 'Metric (g/°C)'}</span>
+            <span className="font-mono font-bold uppercase">{unitSystem === 'imperial' ? 'Imp (oz)' : 'Met (g/mL)'}</span>
           </button>
 
           {/* Audio Mute Button */}
           <button
             onClick={() => setIsMuted(!isMuted)}
-            className={`p-2.5 rounded-xl border shadow-lg transition-all active:scale-95 ${
-              isMuted 
-                ? 'bg-red-500/20 text-red-400 border-red-500/40' 
-                : 'bg-[#1A1613] text-cream-light border-white/[0.12] hover:border-amber-gold/60'
-            }`}
-            title={isMuted ? 'Unmute Phase Audio Chimes' : 'Mute Phase Audio Chimes'}
+            className="p-2.5 rounded-xl bg-[#1A1613] border border-white/[0.12] text-stone-300 hover:border-amber-gold/60 hover:text-cream-light shadow-lg transition-all active:scale-95"
+            title={isMuted ? "Unmute Timer Audio Alerts" : "Mute Timer Audio Alerts"}
           >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-amber-gold" />}
           </button>
         </div>
 
