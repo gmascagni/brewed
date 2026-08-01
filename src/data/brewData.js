@@ -788,6 +788,21 @@ export const MASTERCLASSES = [
       'Ideal for light to medium-light Nordic specialty roasts'
     ]
   },
+  {
+    id: 'mc_golden_ratio',
+    methodId: 'pour_over',
+    method: 'Pour-Over',
+    title: 'The Golden Ratio of Coffee Brewing (1:16 & SCA Golden Cup Standard)',
+    duration: '5:10',
+    thumbnail: './pour_over_hero.jpg',
+    embedId: '1oB1oDrDkHM',
+    description: 'Learn why the 1:16 coffee-to-water ratio is called the Golden Ratio by World Barista Champions and how it targets 18%-22% extraction yield.',
+    keyTakeaways: [
+      '1:16 ratio equals 60 grams of coffee per 1 Liter of water (~2 tbsp per 6 fl oz)',
+      'Targets ideal 18% to 22% soluble extraction yield benchmark',
+      'Prevents sour under-extraction (<18%) and bitter over-extraction (>22%)'
+    ]
+  },
 
   // French Press Videos (methodId: 'french_press')
   {

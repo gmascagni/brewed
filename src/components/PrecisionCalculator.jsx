@@ -262,6 +262,37 @@ export default function PrecisionCalculator({
 
       </div>
 
+      {/* 4. Golden Ratio Educational Callout Box (SCA Standard: 1 : 16) */}
+      {isCoffee && (
+        <div className="mt-6 p-6 rounded-3xl bg-[#181412]/90 border border-amber-gold/30 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-start space-x-3.5">
+            <div className="p-3.5 rounded-2xl bg-amber-500/20 text-amber-gold border border-amber-400/30 flex-shrink-0">
+              <Sparkles className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2.5 mb-1">
+                <span className="font-serif text-lg font-bold text-cream-light">
+                  The Golden Ratio Standard (1 : 16)
+                </span>
+                <span className="text-[10px] uppercase font-mono tracking-widest px-2.5 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30 font-extrabold">
+                  SCA Golden Cup Benchmark
+                </span>
+              </div>
+              <p className="text-xs text-stone-300 leading-relaxed max-w-2xl font-normal">
+                The Specialty Coffee Association (SCA) defines the <strong>Golden Ratio</strong> as <strong>1g coffee to 16 mL water</strong> (approx. 60g per 1 Liter / ~2 tbsp per 6 fl oz). This ratio dissolves 18% - 22% of soluble coffee compounds, yielding peak caramel sweetness and crisp citric acidity without bitter over-extraction.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setCustomRatio(16)}
+            className="py-3 px-5 rounded-2xl bg-amber-gold/20 text-amber-gold hover:bg-amber-gold hover:text-espresso-950 font-extrabold text-xs uppercase tracking-wider border border-amber-400/40 shadow-lg transition-all whitespace-nowrap active:scale-95 flex-shrink-0"
+          >
+            Snap to Golden Ratio (1 : 16)
+          </button>
+        </div>
+      )}
+
       {/* Step Navigation Controls */}
       {onPrevStep && onNextStep && (
         <div className="flex items-center justify-between pt-8 mt-8 border-t border-white/[0.08]">
