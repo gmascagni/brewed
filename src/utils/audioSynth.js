@@ -34,7 +34,7 @@ export function playPhaseChime(isMuted = false) {
 }
 
 /**
- * Stop any playing completion sound or 10-second timer
+ * Stop any playing completion sound
  */
 export function stopCompletionChime() {
   if (currentCompletionTimeout) {
@@ -53,7 +53,7 @@ export function stopCompletionChime() {
 }
 
 /**
- * Play user's tada_original.wav file, repeating over 10 full seconds
+ * Play user's tada_original.wav file, repeating exactly 3 times
  */
 export function playCompletionChime(isMuted = false) {
   if (isMuted) return;
@@ -63,23 +63,32 @@ export function playCompletionChime(isMuted = false) {
 
   try {
     const audio = new Audio('./tada_original.wav');
-    audio.loop = true;
+    audio.loop = false;
     audio.volume = 0.85;
 
     activeAudioElement = audio;
 
-    const playPromise = audio.play();
+    let playCount = 0;
+    const MAX_REPEATS = 3;
 
+    audio.addEventListener('ended', () => {
+      playCount += 1;
+      if (playCount < MAX_REPEATS) {
+        audio.currentTime = 0;
+        audio.play().catch((err) => {
+          console.warn('Repeat audio play failed:', err);
+        });
+      } else {
+        stopCompletionChime();
+      }
+    });
+
+    const playPromise = audio.play();
     if (playPromise !== undefined) {
       playPromise.catch((err) => {
-        console.warn('Audio element play failed, falling back to Web Audio:', err);
+        console.warn('Audio element play failed:', err);
       });
     }
-
-    // Stop automatically after 10 full seconds (10,000 ms)
-    currentCompletionTimeout = setTimeout(() => {
-      stopCompletionChime();
-    }, 10000);
 
   } catch (e) {
     console.error('Failed to play tada_original.wav:', e);
