@@ -206,6 +206,35 @@ export default function TroubleshootingHub({ trackMode }) {
                 <span className="text-emerald-400 font-extrabold text-sm">6.5 - 7.5 pH</span>
               </div>
             </div>
+
+            {/* Contextual Amazon Affiliate Recommendation Box for Water Chemistry */}
+            <div className="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
+              <span className="text-stone-300">Test tap water TDS mineral content or add minerals:</span>
+              <div className="flex gap-2">
+                <a
+                  href="https://www.amazon.com/s?k=Digital+TDS+Water+Quality+Tester+Purity+Meter&tag=thebrewapp13-20"
+                  target="_blank"
+                  rel="nofollow sponsored noopener"
+                  data-product-name="Digital TDS Water Quality Tester"
+                  data-link-id="tds_water_tester"
+                  data-context="diagnostics_water"
+                  className="px-3 py-1.5 rounded-xl bg-amber-400/20 text-amber-gold hover:bg-amber-400/30 border border-amber-400/40 text-[10px] font-extrabold uppercase tracking-wider transition-all"
+                >
+                  TDS Tester ↗
+                </a>
+                <a
+                  href="https://www.amazon.com/s?k=Third+Wave+Water+Coffee+Mineral+Packets&tag=thebrewapp13-20"
+                  target="_blank"
+                  rel="nofollow sponsored noopener"
+                  data-product-name="Third Wave Water Coffee Minerals"
+                  data-link-id="third_wave_water"
+                  data-context="diagnostics_water"
+                  className="px-3 py-1.5 rounded-xl bg-amber-400/20 text-amber-gold hover:bg-amber-400/30 border border-amber-400/40 text-[10px] font-extrabold uppercase tracking-wider transition-all"
+                >
+                  Minerals ↗
+                </a>
+              </div>
+            </div>
           </div>
 
         </div>

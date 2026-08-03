@@ -81,7 +81,10 @@ export default function ProductCard({ product, activeMethod }) {
         <a
           href={product.amazonUrl}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="nofollow sponsored noopener"
+          data-product-name={product.name}
+          data-link-id={product.id}
+          data-context="product_card"
           onClick={handleAmazonClick}
           className="w-full py-3.5 px-5 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl hover:scale-102 active:scale-95 transition-all"
         >
@@ -91,7 +94,7 @@ export default function ProductCard({ product, activeMethod }) {
         </a>
 
         <div className="text-[9px] font-mono text-center text-stone-500 uppercase tracking-wider">
-          Amazon Affiliate Link • Secure Checkout
+          As an Amazon Associate, The Brew App earns from qualifying purchases
         </div>
       </div>
 

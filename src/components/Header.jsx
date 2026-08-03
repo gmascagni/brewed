@@ -25,30 +25,32 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
           </div>
         </div>
 
-        {/* Center Track Mode Switcher */}
+        {/* Center Track Mode Switcher: The Coffee Lab vs The Tea Room */}
         <div className="flex items-center bg-[#14110E] p-1.5 rounded-2xl border border-white/[0.12] shadow-2xl backdrop-blur-xl relative">
           <button
             onClick={() => setTrackMode('coffee')}
             className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
               isCoffee
-                ? 'btn-tactile-amber text-espresso-950 scale-105'
+                ? 'btn-tactile-amber text-espresso-950 scale-105 shadow-lg'
                 : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.05]'
             }`}
+            title="Switch to The Coffee Lab: Grind Sizes, SCA Ratios & Extraction Science"
           >
             <Coffee className="w-4 h-4" />
-            <span>Coffee Track</span>
+            <span>The Coffee Lab</span>
           </button>
           
           <button
             onClick={() => setTrackMode('tea')}
             className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
               !isCoffee
-                ? 'btn-tactile-sage text-cream-light scale-105'
+                ? 'btn-tactile-sage text-cream-light scale-105 shadow-lg'
                 : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.05]'
             }`}
+            title="Switch to The Tea Room: Gongfu Gaiwan, Steeping Timers & Leaf Profiles"
           >
             <Leaf className="w-4 h-4" />
-            <span>Tea Track</span>
+            <span>The Tea Room</span>
           </button>
         </div>
 

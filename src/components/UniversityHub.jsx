@@ -231,12 +231,20 @@ export default function UniversityHub({ trackMode }) {
                     </p>
                   </div>
 
-                  <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] text-cream-soft/50">
+                  <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px] text-cream-soft/70">
                     <span>Direct Single-Origin Sourcing</span>
-                    <span className="text-amber-gold font-bold flex items-center gap-1">
-                      <span>Featured</span>
-                      <ChevronRight className="w-3 h-3" />
-                    </span>
+                    <a
+                      href={`https://www.amazon.com/s?k=${encodeURIComponent(brand.name + ' ' + (brand.roaster || brand.house || ''))}&tag=thebrewapp13-20`}
+                      target="_blank"
+                      rel="nofollow sponsored noopener"
+                      data-product-name={brand.name}
+                      data-link-id={`brand_${brand.name.toLowerCase().replace(/\s+/g, '_')}`}
+                      data-context="terroir_brand_recommendation"
+                      className="px-2.5 py-1 rounded-lg bg-amber-400/20 text-amber-gold hover:bg-amber-400/30 border border-amber-400/40 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1 transition-all"
+                    >
+                      <span>Buy on Amazon</span>
+                      <ShoppingBag className="w-3 h-3" />
+                    </a>
                   </div>
                 </div>
               ))}

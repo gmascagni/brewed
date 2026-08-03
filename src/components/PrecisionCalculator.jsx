@@ -262,34 +262,103 @@ export default function PrecisionCalculator({
 
       </div>
 
-      {/* 4. Golden Ratio Educational Callout Box (SCA Standard: 1 : 16) */}
-      {isCoffee && (
-        <div className="mt-6 p-6 rounded-3xl bg-[#181412]/90 border border-amber-gold/30 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-start space-x-3.5">
-            <div className="p-3.5 rounded-2xl bg-amber-500/20 text-amber-gold border border-amber-400/30 flex-shrink-0">
-              <Sparkles className="w-5 h-5 animate-pulse" />
-            </div>
-            <div>
-              <div className="flex items-center space-x-2.5 mb-1">
-                <span className="font-serif text-lg font-bold text-cream-light">
-                  The Golden Ratio Standard (1 : 16)
-                </span>
-                <span className="text-[10px] uppercase font-mono tracking-widest px-2.5 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30 font-extrabold">
-                  SCA Golden Cup Benchmark
-                </span>
-              </div>
-              <p className="text-xs text-stone-300 leading-relaxed max-w-2xl font-normal">
-                The Specialty Coffee Association (SCA) defines the <strong>Golden Ratio</strong> as <strong>1g coffee to 16 mL water</strong> (approx. 60g per 1 Liter / ~2 tbsp per 6 fl oz). This ratio dissolves 18% - 22% of soluble coffee compounds, yielding peak caramel sweetness and crisp citric acidity without bitter over-extraction.
-              </p>
-            </div>
+      {/* 4. Golden Ratio & Quick Method Ratios Educational Callout Box */}
+      {isCoffee ? (
+        <div className="mt-6 space-y-4">
+          {/* Preset Method Ratio Buttons */}
+          <div className="flex flex-wrap items-center gap-2 bg-black/40 p-3 rounded-2xl border border-white/[0.08]">
+            <span className="text-xs font-mono font-bold text-amber-gold uppercase tracking-wider mr-2">Quick Ratios:</span>
+            <button
+              onClick={() => setCustomRatio(16)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${currentRatio === 16 ? 'bg-amber-gold text-espresso-950 shadow-md' : 'bg-white/[0.06] text-stone-300 hover:bg-white/10'}`}
+            >
+              Pour Over (1:16)
+            </button>
+            <button
+              onClick={() => setCustomRatio(15)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${currentRatio === 15 ? 'bg-amber-gold text-espresso-950 shadow-md' : 'bg-white/[0.06] text-stone-300 hover:bg-white/10'}`}
+            >
+              French Press (1:15)
+            </button>
+            <button
+              onClick={() => setCustomRatio(2)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${currentRatio === 2 ? 'bg-amber-gold text-espresso-950 shadow-md' : 'bg-white/[0.06] text-stone-300 hover:bg-white/10'}`}
+            >
+              Espresso (1:2)
+            </button>
+            <button
+              onClick={() => setCustomRatio(8)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${currentRatio === 8 ? 'bg-amber-gold text-espresso-950 shadow-md' : 'bg-white/[0.06] text-stone-300 hover:bg-white/10'}`}
+            >
+              Cold Brew (1:8)
+            </button>
           </div>
 
-          <button
-            onClick={() => setCustomRatio(16)}
-            className="py-3 px-5 rounded-2xl bg-amber-gold/20 text-amber-gold hover:bg-amber-gold hover:text-espresso-950 font-extrabold text-xs uppercase tracking-wider border border-amber-400/40 shadow-lg transition-all whitespace-nowrap active:scale-95 flex-shrink-0"
+          <div className="p-6 rounded-3xl bg-[#181412]/90 border border-amber-gold/30 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-start space-x-3.5">
+              <div className="p-3.5 rounded-2xl bg-amber-500/20 text-amber-gold border border-amber-400/30 flex-shrink-0">
+                <Sparkles className="w-5 h-5 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center space-x-2.5 mb-1">
+                  <span className="font-serif text-lg font-bold text-cream-light">
+                    The Golden Ratio Standard (1 : 16)
+                  </span>
+                  <span className="text-[10px] uppercase font-mono tracking-widest px-2.5 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30 font-extrabold">
+                    SCA Golden Cup Benchmark
+                  </span>
+                </div>
+                <p className="text-xs text-stone-300 leading-relaxed max-w-2xl font-normal">
+                  The Specialty Coffee Association (SCA) defines the <strong>Golden Ratio</strong> as <strong>1g coffee to 16 mL water</strong> (approx. 60g per 1 Liter / ~2 tbsp per 6 fl oz). This ratio dissolves 18% - 22% of soluble coffee compounds, yielding peak caramel sweetness and crisp citric acidity without bitter over-extraction.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setCustomRatio(16)}
+              className="py-3 px-5 rounded-2xl bg-amber-gold/20 text-amber-gold hover:bg-amber-gold hover:text-espresso-950 font-extrabold text-xs uppercase tracking-wider border border-amber-400/40 shadow-lg transition-all whitespace-nowrap active:scale-95 flex-shrink-0"
+            >
+              Snap to Golden Ratio (1 : 16)
+            </button>
+          </div>
+
+          {/* Contextual Amazon Affiliate Recommendation Box */}
+          <div className="p-4 rounded-2xl bg-black/60 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div className="flex items-center space-x-2 text-stone-300">
+              <Scale className="w-4 h-4 text-amber-gold flex-shrink-0" />
+              <span>To achieve 0.1g extraction accuracy, a digital scale with auto-timer is essential.</span>
+            </div>
+            <a
+              href="https://www.amazon.com/s?k=Mini+Precision+Digital+Gram+Scale+0.01g+Accuracy&tag=thebrewapp13-20"
+              target="_blank"
+              rel="nofollow sponsored noopener"
+              data-product-name="Mini Precision Digital Scale 0.01g"
+              data-link-id="pocket_gram_scale"
+              data-context="ratio_calculator"
+              className="px-4 py-2 rounded-xl bg-amber-400/20 text-amber-gold hover:bg-amber-400/30 border border-amber-400/40 font-extrabold text-[11px] uppercase tracking-wider transition-all whitespace-nowrap flex-shrink-0"
+            >
+              Check Scale on Amazon ↗
+            </a>
+          </div>
+        </div>
+      ) : (
+        /* Tea Steeping Ratios & Contextual Kettle Affiliate Callout */
+        <div className="mt-6 p-4 rounded-2xl bg-black/60 border border-sage-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center space-x-2 text-stone-300">
+            <Thermometer className="w-4 h-4 text-sage-300 flex-shrink-0" />
+            <span>Tea extraction relies on variable water temperature control (160°F - 212°F).</span>
+          </div>
+          <a
+            href="https://www.amazon.com/s?k=Fellow+Stagg+EKG+Electric+Gooseneck+Kettle&tag=thebrewapp13-20"
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            data-product-name="Fellow Stagg EKG Gooseneck Kettle"
+            data-link-id="fellow_stagg_ekg"
+            data-context="tea_ratio_calculator"
+            className="px-4 py-2 rounded-xl bg-sage-500/20 text-sage-300 hover:bg-sage-500/30 border border-sage-500/40 font-extrabold text-[11px] uppercase tracking-wider transition-all whitespace-nowrap flex-shrink-0"
           >
-            Snap to Golden Ratio (1 : 16)
-          </button>
+            Check Kettle on Amazon ↗
+          </a>
         </div>
       )}
 
