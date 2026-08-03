@@ -764,7 +764,7 @@ export const MASTERCLASSES = [
     method: 'Pour-Over',
     title: 'Pour-Over Concentric Pouring & V60 Technique',
     duration: '4:15',
-    thumbnail: './pour_over_hero.jpg',
+    thumbnail: './pourover_technique_thumb.jpg',
     embedId: 'AI4ynXzkSQo',
     description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in V60 and Chemex drippers.',
     keyTakeaways: [
@@ -779,7 +779,7 @@ export const MASTERCLASSES = [
     method: 'Pour-Over',
     title: 'Preferred Single-Origin Beans for Pour-Over Clarity',
     duration: '5:04',
-    thumbnail: './pour_over_hero.jpg',
+    thumbnail: './pourover_beans_thumb.jpg',
     embedId: '1oB1oDrDkHM',
     description: 'Discover why high-altitude washed Ethiopian Yirgacheffe and Kenyan SL-28 excel under paper filter filtration.',
     keyTakeaways: [
@@ -794,7 +794,7 @@ export const MASTERCLASSES = [
     method: 'Pour-Over',
     title: 'The Golden Ratio of Coffee Brewing (1:16 & SCA Golden Cup Standard)',
     duration: '5:10',
-    thumbnail: './pour_over_hero.jpg',
+    thumbnail: './golden_ratio_thumb.jpg',
     embedId: '1oB1oDrDkHM',
     description: 'Learn why the 1:16 coffee-to-water ratio is called the Golden Ratio by World Barista Champions and how it targets 18%-22% extraction yield.',
     keyTakeaways: [
