@@ -1,8 +1,12 @@
-import React from 'react';
-import { Thermometer, Gauge, Sparkles, Droplets, HeartHandshake } from 'lucide-react';
+import React, { useState } from 'react';
+import { Thermometer, Gauge, Sparkles, Droplets, HeartHandshake, Lightbulb } from 'lucide-react';
+import V60ProTipModal from './V60ProTipModal';
 
 export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
   const isCoffee = trackMode === 'coffee';
+  const isPourOver = activeMethod?.id === 'pour_over';
+  const [isProTipOpen, setIsProTipOpen] = useState(false);
+
   const heroImage = activeMethod?.heroImage || (isCoffee ? './coffee_setup.jpg' : './tea_kettle.jpg');
 
   const isMetric = unitSystem === 'metric';
@@ -32,13 +36,27 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
 
       {/* Hero Content Overlay */}
       <div className="relative z-10 p-8 md:p-12 lg:p-14 max-w-3xl">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-xl text-xs uppercase tracking-widest font-extrabold mb-4 text-cream-light border border-white/20 shadow-lg">
-          <Sparkles className={`w-3.5 h-3.5 ${isCoffee ? 'text-amber-gold' : 'text-sage-300'}`} />
-          <span>{isCoffee ? 'Method Specifications & Preferred Beans' : 'Method Specifications & Preferred Leaves'}</span>
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-xl text-xs uppercase tracking-widest font-extrabold text-cream-light border border-white/20 shadow-lg">
+            <Sparkles className={`w-3.5 h-3.5 ${isCoffee ? 'text-amber-gold' : 'text-sage-300'}`} />
+            <span>{isCoffee ? 'Method Specifications & Preferred Beans' : 'Method Specifications & Preferred Leaves'}</span>
+          </div>
+
+          {/* Pro Tip Button for Pour-Over */}
+          {isPourOver && (
+            <button
+              onClick={() => setIsProTipOpen(true)}
+              className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-amber-gold text-espresso-950 hover:bg-amber-gold/90 font-extrabold text-xs uppercase tracking-wider shadow-xl hover:scale-105 active:scale-95 transition-all animate-pulse"
+              title="Open 1-Cup V60 Pro Tip Technique & Temperature Guide"
+            >
+              <Lightbulb className="w-3.5 h-3.5 fill-current text-espresso-950" />
+              <span>Pro Tip 💡</span>
+            </button>
+          )}
         </div>
 
-        <h2 className="font-serif text-3xl md:text-5xl lg:text-6xl font-extrabold text-cream-light tracking-wide mb-4 leading-tight drop-shadow-lg">
-          {activeMethod?.name || 'Specialty Extraction'}
+        <h2 className="font-serif text-3xl md:text-5xl lg:text-6xl font-extrabold text-cream-light tracking-wide mb-4 leading-tight drop-shadow-lg flex items-center justify-between">
+          <span>{activeMethod?.name || 'Specialty Extraction'}</span>
         </h2>
 
         <p className="text-sm md:text-base text-cream-soft/90 leading-relaxed mb-6 max-w-xl font-medium drop-shadow-md">
@@ -68,34 +86,26 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
             </div>
           </div>
 
-          <div className="glass-panel p-4 rounded-2xl flex items-center space-x-3.5 col-span-2 sm:col-span-1 hover:-translate-y-1 transition-all duration-300">
+          <div className="glass-panel p-4 rounded-2xl flex items-center space-x-3.5 hover:-translate-y-1 transition-all duration-300 col-span-2 sm:col-span-1">
             <div className={`p-3 rounded-xl shadow-inner ${isCoffee ? 'bg-amber-gold/25 text-amber-gold border border-amber-gold/30' : 'bg-sage-500/25 text-sage-300 border border-sage-500/30'}`}>
               <Droplets className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[10px] text-cream-soft/60 uppercase font-bold tracking-wider">Extraction Ratio</div>
-              <div className="text-base font-extrabold text-cream-light font-mono">
-                {isCoffee ? `1 : ${activeMethod?.ratio || 15}` : `1g / ${activeMethod?.ratio || 50}ml`}
-              </div>
+              <div className="text-[10px] text-cream-soft/60 uppercase font-bold tracking-wider">Ratio</div>
+              <div className="text-base font-extrabold text-cream-light font-mono">1 : {activeMethod?.ratio || 15}</div>
             </div>
           </div>
 
         </div>
 
-        {/* PREFERRED COFFEE / TEA TYPES FOR THIS METHOD */}
-        {activeMethod?.preferredCoffeeTypes && (
-          <div className="p-4 rounded-2xl bg-black/60 border border-amber-gold/30 shadow-xl backdrop-blur-md">
-            <div className="flex items-center space-x-2 text-xs font-extrabold uppercase tracking-wider text-amber-gold mb-1.5">
-              <HeartHandshake className="w-4 h-4 text-amber-gold" />
-              <span>{isCoffee ? `Preferred Coffee Beans & Origins for ${activeMethod?.name}:` : `Preferred Tea Leaf Varieties for ${activeMethod?.name}:`}</span>
-            </div>
-            <p className="text-xs text-cream-soft/90 font-medium leading-relaxed">
-              {activeMethod?.preferredCoffeeTypes}
-            </p>
-          </div>
-        )}
-
       </div>
+
+      {/* V60 Pro Tip Masterclass Modal Popup */}
+      <V60ProTipModal
+        isOpen={isProTipOpen}
+        onClose={() => setIsProTipOpen(false)}
+      />
+
     </section>
   );
 }

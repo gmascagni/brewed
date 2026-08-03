@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft, BookOpen } from 'lucide-react';
 import { playPhaseChime, playCompletionChime, stopCompletionChime } from '../utils/audioSynth';
+import V60ProTipModal from './V60ProTipModal';
 
 export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, isMuted, onPrevStep, onOpenJournal }) {
   const isCoffee = trackMode === 'coffee';
@@ -93,6 +94,9 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
   const targetPhaseWaterMl = activePhase?.waterMultiplier ? Math.round(dryDoseGrams * activePhase.waterMultiplier) : null;
 
+  const isPourOver = activeMethod?.id === 'pour_over';
+  const [isProTipOpen, setIsProTipOpen] = useState(false);
+
   return (
     <div className={`p-8 md:p-10 lg:p-12 rounded-3xl ${isCoffee ? 'glass-panel-amber' : 'glass-panel-sage'} shadow-2xl transition-all duration-500 relative overflow-hidden`}>
       
@@ -100,7 +104,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/[0.08]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-white/[0.08]">
         <div>
           <h3 className="font-serif text-3xl font-bold text-cream-light flex items-center gap-3 drop-shadow-md">
             <TimerIcon className={`w-7 h-7 ${isCoffee ? 'text-amber-gold' : 'text-sage-300'}`} />
@@ -108,6 +112,17 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
           </h3>
           <p className="text-xs md:text-sm text-stone-300 mt-1">Audio/visual countdown guiding blooming, steep, and drawdown phases</p>
         </div>
+
+        {/* Pro Tip Button for Pour-Over */}
+        {isPourOver && (
+          <button
+            onClick={() => setIsProTipOpen(true)}
+            className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-amber-gold text-espresso-950 hover:bg-amber-gold/90 font-extrabold text-xs uppercase tracking-wider shadow-xl hover:scale-105 active:scale-95 transition-all whitespace-nowrap animate-pulse"
+            title="Open 1-Cup V60 Pro Tip Technique & Temperature Guide"
+          >
+            <span>Pro Tip 💡</span>
+          </button>
+        )}
 
         <span className={`text-xs font-mono font-extrabold tracking-wider uppercase px-4 py-1.5 rounded-full border shadow-inner ${
           isRunning 
@@ -295,6 +310,12 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
           </button>
         )}
       </div>
+
+      {/* V60 Pro Tip Masterclass Modal Popup */}
+      <V60ProTipModal
+        isOpen={isProTipOpen}
+        onClose={() => setIsProTipOpen(false)}
+      />
 
     </div>
   );
