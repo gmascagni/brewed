@@ -26,14 +26,43 @@ export default function MethodSelectorGrid({ trackMode, methods, activeMethod, s
         </div>
 
         <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-extrabold text-cream-light mb-3 leading-tight drop-shadow">
-          {isCoffee ? 'Select Your Craft Extraction Vessel' : 'Select Your Specialty Tea Varietal'}
+          Master the Craft of Coffee & Tea Extraction
         </h2>
         
-        <p className="text-xs md:text-sm text-stone-300 max-w-3xl leading-relaxed font-normal">
-          {isCoffee
-            ? 'Each specialty brewing device governs fluid dynamics, paper filtration friction, and steep geometry. Choose below to tailor water ratios, burr coarseness, and phase-by-phase extraction timers.'
-            : 'Select a tea category to calibrate leaf-to-water ratios, gaiwan preheating, and exact temperature steep cycles.'}
+        <p className="text-xs md:text-sm text-stone-300 max-w-3xl leading-relaxed font-normal mb-8">
+          Precision specialty coffee ratio calculator, fine tea steeping timers, micron-level grind sizing, and troubleshooting guide. Select your brewing path below:
         </p>
+
+        {/* Dual-Path Entry Cards: The Coffee Lab vs The Tea Room */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className={`p-6 rounded-2xl border transition-all ${
+            isCoffee ? 'bg-amber-500/20 border-amber-gold text-cream-light ring-2 ring-amber-gold/40 shadow-xl' : 'bg-black/40 border-white/10 opacity-70 hover:opacity-100'
+          }`}>
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="p-2.5 rounded-xl bg-amber-gold/20 text-amber-gold border border-amber-gold/30">
+                <Coffee className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-cream-light">The Coffee Lab</h3>
+                <p className="text-[11px] text-stone-300">SCA Ratios, Burr Grinders & Pour Over</p>
+              </div>
+            </div>
+          </div>
+
+          <div className={`p-6 rounded-2xl border transition-all ${
+            !isCoffee ? 'bg-sage-500/20 border-sage-400 text-cream-light ring-2 ring-sage-400/40 shadow-xl' : 'bg-black/40 border-white/10 opacity-70 hover:opacity-100'
+          }`}>
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="p-2.5 rounded-xl bg-sage-500/20 text-sage-300 border border-sage-500/30">
+                <Leaf className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-cream-light">The Tea Room</h3>
+                <p className="text-[11px] text-stone-300">Gongfu Gaiwan, Steeping Presets & Terroirs</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Grid of Devices / Teas */}
