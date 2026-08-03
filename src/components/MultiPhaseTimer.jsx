@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft, BookOpen } from 'lucide-react';
-import { playPhaseChime, playCompletionChime } from '../utils/audioSynth';
+import { playPhaseChime, playCompletionChime, stopCompletionChime } from '../utils/audioSynth';
 
 export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, isMuted, onPrevStep, onOpenJournal }) {
   const isCoffee = trackMode === 'coffee';
@@ -16,6 +16,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
   // Reset timer when method changes
   useEffect(() => {
+    stopCompletionChime();
     setCurrentPhaseIndex(0);
     setTimeLeft(phases[0]?.durationSec || 60);
     setIsRunning(false);
@@ -62,6 +63,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
   // Reset Timer handler
   const handleReset = () => {
+    stopCompletionChime();
     setIsRunning(false);
     setIsCompleted(false);
     setCurrentPhaseIndex(0);
