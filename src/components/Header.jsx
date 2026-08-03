@@ -18,8 +18,11 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
             {isCoffee ? <Coffee className="w-6 h-6 animate-pulse" /> : <Leaf className="w-6 h-6 animate-pulse" />}
           </div>
           <div>
-            <h1 className="font-serif text-2xl md:text-3xl font-extrabold tracking-wide text-cream-light flex items-center gap-2 drop-shadow-md">
-              The Brew App <span className="text-[10px] uppercase font-mono tracking-[0.2em] px-2.5 py-1 rounded-full bg-white/[0.08] text-cream-light border border-white/[0.12] shadow-inner">Extraction Master</span>
+            <h1 className="font-serif text-2xl md:text-3xl font-extrabold tracking-wide text-cream-light flex flex-wrap items-center gap-2 drop-shadow-md">
+              <span>The Brew App</span>
+              <span className="text-[10px] uppercase font-mono tracking-[0.15em] px-2.5 py-0.5 rounded-full bg-white/[0.08] text-amber-gold border border-amber-400/30 shadow-inner whitespace-nowrap flex-shrink-0">
+                Extraction Master
+              </span>
             </h1>
             <p className="text-xs text-stone-400 font-medium">Precision Specialty Coffee & Fine Tea at Home</p>
           </div>
