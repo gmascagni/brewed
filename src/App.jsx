@@ -17,6 +17,7 @@ import UserProfileDashboard from './components/UserProfileDashboard';
 import GlobalSearchModal from './components/GlobalSearchModal';
 import AuthModal from './components/AuthModal';
 import BrewMasterCommunity from './components/BrewMasterCommunity';
+import AdminConsoleModal from './components/AdminConsoleModal';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
@@ -28,16 +29,43 @@ export default function App() {
   const [isMuted, setIsMuted] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1 | 2 | 3 | 4
 
-  // User Profile & Account State
-  const [currentUser, setCurrentUser] = useState({
-    username: '@barista_clara',
-    displayName: 'Clara Vance',
-    email: 'clara@specialtybrew.org',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    bio: 'Specialty Coffee Association Certified Barista • Obsessed with high-altitude washed Ethiopians & 1:16 pour-overs.',
-    streakDays: 14,
-    totalBrewsLogged: 142
-  });
+  // User Accounts & Admin Moderation State
+  const [usersList, setUsersList] = useState([
+    {
+      username: '@site_admin',
+      displayName: 'Platform Admin',
+      email: 'admin@thebrew.app',
+      avatar: './avatar_roast_beans.jpg',
+      bio: 'Master Administrator of The Brew App',
+      role: 'admin',
+      streakDays: 30,
+      totalBrewsLogged: 500
+    },
+    {
+      username: '@barista_clara',
+      displayName: 'Clara Vance',
+      email: 'clara@specialtybrew.org',
+      avatar: './avatar_cartoon_female_barista.jpg',
+      bio: 'Specialty Coffee Association Certified Barista • Obsessed with high-altitude washed Ethiopians & 1:16 pour-overs.',
+      role: 'user',
+      streakDays: 14,
+      totalBrewsLogged: 142
+    },
+    {
+      username: '@coffee_guru',
+      displayName: 'James Hoffmann Fan',
+      email: 'guru@coffee.org',
+      avatar: './avatar_cartoon_male_barista.jpg',
+      bio: 'Immersion & V60 Pour-Over Enthusiast',
+      role: 'user',
+      streakDays: 8,
+      totalBrewsLogged: 64
+    }
+  ]);
+
+  // Currently Active Logged In User
+  const [currentUser, setCurrentUser] = useState(usersList[0]); // Default logged-in as Site Admin
+  const isAdmin = currentUser?.role === 'admin';
 
   // Platform Modal States
   const [isJournalOpen, setIsJournalOpen] = useState(false);
@@ -45,6 +73,7 @@ export default function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isRecipeBuilderOpen, setIsRecipeBuilderOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
   // Active Method & Scaling State
   const methods = BREW_METHODS[trackMode] || BREW_METHODS.coffee;
@@ -83,6 +112,10 @@ export default function App() {
     trackEvent('select_method', { method_id: method.id, method_name: method.name });
   };
 
+  const handleDeleteUser = (usernameToDelete) => {
+    setUsersList(usersList.filter((u) => u.username !== usernameToDelete));
+  };
+
   const isCoffee = trackMode === 'coffee';
   const currentActiveMethod = activeMethod || (methods.length > 0 ? methods[0] : null);
 
@@ -114,6 +147,8 @@ export default function App() {
           if (commElem) commElem.scrollIntoView({ behavior: 'smooth' });
         }}
         onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenAdmin={() => setIsAdminModalOpen(true)}
+        isAdmin={isAdmin}
       />
 
       {/* Main Container */}
@@ -291,7 +326,20 @@ export default function App() {
             isOpen={isAuthModalOpen}
             onClose={() => setIsAuthModalOpen(false)}
             currentUser={currentUser}
-            onSaveProfile={(updatedUser) => setCurrentUser(updatedUser)}
+            onSaveProfile={(updatedUser) => {
+              setCurrentUser(updatedUser);
+              setUsersList([updatedUser, ...usersList.filter((u) => u.username !== updatedUser.username)]);
+            }}
+          />
+
+          {/* 8. Admin Moderation Console Modal */}
+          <AdminConsoleModal
+            isOpen={isAdminModalOpen}
+            onClose={() => setIsAdminModalOpen(false)}
+            users={usersList}
+            onDeleteUser={handleDeleteUser}
+            posts={[]}
+            onDeletePost={() => {}}
           />
 
         </main>
@@ -304,7 +352,7 @@ export default function App() {
               <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
             </div>
             <div className="text-cream-soft/40">
-              The Brew Master Community Forum • Community Recipe Exchange • User Accounts • Analytics Enabled
+              Admin Moderation Console • Strict Profile Ownership Security • Analytics Enabled
             </div>
           </div>
         </footer>

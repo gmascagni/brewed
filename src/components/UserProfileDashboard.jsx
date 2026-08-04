@@ -19,6 +19,8 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
     unlockedBadgeIds: ['first_brew', 'golden_ratio_master', 'streak_3_days', 'streak_7_days', 'pour_over_aficionado']
   };
 
+  // Strict Ownership Security: Only allow editing if currentUser matches the profile
+  const isOwnProfile = currentUser && (currentUser.username === profile.username || currentUser.email === profile.email);
   const unlockedBadgeIds = profile.unlockedBadgeIds || ['first_brew', 'golden_ratio_master', 'streak_3_days', 'streak_7_days', 'pour_over_aficionado'];
 
   return (
@@ -52,18 +54,19 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
 
               <div className="flex items-center justify-center gap-2">
                 <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-gold border border-amber-400/40 text-xs font-mono font-bold">
-                  Tastemaker Status
+                  {isOwnProfile ? 'Your Active Account' : 'Public Profile (Read-Only)'}
                 </span>
-                {onOpenAuth && (
+                {isOwnProfile && onOpenAuth && (
                   <button
                     onClick={() => {
                       onClose();
                       onOpenAuth();
                     }}
-                    className="p-1.5 rounded-xl bg-white/10 text-amber-gold hover:bg-white/20 border border-amber-gold/30 transition-all"
-                    title="Edit Profile Info & Avatar"
+                    className="p-1.5 rounded-xl bg-white/10 text-amber-gold hover:bg-white/20 border border-amber-gold/30 transition-all flex items-center gap-1 text-xs font-bold font-mono"
+                    title="Edit Your Profile Info & Avatar"
                   >
-                    <Edit3 className="w-4 h-4" />
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Edit Profile</span>
                   </button>
                 )}
               </div>

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Coffee, Leaf, Volume2, VolumeX, Scale, BookOpen, ShoppingBag, Search, User, Users } from 'lucide-react';
+import { Coffee, Leaf, Volume2, VolumeX, Scale, BookOpen, ShoppingBag, Search, User, Users, ShieldCheck } from 'lucide-react';
 
-export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenAuth }) {
+export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenAuth, onOpenAdmin, isAdmin }) {
   const isCoffee = trackMode === 'coffee';
 
   return (
@@ -18,36 +18,36 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
             {isCoffee ? <Coffee className="w-6 h-6 animate-pulse" /> : <Leaf className="w-6 h-6 animate-pulse" />}
           </div>
           <div>
-            <h1 className="font-serif text-2xl md:text-3xl font-extrabold tracking-wide text-cream-light flex flex-wrap items-center gap-2 drop-shadow-md">
+            <h1 className="font-serif text-2xl font-bold tracking-wider text-cream-light flex items-center gap-2">
               <span>The Brew App</span>
-              <span className="text-[10px] uppercase font-mono tracking-[0.15em] px-2.5 py-0.5 rounded-full bg-white/[0.08] text-amber-gold border border-amber-400/30 shadow-inner whitespace-nowrap flex-shrink-0">
+              <span className="whitespace-nowrap flex-shrink-0 text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/40">
                 Extraction Master
               </span>
             </h1>
-            <p className="text-xs text-stone-400 font-medium">Precision Specialty Coffee & Fine Tea at Home</p>
+            <p className="text-[11px] text-stone-400 font-mono">Precision Specialty Coffee & Fine Tea at Home</p>
           </div>
         </div>
 
         {/* Center Track Mode Switcher: The Coffee Lab vs The Tea Room */}
-        <div className="flex items-center bg-[#14110E] p-1.5 rounded-2xl border border-white/[0.12] shadow-2xl backdrop-blur-xl relative">
+        <div className="flex items-center p-1.5 rounded-2xl bg-[#14110E] border border-white/[0.12] shadow-inner text-xs font-bold">
           <button
             onClick={() => setTrackMode('coffee')}
-            className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-              isCoffee
-                ? 'btn-tactile-amber text-espresso-950 scale-105 shadow-lg'
+            className={`flex items-center space-x-2 px-5 py-2 rounded-xl transition-all duration-300 ${
+              isCoffee 
+                ? 'btn-tactile-amber text-espresso-950 scale-105 shadow-lg' 
                 : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.05]'
             }`}
-            title="Switch to The Coffee Lab: Grind Sizes, SCA Ratios & Extraction Science"
+            title="Switch to The Coffee Lab: Pour Over, French Press, Espresso & Ratios"
           >
             <Coffee className="w-4 h-4" />
             <span>The Coffee Lab</span>
           </button>
-          
+
           <button
             onClick={() => setTrackMode('tea')}
-            className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-              !isCoffee
-                ? 'btn-tactile-sage text-cream-light scale-105 shadow-lg'
+            className={`flex items-center space-x-2 px-5 py-2 rounded-xl transition-all duration-300 ${
+              !isCoffee 
+                ? 'btn-tactile-sage text-cream-light scale-105 shadow-lg' 
                 : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.05]'
             }`}
             title="Switch to The Tea Room: Gongfu Gaiwan, Steeping Timers & Leaf Profiles"
@@ -57,9 +57,21 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
           </button>
         </div>
 
-        {/* Right Action Bar (Search, Profile, Brew Journal, Shop Gear, Unit Toggle & Mute) */}
-        <div className="flex items-center space-x-2.5">
+        {/* Right Action Bar (Search, Profile, Admin, Brew Journal, Shop Gear, Unit Toggle & Mute) */}
+        <div className="flex items-center space-x-2">
           
+          {/* Admin Console Button (Only visible for Admins) */}
+          {onOpenAdmin && (
+            <button
+              onClick={onOpenAdmin}
+              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono font-bold text-xs hover:bg-rose-500/30 transition-all active:scale-95 shadow-lg"
+              title="Open Admin Moderation Console (Manage Users & Posts)"
+            >
+              <ShieldCheck className="w-4 h-4 text-rose-400" />
+              <span className="hidden xl:inline">Admin</span>
+            </button>
+          )}
+
           {/* Global Search Button */}
           {onOpenSearch && (
             <button
