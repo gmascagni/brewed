@@ -55,11 +55,11 @@ export default function App() {
 
   // Currently Active Logged In User (Null by default for guest visitors)
   const [currentUser, setCurrentUser] = useState(null); 
-  const isAdmin = currentUser !== null && (
+  const isAdmin = Boolean(currentUser && (
     currentUser.username?.toLowerCase() === '@clpiken' ||
     currentUser.email?.toLowerCase().includes('clpiken') ||
     currentUser.role === 'admin'
-  );
+  ));
 
   // Platform Modal States
   const [isJournalOpen, setIsJournalOpen] = useState(false);
@@ -111,7 +111,11 @@ export default function App() {
   };
 
   const isCoffee = trackMode === 'coffee';
-  const currentActiveMethod = activeMethod || (methods.length > 0 ? methods[0] : null);
+  
+  // Guarantee active method belongs to current track
+  const currentActiveMethod = (activeMethod && methods.some(m => m.id === activeMethod.id))
+    ? activeMethod
+    : (methods.length > 0 ? methods[0] : null);
 
   // Calculated Water Volume & Dose
   const effectiveRatio = customRatio !== null ? customRatio : (currentActiveMethod?.ratio || 15);
