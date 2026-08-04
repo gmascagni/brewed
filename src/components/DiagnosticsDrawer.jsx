@@ -18,13 +18,15 @@ export default function DiagnosticsDrawer({ trackMode }) {
           </div>
           <div>
             <h3 className="font-serif text-2xl font-bold text-cream-light flex items-center gap-3">
-              <span>Coffee & Tea Extraction Diagnostics</span>
+              <span>{isCoffee ? 'Coffee Extraction Diagnostics' : 'Tea Extraction Diagnostics'}</span>
               <span className="text-[10px] uppercase font-mono tracking-[0.2em] px-3 py-1 rounded-full bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 font-extrabold">
                 Troubleshooting & Water
               </span>
             </h3>
             <p className="text-xs md:text-sm text-stone-300 mt-1 font-normal">
-              Diagnose flavor defects (sourness, bitterness, astringency, weakness) and calibrate Burr Grinder coarseness and water TDS/pH.
+              {isCoffee
+                ? 'Diagnose coffee flavor defects (sourness, bitterness, astringency, weakness) and calibrate Burr Grinder coarseness and water TDS/pH.'
+                : 'Diagnose tea flavor defects (tannin bitterness, flat steep, over-steeping) and calibrate water temperature, leaf ratio & steeping timings.'}
             </p>
           </div>
         </div>

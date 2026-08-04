@@ -213,6 +213,12 @@ export default function App() {
             />
           </div>
 
+          {/* 1. Dedicated Diagnostics Drawer (Taste Troubleshooting & Water Chemistry) */}
+          <DiagnosticsDrawer trackMode={trackMode} />
+
+          {/* 2. Dedicated Knowledge Base Drawer (Terroir Atlas & Agronomy) */}
+          <KnowledgeBaseDrawer trackMode={trackMode} />
+
           {/* Amazon Affiliate "Brew Essentials Kit & Shop" Section */}
           <div id="brew-shop-section">
             <ShopDrawer
@@ -220,12 +226,6 @@ export default function App() {
               activeMethod={currentActiveMethod}
             />
           </div>
-
-          {/* 1. Dedicated Diagnostics Drawer (Taste Troubleshooting & Water Chemistry) */}
-          <DiagnosticsDrawer trackMode={trackMode} />
-
-          {/* 2. Dedicated Knowledge Base Drawer (Terroir Atlas & Agronomy) */}
-          <KnowledgeBaseDrawer trackMode={trackMode} />
 
           {/* 3. Personal Tasting Journal & Golden Cup Log Modal */}
           <BrewJournal
