@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { X, User, Mail, Lock, Shield, Sparkles, CheckCircle2, Edit3, Camera, Image, LogOut } from 'lucide-react';
+import { X, User, Mail, Lock, Shield, Sparkles, CheckCircle2, Edit3, Camera, Image, LogOut, AlertCircle } from 'lucide-react';
 import { AVATAR_PRESETS } from '../data/avatarPresets';
 import { trackEvent } from '../utils/analytics';
 
-export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile, onLogout }) {
+export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile, onLogout, usersList }) {
   if (!isOpen) return null;
 
   const [mode, setMode] = useState(currentUser ? 'edit' : 'login'); // 'login' | 'signup' | 'edit'
@@ -13,34 +13,88 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
   const [displayName, setDisplayName] = useState(currentUser?.displayName || '');
   const [bio, setBio] = useState(currentUser?.bio || '');
   const [avatar, setAvatar] = useState(currentUser?.avatar || AVATAR_PRESETS[0].url);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleAuthSubmit = (e) => {
     e.preventDefault();
+    setErrorMessage('');
 
-    if (!email) {
-      alert('Please enter a valid email address.');
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) {
+      setErrorMessage('Please enter a valid email address.');
       return;
     }
 
-    const cleanHandle = username.startsWith('@') ? username : `@${username || email.split('@')[0]}`;
-    
-    const isMasterAdmin = cleanHandle.toLowerCase() === '@clpiken' || email.toLowerCase().includes('clpiken');
-    
-    const userObj = {
-      email: email.trim(),
-      username: cleanHandle,
-      displayName: displayName.trim() || email.split('@')[0],
-      bio: bio.trim() || 'Specialty Coffee & Fine Tea Enthusiast',
-      avatar: avatar || AVATAR_PRESETS[0].url,
-      role: isMasterAdmin ? 'admin' : 'user',
-      streakDays: currentUser?.streakDays || 1,
-      totalBrewsLogged: currentUser?.totalBrewsLogged || 1
-    };
+    // SIGN IN MODE: Must match an existing registered account in usersList!
+    if (mode === 'login') {
+      const existingUser = (usersList || []).find(
+        (u) => u.email.toLowerCase() === cleanEmail || u.username.toLowerCase() === `@${cleanEmail.replace('@', '')}`
+      );
 
-    onSaveProfile(userObj);
-    trackEvent(mode === 'signup' ? 'user_signup' : 'user_login', { username: userObj.username });
-    alert(mode === 'signup' ? `Account registered as ${userObj.displayName} (${userObj.username})!` : `Logged in as ${userObj.displayName} (${userObj.username})!`);
-    onClose();
+      if (!existingUser) {
+        setErrorMessage(`No account found for "${email}". Please click "Create Account" below to register first!`);
+        return;
+      }
+
+      onSaveProfile(existingUser);
+      trackEvent('user_login', { username: existingUser.username });
+      alert(`Welcome back, ${existingUser.displayName} (${existingUser.username})!`);
+      onClose();
+      return;
+    }
+
+    // CREATE ACCOUNT MODE: Register new account
+    if (mode === 'signup') {
+      const cleanHandle = username.trim().startsWith('@') ? username.trim() : `@${username.trim() || cleanEmail.split('@')[0]}`;
+      const duplicateUser = (usersList || []).find(
+        (u) => u.email.toLowerCase() === cleanEmail || u.username.toLowerCase() === cleanHandle.toLowerCase()
+      );
+
+      if (duplicateUser) {
+        setErrorMessage(`An account already exists for ${cleanEmail} (${cleanHandle}). Please switch to "Sign In".`);
+        return;
+      }
+
+      const isMasterAdmin = cleanHandle.toLowerCase() === '@clpiken' || cleanEmail.includes('clpiken');
+
+      const newUserObj = {
+        email: cleanEmail,
+        username: cleanHandle,
+        displayName: displayName.trim() || cleanEmail.split('@')[0],
+        bio: bio.trim() || 'Specialty Coffee & Fine Tea Enthusiast',
+        avatar: avatar || AVATAR_PRESETS[0].url,
+        role: isMasterAdmin ? 'admin' : 'user',
+        streakDays: 1,
+        totalBrewsLogged: 1
+      };
+
+      onSaveProfile(newUserObj);
+      trackEvent('user_signup', { username: newUserObj.username });
+      alert(`Account registered successfully as ${newUserObj.displayName} (${newUserObj.username})!`);
+      onClose();
+      return;
+    }
+
+    // EDIT PROFILE MODE
+    if (mode === 'edit') {
+      const cleanHandle = username.trim().startsWith('@') ? username.trim() : `@${username.trim() || cleanEmail.split('@')[0]}`;
+      const isMasterAdmin = cleanHandle.toLowerCase() === '@clpiken' || cleanEmail.includes('clpiken');
+
+      const updatedUserObj = {
+        ...currentUser,
+        email: cleanEmail,
+        username: cleanHandle,
+        displayName: displayName.trim() || cleanEmail.split('@')[0],
+        bio: bio.trim() || 'Specialty Coffee & Fine Tea Enthusiast',
+        avatar: avatar || AVATAR_PRESETS[0].url,
+        role: isMasterAdmin ? 'admin' : (currentUser?.role || 'user')
+      };
+
+      onSaveProfile(updatedUserObj);
+      trackEvent('update_profile', { username: updatedUserObj.username });
+      alert('Profile changes saved successfully!');
+      onClose();
+    }
   };
 
   return (
@@ -85,17 +139,17 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
         )}
 
         {/* Mode Switcher Pills */}
-        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-black/50 border border-white/10 mb-6 text-xs font-bold">
+        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-black/50 border border-white/10 mb-4 text-xs font-bold">
           <button
             type="button"
-            onClick={() => setMode('login')}
+            onClick={() => { setMode('login'); setErrorMessage(''); }}
             className={`flex-1 py-2 rounded-xl transition-all ${mode === 'login' ? 'bg-amber-gold text-espresso-950 shadow' : 'text-stone-400 hover:text-cream-light'}`}
           >
             Sign In
           </button>
           <button
             type="button"
-            onClick={() => setMode('signup')}
+            onClick={() => { setMode('signup'); setErrorMessage(''); }}
             className={`flex-1 py-2 rounded-xl transition-all ${mode === 'signup' ? 'bg-amber-gold text-espresso-950 shadow' : 'text-stone-400 hover:text-cream-light'}`}
           >
             Create Account
@@ -103,13 +157,21 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
           {currentUser && (
             <button
               type="button"
-              onClick={() => setMode('edit')}
+              onClick={() => { setMode('edit'); setErrorMessage(''); }}
               className={`flex-1 py-2 rounded-xl transition-all ${mode === 'edit' ? 'bg-amber-gold text-espresso-950 shadow' : 'text-stone-400 hover:text-cream-light'}`}
             >
               Edit Profile
             </button>
           )}
         </div>
+
+        {/* Error / Validation Alert Banner */}
+        {errorMessage && (
+          <div className="p-3 mb-4 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-mono flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-400" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
         <form onSubmit={handleAuthSubmit} className="space-y-4 text-xs">
           

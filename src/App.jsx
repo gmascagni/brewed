@@ -322,6 +322,7 @@ export default function App() {
             isOpen={isAuthModalOpen}
             onClose={() => setIsAuthModalOpen(false)}
             currentUser={currentUser}
+            usersList={usersList}
             onSaveProfile={(updatedUser) => {
               setCurrentUser(updatedUser);
               setUsersList([updatedUser, ...usersList.filter((u) => u.username !== updatedUser.username)]);
