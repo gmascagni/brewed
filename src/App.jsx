@@ -307,6 +307,7 @@ export default function App() {
             trackMode={trackMode}
             currentUser={currentUser}
             onOpenAuth={() => setIsAuthModalOpen(true)}
+            onLogout={() => setCurrentUser(null)}
           />
 
           {/* 6. Recipe Builder Modal */}

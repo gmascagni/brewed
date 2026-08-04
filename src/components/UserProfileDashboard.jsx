@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { X, User, Flame, Award, Sparkles, Coffee, Leaf, Shield, CheckCircle2, Bookmark, Edit3 } from 'lucide-react';
+import React from 'react';
+import { X, User, Flame, Award, Sparkles, Coffee, Leaf, Shield, CheckCircle2, Bookmark, Edit3, LogOut } from 'lucide-react';
 import { BADGES_DATA } from '../data/badgesData';
 
-export default function UserProfileDashboard({ isOpen, onClose, trackMode, currentUser, onOpenAuth }) {
+export default function UserProfileDashboard({ isOpen, onClose, trackMode, currentUser, onOpenAuth, onLogout }) {
   if (!isOpen) return null;
 
   const isCoffee = trackMode === 'coffee';
@@ -62,11 +62,24 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
                       onClose();
                       onOpenAuth();
                     }}
-                    className="p-1.5 rounded-xl bg-white/10 text-amber-gold hover:bg-white/20 border border-amber-gold/30 transition-all flex items-center gap-1 text-xs font-bold font-mono"
+                    className="p-1.5 px-3 rounded-xl bg-white/10 text-amber-gold hover:bg-white/20 border border-amber-gold/30 transition-all flex items-center gap-1 text-xs font-bold font-mono"
                     title="Edit Your Profile Info & Avatar"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
-                    <span>Edit Profile</span>
+                    <span>Edit</span>
+                  </button>
+                )}
+                {isOwnProfile && onLogout && (
+                  <button
+                    onClick={() => {
+                      onLogout();
+                      onClose();
+                    }}
+                    className="p-1.5 px-3 rounded-xl bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white border border-rose-500/40 transition-all flex items-center gap-1 text-xs font-bold font-mono"
+                    title="Sign Out of Your Account"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
                   </button>
                 )}
               </div>
