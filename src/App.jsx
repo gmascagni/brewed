@@ -95,6 +95,10 @@ export default function App() {
         }}
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenProfile={() => setIsProfileOpen(true)}
+        onOpenCommunity={() => {
+          const commElem = document.getElementById('community-section');
+          if (commElem) commElem.scrollIntoView({ behavior: 'smooth' });
+        }}
       />
 
       {/* Main Container */}
@@ -190,10 +194,12 @@ export default function App() {
           )}
 
           {/* Community Recipe Explorer & User Submissions */}
-          <RecipeExplorer
-            trackMode={trackMode}
-            onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
-          />
+          <div id="community-section">
+            <RecipeExplorer
+              trackMode={trackMode}
+              onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
+            />
+          </div>
 
           {/* Video Masterclass Tutorials for Selected Method */}
           <div className="mt-14">

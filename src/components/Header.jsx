@@ -1,7 +1,7 @@
 import React from 'react';
-import { Coffee, Leaf, Volume2, VolumeX, Scale, BookOpen, ShoppingBag, Search, User } from 'lucide-react';
+import { Coffee, Leaf, Volume2, VolumeX, Scale, BookOpen, ShoppingBag, Search, User, Users } from 'lucide-react';
 
-export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop, onOpenSearch, onOpenProfile }) {
+export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop, onOpenSearch, onOpenProfile, onOpenCommunity }) {
   const isCoffee = trackMode === 'coffee';
 
   return (
@@ -80,6 +80,18 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
             >
               <User className="w-4 h-4" />
               <span className="hidden md:inline">Profile</span>
+            </button>
+          )}
+
+          {/* Community Recipes & Exchange Button */}
+          {onOpenCommunity && (
+            <button
+              onClick={onOpenCommunity}
+              className="flex items-center space-x-1.5 px-3 py-2.5 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-gold font-extrabold text-xs hover:bg-amber-500/25 transition-all active:scale-95 shadow-lg"
+              title="Jump to Community Shared Recipes & User Submissions"
+            >
+              <Users className="w-4 h-4 text-amber-gold" />
+              <span className="font-bold uppercase tracking-wider hidden sm:inline">Community 🌐</span>
             </button>
           )}
           
