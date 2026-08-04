@@ -1,7 +1,7 @@
 import React from 'react';
-import { Coffee, Leaf, Volume2, VolumeX, Scale, BookOpen, ShoppingBag } from 'lucide-react';
+import { Coffee, Leaf, Volume2, VolumeX, Scale, BookOpen, ShoppingBag, Search, User } from 'lucide-react';
 
-export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop }) {
+export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop, onOpenSearch, onOpenProfile }) {
   const isCoffee = trackMode === 'coffee';
 
   return (
@@ -57,8 +57,31 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
           </button>
         </div>
 
-        {/* Right Action Bar (Brew Journal, Shop Gear, Unit Toggle & Mute) */}
-        <div className="flex items-center space-x-3">
+        {/* Right Action Bar (Search, Profile, Brew Journal, Shop Gear, Unit Toggle & Mute) */}
+        <div className="flex items-center space-x-2.5">
+          
+          {/* Global Search Button */}
+          {onOpenSearch && (
+            <button
+              onClick={onOpenSearch}
+              className="p-2.5 rounded-xl bg-[#1A1613] border border-white/[0.12] text-stone-300 hover:border-amber-gold/60 hover:text-amber-gold shadow-lg transition-all active:scale-95"
+              title="Global Search (Recipes, Gear, Devices, Terroirs)"
+            >
+              <Search className="w-4 h-4 text-amber-gold" />
+            </button>
+          )}
+
+          {/* User Profile & Badges Button */}
+          {onOpenProfile && (
+            <button
+              onClick={onOpenProfile}
+              className="flex items-center space-x-1.5 px-3 py-2.5 rounded-xl bg-amber-500/20 border border-amber-gold/50 text-amber-gold font-mono font-bold text-xs hover:bg-amber-500/30 transition-all active:scale-95 shadow-lg"
+              title="Open Tastemaker Profile, Streaks & Badges"
+            >
+              <User className="w-4 h-4" />
+              <span className="hidden md:inline">Profile</span>
+            </button>
+          )}
           
           {/* Shop Gear Button */}
           {onOpenShop && (

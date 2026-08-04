@@ -11,6 +11,10 @@ import KnowledgeBaseDrawer from './components/KnowledgeBaseDrawer';
 import DiagnosticsDrawer from './components/DiagnosticsDrawer';
 import ShopDrawer from './components/ShopDrawer';
 import BrewJournal from './components/BrewJournal';
+import RecipeExplorer from './components/RecipeExplorer';
+import RecipeBuilderModal from './components/RecipeBuilderModal';
+import UserProfileDashboard from './components/UserProfileDashboard';
+import GlobalSearchModal from './components/GlobalSearchModal';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
@@ -21,7 +25,12 @@ export default function App() {
   const [unitSystem, setUnitSystem] = useState('imperial'); // 'imperial' | 'metric'
   const [isMuted, setIsMuted] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1 | 2 | 3 | 4
+
+  // Platform Modal States
   const [isJournalOpen, setIsJournalOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isRecipeBuilderOpen, setIsRecipeBuilderOpen] = useState(false);
 
   // Active Method & Scaling State
   const methods = BREW_METHODS[trackMode] || BREW_METHODS.coffee;
@@ -38,7 +47,7 @@ export default function App() {
   // Initialize Analytics on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      initGA(window.GA_MEASUREMENT_ID || 'G-XXXXXXXXXX');
+      initGA(window.GA_MEASUREMENT_ID || 'G-VT2YZ4KHHB');
     }
   }, []);
 
@@ -49,134 +58,99 @@ export default function App() {
     setActiveMethod(newMethods[0]);
     setCustomRatio(null);
     setCustomWaterMl(null);
-    setActiveVideo(null);
-    setCurrentStep(1); // Reset to Step 1 on track switch
-    trackEvent('switch_track', { track: newTrack });
+    trackEvent('switch_track_mode', { track_mode: newTrack });
   };
 
-  // Sync active method selection
-  const handleMethodSelect = (method) => {
-    if (method) {
-      setActiveMethod(method);
-      setCustomRatio(null);
-      setCustomWaterMl(null);
-      setActiveVideo(null);
-      trackEvent('select_method', { method_id: method.id, method_name: method.name });
-    }
+  const handleSelectMethodFromGrid = (method) => {
+    setActiveMethod(method);
+    setCustomRatio(null);
+    setCustomWaterMl(null);
+    setCurrentStep(2);
+    trackEvent('select_method', { method_id: method.id, method_name: method.name });
   };
-
-  const handleScrollToShop = () => {
-    const shopElem = document.getElementById('brew-shop-section');
-    if (shopElem) {
-      shopElem.scrollIntoView({ behavior: 'smooth' });
-    }
-    trackEvent('open_shop');
-  };
-
-  // Ensure activeMethod always belongs to current trackMode methods
-  const currentActiveMethod = (activeMethod && methods.some(m => m.id === activeMethod.id))
-    ? activeMethod
-    : (methods[0] || BREW_METHODS.coffee[0]);
 
   const isCoffee = trackMode === 'coffee';
-  const heroImage = currentActiveMethod?.heroImage || (isCoffee ? './coffee_setup.jpg' : './tea_kettle.jpg');
+  const currentActiveMethod = activeMethod || (methods.length > 0 ? methods[0] : null);
 
-  // Math for dry dose calculation
-  const totalWaterMl = customWaterMl !== null ? customWaterMl : (cupCount * cupMl);
-  const ratio = customRatio || currentActiveMethod?.ratio || 15;
-  const dryDoseGrams = totalWaterMl / ratio;
+  // Calculated Water Volume & Dose
+  const effectiveRatio = customRatio !== null ? customRatio : (currentActiveMethod?.ratio || 15);
+  const calculatedTotalWaterMl = customWaterMl !== null ? customWaterMl : (cupCount * cupMl);
+  const dryDoseGrams = calculatedTotalWaterMl > 0 ? Math.round((calculatedTotalWaterMl / effectiveRatio) * 10) / 10 : 0;
 
   return (
-    <div className={`min-h-screen relative transition-colors duration-500 ${
-      isCoffee ? 'bg-[#0A0908] text-cream-soft' : 'bg-slate-950 text-cream-soft'
-    }`}>
+    <div className="min-h-screen bg-[#0A0908] text-cream-soft font-sans selection:bg-amber-gold selection:text-espresso-950 flex flex-col">
       
-      {/* Full-Page Dynamic Method Background Image */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <img
-          key={heroImage}
-          src={heroImage}
-          alt={currentActiveMethod?.name || 'Brew Background'}
-          className="w-full h-full object-cover object-center transform scale-105 filter brightness-[0.72] contrast-115 transition-all duration-1000 ease-in-out"
-        />
-        <div className={`absolute inset-0 ${
-          isCoffee
-            ? 'bg-gradient-to-b from-[#0A0908]/40 via-[#0A0908]/60 to-[#0A0908]/85'
-            : 'bg-gradient-to-b from-slate-950/40 via-slate-950/60 to-slate-950/85'
-        }`} />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-transparent via-black/20 to-black/70" />
-      </div>
+      {/* Sticky Header with Action Controls */}
+      <Header
+        trackMode={trackMode}
+        setTrackMode={handleTrackSwitch}
+        unitSystem={unitSystem}
+        setUnitSystem={setUnitSystem}
+        isMuted={isMuted}
+        setIsMuted={setIsMuted}
+        onOpenJournal={() => setIsJournalOpen(true)}
+        onOpenShop={() => {
+          const shopElem = document.getElementById('brew-shop-section');
+          if (shopElem) shopElem.scrollIntoView({ behavior: 'smooth' });
+        }}
+        onOpenSearch={() => setIsSearchOpen(true)}
+        onOpenProfile={() => setIsProfileOpen(true)}
+      />
 
-      {/* App Main Body Layer */}
-      <div className="relative z-10">
+      {/* Main Container */}
+      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
         
-        {/* 1. Header Bar */}
-        <Header
-          trackMode={trackMode}
-          setTrackMode={handleTrackSwitch}
-          unitSystem={unitSystem}
-          setUnitSystem={setUnitSystem}
-          isMuted={isMuted}
-          setIsMuted={setIsMuted}
-          onOpenJournal={() => setIsJournalOpen(true)}
-          onOpenShop={handleScrollToShop}
-        />
-
-        {/* 2. Top Sticky 4-Step Indicator Bar */}
+        {/* Step-by-Step Progress Bar */}
         <StepIndicator
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           trackMode={trackMode}
         />
 
-        {/* 3. Guided Wizard Step Container */}
-        <main key={`${trackMode}-${currentStep}`} className="max-w-7xl mx-auto px-4 lg:px-8 py-4">
-          
-          {/* STEP 01: CHOOSE METHOD */}
+        <main className="mt-8 space-y-12">
+
+          {/* STEP 01: ATELIER / METHOD SELECTOR */}
           {currentStep === 1 && (
             <MethodSelectorGrid
               trackMode={trackMode}
               methods={methods}
               activeMethod={currentActiveMethod}
-              setActiveMethod={handleMethodSelect}
+              setActiveMethod={handleSelectMethodFromGrid}
               onNextStep={() => setCurrentStep(2)}
               unitSystem={unitSystem}
             />
           )}
 
-          {/* STEP 02: RATIO & CUP SCALER */}
+          {/* STEP 02: PRECISION RATIO CALCULATOR & SCALER */}
           {currentStep === 2 && (
-            <PrecisionCalculator
-              trackMode={trackMode}
-              methods={methods}
-              activeMethod={currentActiveMethod}
-              setActiveMethod={handleMethodSelect}
-              cupCount={cupCount}
-              setCupCount={setCupCount}
-              cupMl={cupMl}
-              setCupMl={setCupMl}
-              customRatio={customRatio}
-              setCustomRatio={setCustomRatio}
-              customWaterMl={customWaterMl}
-              setCustomWaterMl={setCustomWaterMl}
-              unitSystem={unitSystem}
-              onPrevStep={() => setCurrentStep(1)}
-              onNextStep={() => setCurrentStep(3)}
-            />
+            <div className="animate-fade-in space-y-8">
+              <PrecisionCalculator
+                trackMode={trackMode}
+                activeMethod={currentActiveMethod}
+                cupCount={cupCount}
+                setCupCount={setCupCount}
+                cupMl={cupMl}
+                setCupMl={setCupMl}
+                customRatio={customRatio}
+                setCustomRatio={setCustomRatio}
+                customWaterMl={customWaterMl}
+                setCustomWaterMl={setCustomWaterMl}
+                unitSystem={unitSystem}
+                onNextStep={() => setCurrentStep(3)}
+                onPrevStep={() => setCurrentStep(1)}
+              />
+            </div>
           )}
 
-          {/* STEP 03: GRIND & BEAN SPECS */}
+          {/* STEP 03: METHOD SPECIFICATIONS, HERO & GRIND VISUALIZER */}
           {currentStep === 3 && (
-            <div className="space-y-8 animate-fade-in">
-              
-              {/* Method Specs & Preferred Roasts Hero Banner */}
+            <div className="animate-fade-in space-y-10">
               <HeroBanner
                 trackMode={trackMode}
                 activeMethod={currentActiveMethod}
                 unitSystem={unitSystem}
               />
 
-              {/* Coffee Grind Coarseness Visual Micron Reference (Coffee Track Only) */}
               {isCoffee && <GrindVisualGuide activeMethod={currentActiveMethod} />}
 
               {/* Step Navigation Controls */}
@@ -214,6 +188,12 @@ export default function App() {
               />
             </div>
           )}
+
+          {/* Community Recipe Explorer & User Submissions */}
+          <RecipeExplorer
+            trackMode={trackMode}
+            onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
+          />
 
           {/* Video Masterclass Tutorials for Selected Method */}
           <div className="mt-14">
@@ -253,6 +233,30 @@ export default function App() {
             unitSystem={unitSystem}
           />
 
+          {/* 4. Global Multi-Index Search Overlay */}
+          <GlobalSearchModal
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+            onSelectMethod={(method) => {
+              setActiveMethod(method);
+              setCurrentStep(2);
+            }}
+          />
+
+          {/* 5. User Profile & Badges Dashboard */}
+          <UserProfileDashboard
+            isOpen={isProfileOpen}
+            onClose={() => setIsProfileOpen(false)}
+            trackMode={trackMode}
+          />
+
+          {/* 6. Recipe Builder Modal */}
+          <RecipeBuilderModal
+            isOpen={isRecipeBuilderOpen}
+            onClose={() => setIsRecipeBuilderOpen(false)}
+            trackMode={trackMode}
+          />
+
         </main>
 
         {/* App Footer */}
@@ -263,7 +267,7 @@ export default function App() {
               <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
             </div>
             <div className="text-cream-soft/40">
-              Guided 4-Step Brewing Wizard • Amazon Affiliate Store • Personal Tasting Journal • Analytics Enabled
+              Community Recipe Exchange • Gamification Badges • Global Search • Amazon Affiliate Store • Analytics Enabled
             </div>
           </div>
         </footer>
