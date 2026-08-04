@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Users, MessageSquare, ThumbsUp, Plus, Sparkles, Coffee, Leaf, Tag, Shield, Send, X, ExternalLink } from 'lucide-react';
+import { Users, MessageSquare, ThumbsUp, Plus, Sparkles, Coffee, Leaf, Tag, Shield, Send, X, ExternalLink, CornerDownRight } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 
 export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
   const [activeForumTab, setActiveForumTab] = useState('coffee'); // 'coffee' | 'tea'
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('all'); // 'all' | 'gear' | 'beans' | 'teas' | 'experiences'
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+  const [activeCommentPost, setActiveCommentPost] = useState(null); // Post object for comments modal
+  const [commentInput, setCommentInput] = useState('');
 
-  // Mock Forum Posts State
+  // Mock Forum Posts State with Nested Comments
   const [posts, setPosts] = useState([
     {
       id: 'post_1',
@@ -21,8 +23,23 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
       content: 'After 6 months of daily V60 pour-overs, the degree-by-degree PID accuracy on the Fellow Stagg EKG made a night-and-day difference for 96°C light roast Ethiopian washed beans compared to standard stove kettles.',
       upvotes: 42,
       isUpvoted: false,
-      commentsCount: 12,
-      tags: ['FellowStagg', 'V60', 'GooseneckKettle']
+      tags: ['FellowStagg', 'V60', 'GooseneckKettle'],
+      comments: [
+        {
+          id: 'c1_1',
+          author: '@roast_master_sam',
+          authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+          text: 'Completely agree! The counterbalanced handle makes slow 5g/sec spiral pours practically effortless.',
+          timeAgo: '1 hour ago'
+        },
+        {
+          id: 'c1_2',
+          author: '@tea_master_lin',
+          authorAvatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+          text: 'It is fantastic for delicate green tea and Gongfu Gaiwans at 80°C too.',
+          timeAgo: '45 mins ago'
+        }
+      ]
     },
     {
       id: 'post_2',
@@ -36,8 +53,16 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
       content: 'Mindblowing jasmine aroma with candy-like peach acidity. Highly recommend 1:16.6 ratio at 94°C with a 45-second bloom for maximum extraction clarity.',
       upvotes: 28,
       isUpvoted: false,
-      commentsCount: 8,
-      tags: ['OnyxCoffee', 'EthiopiaYirgacheffe', 'SingleOrigin']
+      tags: ['OnyxCoffee', 'EthiopiaYirgacheffe', 'SingleOrigin'],
+      comments: [
+        {
+          id: 'c2_1',
+          author: '@barista_clara',
+          authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+          text: 'Tried this batch yesterday! The anaerobic fermentation brings out incredible mango and tropical acidity.',
+          timeAgo: '2 hours ago'
+        }
+      ]
     },
     {
       id: 'post_3',
@@ -51,8 +76,8 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
       content: 'Rolled tea pearls uncurling across 7 steeps. 1st steep flash rinse at 92°C yields buttery cream notes, 3rd steep opens up intense orchid honey floral aromatics.',
       upvotes: 35,
       isUpvoted: false,
-      commentsCount: 15,
-      tags: ['AlishanOolong', 'Gaiwan', 'GongfuTea']
+      tags: ['AlishanOolong', 'Gaiwan', 'GongfuTea'],
+      comments: []
     }
   ]);
 
@@ -72,6 +97,34 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
     trackEvent('upvote_forum_post', { post_id: postId });
   };
 
+  const handleAddComment = (e) => {
+    e.preventDefault();
+    if (!commentInput.trim() || !activeCommentPost) return;
+
+    const newCommentObj = {
+      id: `comm_${Date.now()}`,
+      author: currentUser?.username || '@brew_master',
+      authorAvatar: currentUser?.avatar || './avatar_barista.jpg',
+      text: commentInput.trim(),
+      timeAgo: 'Just now'
+    };
+
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === activeCommentPost.id
+          ? { ...p, comments: [...p.comments, newCommentObj] }
+          : p
+      )
+    );
+
+    setActiveCommentPost((prev) =>
+      prev ? { ...prev, comments: [...prev.comments, newCommentObj] } : null
+    );
+
+    trackEvent('add_post_comment', { post_id: activeCommentPost.id });
+    setCommentInput('');
+  };
+
   const handleCreatePost = (e) => {
     e.preventDefault();
     if (!newTitle || !newContent) return;
@@ -83,13 +136,13 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
       categoryLabel: newCategory === 'gear' ? 'Gear & Instruments' : newCategory === 'beans' ? 'Beans & Roasters' : newCategory === 'teas' ? 'Tea Varietals' : 'Experiences & Tips',
       title: newTitle,
       author: currentUser?.username || '@brew_master',
-      authorAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      authorAvatar: currentUser?.avatar || './avatar_barista.jpg',
       timeAgo: 'Just now',
       content: newContent,
       upvotes: 1,
       isUpvoted: true,
-      commentsCount: 0,
-      tags: [activeForumTab === 'coffee' ? 'CoffeeMaster' : 'TeaMaster']
+      tags: [activeForumTab === 'coffee' ? 'CoffeeMaster' : 'TeaMaster'],
+      comments: []
     };
 
     setPosts([newPostObj, ...posts]);
@@ -246,7 +299,7 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
               ))}
             </div>
 
-            {/* Footer Upvote & Comments */}
+            {/* Footer Upvote & Comments Button */}
             <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs">
               <button
                 onClick={() => handleUpvote(post.id)}
@@ -260,15 +313,98 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
                 <span>{post.upvotes} Upvotes</span>
               </button>
 
-              <div className="flex items-center space-x-1.5 text-stone-400 font-mono text-xs">
+              {/* Interactive Comment Trigger Button */}
+              <button
+                onClick={() => {
+                  if (!currentUser) {
+                    onOpenAuth();
+                  } else {
+                    setActiveCommentPost(post);
+                  }
+                }}
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-amber-500/20 text-amber-gold border border-amber-gold/40 hover:bg-amber-500/30 transition-all font-mono text-xs font-bold shadow-md"
+              >
                 <MessageSquare className="w-4 h-4" />
-                <span>{post.commentsCount} Comments</span>
-              </div>
+                <span>{post.comments.length} Comments • Reply 💬</span>
+              </button>
             </div>
 
           </div>
         ))}
       </div>
+
+      {/* Interactive Comments & Discussion Modal */}
+      {activeCommentPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
+          <div className="relative max-w-2xl w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] text-cream-light flex flex-col">
+            
+            <button
+              onClick={() => setActiveCommentPost(null)}
+              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 text-stone-300 hover:text-cream-light hover:bg-white/20 transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center space-x-2 text-xs font-mono font-extrabold uppercase tracking-widest text-amber-gold mb-2">
+              <Sparkles className="w-4 h-4 animate-pulse" />
+              <span>Discussion Thread • Brew Master Community</span>
+            </div>
+
+            {/* Original Post Header Summary */}
+            <div className="p-4 rounded-2xl bg-black/50 border border-white/10 mb-6">
+              <h4 className="font-serif text-lg font-bold text-cream-light mb-1">
+                {activeCommentPost.title}
+              </h4>
+              <span className="text-[10px] text-stone-400 font-mono">By {activeCommentPost.author} • {activeCommentPost.timeAgo}</span>
+              <p className="text-xs text-stone-300 mt-2 font-normal leading-relaxed">{activeCommentPost.content}</p>
+            </div>
+
+            {/* List of Existing Comments */}
+            <div className="space-y-3 mb-6 overflow-y-auto max-h-[350px] pr-2">
+              <span className="font-mono text-xs text-amber-gold uppercase tracking-wider font-bold block mb-2">
+                Discussion Comments ({activeCommentPost.comments.length})
+              </span>
+
+              {activeCommentPost.comments.length === 0 ? (
+                <div className="p-6 text-center text-stone-500 font-mono text-xs rounded-2xl bg-black/30 border border-white/5">
+                  No comments yet. Be the first Brew Master to share your thoughts!
+                </div>
+              ) : (
+                activeCommentPost.comments.map((comm) => (
+                  <div key={comm.id} className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-1.5">
+                    <div className="flex items-center space-x-2">
+                      <img src={comm.authorAvatar} alt={comm.author} className="w-6 h-6 rounded-full object-cover border border-amber-gold/40" />
+                      <span className="font-bold text-cream-light text-xs">{comm.author}</span>
+                      <span className="text-[9px] text-stone-400 font-mono">• {comm.timeAgo}</span>
+                    </div>
+                    <p className="text-xs text-stone-300 pl-8 leading-relaxed font-normal">{comm.text}</p>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Add Comment Input Form */}
+            <form onSubmit={handleAddComment} className="flex items-center gap-2 pt-4 border-t border-white/10">
+              <input
+                type="text"
+                required
+                value={commentInput}
+                onChange={(e) => setCommentInput(e.target.value)}
+                placeholder={`Comment as ${currentUser?.username || 'Guest Barista'}...`}
+                className="flex-1 p-3 rounded-xl bg-black/60 border border-white/15 text-cream-light text-xs focus:outline-none focus:border-amber-gold"
+              />
+              <button
+                type="submit"
+                className="py-3 px-5 rounded-xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-lg active:scale-95 transition-all"
+              >
+                <span>Post</span>
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </form>
+
+          </div>
+        </div>
+      )}
 
       {/* Create Post Modal */}
       {isCreatePostOpen && (
