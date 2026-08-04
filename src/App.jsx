@@ -275,6 +275,8 @@ export default function App() {
             isOpen={isProfileOpen}
             onClose={() => setIsProfileOpen(false)}
             trackMode={trackMode}
+            currentUser={currentUser}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
           />
 
           {/* 6. Recipe Builder Modal */}

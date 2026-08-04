@@ -1,23 +1,25 @@
 import React, { useState } from 'react';
-import { X, User, Flame, Award, Sparkles, Coffee, Leaf, Shield, CheckCircle2, Bookmark } from 'lucide-react';
+import { X, User, Flame, Award, Sparkles, Coffee, Leaf, Shield, CheckCircle2, Bookmark, Edit3 } from 'lucide-react';
 import { BADGES_DATA } from '../data/badgesData';
 
-export default function UserProfileDashboard({ isOpen, onClose, trackMode }) {
+export default function UserProfileDashboard({ isOpen, onClose, trackMode, currentUser, onOpenAuth }) {
   if (!isOpen) return null;
 
   const isCoffee = trackMode === 'coffee';
 
-  // Mock Active Tastemaker Profile State
-  const profile = {
-    username: '@barista_clara',
-    displayName: 'Clara Vance',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    bio: 'Specialty Coffee Association Certified Barista • Obsessed with high-altitude washed Ethiopians & 1:16 pour-overs.',
-    location: 'Seattle, WA',
-    streakDays: 14,
-    totalBrewsLogged: 142,
-    unlockedBadgeIds: ['first_brew', 'golden_ratio_master', 'streak_3_days', 'streak_7_days', 'pour_over_aficionado', 'terroir_explorer', 'recipe_creator']
+  // Use active logged-in user profile, fallback to default if not set
+  const profile = currentUser || {
+    username: '@barista_master',
+    displayName: 'Specialty Brew Master',
+    avatar: './avatar_cartoon_female_barista.jpg',
+    bio: 'Specialty Coffee & Fine Tea Enthusiast',
+    location: 'Global Atelier',
+    streakDays: 7,
+    totalBrewsLogged: 42,
+    unlockedBadgeIds: ['first_brew', 'golden_ratio_master', 'streak_3_days', 'streak_7_days', 'pour_over_aficionado']
   };
+
+  const unlockedBadgeIds = profile.unlockedBadgeIds || ['first_brew', 'golden_ratio_master', 'streak_3_days', 'streak_7_days', 'pour_over_aficionado'];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
@@ -34,7 +36,7 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode }) {
         {/* User Header Profile Card */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 mb-8 pb-6 border-b border-white/10">
           <img
-            src={profile.avatar}
+            src={profile.avatar || './avatar_cartoon_female_barista.jpg'}
             alt={profile.displayName}
             className="w-20 h-20 rounded-full object-cover border-2 border-amber-gold shadow-xl"
           />
@@ -45,16 +47,30 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode }) {
                   <span>{profile.displayName}</span>
                   <Shield className="w-4 h-4 text-amber-gold fill-current" />
                 </h3>
-                <span className="text-xs font-mono text-amber-gold font-bold">{profile.username} • {profile.location}</span>
+                <span className="text-xs font-mono text-amber-gold font-bold">{profile.username} • {profile.email || 'Verified Account'}</span>
               </div>
 
-              <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-gold border border-amber-400/40 text-xs font-mono font-bold">
-                Tastemaker Status
-              </span>
+              <div className="flex items-center justify-center gap-2">
+                <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-gold border border-amber-400/40 text-xs font-mono font-bold">
+                  Tastemaker Status
+                </span>
+                {onOpenAuth && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenAuth();
+                    }}
+                    className="p-1.5 rounded-xl bg-white/10 text-amber-gold hover:bg-white/20 border border-amber-gold/30 transition-all"
+                    title="Edit Profile Info & Avatar"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
 
-            <p className="text-xs text-stone-300 mt-2 leading-relaxed">
-              {profile.bio}
+            <p className="text-xs text-stone-300 mt-2 leading-relaxed font-normal">
+              {profile.bio || 'Specialty Coffee & Fine Tea Enthusiast'}
             </p>
           </div>
         </div>
@@ -64,18 +80,18 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode }) {
           <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-400/30">
             <div className="flex items-center justify-center space-x-1 text-amber-gold text-lg font-bold">
               <Flame className="w-5 h-5 text-amber-gold animate-bounce" />
-              <span>{profile.streakDays} Days</span>
+              <span>{profile.streakDays || 1} Days</span>
             </div>
             <span className="text-[10px] text-stone-400 font-sans uppercase font-bold tracking-wider block mt-1">Daily Brew Streak</span>
           </div>
 
           <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
-            <div className="text-lg font-bold text-cream-light">{profile.totalBrewsLogged}</div>
+            <div className="text-lg font-bold text-cream-light">{profile.totalBrewsLogged || 1}</div>
             <span className="text-[10px] text-stone-400 font-sans uppercase font-bold tracking-wider block mt-1">Total Brews Logged</span>
           </div>
 
           <div className="p-4 rounded-2xl bg-black/40 border border-white/10">
-            <div className="text-lg font-bold text-amber-gold">{profile.unlockedBadgeIds.length} / {BADGES_DATA.length}</div>
+            <div className="text-lg font-bold text-amber-gold">{unlockedBadgeIds.length} / {BADGES_DATA.length}</div>
             <span className="text-[10px] text-stone-400 font-sans uppercase font-bold tracking-wider block mt-1">Badges Unlocked</span>
           </div>
         </div>
@@ -89,7 +105,7 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode }) {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {BADGES_DATA.map((badge) => {
-              const isUnlocked = profile.unlockedBadgeIds.includes(badge.id);
+              const isUnlocked = unlockedBadgeIds.includes(badge.id);
               return (
                 <div
                   key={badge.id}
