@@ -29,14 +29,14 @@ export default function App() {
   const [isMuted, setIsMuted] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1 | 2 | 3 | 4
 
-  // User Accounts & Admin Moderation State
+  // User Accounts & Master Admin Account State (@clpiken)
   const [usersList, setUsersList] = useState([
     {
-      username: '@site_admin',
-      displayName: 'Platform Admin',
-      email: 'admin@thebrew.app',
+      username: '@clpiken',
+      displayName: 'clpiken',
+      email: 'clpiken@thebrew.app',
       avatar: './avatar_roast_beans.jpg',
-      bio: 'Master Administrator of The Brew App',
+      bio: 'Platform Owner & Master Administrator of The Brew App',
       role: 'admin',
       streakDays: 30,
       totalBrewsLogged: 500
@@ -50,22 +50,16 @@ export default function App() {
       role: 'user',
       streakDays: 14,
       totalBrewsLogged: 142
-    },
-    {
-      username: '@coffee_guru',
-      displayName: 'James Hoffmann Fan',
-      email: 'guru@coffee.org',
-      avatar: './avatar_cartoon_male_barista.jpg',
-      bio: 'Immersion & V60 Pour-Over Enthusiast',
-      role: 'user',
-      streakDays: 8,
-      totalBrewsLogged: 64
     }
   ]);
 
   // Currently Active Logged In User (Null by default for guest visitors)
   const [currentUser, setCurrentUser] = useState(null); 
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin = currentUser !== null && (
+    currentUser.username?.toLowerCase() === '@clpiken' ||
+    currentUser.email?.toLowerCase().includes('clpiken') ||
+    currentUser.role === 'admin'
+  );
 
   // Platform Modal States
   const [isJournalOpen, setIsJournalOpen] = useState(false);

@@ -24,13 +24,15 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
 
     const cleanHandle = username.startsWith('@') ? username : `@${username || email.split('@')[0]}`;
     
+    const isMasterAdmin = cleanHandle.toLowerCase() === '@clpiken' || email.toLowerCase().includes('clpiken');
+    
     const userObj = {
       email: email.trim(),
       username: cleanHandle,
       displayName: displayName.trim() || email.split('@')[0],
       bio: bio.trim() || 'Specialty Coffee & Fine Tea Enthusiast',
       avatar: avatar || AVATAR_PRESETS[0].url,
-      role: email.includes('admin') ? 'admin' : 'user',
+      role: isMasterAdmin ? 'admin' : 'user',
       streakDays: currentUser?.streakDays || 1,
       totalBrewsLogged: currentUser?.totalBrewsLogged || 1
     };
