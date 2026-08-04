@@ -15,6 +15,8 @@ import RecipeExplorer from './components/RecipeExplorer';
 import RecipeBuilderModal from './components/RecipeBuilderModal';
 import UserProfileDashboard from './components/UserProfileDashboard';
 import GlobalSearchModal from './components/GlobalSearchModal';
+import AuthModal from './components/AuthModal';
+import BrewMasterCommunity from './components/BrewMasterCommunity';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
@@ -26,11 +28,23 @@ export default function App() {
   const [isMuted, setIsMuted] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1 | 2 | 3 | 4
 
+  // User Profile & Account State
+  const [currentUser, setCurrentUser] = useState({
+    username: '@barista_clara',
+    displayName: 'Clara Vance',
+    email: 'clara@specialtybrew.org',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    bio: 'Specialty Coffee Association Certified Barista • Obsessed with high-altitude washed Ethiopians & 1:16 pour-overs.',
+    streakDays: 14,
+    totalBrewsLogged: 142
+  });
+
   // Platform Modal States
   const [isJournalOpen, setIsJournalOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isRecipeBuilderOpen, setIsRecipeBuilderOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Active Method & Scaling State
   const methods = BREW_METHODS[trackMode] || BREW_METHODS.coffee;
@@ -96,9 +110,10 @@ export default function App() {
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenProfile={() => setIsProfileOpen(true)}
         onOpenCommunity={() => {
-          const commElem = document.getElementById('community-section');
+          const commElem = document.getElementById('brew-master-community');
           if (commElem) commElem.scrollIntoView({ behavior: 'smooth' });
         }}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
       />
 
       {/* Main Container */}
@@ -193,6 +208,12 @@ export default function App() {
             </div>
           )}
 
+          {/* Dedicated Forum Component: The Brew Master Community */}
+          <BrewMasterCommunity
+            currentUser={currentUser}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+          />
+
           {/* Community Recipe Explorer & User Submissions */}
           <div id="community-section">
             <RecipeExplorer
@@ -263,6 +284,14 @@ export default function App() {
             trackMode={trackMode}
           />
 
+          {/* 7. Sign In / Create / Manage Profile Auth Modal */}
+          <AuthModal
+            isOpen={isAuthModalOpen}
+            onClose={() => setIsAuthModalOpen(false)}
+            currentUser={currentUser}
+            onSaveProfile={(updatedUser) => setCurrentUser(updatedUser)}
+          />
+
         </main>
 
         {/* App Footer */}
@@ -273,7 +302,7 @@ export default function App() {
               <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
             </div>
             <div className="text-cream-soft/40">
-              Community Recipe Exchange • Gamification Badges • Global Search • Amazon Affiliate Store • Analytics Enabled
+              The Brew Master Community Forum • Community Recipe Exchange • User Accounts • Analytics Enabled
             </div>
           </div>
         </footer>

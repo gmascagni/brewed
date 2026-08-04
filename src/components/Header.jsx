@@ -1,7 +1,7 @@
 import React from 'react';
 import { Coffee, Leaf, Volume2, VolumeX, Scale, BookOpen, ShoppingBag, Search, User, Users } from 'lucide-react';
 
-export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop, onOpenSearch, onOpenProfile, onOpenCommunity }) {
+export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenAuth }) {
   const isCoffee = trackMode === 'coffee';
 
   return (
@@ -80,6 +80,18 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
             >
               <User className="w-4 h-4" />
               <span className="hidden md:inline">Profile</span>
+            </button>
+          )}
+
+          {/* Sign In / Account Setup Button */}
+          {onOpenAuth && (
+            <button
+              onClick={onOpenAuth}
+              className="flex items-center space-x-1.5 px-3 py-2.5 rounded-xl bg-amber-gold text-espresso-950 font-extrabold text-xs hover:bg-amber-gold/90 transition-all active:scale-95 shadow-lg"
+              title="Sign In / Create Brew Master Account"
+            >
+              <User className="w-4 h-4 text-espresso-950" />
+              <span className="font-bold uppercase tracking-wider hidden lg:inline">Sign In / Join</span>
             </button>
           )}
 
