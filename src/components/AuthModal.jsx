@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, User, Mail, Lock, Shield, Sparkles, CheckCircle2, Edit3, Camera } from 'lucide-react';
+import { X, User, Mail, Lock, Shield, Sparkles, CheckCircle2, Edit3, Camera, Image } from 'lucide-react';
+import { AVATAR_PRESETS } from '../data/avatarPresets';
 import { trackEvent } from '../utils/analytics';
 
 export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile }) {
@@ -11,7 +12,7 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile 
   const [username, setUsername] = useState(currentUser?.username || '');
   const [displayName, setDisplayName] = useState(currentUser?.displayName || '');
   const [bio, setBio] = useState(currentUser?.bio || '');
-  const [avatar, setAvatar] = useState(currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80');
+  const [avatar, setAvatar] = useState(currentUser?.avatar || AVATAR_PRESETS[0].url);
 
   const handleAuthSubmit = (e) => {
     e.preventDefault();
@@ -84,18 +85,39 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile 
           
           {(mode === 'signup' || mode === 'edit') && (
             <>
-              {/* Avatar Preview */}
-              <div className="flex items-center space-x-4 p-3.5 rounded-2xl bg-black/40 border border-white/10">
-                <img src={avatar} alt="Avatar Preview" className="w-14 h-14 rounded-full object-cover border border-amber-gold" />
-                <div className="flex-1">
-                  <label className="block text-[10px] font-mono text-stone-400 uppercase tracking-wider mb-1">Avatar Image URL</label>
-                  <input
-                    type="text"
-                    value={avatar}
-                    onChange={(e) => setAvatar(e.target.value)}
-                    placeholder="https://..."
-                    className="w-full p-2 rounded-lg bg-black/60 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
-                  />
+              {/* Profile Picture Avatar Library Picker */}
+              <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-cream-light uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    <Image className="w-4 h-4 text-amber-gold" />
+                    <span>Choose Profile Icon Avatar</span>
+                  </span>
+                  <img src={avatar} alt="Active Avatar" className="w-9 h-9 rounded-full object-cover border-2 border-amber-gold" />
+                </div>
+
+                {/* Grid of Preset Avatars */}
+                <div className="grid grid-cols-4 gap-2 pt-1">
+                  {AVATAR_PRESETS.map((preset) => {
+                    const isSelected = avatar === preset.url;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => setAvatar(preset.url)}
+                        className={`relative rounded-xl overflow-hidden border-2 transition-all p-0.5 group ${
+                          isSelected ? 'border-amber-gold ring-2 ring-amber-gold/50 scale-105' : 'border-white/10 opacity-70 hover:opacity-100'
+                        }`}
+                        title={preset.label}
+                      >
+                        <img src={preset.url} alt={preset.label} className="w-full h-12 rounded-lg object-cover" />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-amber-gold/30 flex items-center justify-center">
+                            <CheckCircle2 className="w-4 h-4 text-espresso-950 fill-amber-gold" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
