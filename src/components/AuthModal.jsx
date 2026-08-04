@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { X, User, Mail, Lock, Shield, Sparkles, CheckCircle2, Edit3, Camera, Image } from 'lucide-react';
+import { X, User, Mail, Lock, Shield, Sparkles, CheckCircle2, Edit3, Camera, Image, LogOut } from 'lucide-react';
 import { AVATAR_PRESETS } from '../data/avatarPresets';
 import { trackEvent } from '../utils/analytics';
 
-export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile }) {
+export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile, onLogout }) {
   if (!isOpen) return null;
 
   const [mode, setMode] = useState(currentUser ? 'edit' : 'login'); // 'login' | 'signup' | 'edit'
@@ -16,19 +16,28 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile 
 
   const handleAuthSubmit = (e) => {
     e.preventDefault();
-    const updatedUser = {
-      email,
-      username: username || `@${email.split('@')[0]}`,
-      displayName: displayName || email.split('@')[0],
-      bio: bio || 'Specialty Coffee & Fine Tea Enthusiast',
-      avatar,
+
+    if (!email) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    const cleanHandle = username.startsWith('@') ? username : `@${username || email.split('@')[0]}`;
+    
+    const userObj = {
+      email: email.trim(),
+      username: cleanHandle,
+      displayName: displayName.trim() || email.split('@')[0],
+      bio: bio.trim() || 'Specialty Coffee & Fine Tea Enthusiast',
+      avatar: avatar || AVATAR_PRESETS[0].url,
+      role: email.includes('admin') ? 'admin' : 'user',
       streakDays: currentUser?.streakDays || 1,
       totalBrewsLogged: currentUser?.totalBrewsLogged || 1
     };
 
-    onSaveProfile(updatedUser);
-    trackEvent(mode === 'signup' ? 'user_signup' : 'update_profile', { username: updatedUser.username });
-    alert(mode === 'signup' ? 'Account created successfully! Welcome to Brew Master Community.' : 'Profile updated successfully!');
+    onSaveProfile(userObj);
+    trackEvent(mode === 'signup' ? 'user_signup' : 'user_login', { username: userObj.username });
+    alert(mode === 'signup' ? `Account registered as ${userObj.displayName} (${userObj.username})!` : `Logged in as ${userObj.displayName} (${userObj.username})!`);
     onClose();
   };
 
@@ -47,12 +56,31 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile 
         {/* Header Tabs */}
         <div className="flex items-center space-x-2 text-xs font-mono font-extrabold uppercase tracking-widest text-amber-gold mb-2">
           <Sparkles className="w-4 h-4 animate-pulse" />
-          <span>Brew Master Identity</span>
+          <span>Brew Master Authentication</span>
         </div>
 
-        <h3 className="font-serif text-2xl font-bold text-cream-light mb-6">
-          {mode === 'edit' ? 'Manage Brew Master Profile' : mode === 'signup' ? 'Create Brew Master Account' : 'Sign In to Brew Master'}
+        <h3 className="font-serif text-2xl font-bold text-cream-light mb-2">
+          {mode === 'edit' ? 'Manage Your Account' : mode === 'signup' ? 'Create New Account' : 'Sign In to Your Account'}
         </h3>
+
+        {currentUser && (
+          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-gold/30 text-xs font-mono mb-4 text-amber-gold flex items-center justify-between">
+            <span>Currently Signed In: <strong>{currentUser.displayName} ({currentUser.username})</strong></span>
+            {onLogout && (
+              <button
+                type="button"
+                onClick={() => {
+                  onLogout();
+                  onClose();
+                }}
+                className="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white transition-all flex items-center gap-1 text-[10px]"
+              >
+                <LogOut className="w-3 h-3" />
+                <span>Sign Out</span>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Mode Switcher Pills */}
         <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-black/50 border border-white/10 mb-6 text-xs font-bold">
@@ -83,8 +111,44 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile 
 
         <form onSubmit={handleAuthSubmit} className="space-y-4 text-xs">
           
+          <div>
+            <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Email Address</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="yourname@domain.com"
+              className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
+            />
+          </div>
+
           {(mode === 'signup' || mode === 'edit') && (
             <>
+              <div>
+                <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Display Name</label>
+                <input
+                  type="text"
+                  required
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="E.g., Sarah Parker"
+                  className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Username Handle</label>
+                <input
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="E.g., @sarah_brews"
+                  className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light font-mono focus:outline-none focus:border-amber-gold"
+                />
+              </div>
+
               {/* Profile Picture Avatar Library Picker */}
               <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-3">
                 <div className="flex items-center justify-between">
@@ -122,30 +186,6 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile 
               </div>
 
               <div>
-                <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Display Name</label>
-                <input
-                  type="text"
-                  required
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="E.g., Clara Vance"
-                  className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
-                />
-              </div>
-
-              <div>
-                <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Username Handle</label>
-                <input
-                  type="text"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="E.g., @barista_clara"
-                  className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light font-mono focus:outline-none focus:border-amber-gold"
-                />
-              </div>
-
-              <div>
                 <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Bio / Bio Quote</label>
                 <textarea
                   rows="2"
@@ -157,18 +197,6 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile 
               </div>
             </>
           )}
-
-          <div>
-            <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Email Address</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@domain.com"
-              className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
-            />
-          </div>
 
           {mode !== 'edit' && (
             <div>

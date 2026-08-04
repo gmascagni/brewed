@@ -63,8 +63,8 @@ export default function App() {
     }
   ]);
 
-  // Currently Active Logged In User
-  const [currentUser, setCurrentUser] = useState(usersList[0]); // Default logged-in as Site Admin
+  // Currently Active Logged In User (Null by default for guest visitors)
+  const [currentUser, setCurrentUser] = useState(null); 
   const isAdmin = currentUser?.role === 'admin';
 
   // Platform Modal States
@@ -330,6 +330,7 @@ export default function App() {
               setCurrentUser(updatedUser);
               setUsersList([updatedUser, ...usersList.filter((u) => u.username !== updatedUser.username)]);
             }}
+            onLogout={() => setCurrentUser(null)}
           />
 
           {/* 8. Admin Moderation Console Modal */}

@@ -99,12 +99,17 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
 
   const handleAddComment = (e) => {
     e.preventDefault();
+    if (!currentUser) {
+      alert('Please sign in or create an account to post comments.');
+      onOpenAuth();
+      return;
+    }
     if (!commentInput.trim() || !activeCommentPost) return;
 
     const newCommentObj = {
       id: `comm_${Date.now()}`,
-      author: currentUser?.username || '@brew_master',
-      authorAvatar: currentUser?.avatar || './avatar_barista.jpg',
+      author: currentUser.username,
+      authorAvatar: currentUser.avatar || './avatar_cartoon_female_barista.jpg',
       text: commentInput.trim(),
       timeAgo: 'Just now'
     };
@@ -121,12 +126,17 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
       prev ? { ...prev, comments: [...prev.comments, newCommentObj] } : null
     );
 
-    trackEvent('add_post_comment', { post_id: activeCommentPost.id });
+    trackEvent('add_post_comment', { post_id: activeCommentPost.id, author: currentUser.username });
     setCommentInput('');
   };
 
   const handleCreatePost = (e) => {
     e.preventDefault();
+    if (!currentUser) {
+      alert('Please sign in or create an account to publish posts.');
+      onOpenAuth();
+      return;
+    }
     if (!newTitle || !newContent) return;
 
     const newPostObj = {
@@ -135,8 +145,8 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
       category: newCategory,
       categoryLabel: newCategory === 'gear' ? 'Gear & Instruments' : newCategory === 'beans' ? 'Beans & Roasters' : newCategory === 'teas' ? 'Tea Varietals' : 'Experiences & Tips',
       title: newTitle,
-      author: currentUser?.username || '@brew_master',
-      authorAvatar: currentUser?.avatar || './avatar_barista.jpg',
+      author: currentUser.username,
+      authorAvatar: currentUser.avatar || './avatar_cartoon_female_barista.jpg',
       timeAgo: 'Just now',
       content: newContent,
       upvotes: 1,
@@ -146,7 +156,7 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
     };
 
     setPosts([newPostObj, ...posts]);
-    trackEvent('create_forum_post', { forum: activeForumTab, category: newCategory });
+    trackEvent('create_forum_post', { forum: activeForumTab, category: newCategory, author: currentUser.username });
     setNewTitle('');
     setNewContent('');
     setIsCreatePostOpen(false);
