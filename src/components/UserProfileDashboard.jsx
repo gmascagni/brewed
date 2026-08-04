@@ -1,10 +1,11 @@
-import React from 'react';
-import { X, User, Flame, Award, Sparkles, Coffee, Leaf, Shield, CheckCircle2, Bookmark, Edit3, LogOut } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, User, Flame, Award, Sparkles, Coffee, Leaf, Shield, CheckCircle2, Bookmark, Edit3, LogOut, HelpCircle, ChevronDown, ChevronUp, Target } from 'lucide-react';
 import { BADGES_DATA } from '../data/badgesData';
 
 export default function UserProfileDashboard({ isOpen, onClose, trackMode, currentUser, onOpenAuth, onLogout }) {
   if (!isOpen) return null;
 
+  const [showInstructions, setShowInstructions] = useState(false);
   const isCoffee = trackMode === 'coffee';
 
   // Use active logged-in user profile, fallback to default if not set
@@ -112,11 +113,45 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
           </div>
         </div>
 
+        {/* Badges Unlock Guide Accordion Header */}
+        <div className="mb-6 rounded-2xl bg-amber-500/10 border border-amber-gold/30 p-4">
+          <button
+            onClick={() => setShowInstructions(!showInstructions)}
+            className="w-full flex items-center justify-between text-left font-bold text-cream-light text-xs uppercase tracking-wider"
+          >
+            <div className="flex items-center gap-2 text-amber-gold">
+              <Target className="w-4 h-4" />
+              <span>📖 How to Unlock Badges & Achievements Guide</span>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] font-mono text-stone-400">
+              <span>{showInstructions ? 'Hide Instructions' : 'View Instructions'}</span>
+              {showInstructions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </div>
+          </button>
+
+          {showInstructions && (
+            <div className="mt-4 pt-3 border-t border-amber-gold/20 space-y-2 text-xs font-sans text-stone-300 leading-relaxed animate-fade-in">
+              <p className="font-semibold text-cream-light">
+                Earn badges and level up your tastemaker status by performing daily brewing activities across the platform:
+              </p>
+              <ul className="space-y-1.5 list-disc list-inside font-mono text-[11px] text-stone-300">
+                <li><strong className="text-amber-gold">☕ First Extraction:</strong> Log your very first brew in the Personal Tasting Journal or Guided Brew Timer.</li>
+                <li><strong className="text-amber-gold">✨ Golden Ratio Master:</strong> Scale any coffee brew to the exact SCA standard 1:16 ratio.</li>
+                <li><strong className="text-amber-gold">🔥 3-Day & 7-Day Streaks:</strong> Log at least 1 brew daily for consecutive days to maintain your active streak.</li>
+                <li><strong className="text-amber-gold">🌊 Pour Over Aficionado:</strong> Complete 5 V60 pour-over brews using the multi-phase timer.</li>
+                <li><strong className="text-amber-gold">🏺 Immersion Master:</strong> Complete 5 French Press immersion brews.</li>
+                <li><strong className="text-amber-gold">🌍 Terroir Atlas Explorer:</strong> Explore terroirs & agronomy in the Knowledge Base across 5 growing origins.</li>
+                <li><strong className="text-amber-gold">📜 Master Alchemist:</strong> Build and publish a custom recipe in the Community Recipe Builder.</li>
+              </ul>
+            </div>
+          )}
+        </div>
+
         {/* Gamification Achievements & Badges Grid */}
         <div className="mb-8">
           <div className="font-bold text-cream-light text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
             <Award className="w-4 h-4 text-amber-gold" />
-            <span>Unlocked Achievements & Badges</span>
+            <span>Tastemaker Achievements & Badges ({unlockedBadgeIds.length} Unlocked)</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -134,6 +169,9 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
                   <div className="text-2xl mb-1">{badge.icon}</div>
                   <div className="font-extrabold text-xs truncate">{badge.name}</div>
                   <div className="text-[9px] text-stone-400 mt-1 leading-tight line-clamp-2">{badge.description}</div>
+                  <div className="mt-2 text-[8px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-black/50 border border-white/10 text-amber-gold">
+                    {isUnlocked ? '✓ Unlocked' : '🔒 Locked'}
+                  </div>
                 </div>
               );
             })}
