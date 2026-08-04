@@ -1,7 +1,7 @@
 import React from 'react';
 import { Coffee, Leaf, Volume2, VolumeX, Scale, BookOpen, ShoppingBag, Search, User, Users, ShieldCheck } from 'lucide-react';
 
-export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenAuth, onOpenAdmin, isAdmin }) {
+export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSystem, isMuted, setIsMuted, onOpenJournal, onOpenShop, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenAuth, onOpenAdmin, isAdmin, currentUser }) {
   const isCoffee = trackMode === 'coffee';
 
   return (
@@ -86,24 +86,31 @@ export default function Header({ trackMode, setTrackMode, unitSystem, setUnitSys
           {/* User Profile & Badges Button */}
           {onOpenProfile && (
             <button
-              onClick={onOpenProfile}
-              className="flex items-center space-x-1.5 px-3 py-2.5 rounded-xl bg-amber-500/20 border border-amber-gold/50 text-amber-gold font-mono font-bold text-xs hover:bg-amber-500/30 transition-all active:scale-95 shadow-lg"
-              title="Open Tastemaker Profile, Streaks & Badges"
+              onClick={currentUser ? onOpenProfile : onOpenAuth}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-all active:scale-95 shadow-lg border ${
+                currentUser
+                  ? 'bg-amber-gold/15 border-amber-gold/50 text-cream-light hover:bg-amber-gold/25'
+                  : 'bg-amber-500/20 border-amber-gold/50 text-amber-gold hover:bg-amber-500/30'
+              }`}
+              title={currentUser ? `Logged in as ${currentUser.displayName} (${currentUser.username})` : 'Sign In / Join Brew Master Community'}
             >
-              <User className="w-4 h-4" />
-              <span className="hidden md:inline">Profile</span>
-            </button>
-          )}
-
-          {/* Sign In / Account Setup Button */}
-          {onOpenAuth && (
-            <button
-              onClick={onOpenAuth}
-              className="flex items-center space-x-1.5 px-3 py-2.5 rounded-xl bg-amber-gold text-espresso-950 font-extrabold text-xs hover:bg-amber-gold/90 transition-all active:scale-95 shadow-lg"
-              title="Sign In / Create Brew Master Account"
-            >
-              <User className="w-4 h-4 text-espresso-950" />
-              <span className="font-bold uppercase tracking-wider hidden lg:inline">Sign In / Join</span>
+              {currentUser ? (
+                <>
+                  <img
+                    src={currentUser.avatar || './avatar_cartoon_female_barista.jpg'}
+                    alt={currentUser.displayName}
+                    className="w-6 h-6 rounded-full object-cover border border-amber-gold"
+                  />
+                  <span className="font-bold text-xs text-amber-gold truncate max-w-[120px] hidden sm:inline">
+                    {currentUser.displayName}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <User className="w-4 h-4 text-amber-gold" />
+                  <span className="font-bold uppercase tracking-wider text-xs hidden sm:inline">Sign In / Join</span>
+                </>
+              )}
             </button>
           )}
 

@@ -149,6 +149,7 @@ export default function App() {
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onOpenAdmin={() => setIsAdminModalOpen(true)}
         isAdmin={isAdmin}
+        currentUser={currentUser}
       />
 
       {/* Main Container */}
