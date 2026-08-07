@@ -24,7 +24,7 @@ export default function V60ProTipModal({ isOpen, onClose }) {
         </div>
 
         <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light mb-2">
-          Ultimate 1-Cup V60 Pour-Over Technique
+          Ultimate 1-Cup V60 Pour Over Technique
         </h3>
         <p className="text-xs text-stone-300 mb-6 font-normal">
           Dose: <strong className="text-amber-gold font-mono">15g Ground Coffee</strong> to <strong className="text-cyan-400 font-mono">250g Water</strong> (1:16.6 Ratio). Target Total Brew Time: <strong className="text-amber-gold font-mono">~3:00 min</strong>.

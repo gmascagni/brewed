@@ -7,7 +7,7 @@ export const COMMUNITY_RECIPES = [
     author: '@barista_clara',
     authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
     methodId: 'pour_over',
-    methodName: 'Pour-Over (V60)',
+    methodName: 'Pour Over (V60)',
     trackMode: 'coffee',
     beanName: 'Ethiopia Yirgacheffe Washed',
     roasterName: 'Onyx Coffee Lab',

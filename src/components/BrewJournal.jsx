@@ -75,7 +75,7 @@ export default function BrewJournal({
         minute: '2-digit'
       }),
       trackMode,
-      methodName: activeMethod?.name || (isCoffee ? 'Pour-Over' : 'Green Tea'),
+      methodName: activeMethod?.name || (isCoffee ? 'Pour Over' : 'Green Tea'),
       beanName: beanName.trim() || (isCoffee ? 'Single-Origin Ethiopian Yirgacheffe' : 'Full-Leaf Dragonwell Green Tea'),
       roaster: roaster.trim() || 'Artisan Roaster',
       doseStr: defaultDoseStr,

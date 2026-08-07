@@ -4,7 +4,7 @@ import V60ProTipModal from './V60ProTipModal';
 
 export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
   const isCoffee = trackMode === 'coffee';
-  const isPourOver = activeMethod?.id === 'pour_over';
+  const isPourOver = activeMethod?.id === 'pour_over' || activeMethod?.id === 'chemex';
   const [isProTipOpen, setIsProTipOpen] = useState(false);
 
   const heroImage = activeMethod?.heroImage || (isCoffee ? './coffee_setup.jpg' : './tea_kettle.jpg');

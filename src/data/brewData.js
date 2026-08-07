@@ -2,7 +2,7 @@ export const BREW_METHODS = {
   coffee: [
     {
       id: 'pour_over',
-      name: 'Pour-Over (V60 / Chemex)',
+      name: 'Pour Over (V60)',
       category: 'coffee',
       featured: false,
       heroImage: './pour_over_hero.jpg',
@@ -18,6 +18,26 @@ export const BREW_METHODS = {
         { name: 'Bloom Phase', durationSec: 45, waterMultiplier: 3, instruction: 'Pour 3x coffee weight in circular motion. Let coffee expand and off-gas CO2.' },
         { name: 'Main Concentric Pour', durationSec: 60, waterMultiplier: 0.6, instruction: 'Slow concentric pour from center outward. Keep water level steady.' },
         { name: 'Final Center Pour & Drawdown', durationSec: 75, waterMultiplier: 1.0, instruction: 'Gently top up remaining water in center. Allow full bed drawdown.' }
+      ]
+    },
+    {
+      id: 'chemex',
+      name: 'Chemex Glass Brewer',
+      category: 'coffee',
+      featured: false,
+      heroImage: './chemex_hero.jpg',
+      ratio: 16, // 1:16 ratio
+      defaultCupMl: 250,
+      tempC: 94,
+      tempF: 201,
+      grind: 'Medium-Coarse',
+      micron: '650 - 800 µm',
+      description: 'Ultra-clean, elegant pour over extraction utilizing thick bonded paper filters to filter out all sediment and bitter oils for exceptional clarity.',
+      preferredCoffeeTypes: 'Light to Medium Roasts. Washed Ethiopian, Kenyan, and Costa Rican single-origin beans for crisp fruit acidity and sweet floral finish.',
+      phases: [
+        { name: 'Bloom Phase', durationSec: 45, waterMultiplier: 3, instruction: 'Saturate grounds with 3x coffee weight. Allow heavy bloom for 45 seconds.' },
+        { name: 'Slow Spiral Pulse Pour', durationSec: 90, waterMultiplier: 0.7, instruction: 'Pour in slow steady spirals avoiding the outer glass filter rim.' },
+        { name: 'Final Drawdown & Filter Lift', durationSec: 105, waterMultiplier: 1.0, instruction: 'Allow complete drawdown through thick paper filter. Lift filter and discard.' }
       ]
     },
     {
@@ -757,16 +777,47 @@ export const MASTERCLASSES = [
     ]
   },
 
-  // Pour-Over Videos (methodId: 'pour_over')
+  // Chemex Videos (methodId: 'chemex')
+  {
+    id: 'mc_chemex_technique',
+    methodId: 'chemex',
+    method: 'Chemex Glass Brewer',
+    title: 'Mastering the Chemex Glass Brewer & Bonded Filters',
+    duration: '5:30',
+    thumbnail: './chemex_hero.jpg',
+    embedId: '1oB1oDrDkHM',
+    description: 'Learn how thick bonded paper filters and slow pulse pouring yield ultra-clean, sediment-free specialty coffee.',
+    keyTakeaways: [
+      'Use 3-fold thick side facing the spout to prevent air channel blockages',
+      'Medium-Coarse grind size (650-800 µm) prevents filter clogging',
+      'Rinse filter thoroughly with hot water before adding coffee grounds'
+    ]
+  },
+  {
+    id: 'mc_chemex_beans',
+    methodId: 'chemex',
+    method: 'Chemex Glass Brewer',
+    title: 'Best Coffee Beans & Ratios for Chemex Clarity',
+    duration: '4:45',
+    thumbnail: './chemex_hero.jpg',
+    embedId: 'AI4ynXzkSQo',
+    description: 'Why light roast washed Ethiopian and Kenyan beans shine in Chemex with 1:16 ratio for floral notes.',
+    keyTakeaways: [
+      'Ideal for light washed roasts with delicate floral & fruit notes',
+      'Thick paper filter removes bitter oils for pristine clarity'
+    ]
+  },
+
+  // Pour Over Videos (methodId: 'pour_over')
   {
     id: 'mc_pourover_v60',
     methodId: 'pour_over',
-    method: 'Pour-Over',
-    title: 'Pour-Over Concentric Pouring & V60 Technique',
+    method: 'Pour Over',
+    title: 'Pour Over Concentric Pouring & V60 Technique',
     duration: '4:15',
     thumbnail: './pourover_technique_thumb.jpg',
     embedId: 'AI4ynXzkSQo',
-    description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in V60 and Chemex drippers.',
+    description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in V60 drippers.',
     keyTakeaways: [
       'Pour gently in center-outward concentric spirals',
       'Never hit paper walls directly to prevent water bypass',
@@ -776,8 +827,8 @@ export const MASTERCLASSES = [
   {
     id: 'mc_pourover_beans',
     methodId: 'pour_over',
-    method: 'Pour-Over',
-    title: 'Preferred Single-Origin Beans for Pour-Over Clarity',
+    method: 'Pour Over',
+    title: 'Preferred Single-Origin Beans for Pour Over Clarity',
     duration: '5:04',
     thumbnail: './pourover_beans_thumb.jpg',
     embedId: '1oB1oDrDkHM',
@@ -791,7 +842,7 @@ export const MASTERCLASSES = [
   {
     id: 'mc_golden_ratio',
     methodId: 'pour_over',
-    method: 'Pour-Over',
+    method: 'Pour Over',
     title: 'The Golden Ratio of Coffee Brewing (1:16 & SCA Golden Cup Standard)',
     duration: '5:10',
     thumbnail: './golden_ratio_thumb.jpg',
