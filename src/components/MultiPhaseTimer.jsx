@@ -105,7 +105,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
   const targetPhaseWaterMl = activePhase?.waterMultiplier ? Math.round(dryDoseGrams * activePhase.waterMultiplier) : null;
 
-  const isPourOver = activeMethod?.id === 'pour_over' || activeMethod?.id === 'chemex';
+  const isPourOver = activeMethod?.id === 'pour_over' || activeMethod?.id === 'chemex' || activeMethod?.id === 'classic_pour_over';
   const [isProTipOpen, setIsProTipOpen] = useState(false);
 
   return (

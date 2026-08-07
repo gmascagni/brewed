@@ -1,6 +1,26 @@
 export const BREW_METHODS = {
   coffee: [
     {
+      id: 'classic_pour_over',
+      name: 'Classic Pour Over',
+      category: 'coffee',
+      featured: true,
+      heroImage: './pour_over_hero.jpg',
+      ratio: 16, // 1:16 ratio (1g coffee to 16ml water)
+      defaultCupMl: 240,
+      tempC: 93,
+      tempF: 200,
+      grind: 'Medium-Fine',
+      micron: '450 - 650 µm',
+      description: 'Universal pour-over extraction method suitable for all standard cone, wedge, and flat-bottom drippers. Delivers clean, balanced acidity and rich aromatic clarity.',
+      preferredCoffeeTypes: 'Light to Medium Roasts. Central American, Colombian, and East African single-origin coffees.',
+      phases: [
+        { name: 'Bloom Phase', durationSec: 45, waterMultiplier: 3, instruction: 'Pour 3x coffee weight in circular motion. Let coffee bloom and de-gas.' },
+        { name: 'Pulse Pouring', durationSec: 60, waterMultiplier: 0.6, instruction: 'Pour in steady spiral pulses to keep water level consistent.' },
+        { name: 'Final Drawdown', durationSec: 75, waterMultiplier: 1.0, instruction: 'Top up remaining water and allow complete bed drawdown.' }
+      ]
+    },
+    {
       id: 'pour_over',
       name: 'Hario V60 Dripper',
       category: 'coffee',
