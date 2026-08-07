@@ -9,7 +9,6 @@ import MasterclassHub from './components/MasterclassHub';
 import MultiPhaseTimer from './components/MultiPhaseTimer';
 import KnowledgeBaseDrawer from './components/KnowledgeBaseDrawer';
 import DiagnosticsDrawer from './components/DiagnosticsDrawer';
-import ShopDrawer from './components/ShopDrawer';
 import BrewJournal from './components/BrewJournal';
 import RecipeExplorer from './components/RecipeExplorer';
 import RecipeBuilderModal from './components/RecipeBuilderModal';
@@ -125,19 +124,11 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0A0908] text-cream-soft font-sans selection:bg-amber-gold selection:text-espresso-950 flex flex-col">
       
-      {/* Sticky Header with Action Controls */}
+      {/* Streamlined Minimalist Header */}
       <Header
         trackMode={trackMode}
         setTrackMode={handleTrackSwitch}
-        unitSystem={unitSystem}
-        setUnitSystem={setUnitSystem}
-        isMuted={isMuted}
-        setIsMuted={setIsMuted}
         onOpenJournal={() => setIsJournalOpen(true)}
-        onOpenShop={() => {
-          const shopElem = document.getElementById('brew-shop-section');
-          if (shopElem) shopElem.scrollIntoView({ behavior: 'smooth' });
-        }}
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenProfile={() => setIsProfileOpen(true)}
         onOpenCommunity={() => {
@@ -150,19 +141,19 @@ export default function App() {
         currentUser={currentUser}
       />
 
-      {/* Main Container */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+      {/* Main Workspace Container */}
+      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         
-        {/* Step-by-Step Progress Bar */}
+        {/* Step Progress Bar */}
         <StepIndicator
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           trackMode={trackMode}
         />
 
-        <main className="mt-8 space-y-12">
+        <main className="mt-6 space-y-10">
 
-          {/* STEP 01: ATELIER / METHOD SELECTOR */}
+          {/* STEP 01: METHOD SELECTOR */}
           {currentStep === 1 && (
             <MethodSelectorGrid
               trackMode={trackMode}
@@ -179,7 +170,9 @@ export default function App() {
             <div className="animate-fade-in space-y-8">
               <PrecisionCalculator
                 trackMode={trackMode}
+                methods={methods}
                 activeMethod={currentActiveMethod}
+                setActiveMethod={setActiveMethod}
                 cupCount={cupCount}
                 setCupCount={setCupCount}
                 cupMl={cupMl}
@@ -189,15 +182,18 @@ export default function App() {
                 customWaterMl={customWaterMl}
                 setCustomWaterMl={setCustomWaterMl}
                 unitSystem={unitSystem}
+                setUnitSystem={setUnitSystem}
+                isMuted={isMuted}
+                setIsMuted={setIsMuted}
                 onNextStep={() => setCurrentStep(3)}
                 onPrevStep={() => setCurrentStep(1)}
               />
             </div>
           )}
 
-          {/* STEP 03: METHOD SPECIFICATIONS, HERO & GRIND VISUALIZER */}
+          {/* STEP 03: METHOD SPECIFICATIONS & HERO */}
           {currentStep === 3 && (
-            <div className="animate-fade-in space-y-10">
+            <div className="animate-fade-in space-y-8">
               <HeroBanner
                 trackMode={trackMode}
                 activeMethod={currentActiveMethod}
@@ -242,22 +238,8 @@ export default function App() {
             </div>
           )}
 
-          {/* Dedicated Forum Component: The Brew Master Community */}
-          <BrewMasterCommunity
-            currentUser={currentUser}
-            onOpenAuth={() => setIsAuthModalOpen(true)}
-          />
-
-          {/* Community Recipe Explorer & User Submissions */}
-          <div id="community-section">
-            <RecipeExplorer
-              trackMode={trackMode}
-              onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
-            />
-          </div>
-
-          {/* Video Masterclass Tutorials for Selected Method */}
-          <div className="mt-14">
+          {/* Video Masterclass Tutorials */}
+          <div className="mt-10">
             <MasterclassHub
               trackMode={trackMode}
               activeMethod={currentActiveMethod}
@@ -268,21 +250,27 @@ export default function App() {
             />
           </div>
 
-          {/* 1. Dedicated Diagnostics Drawer (Taste Troubleshooting & Water Chemistry) */}
+          {/* 1. Diagnostics Drawer (Troubleshooting & Water) */}
           <DiagnosticsDrawer trackMode={trackMode} />
 
-          {/* 2. Dedicated Knowledge Base Drawer (Terroir Atlas & Agronomy) */}
+          {/* 2. Knowledge Base Drawer (Terroir Atlas) */}
           <KnowledgeBaseDrawer trackMode={trackMode} />
 
-          {/* Amazon Affiliate "Brew Essentials Kit & Shop" Section */}
-          <div id="brew-shop-section">
-            <ShopDrawer
+          {/* Community Shared Recipes Grid */}
+          <div id="community-section">
+            <RecipeExplorer
               trackMode={trackMode}
-              activeMethod={currentActiveMethod}
+              onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
             />
           </div>
 
-          {/* 3. Personal Tasting Journal & Golden Cup Log Modal */}
+          {/* Brew Master Community Forum (Clean Bottom Section) */}
+          <BrewMasterCommunity
+            currentUser={currentUser}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+          />
+
+          {/* Personal Tasting Journal Modal */}
           <BrewJournal
             isOpen={isJournalOpen}
             onClose={() => setIsJournalOpen(false)}
@@ -294,7 +282,7 @@ export default function App() {
             unitSystem={unitSystem}
           />
 
-          {/* 4. Global Multi-Index Search Overlay */}
+          {/* Global Multi-Index Search Overlay */}
           <GlobalSearchModal
             isOpen={isSearchOpen}
             onClose={() => setIsSearchOpen(false)}
@@ -304,7 +292,7 @@ export default function App() {
             }}
           />
 
-          {/* 5. User Profile & Badges Dashboard */}
+          {/* User Profile & Badges Dashboard */}
           <UserProfileDashboard
             isOpen={isProfileOpen}
             onClose={() => setIsProfileOpen(false)}
@@ -314,14 +302,14 @@ export default function App() {
             onLogout={() => setCurrentUser(null)}
           />
 
-          {/* 6. Recipe Builder Modal */}
+          {/* Recipe Builder Modal */}
           <RecipeBuilderModal
             isOpen={isRecipeBuilderOpen}
             onClose={() => setIsRecipeBuilderOpen(false)}
             trackMode={trackMode}
           />
 
-          {/* 7. Sign In / Create / Manage Profile Auth Modal */}
+          {/* Sign In / Auth Modal */}
           <AuthModal
             isOpen={isAuthModalOpen}
             onClose={() => setIsAuthModalOpen(false)}
@@ -334,7 +322,7 @@ export default function App() {
             onLogout={() => setCurrentUser(null)}
           />
 
-          {/* 8. Admin Moderation Console Modal */}
+          {/* Admin Moderation Console Modal */}
           <AdminConsoleModal
             isOpen={isAdminModalOpen}
             onClose={() => setIsAdminModalOpen(false)}
@@ -346,7 +334,7 @@ export default function App() {
 
         </main>
 
-        {/* App Footer */}
+        {/* Streamlined App Footer */}
         <footer className="mt-16 border-t border-white/10 py-8 px-4 text-center text-xs text-cream-soft/50 backdrop-blur-xl bg-black/40">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
@@ -354,7 +342,7 @@ export default function App() {
               <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
             </div>
             <div className="text-cream-soft/40">
-              Admin Moderation Console • Strict Profile Ownership Security • Analytics Enabled
+              Clean UI Mode Active • Admin Security Enforced
             </div>
           </div>
         </footer>

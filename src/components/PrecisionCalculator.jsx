@@ -1,5 +1,5 @@
 import React from 'react';
-import { CupSoda, Scale, Sliders, CheckCircle2, Sparkles, Thermometer, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
+import { CupSoda, Scale, Sliders, CheckCircle2, Sparkles, Thermometer, Clock, ChevronRight, ChevronLeft, Volume2, VolumeX } from 'lucide-react';
 
 export default function PrecisionCalculator({
   trackMode,
@@ -15,6 +15,9 @@ export default function PrecisionCalculator({
   customWaterMl,
   setCustomWaterMl,
   unitSystem,
+  setUnitSystem,
+  isMuted,
+  setIsMuted,
   onPrevStep,
   onNextStep
 }) {
@@ -51,18 +54,39 @@ export default function PrecisionCalculator({
   };
 
   return (
-    <div className={`p-8 md:p-10 lg:p-12 rounded-3xl ${isCoffee ? 'glass-panel-amber' : 'glass-panel-sage'} shadow-2xl transition-all duration-500`}>
+    <div className="space-y-8 animate-fade-in">
       
-      {/* 1. Header Bar with Device Switcher Pills */}
-      <div className="mb-8 pb-6 border-b border-white/[0.08]">
-        <div className="flex items-center justify-between gap-2 mb-3">
+      {/* 1. Header Card with Embedded Unit (oz/g) & Audio Preferences */}
+      <div className="p-6 md:p-8 rounded-3xl glass-panel-amber relative overflow-hidden shadow-2xl">
+        <div className="flex items-center justify-between gap-4 mb-3">
           <div className="inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] text-amber-gold">
-            <Sparkles className="w-4 h-4 animate-pulse" />
-            <span>Step 02 of 04 • Dose & Volumetric Scaler</span>
+            <Sparkles className="w-4 h-4 animate-pulse text-amber-gold" />
+            <span>Step 02 of 04 • Precision Scaler & Ratio Matrix</span>
           </div>
-          <span className="text-xs font-mono font-bold bg-white/[0.06] px-3.5 py-1 rounded-full text-cream-light border border-white/[0.12] shadow-inner">
-            Active: {activeMethod?.name}
-          </span>
+
+          {/* Embedded Preferences Control Bar: Imperial/Metric Unit Toggle & Mute Speaker */}
+          <div className="flex items-center space-x-2 text-xs font-mono font-bold">
+            {setUnitSystem && (
+              <button
+                onClick={() => setUnitSystem(unitSystem === 'metric' ? 'imperial' : 'metric')}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-black/60 border border-white/15 text-stone-200 hover:border-amber-gold/60 transition-all shadow-md active:scale-95"
+                title="Toggle Imperial (oz/°F) vs Metric (g/mL/°C)"
+              >
+                <Scale className="w-3.5 h-3.5 text-amber-gold" />
+                <span>{unitSystem === 'imperial' ? 'Imp (oz/°F)' : 'Met (g/°C)'}</span>
+              </button>
+            )}
+
+            {setIsMuted && (
+              <button
+                onClick={() => setIsMuted(!isMuted)}
+                className="p-1.5 px-2.5 rounded-xl bg-black/60 border border-white/15 text-stone-200 hover:border-amber-gold/60 transition-all shadow-md active:scale-95"
+                title={isMuted ? "Unmute Audio Alerts" : "Mute Audio Alerts"}
+              >
+                {isMuted ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5 text-amber-gold" />}
+              </button>
+            )}
+          </div>
         </div>
 
         <h3 className="font-serif text-3xl md:text-4xl font-extrabold text-cream-light drop-shadow-md">
