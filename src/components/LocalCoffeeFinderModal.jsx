@@ -392,29 +392,31 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
                   <div>
                     <div className="flex items-center space-x-2 mb-1">
                       <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/40">
-                        {activeShop.specialtyGrade}
+                        {activeShop?.specialtyGrade || 'Specialty Coffee Bar'}
                       </span>
-                      <span className="text-xs text-stone-400 font-mono">{activeShop.phone}</span>
+                      <span className="text-xs text-stone-400 font-mono">{activeShop?.phone || ''}</span>
                     </div>
 
                     <h3 className="font-serif text-xl font-extrabold text-cream-light">
-                      {activeShop.name}
+                      {activeShop?.name || 'Local Specialty Coffee Shop'}
                     </h3>
-                    <p className="text-xs text-stone-300">{activeShop.address}</p>
+                    <p className="text-xs text-stone-300">{activeShop?.address || ''}</p>
                     <p className="text-xs text-amber-gold/90 font-mono mt-1">
-                      Gear & Bar Setup: {activeShop.equipment}
+                      Gear & Bar Setup: {activeShop?.equipment || 'Espresso Bar'}
                     </p>
                   </div>
 
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeShop.name + ' ' + activeShop.address)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full sm:w-auto py-3 px-6 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-extrabold flex items-center justify-center space-x-2 shadow-xl whitespace-nowrap active:scale-95"
-                  >
-                    <Navigation className="w-4 h-4" />
-                    <span>Get Directions in Maps 🗺️</span>
-                  </a>
+                  {activeShop && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeShop.name + ' ' + activeShop.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto py-3 px-6 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-extrabold flex items-center justify-center space-x-2 shadow-xl whitespace-nowrap active:scale-95"
+                    >
+                      <Navigation className="w-4 h-4" />
+                      <span>Get Directions in Maps 🗺️</span>
+                    </a>
+                  )}
                 </div>
               </div>
 
