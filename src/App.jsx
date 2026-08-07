@@ -16,7 +16,7 @@ import UserProfileDashboard from './components/UserProfileDashboard';
 import GlobalSearchModal from './components/GlobalSearchModal';
 import AuthModal from './components/AuthModal';
 import BrewMasterCommunity from './components/BrewMasterCommunity';
-import AdminConsoleModal from './components/AdminConsoleModal';
+import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
@@ -67,6 +67,7 @@ export default function App() {
   const [isRecipeBuilderOpen, setIsRecipeBuilderOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [isLocalCoffeeOpen, setIsLocalCoffeeOpen] = useState(false);
 
   // Active Method & Scaling State
   const methods = BREW_METHODS[trackMode] || BREW_METHODS.coffee;
@@ -135,6 +136,7 @@ export default function App() {
           const commElem = document.getElementById('brew-master-community');
           if (commElem) commElem.scrollIntoView({ behavior: 'smooth' });
         }}
+        onOpenLocalCoffee={() => setIsLocalCoffeeOpen(true)}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onOpenAdmin={() => setIsAdminModalOpen(true)}
         isAdmin={isAdmin}
@@ -330,6 +332,12 @@ export default function App() {
             onDeleteUser={handleDeleteUser}
             posts={[]}
             onDeletePost={() => {}}
+          />
+
+          {/* Specialty Coffee Shop Finder Modal (GPS 10-Mile Radar) */}
+          <LocalCoffeeFinderModal
+            isOpen={isLocalCoffeeOpen}
+            onClose={() => setIsLocalCoffeeOpen(false)}
           />
 
         </main>

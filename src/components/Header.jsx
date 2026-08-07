@@ -1,7 +1,7 @@
 import React from 'react';
-import { Coffee, Leaf, BookOpen, Search, User, Users, ShieldCheck } from 'lucide-react';
+import { Coffee, Leaf, BookOpen, Search, User, Users, ShieldCheck, MapPin } from 'lucide-react';
 
-export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenAuth, onOpenAdmin, isAdmin, currentUser }) {
+export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenLocalCoffee, onOpenAuth, onOpenAdmin, isAdmin, currentUser }) {
   const isCoffee = trackMode === 'coffee';
 
   return (
@@ -69,6 +69,18 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
             >
               <ShieldCheck className="w-4 h-4 text-rose-400" />
               <span className="hidden xl:inline">Admin</span>
+            </button>
+          )}
+
+          {/* Shop Local Coffee Finder Button with Brew-Inspired Logo */}
+          {onOpenLocalCoffee && (
+            <button
+              onClick={onOpenLocalCoffee}
+              className="flex items-center space-x-1.5 px-3 py-2 rounded-xl btn-tactile-amber text-espresso-950 font-extrabold shadow-lg hover:scale-105 active:scale-95 transition-all"
+              title="Shop Local Coffee • Locate Specialty Coffee Shops within 10 Miles"
+            >
+              <MapPin className="w-4 h-4 text-espresso-950 animate-bounce" />
+              <span className="hidden sm:inline uppercase tracking-wider text-[11px]">Shop Local Coffee 📍</span>
             </button>
           )}
 
