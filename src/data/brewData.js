@@ -2,7 +2,7 @@ export const BREW_METHODS = {
   coffee: [
     {
       id: 'pour_over',
-      name: 'Pour Over (V60)',
+      name: 'Hario V60 Dripper',
       category: 'coffee',
       featured: false,
       heroImage: './pour_over_hero.jpg',
@@ -808,16 +808,16 @@ export const MASTERCLASSES = [
     ]
   },
 
-  // Pour Over Videos (methodId: 'pour_over')
+  // Hario V60 Videos (methodId: 'pour_over')
   {
     id: 'mc_pourover_v60',
     methodId: 'pour_over',
-    method: 'Pour Over',
-    title: 'Pour Over Concentric Pouring & V60 Technique',
+    method: 'Hario V60 Dripper',
+    title: 'Hario V60 Concentric Pouring Technique',
     duration: '4:15',
     thumbnail: './pourover_technique_thumb.jpg',
     embedId: 'AI4ynXzkSQo',
-    description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in V60 drippers.',
+    description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in Hario V60 conical drippers.',
     keyTakeaways: [
       'Pour gently in center-outward concentric spirals',
       'Never hit paper walls directly to prevent water bypass',
@@ -827,8 +827,8 @@ export const MASTERCLASSES = [
   {
     id: 'mc_pourover_beans',
     methodId: 'pour_over',
-    method: 'Pour Over',
-    title: 'Preferred Single-Origin Beans for Pour Over Clarity',
+    method: 'Hario V60 Dripper',
+    title: 'Preferred Single-Origin Beans for Hario V60 Clarity',
     duration: '5:04',
     thumbnail: './pourover_beans_thumb.jpg',
     embedId: '1oB1oDrDkHM',
@@ -842,7 +842,7 @@ export const MASTERCLASSES = [
   {
     id: 'mc_golden_ratio',
     methodId: 'pour_over',
-    method: 'Pour Over',
+    method: 'Hario V60 Dripper',
     title: 'The Golden Ratio of Coffee Brewing (1:16 & SCA Golden Cup Standard)',
     duration: '5:10',
     thumbnail: './golden_ratio_thumb.jpg',

@@ -82,7 +82,7 @@ export default function RecipeBuilderModal({ isOpen, onClose, trackMode }) {
                 onChange={(e) => setMethodId(e.target.value)}
                 className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
               >
-                <option value="pour_over">Pour Over (V60)</option>
+                <option value="pour_over">Hario V60 Dripper</option>
                 <option value="chemex">Chemex Glass Brewer</option>
                 <option value="french_press">French Press</option>
                 <option value="espresso">Espresso</option>
