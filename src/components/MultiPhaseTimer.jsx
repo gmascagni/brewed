@@ -12,17 +12,17 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   const [isRunning, setIsRunning] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  const activePhase = phases[currentPhaseIndex] || phases[0];
+  const activePhase = phases[currentPhaseIndex] || phases[0] || { name: 'Brew Extraction', durationSec: 60, waterMultiplier: 1.0, instruction: 'Begin brewing.' };
   const totalPhaseTime = activePhase?.durationSec || 60;
 
-  // Reset timer when method changes
+  // Reset timer when method or track mode changes
   useEffect(() => {
     stopCompletionChime();
     setCurrentPhaseIndex(0);
     setTimeLeft(phases[0]?.durationSec || 60);
     setIsRunning(false);
     setIsCompleted(false);
-  }, [activeMethod]);
+  }, [activeMethod, trackMode]);
 
   // Main Timer Countdown Loop
   useEffect(() => {
@@ -34,11 +34,17 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     } else if (isRunning && timeLeft === 0) {
       // Phase finish handler
       if (currentPhaseIndex < phases.length - 1) {
-        // Move to next phase
+        // Move to next phase safely
         playPhaseChime(isMuted);
         const nextIdx = currentPhaseIndex + 1;
-        setCurrentPhaseIndex(nextIdx);
-        setTimeLeft(phases[nextIdx].durationSec);
+        if (phases[nextIdx]) {
+          setCurrentPhaseIndex(nextIdx);
+          setTimeLeft(phases[nextIdx].durationSec || 60);
+        } else {
+          playCompletionChime(isMuted);
+          setIsRunning(false);
+          setIsCompleted(true);
+        }
       } else {
         // All phases complete!
         playCompletionChime(isMuted);
@@ -53,9 +59,14 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   const handleSkipPhase = () => {
     if (currentPhaseIndex < phases.length - 1) {
       const nextIdx = currentPhaseIndex + 1;
-      setCurrentPhaseIndex(nextIdx);
-      setTimeLeft(phases[nextIdx].durationSec);
-      setIsRunning(true);
+      if (phases[nextIdx]) {
+        setCurrentPhaseIndex(nextIdx);
+        setTimeLeft(phases[nextIdx].durationSec || 60);
+        setIsRunning(true);
+      } else {
+        setIsRunning(false);
+        setIsCompleted(true);
+      }
     } else {
       setIsRunning(false);
       setIsCompleted(true);

@@ -16,6 +16,13 @@ export class ErrorBoundary extends React.Component {
   }
 
   handleReset = () => {
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        window.sessionStorage.clear();
+      }
+    } catch (e) {
+      console.warn("Could not clear session storage:", e);
+    }
     this.setState({ hasError: false, error: null });
     window.location.reload();
   };
@@ -28,16 +35,16 @@ export class ErrorBoundary extends React.Component {
             <div className="w-16 h-16 rounded-full bg-amber-gold/20 text-amber-gold flex items-center justify-center mx-auto mb-4 border border-amber-gold/40">
               <AlertCircle className="w-8 h-8" />
             </div>
-            <h2 className="font-serif text-2xl font-extrabold mb-2">Workspace Reload Required</h2>
+            <h2 className="font-serif text-2xl font-extrabold mb-2">Workspace Reset & Recovery</h2>
             <p className="text-xs text-cream-soft/80 mb-6 leading-relaxed">
-              The application encountered a transient state sync error while switching brew tracks. Click below to reload the workspace.
+              The application encountered a state sync glitch. Click below to restore state and reload cleanly.
             </p>
             <button
               onClick={this.handleReset}
               className="w-full py-3.5 rounded-2xl btn-tactile-amber text-espresso-950 text-xs font-extrabold flex items-center justify-center gap-2 shadow-xl active:scale-95"
             >
               <RefreshCw className="w-4 h-4" />
-              <span>Reload Workspace</span>
+              <span>Restore Workspace</span>
             </button>
           </div>
         </div>
