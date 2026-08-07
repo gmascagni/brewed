@@ -17,6 +17,7 @@ import GlobalSearchModal from './components/GlobalSearchModal';
 import AuthModal from './components/AuthModal';
 import BrewMasterCommunity from './components/BrewMasterCommunity';
 import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
+import AdminConsoleModal from './components/AdminConsoleModal';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
