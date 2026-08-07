@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Navigation, Star, Search, Coffee, Compass, ExternalLink, X, Sparkles, Clock } from 'lucide-react';
+import { MapPin, Navigation, Star, Search, Coffee, Compass, ExternalLink, X, Sparkles, Clock, AlertCircle } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 
 // Calculate exact Haversine distance in miles between two lat/lng coordinates
@@ -18,9 +18,31 @@ function getHaversineDistanceMiles(lat1, lon1, lat2, lon2) {
   return Math.round(R * c * 10) / 10;
 }
 
-// Nationwide Specialty Coffee Shops Database (Including Atlanta, Seattle, NYC, SF, Chicago, Austin, etc.)
+// City & Zip Geocoding Coordinates Dictionary
+const CITY_GEOCODE_MAP = {
+  'alpharetta': { lat: 34.0754, lng: -84.2941, label: 'Alpharetta, GA' },
+  'alpharetta, ga': { lat: 34.0754, lng: -84.2941, label: 'Alpharetta, GA' },
+  'alpharetta ga': { lat: 34.0754, lng: -84.2941, label: 'Alpharetta, GA' },
+  'roswell': { lat: 34.0232, lng: -84.3616, label: 'Roswell, GA' },
+  'sandy springs': { lat: 33.9304, lng: -84.3733, label: 'Sandy Springs, GA' },
+  'atlanta': { lat: 33.7490, lng: -84.3880, label: 'Atlanta, GA' },
+  'atlanta, ga': { lat: 33.7490, lng: -84.3880, label: 'Atlanta, GA' },
+  'marietta': { lat: 33.9526, lng: -84.5499, label: 'Marietta, GA' },
+  'decatur': { lat: 33.7748, lng: -84.2963, label: 'Decatur, GA' },
+  'johns creek': { lat: 34.0289, lng: -84.1986, label: 'Johns Creek, GA' },
+  'bentonville': { lat: 36.3729, lng: -94.2088, label: 'Bentonville, AR' },
+  'portland': { lat: 45.5152, lng: -122.6784, label: 'Portland, OR' },
+  'brooklyn': { lat: 40.7051, lng: -73.9332, label: 'Brooklyn, NY' },
+  'new york': { lat: 40.7128, lng: -74.0060, label: 'New York, NY' },
+  'san francisco': { lat: 37.7749, lng: -122.4194, label: 'San Francisco, CA' },
+  'seattle': { lat: 47.6062, lng: -122.3321, label: 'Seattle, WA' },
+  'chicago': { lat: 41.8781, lng: -87.6298, label: 'Chicago, IL' },
+  'austin': { lat: 30.2672, lng: -97.7431, label: 'Austin, TX' }
+};
+
+// Nationwide Specialty Coffee Shops Database
 const SPECIALTY_COFFEE_SHOPS_DB = [
-  // ATLANTA, GA METRO
+  // ATLANTA & NORTH METRO (Alpharetta / Roswell / Atlanta)
   {
     id: 'shop_atl_east_pole',
     name: 'East Pole Coffee Co.',
@@ -40,41 +62,22 @@ const SPECIALTY_COFFEE_SHOPS_DB = [
     description: 'Premier Atlanta specialty roaster in Armour Yards with single-origin pour-overs, nitro cold brew, and seasonal espresso drinks.'
   },
   {
-    id: 'shop_atl_chrome_yellow',
-    name: 'Chrome Yellow Trading Co.',
+    id: 'shop_atl_bellwood',
+    name: 'Bellwood Coffee',
     city: 'Atlanta',
     state: 'GA',
-    zip: '30312',
-    address: '501 Edgewood Ave SE, Atlanta, GA 30312',
-    lat: 33.7541,
-    lng: -84.3704,
+    zip: '30309',
+    address: '1366 Peachtree St NE, Atlanta, GA 30309',
+    lat: 33.7915,
+    lng: -84.3842,
     rating: 4.8,
-    reviewsCount: 390,
+    reviewsCount: 260,
     isOpen: true,
-    hours: '7:00 AM - 4:00 PM',
-    phone: '(404) 458-2947',
-    specialtyGrade: 'Artisan Craft Roasts & High-Elevation Washed Coffees',
-    equipment: 'La Marzocco Linea PB, Fellow Ode, Aeropress Bar',
-    description: 'Edgewood neighborhood staple roasting exceptional single-origins with a minimalist industrial vibe.'
-  },
-  {
-    id: 'shop_atl_brash',
-    name: 'Brash Coffee Roasters',
-    city: 'Atlanta',
-    state: 'GA',
-    zip: '30305',
-    address: '130 W Paces Ferry Rd NW, Atlanta, GA 30305',
-    lat: 33.8407,
-    lng: -84.3811,
-    rating: 4.8,
-    reviewsCount: 310,
-    isOpen: true,
-    hours: '7:00 AM - 6:00 PM',
-    phone: '(404) 434-1188',
-    specialtyGrade: 'Direct Origin Farm Sourced (Guatemala & El Salvador)',
-    equipment: 'Modbar Espresso, Slayer Custom, Hario V60 Bar',
-    photo: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&auto=format&fit=crop&q=80',
-    description: 'Iconic shipping container espresso bar in Buckhead serving direct-trade single-origin coffees brewed with extreme precision.'
+    hours: '7:00 AM - 5:00 PM',
+    phone: '(404) 835-2431',
+    specialtyGrade: 'High Elevation Ethiopian & Colombian Micro-Lots',
+    equipment: 'La Marzocco GS3, Hario V60 Bar',
+    description: 'Serene Midtown Atlanta specialty coffee shop featuring seasonal single-origins, house matcha, and botanical espresso drinks.'
   },
   {
     id: 'shop_atl_spiller_park',
@@ -95,6 +98,24 @@ const SPECIALTY_COFFEE_SHOPS_DB = [
     description: 'High-energy specialty multi-roaster inside Ponce City Market serving Intelligentsia, George Howell, and guest micro-lots.'
   },
   {
+    id: 'shop_atl_chrome_yellow',
+    name: 'Chrome Yellow Trading Co.',
+    city: 'Atlanta',
+    state: 'GA',
+    zip: '30312',
+    address: '501 Edgewood Ave SE, Atlanta, GA 30312',
+    lat: 33.7541,
+    lng: -84.3704,
+    rating: 4.8,
+    reviewsCount: 390,
+    isOpen: true,
+    hours: '7:00 AM - 4:00 PM',
+    phone: '(404) 458-2947',
+    specialtyGrade: 'Artisan Craft Roasts & High-Elevation Washed Coffees',
+    equipment: 'La Marzocco Linea PB, Fellow Ode, Aeropress Bar',
+    description: 'Edgewood neighborhood staple roasting exceptional single-origins with a minimalist industrial vibe.'
+  },
+  {
     id: 'shop_atl_perc',
     name: 'PERC Coffee Atlanta',
     city: 'Atlanta',
@@ -113,25 +134,25 @@ const SPECIALTY_COFFEE_SHOPS_DB = [
     description: 'Savannah-born craft roaster with funky, fruit-forward natural process coffees, espresso drinks, and custom merch.'
   },
   {
-    id: 'shop_atl_bellwood',
-    name: 'Bellwood Coffee',
+    id: 'shop_atl_brash',
+    name: 'Brash Coffee Roasters',
     city: 'Atlanta',
     state: 'GA',
-    zip: '30309',
-    address: '1366 Peachtree St NE, Atlanta, GA 30309',
-    lat: 33.7915,
-    lng: -84.3842,
+    zip: '30305',
+    address: '130 W Paces Ferry Rd NW, Atlanta, GA 30305',
+    lat: 33.8407,
+    lng: -84.3811,
     rating: 4.8,
-    reviewsCount: 260,
+    reviewsCount: 310,
     isOpen: true,
-    hours: '7:00 AM - 5:00 PM',
-    phone: '(404) 835-2431',
-    specialtyGrade: 'High Elevation Ethiopian & Colombian Micro-Lots',
-    equipment: 'La Marzocco GS3, Hario V60 Bar',
-    description: 'Serene Midtown Atlanta specialty coffee shop featuring seasonal single-origins, house matcha, and botanical espresso drinks.'
+    hours: '7:00 AM - 6:00 PM',
+    phone: '(404) 434-1188',
+    specialtyGrade: 'Direct Origin Farm Sourced (Guatemala & El Salvador)',
+    equipment: 'Modbar Espresso, Slayer Custom, Hario V60 Bar',
+    description: 'Iconic shipping container espresso bar in Buckhead serving direct-trade single-origin coffees brewed with extreme precision.'
   },
 
-  // OTHER MAJOR METROS
+  // OTHER NATIONWIDE SPECIALTY HUBS
   {
     id: 'shop_onyx_bentonville',
     name: 'Onyx Coffee Lab HQ',
@@ -217,8 +238,36 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
   });
   const [isLocating, setIsLocating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [radiusMiles, setRadiusMiles] = useState(10);
+  const [radiusMiles, setRadiusMiles] = useState(25); // Default to 25 mi for metro coverage
   const [selectedShopId, setSelectedShopId] = useState(SPECIALTY_COFFEE_SHOPS_DB[0].id);
+
+  // Handle Search Input & Geocoding City Recentering
+  const handleSearchChange = (queryStr) => {
+    setSearchQuery(queryStr);
+    const cleaned = queryStr.toLowerCase().trim();
+
+    // Check if searched query matches a city in our City Geocode Map
+    if (CITY_GEOCODE_MAP[cleaned]) {
+      const geo = CITY_GEOCODE_MAP[cleaned];
+      setUserLocation({
+        lat: geo.lat,
+        lng: geo.lng,
+        label: `${geo.label} Radar`
+      });
+    } else {
+      // Check partial match for city name (e.g. 'alpharetta' in 'alpharetta , ga')
+      Object.keys(CITY_GEOCODE_MAP).forEach((cityKey) => {
+        if (cleaned.startsWith(cityKey)) {
+          const geo = CITY_GEOCODE_MAP[cityKey];
+          setUserLocation({
+            lat: geo.lat,
+            lng: geo.lng,
+            label: `${geo.label} Radar`
+          });
+        }
+      });
+    }
+  };
 
   // Request Browser Real GPS Location
   const handleGetLocation = () => {
@@ -239,7 +288,6 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
         (error) => {
           console.warn('Geolocation access denied or timed out:', error);
           setIsLocating(false);
-          // Keep Atlanta as fallback
           setUserLocation({
             lat: 33.7490,
             lng: -84.3880,
@@ -269,22 +317,26 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
   // Sort shops by calculated distance ascending (closest shop first)
   shopsWithDistances.sort((a, b) => a.calculatedDistanceMiles - b.calculatedDistanceMiles);
 
-  // Filter shops by search query (city, zip, or name) AND radius
+  // Filter shops by radius AND optional text query
   const filteredShops = shopsWithDistances.filter((shop) => {
     const q = searchQuery.toLowerCase().trim();
     const isWithinRadius = shop.calculatedDistanceMiles <= radiusMiles;
 
-    if (!q) {
+    // If query is empty or matched a city geocode, filter strictly by radius
+    if (!q || CITY_GEOCODE_MAP[q] || Object.keys(CITY_GEOCODE_MAP).some(k => q.startsWith(k))) {
       return isWithinRadius;
     }
 
-    return (
+    // Otherwise match shop name or address keyword
+    const matchesKeyword = (
       shop.name.toLowerCase().includes(q) ||
       shop.city.toLowerCase().includes(q) ||
       shop.state.toLowerCase().includes(q) ||
       shop.address.toLowerCase().includes(q) ||
       shop.specialtyGrade.toLowerCase().includes(q)
     );
+
+    return isWithinRadius && matchesKeyword;
   });
 
   const activeShop = shopsWithDistances.find((s) => s.id === selectedShopId) || filteredShops[0] || shopsWithDistances[0];
@@ -328,8 +380,8 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by city (e.g. Atlanta), zip, or shop..."
+              onChange={(e) => handleSearchChange(e.target.value)}
+              placeholder="Search city (e.g. Alpharetta), zip, or shop..."
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-cream-light focus:outline-none focus:border-amber-gold"
             />
           </div>
@@ -376,8 +428,17 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
             </div>
 
             {filteredShops.length === 0 ? (
-              <div className="p-8 text-center bg-black/30 rounded-2xl border border-white/10 text-xs text-stone-400">
-                No coffee shops found within {radiusMiles} miles of your location. Try selecting <strong>25 mi</strong>, <strong>100 mi</strong>, or <strong>500 mi</strong> radius above!
+              <div className="p-6 text-center bg-black/40 rounded-2xl border border-white/10 text-xs text-stone-300 space-y-3">
+                <AlertCircle className="w-6 h-6 text-amber-gold mx-auto" />
+                <p className="leading-relaxed">
+                  No shops found within <strong>{radiusMiles} miles</strong> of {userLocation.label}.
+                </p>
+                <button
+                  onClick={() => setRadiusMiles(radiusMiles < 100 ? 100 : 500)}
+                  className="py-2 px-4 rounded-xl btn-tactile-amber text-espresso-950 font-extrabold text-xs shadow-lg active:scale-95"
+                >
+                  Expand Radar Radius to {radiusMiles < 100 ? '100 mi' : '500 mi'} 📡
+                </button>
               </div>
             ) : (
               filteredShops.map((shop) => {
