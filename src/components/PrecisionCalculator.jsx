@@ -1,5 +1,6 @@
-import React from 'react';
-import { CupSoda, Scale, Sliders, CheckCircle2, Sparkles, Thermometer, Clock, ChevronRight, ChevronLeft, Volume2, VolumeX } from 'lucide-react';
+import React, { useState } from 'react';
+import { CupSoda, Scale, Sliders, CheckCircle2, Sparkles, Thermometer, Clock, ChevronRight, ChevronLeft, Volume2, VolumeX, Lightbulb } from 'lucide-react';
+import V60ProTipModal from './V60ProTipModal';
 
 export default function PrecisionCalculator({
   trackMode,
@@ -23,6 +24,8 @@ export default function PrecisionCalculator({
 }) {
   const isCoffee = trackMode === 'coffee';
   const isMetric = unitSystem === 'metric';
+  const isPourOver = activeMethod?.id === 'classic_pour_over' || activeMethod?.id === 'pour_over' || activeMethod?.id === 'chemex';
+  const [isProTipOpen, setIsProTipOpen] = useState(false);
 
   // Math Calculations
   const totalWaterMl = customWaterMl !== null ? customWaterMl : (cupCount * cupMl);
@@ -64,8 +67,19 @@ export default function PrecisionCalculator({
             <span>Step 02 of 04 • Precision Scaler & Ratio Matrix</span>
           </div>
 
-          {/* Embedded Preferences Control Bar: Imperial/Metric Unit Toggle & Mute Speaker */}
+          {/* Embedded Preferences Control Bar: Imperial/Metric Unit Toggle, Mute Speaker & Pro Tip */}
           <div className="flex items-center space-x-2 text-xs font-mono font-bold">
+            {isPourOver && (
+              <button
+                onClick={() => setIsProTipOpen(true)}
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-gold text-espresso-950 hover:bg-amber-gold/90 font-extrabold text-xs uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all animate-pulse"
+                title="Open Pour Over Pro Tip Masterclass Guide"
+              >
+                <Lightbulb className="w-3.5 h-3.5 fill-current text-espresso-950" />
+                <span>Pro Tip 💡</span>
+              </button>
+            )}
+
             {setUnitSystem && (
               <button
                 onClick={() => setUnitSystem(unitSystem === 'metric' ? 'imperial' : 'metric')}
@@ -406,6 +420,12 @@ export default function PrecisionCalculator({
           </button>
         </div>
       )}
+
+      {/* 1-Cup V60 / Pour Over Pro Tip Masterclass Modal */}
+      <V60ProTipModal
+        isOpen={isProTipOpen}
+        onClose={() => setIsProTipOpen(false)}
+      />
 
     </div>
   );
