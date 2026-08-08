@@ -828,6 +828,38 @@ export const MASTERCLASSES = [
     ]
   },
 
+  // Classic Pour Over Videos (methodId: 'classic_pour_over')
+  {
+    id: 'mc_classic_pourover_technique',
+    methodId: 'classic_pour_over',
+    method: 'Classic Pour Over',
+    title: 'Mastering the Classic Pour Over (Universal Cone & Flat-Bottom Drippers)',
+    duration: '4:30',
+    thumbnail: './pourover_technique_thumb.jpg',
+    embedId: 'AI4ynXzkSQo',
+    description: 'Universal step-by-step masterclass covering bloom degassing, spiral pulse pouring, and maintaining a flat coffee bed across all pour-over drippers.',
+    keyTakeaways: [
+      'Pour 3x coffee weight for a 45-second bloom degassing phase',
+      'Keep kettle spout low to prevent excessive agitation and clogging',
+      'Maintain steady water bed level with 5g/sec spiral pulse pours'
+    ]
+  },
+  {
+    id: 'mc_classic_pourover_beans',
+    methodId: 'classic_pour_over',
+    method: 'Classic Pour Over',
+    title: 'Best Coffee Beans & SCA 1:16 Golden Ratios for Pour Over',
+    duration: '5:10',
+    thumbnail: './golden_ratio_thumb.jpg',
+    embedId: '1oB1oDrDkHM',
+    description: 'Learn why the 1:16 ratio and medium-fine grind size produce sparkling acidity and rich floral sweetness in pour-over brewing.',
+    keyTakeaways: [
+      '1:16 ratio equals 60 grams of coffee per 1 Liter of water',
+      'Ideal for washed Ethiopian, Guatemalan, and Colombian single origins',
+      'Prevents sour under-extraction and bitter over-extraction'
+    ]
+  },
+
   // Hario V60 Videos (methodId: 'pour_over')
   {
     id: 'mc_pourover_v60',
