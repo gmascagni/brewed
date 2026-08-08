@@ -67,8 +67,8 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
           onClick={handleToggleExpand}
           className={`flex items-center space-x-2.5 px-6 py-3.5 rounded-2xl text-xs uppercase tracking-wider font-extrabold shadow-xl transition-all active:scale-95 whitespace-nowrap ${
             isExpanded
-              ? 'bg-amber-gold text-espresso-950 shadow-amber-gold/20 scale-105'
-              : 'btn-tactile-amber text-espresso-950 hover:scale-105 animate-pulse'
+              ? 'btn-tactile-amber text-espresso-950 shadow-amber-gold/20 scale-105'
+              : 'bg-[#1C1814] text-cream-soft border border-white/20 hover:border-amber-gold/60 hover:text-cream-light hover:bg-[#25201B] shadow-md'
           }`}
           title={isExpanded ? 'Collapse Help Videos section' : 'Expand Help Videos section'}
         >
