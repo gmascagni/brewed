@@ -65,15 +65,15 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
         {/* Expand / Collapse Help Videos Button */}
         <button
           onClick={handleToggleExpand}
-          className={`flex items-center space-x-2.5 px-6 py-3.5 rounded-2xl text-xs uppercase tracking-wider font-extrabold shadow-xl transition-all active:scale-95 whitespace-nowrap ${
+          className={`px-7 py-4 rounded-2xl text-xs font-extrabold uppercase tracking-wider flex items-center gap-2.5 shadow-2xl transition-all active:scale-95 whitespace-nowrap ${
             isExpanded
-              ? 'btn-tactile-amber text-espresso-950 shadow-amber-gold/20 scale-105'
-              : 'bg-[#1C1814] text-cream-soft border border-white/20 hover:border-amber-gold/60 hover:text-cream-light hover:bg-[#25201B] shadow-md'
+              ? 'bg-amber-gold text-espresso-950 hover:bg-amber-gold/90'
+              : 'bg-white/[0.08] text-cream-light hover:bg-white/[0.15] border border-white/[0.12]'
           }`}
           title={isExpanded ? 'Collapse Help Videos section' : 'Expand Help Videos section'}
         >
           <Film className="w-4 h-4" />
-          <span>{isExpanded ? 'Collapse Help Videos 🔼' : 'Expand Help Videos 🎬'}</span>
+          <span>{isExpanded ? 'Close Help Videos' : 'Expand Help Videos'}</span>
           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
       </div>
