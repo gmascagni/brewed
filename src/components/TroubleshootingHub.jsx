@@ -187,29 +187,77 @@ export default function TroubleshootingHub({ trackMode }) {
             </div>
           )}
 
-          {/* Water Quality & Filter Card */}
-          <div className="p-6 rounded-3xl bg-espresso-900/70 border border-white/15 shadow-2xl">
-            <h4 className="text-sm uppercase tracking-wider font-extrabold text-cream-light mb-2 flex items-center gap-2 drop-shadow">
-              <Droplet className="w-4 h-4 text-cyan-400" />
-              <span>Water Chemistry & Filtration at Home</span>
-            </h4>
-            <p className="text-xs text-cream-soft/80 font-medium leading-relaxed">
-              Water accounts for 98.5% of coffee and 99.5% of tea. Standard tap water with high scale mutes acidity and tannins, while pure distilled zero-TDS water yields flat notes.
+          {/* Comprehensive Water Quality & Extraction Chemistry Masterclass Card */}
+          <div className="p-6 rounded-3xl bg-espresso-900/90 border-2 border-cyan-500/40 shadow-2xl space-y-4">
+            
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm uppercase font-mono tracking-wider font-extrabold text-cream-light flex items-center gap-2 drop-shadow">
+                <Droplet className="w-4 h-4 text-cyan-400 animate-pulse" />
+                <span>Why Water Quality Is Paramount (98.5% of Your Cup)</span>
+              </h4>
+              <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-cyan-300 bg-cyan-500/20 px-2.5 py-1 rounded-full border border-cyan-400/40">
+                Critical Ingredient
+              </span>
+            </div>
+
+            <p className="text-xs text-cream-soft/90 font-medium leading-relaxed">
+              Water makes up <strong className="text-cyan-300 font-mono">98.5% of brewed coffee</strong> and <strong className="text-cyan-300 font-mono">99.5% of tea</strong>. Water is not merely a solvent—its mineral composition dictates how flavor compounds dissolve. Bad tap water with high alkalinity or chlorine will ruin even $100/lb specialty micro-lots.
             </p>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-xs font-mono">
-              <div className="p-3 rounded-2xl bg-black/40 border border-white/10 shadow-inner">
-                <span className="text-cream-soft/60 block text-[10px] font-extrabold">TARGET TDS</span>
-                <span className="text-amber-gold font-extrabold text-sm">120 - 150 ppm</span>
+
+            {/* Target Water Chemistry Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+              <div className="p-3 rounded-2xl bg-black/50 border border-white/10 shadow-inner">
+                <span className="text-stone-400 block text-[9px] font-extrabold uppercase">Target TDS</span>
+                <strong className="text-amber-gold font-extrabold text-xs sm:text-sm">120 - 150 ppm</strong>
+                <span className="text-[9px] text-stone-400 block font-sans">SCA Benchmark</span>
               </div>
-              <div className="p-3 rounded-2xl bg-black/40 border border-white/10 shadow-inner">
-                <span className="text-cream-soft/60 block text-[10px] font-extrabold">OPTIMAL PH</span>
-                <span className="text-emerald-400 font-extrabold text-sm">6.5 - 7.5 pH</span>
+
+              <div className="p-3 rounded-2xl bg-black/50 border border-white/10 shadow-inner">
+                <span className="text-stone-400 block text-[9px] font-extrabold uppercase">Optimal pH</span>
+                <strong className="text-emerald-400 font-extrabold text-xs sm:text-sm">6.5 - 7.5 pH</strong>
+                <span className="text-[9px] text-stone-400 block font-sans">Neutral Buffer</span>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-black/50 border border-white/10 shadow-inner">
+                <span className="text-stone-400 block text-[9px] font-extrabold uppercase">Ca²⁺ / Mg²⁺</span>
+                <strong className="text-cyan-300 font-extrabold text-xs sm:text-sm">50 - 85 ppm</strong>
+                <span className="text-[9px] text-stone-400 block font-sans">Flavor Binding</span>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-black/50 border border-white/10 shadow-inner">
+                <span className="text-stone-400 block text-[9px] font-extrabold uppercase">Alkalinity</span>
+                <strong className="text-purple-300 font-extrabold text-xs sm:text-sm">40 - 50 ppm</strong>
+                <span className="text-[9px] text-stone-400 block font-sans">Acid Balance</span>
+              </div>
+            </div>
+
+            {/* Water Defects Diagnostics Summary */}
+            <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 text-[11px] space-y-2 text-stone-300">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-3.5 h-3.5 text-rose-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-cream-light font-bold">Hard Tap Water (High Limescale & Bicarbonates):</strong> Completely destroys bright citric acidity, turning light roasts chalky, flat, and woody.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-cream-light font-bold">Pure Distilled / Zero-TDS Water:</strong> Lacks essential Magnesium (Mg²⁺) and Calcium (Ca²⁺) binding ions, leaving cups thin, sharp, and sour.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-cream-light font-bold">Chlorinated Tap Water:</strong> Causes plastic, chemical, or metallic off-flavors. Always use activated charcoal filtration or remineralized RO water.
+                </div>
               </div>
             </div>
 
             {/* Contextual Amazon Affiliate Recommendation Box for Water Chemistry */}
-            <div className="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
-              <span className="text-stone-300">Test tap water TDS mineral content or add minerals:</span>
+            <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
+              <span className="text-stone-300 font-medium">Test tap water TDS mineral content or add minerals:</span>
               <div className="flex gap-2">
                 <a
                   href="https://www.amazon.com/s?k=Digital+TDS+Water+Quality+Tester+Purity+Meter&tag=thebrewapp13-20"
