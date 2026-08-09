@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, X, Coffee, Leaf, ShoppingBag, BookOpen, GraduationCap, HelpCircle, ChevronRight, Star } from 'lucide-react';
+import { Search, X, Coffee, Leaf, ShoppingBag, BookOpen, GraduationCap, ChevronRight, Star, Compass } from 'lucide-react';
 import { BREW_METHODS, TERROIR_ATLAS } from '../data/brewData';
 import { PRODUCTS_DATA } from '../data/productsData';
 import { COMMUNITY_RECIPES } from '../data/communityRecipesData';
@@ -55,7 +55,8 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
       if (
         !searchQuery ||
         orig.country.toLowerCase().includes(searchQuery) ||
-        (orig.macroRegion && orig.macroRegion.toLowerCase().includes(searchQuery))
+        (orig.macroRegion && orig.macroRegion.toLowerCase().includes(searchQuery)) ||
+        (orig.regions && orig.regions.toLowerCase().includes(searchQuery))
       ) {
         matchingOrigins.push(orig);
       }
@@ -74,8 +75,10 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
     onClose();
   };
 
+  const totalResultsCount = matchingRecipes.length + matchingMethods.length + matchingProducts.length + matchingOrigins.length;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-20 px-4 bg-black/80 backdrop-blur-xl animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-20 px-4 bg-black/85 backdrop-blur-xl animate-fade-in">
       
       <div className="relative max-w-3xl w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 shadow-2xl overflow-hidden text-cream-light flex flex-col max-h-[85vh]">
         
@@ -102,31 +105,31 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
         <div className="flex items-center gap-2 px-6 py-3 border-b border-white/10 overflow-x-auto text-xs font-mono font-bold bg-black/20">
           <button
             onClick={() => setActiveCategory('all')}
-            className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'all' ? 'bg-amber-gold text-espresso-950 shadow-md' : 'text-stone-400 hover:text-cream-light'}`}
+            className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'all' ? 'bg-amber-gold text-espresso-950 shadow-md font-extrabold' : 'text-stone-400 hover:text-cream-light'}`}
           >
-            All Results
+            All Results ({totalResultsCount})
           </button>
           <button
             onClick={() => setActiveCategory('recipes')}
-            className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'recipes' ? 'bg-amber-gold text-espresso-950 shadow-md' : 'text-stone-400 hover:text-cream-light'}`}
+            className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'recipes' ? 'bg-amber-gold text-espresso-950 shadow-md font-extrabold' : 'text-stone-400 hover:text-cream-light'}`}
           >
             Recipes ({matchingRecipes.length})
           </button>
           <button
             onClick={() => setActiveCategory('methods')}
-            className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'methods' ? 'bg-amber-gold text-espresso-950 shadow-md' : 'text-stone-400 hover:text-cream-light'}`}
+            className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'methods' ? 'bg-amber-gold text-espresso-950 shadow-md font-extrabold' : 'text-stone-400 hover:text-cream-light'}`}
           >
             Methods ({matchingMethods.length})
           </button>
           <button
             onClick={() => setActiveCategory('gear')}
-            className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'gear' ? 'bg-amber-gold text-espresso-950 shadow-md' : 'text-stone-400 hover:text-cream-light'}`}
+            className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'gear' ? 'bg-amber-gold text-espresso-950 shadow-md font-extrabold' : 'text-stone-400 hover:text-cream-light'}`}
           >
             Gear ({matchingProducts.length})
           </button>
           <button
             onClick={() => setActiveCategory('origins')}
-            className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'origins' ? 'bg-amber-gold text-espresso-950 shadow-md' : 'text-stone-400 hover:text-cream-light'}`}
+            className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'origins' ? 'bg-amber-gold text-espresso-950 shadow-md font-extrabold' : 'text-stone-400 hover:text-cream-light'}`}
           >
             Terroirs ({matchingOrigins.length})
           </button>
@@ -140,7 +143,7 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
             <div>
               <div className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold mb-3 flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>Community Recipes</span>
+                <span>Community Recipes ({matchingRecipes.length})</span>
               </div>
               <div className="grid grid-cols-1 gap-2.5">
                 {matchingRecipes.map((recipe) => (
@@ -166,18 +169,18 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
             </div>
           )}
 
-          {/* 2. Brewing Methods */}
+          {/* 2. Brewing Devices & Methods */}
           {(activeCategory === 'all' || activeCategory === 'methods') && matchingMethods.length > 0 && (
             <div>
               <div className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold mb-3 flex items-center gap-1.5">
                 <Coffee className="w-3.5 h-3.5" />
-                <span>Brewing Devices & Varietals</span>
+                <span>Brewing Devices & Varietals ({matchingMethods.length})</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {matchingMethods.map((method) => (
                   <div
                     key={method.id}
-                    onClick={() => handleMethodSelect(method)}
+                    onClick={() => handleSelectMethod(method)}
                     className="p-3.5 rounded-2xl bg-black/40 border border-white/10 hover:border-amber-gold/50 transition-all flex items-center justify-between gap-2 group cursor-pointer"
                   >
                     <div>
@@ -200,7 +203,7 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
             <div>
               <div className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold mb-3 flex items-center gap-1.5">
                 <ShoppingBag className="w-3.5 h-3.5" />
-                <span>Curated Brew Gear & Beans</span>
+                <span>Curated Brew Gear & Beans ({matchingProducts.length})</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {matchingProducts.map((prod) => (
@@ -226,6 +229,61 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
                   </a>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* 4. Terroirs & Origins */}
+          {(activeCategory === 'all' || activeCategory === 'origins') && matchingOrigins.length > 0 && (
+            <div>
+              <div className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold mb-3 flex items-center gap-1.5">
+                <GraduationCap className="w-3.5 h-3.5" />
+                <span>Terroirs & Origin Terroir Atlas ({matchingOrigins.length})</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {matchingOrigins.map((orig) => (
+                  <div
+                    key={orig.id}
+                    className="p-3.5 rounded-2xl bg-black/40 border border-white/10 hover:border-amber-gold/50 transition-all flex flex-col justify-between gap-2 group cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="font-serif font-bold text-cream-light text-sm flex items-center gap-2 group-hover:text-amber-gold transition-colors">
+                        <span className="text-base">{orig.flag || '🌍'}</span>
+                        <span>{orig.country}</span>
+                      </div>
+                      <span className="text-[10px] font-mono text-amber-gold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-gold/30">
+                        {orig.altitude || 'High Altitude'}
+                      </span>
+                    </div>
+
+                    <div className="text-[10px] font-mono text-stone-400">
+                      {orig.macroRegion || orig.regions}
+                    </div>
+
+                    {orig.flavorNotes && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {orig.flavorNotes.slice(0, 3).map((note, idx) => (
+                          <span key={idx} className="text-[9px] font-mono px-2 py-0.5 rounded bg-white/5 text-stone-300 border border-white/10">
+                            {note}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* No Matching Results Empty Callout */}
+          {totalResultsCount === 0 && (
+            <div className="p-8 text-center bg-black/40 rounded-2xl border border-white/10 space-y-3">
+              <Compass className="w-8 h-8 text-amber-gold mx-auto animate-spin-slow" />
+              <p className="text-stone-300 font-medium">
+                No matching results found for <strong className="text-amber-gold">"{query}"</strong>.
+              </p>
+              <p className="text-stone-400 text-[11px]">
+                Try searching for <code className="text-amber-gold">V60</code>, <code className="text-amber-gold">Ethiopia</code>, <code className="text-amber-gold">Kettle</code>, or <code className="text-amber-gold">Grinder</code>.
+              </p>
             </div>
           )}
 
