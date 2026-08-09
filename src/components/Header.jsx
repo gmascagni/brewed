@@ -5,7 +5,7 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
   const isCoffee = trackMode === 'coffee';
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#0A0908]/95 border-b border-white/[0.08] shadow-2xl px-4 lg:px-8 py-3.5 transition-colors duration-500">
+    <div className="px-4 lg:px-8 py-2.5 transition-colors duration-500">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         
         {/* Logo & Brand Title */}
@@ -153,6 +153,6 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
         </div>
 
       </div>
-    </header>
+    </div>
   );
 }

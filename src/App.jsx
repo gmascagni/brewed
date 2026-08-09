@@ -126,32 +126,34 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0A0908] text-cream-soft font-sans selection:bg-amber-gold selection:text-espresso-950 flex flex-col">
       
-      {/* Streamlined Minimalist Header */}
-      <Header
-        trackMode={trackMode}
-        setTrackMode={handleTrackSwitch}
-        onOpenJournal={() => setIsJournalOpen(true)}
-        onOpenSearch={() => setIsSearchOpen(true)}
-        onOpenProfile={() => setIsProfileOpen(true)}
-        onOpenCommunity={() => setIsCommunityOpen(true)}
-        onOpenLocalCoffee={() => setIsLocalCoffeeOpen(true)}
-        onOpenAuth={() => setIsAuthModalOpen(true)}
-        onOpenAdmin={() => setIsAdminModalOpen(true)}
-        isAdmin={isAdmin}
-        currentUser={currentUser}
-      />
-
-      {/* Main Workspace Container */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      {/* 100% Bulletproof Sticky Top Header Container (Sticky on Android, iOS, & Desktop) */}
+      <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#0A0908]/95 border-b border-amber-gold/30 shadow-2xl transition-colors duration-500">
+        <Header
+          trackMode={trackMode}
+          setTrackMode={handleTrackSwitch}
+          onOpenJournal={() => setIsJournalOpen(true)}
+          onOpenSearch={() => setIsSearchOpen(true)}
+          onOpenProfile={() => setIsProfileOpen(true)}
+          onOpenCommunity={() => setIsCommunityOpen(true)}
+          onOpenLocalCoffee={() => setIsLocalCoffeeOpen(true)}
+          onOpenAuth={() => setIsAuthModalOpen(true)}
+          onOpenAdmin={() => setIsAdminModalOpen(true)}
+          isAdmin={isAdmin}
+          currentUser={currentUser}
+        />
         
-        {/* Step Progress Bar */}
+        {/* Step Progress Bar Pinned Inside Sticky Top Bar */}
         <StepIndicator
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           trackMode={trackMode}
         />
+      </header>
 
-        <main className="mt-6 space-y-10">
+      {/* Main Workspace Container */}
+      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+
+        <main className="mt-4 space-y-10">
 
           {/* STEP 01: METHOD SELECTOR */}
           {currentStep === 1 && (
