@@ -159,6 +159,7 @@ export default function App() {
           {currentStep === 1 && (
             <MethodSelectorGrid
               trackMode={trackMode}
+              setTrackMode={setTrackMode}
               methods={methods}
               activeMethod={currentActiveMethod}
               setActiveMethod={handleSelectMethodFromGrid}

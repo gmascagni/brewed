@@ -1,7 +1,7 @@
 import React from 'react';
 import { Thermometer, Clock, CheckCircle2, ChevronRight, Sparkles, Coffee, Leaf, Gauge } from 'lucide-react';
 
-export default function MethodSelectorGrid({ trackMode, methods, activeMethod, setActiveMethod, onNextStep, unitSystem }) {
+export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, activeMethod, setActiveMethod, onNextStep, unitSystem }) {
   const isCoffee = trackMode === 'coffee';
   const isMetric = unitSystem === 'metric';
 
@@ -33,35 +33,59 @@ export default function MethodSelectorGrid({ trackMode, methods, activeMethod, s
           Precision specialty coffee ratio calculator, fine tea steeping timers, micron-level grind sizing, and troubleshooting guide. Select your brewing path below:
         </p>
 
-        {/* Dual-Path Entry Cards: The Coffee Lab vs The Tea Room */}
+        {/* Dual-Path Entry Buttons: The Coffee Lab vs The Tea Room */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className={`p-6 rounded-2xl border transition-all ${
-            isCoffee ? 'bg-amber-500/20 border-amber-gold text-cream-light ring-2 ring-amber-gold/40 shadow-xl' : 'bg-black/40 border-white/10 opacity-70 hover:opacity-100'
-          }`}>
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="p-2.5 rounded-xl bg-amber-gold/20 text-amber-gold border border-amber-gold/30">
-                <Coffee className="w-5 h-5" />
+          <button
+            type="button"
+            onClick={() => setTrackMode && setTrackMode('coffee')}
+            className={`p-6 rounded-2xl border text-left transition-all duration-300 cursor-pointer active:scale-95 group ${
+              isCoffee
+                ? 'btn-tactile-amber text-espresso-950 ring-2 ring-amber-gold/50 shadow-2xl scale-[1.02]'
+                : 'bg-black/50 border-white/10 text-stone-300 opacity-70 hover:opacity-100 hover:border-amber-gold/50 hover:bg-black/70'
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <div className={`p-3 rounded-xl transition-colors ${
+                isCoffee ? 'bg-black/30 text-current border border-current/20' : 'bg-amber-gold/20 text-amber-gold border border-amber-gold/30'
+              }`}>
+                <Coffee className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-serif text-lg font-bold text-cream-light">The Coffee Lab</h3>
-                <p className="text-[11px] text-stone-300">SCA Ratios, Burr Grinders & Pour Over</p>
+                <h3 className={`font-serif text-lg font-bold ${isCoffee ? 'text-espresso-950' : 'text-cream-light group-hover:text-amber-gold transition-colors'}`}>
+                  The Coffee Lab
+                </h3>
+                <p className={`text-[11px] ${isCoffee ? 'text-espresso-950/80 font-medium' : 'text-stone-400'}`}>
+                  SCA Ratios, Burr Grinders & Pour Over
+                </p>
               </div>
             </div>
-          </div>
+          </button>
 
-          <div className={`p-6 rounded-2xl border transition-all ${
-            !isCoffee ? 'bg-sage-500/20 border-sage-400 text-cream-light ring-2 ring-sage-400/40 shadow-xl' : 'bg-black/40 border-white/10 opacity-70 hover:opacity-100'
-          }`}>
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="p-2.5 rounded-xl bg-sage-500/20 text-sage-300 border border-sage-500/30">
-                <Leaf className="w-5 h-5" />
+          <button
+            type="button"
+            onClick={() => setTrackMode && setTrackMode('tea')}
+            className={`p-6 rounded-2xl border text-left transition-all duration-300 cursor-pointer active:scale-95 group ${
+              !isCoffee
+                ? 'btn-tactile-sage text-cream-light ring-2 ring-sage-400/50 shadow-2xl scale-[1.02]'
+                : 'bg-black/50 border-white/10 text-stone-300 opacity-70 hover:opacity-100 hover:border-sage-400/50 hover:bg-black/70'
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <div className={`p-3 rounded-xl transition-colors ${
+                !isCoffee ? 'bg-black/30 text-current border border-current/20' : 'bg-sage-500/20 text-sage-300 border border-sage-500/30'
+              }`}>
+                <Leaf className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-serif text-lg font-bold text-cream-light">The Tea Room</h3>
-                <p className="text-[11px] text-stone-300">Gongfu Gaiwan, Steeping Presets & Terroirs</p>
+                <h3 className={`font-serif text-lg font-bold ${!isCoffee ? 'text-cream-light' : 'text-cream-light group-hover:text-sage-300 transition-colors'}`}>
+                  The Tea Room
+                </h3>
+                <p className={`text-[11px] ${!isCoffee ? 'text-cream-light/80 font-medium' : 'text-stone-400'}`}>
+                  Gongfu Gaiwan, Steeping Presets & Terroirs
+                </p>
               </div>
             </div>
-          </div>
+          </button>
         </div>
       </div>
 
