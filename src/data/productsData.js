@@ -203,6 +203,21 @@ export const PRODUCTS_DATA = [
     description: 'PID degree-by-degree temperature control (135°F - 212°F) with precision counterbalanced gooseneck pour spout.'
   },
   {
+    id: 'cosori_gooseneck_timer',
+    name: 'COSORI Electric Gooseneck Kettle with Stopwatch Timer & Variable Temp Control',
+    category: 'water_kettles',
+    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
+    badge: 'Built-in Timer & PID',
+    rating: 4.8,
+    reviewsCount: 14200,
+    priceRange: '$65 - $79',
+    topRated: true,
+    asin: 'B08BG4578S',
+    amazonUrl: `https://www.amazon.com/s?k=Electric+Gooseneck+Kettle+with+Timer+and+Variable+Temperature&tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './tea_kettle.jpg',
+    description: 'Precision 1°F temperature presets with integrated extraction stopwatch timer, food-grade 304 stainless steel, and 5g/sec pour rate control.'
+  },
+  {
     id: 'third_wave_water',
     name: 'Third Wave Water Coffee Mineral Packets 12 Pack',
     category: 'water_kettles',

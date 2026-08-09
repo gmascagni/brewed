@@ -299,6 +299,25 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
         </div>
       </div>
 
+      {/* Contextual Amazon Affiliate Recommendation Box for Gooseneck Kettles with Built-in Timers */}
+      <div className="mt-8 p-4 rounded-2xl bg-black/60 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div className="flex items-center space-x-2 text-stone-300">
+          <TimerIcon className="w-4 h-4 text-amber-gold flex-shrink-0 animate-pulse" />
+          <span>Precision pour-overs require electric gooseneck kettles with built-in timers & degree PID control (Fellow Stagg EKG, COSORI Smart Kettle).</span>
+        </div>
+        <a
+          href="https://www.amazon.com/s?k=Electric+Gooseneck+Kettle+with+Timer+and+Variable+Temperature&tag=thebrewapp13-20"
+          target="_blank"
+          rel="nofollow sponsored noopener"
+          data-product-name="Electric Gooseneck Kettles with Timers"
+          data-link-id="gooseneck_kettles_with_timers"
+          data-context="step4_guided_timer_kettle"
+          className="px-4 py-2 rounded-xl bg-amber-400/20 text-amber-gold hover:bg-amber-400/30 border border-amber-400/40 font-extrabold text-[11px] uppercase tracking-wider transition-all whitespace-nowrap flex-shrink-0"
+        >
+          Check Kettles with Timers on Amazon ↗
+        </a>
+      </div>
+
       {/* Step Navigation & Journal Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-white/[0.08]">
         {onPrevStep && (

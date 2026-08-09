@@ -157,6 +157,25 @@ export default function GrindVisualGuide({ activeMethod }) {
           <Sliders className="w-4 h-4 text-amber-gold flex-shrink-0" />
           <span><strong className="text-amber-gold font-bold">Burr Setting Tip: </strong>{activeGrind.burrSettingTip}</span>
         </div>
+
+        {/* Contextual Amazon Affiliate Recommendation Box for Precision Burr Coffee Grinders */}
+        <div className="mt-5 p-4 rounded-2xl bg-black/60 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center space-x-2 text-stone-300">
+            <Gauge className="w-4 h-4 text-amber-gold flex-shrink-0" />
+            <span>Uniform particle distribution requires precision conical or flat burr grinders (Fellow Ode Gen 2, Baratza Encore ESP, 1Zpresso).</span>
+          </div>
+          <a
+            href="https://www.amazon.com/s?k=Burr+Coffee+Grinder+Espresso+Pour+Over&tag=thebrewapp13-20"
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            data-product-name="Precision Burr Coffee Grinders"
+            data-link-id="precision_burr_grinders"
+            data-context="step3_grind_burr"
+            className="px-4 py-2 rounded-xl bg-amber-400/20 text-amber-gold hover:bg-amber-400/30 border border-amber-400/40 font-extrabold text-[11px] uppercase tracking-wider transition-all whitespace-nowrap flex-shrink-0"
+          >
+            Check Coffee Grinders on Amazon ↗
+          </a>
+        </div>
       </div>
 
       {/* MACRO PHOTO BUBBLE MODAL POPUP */}
