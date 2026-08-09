@@ -10,12 +10,11 @@ import MultiPhaseTimer from './components/MultiPhaseTimer';
 import KnowledgeBaseDrawer from './components/KnowledgeBaseDrawer';
 import DiagnosticsDrawer from './components/DiagnosticsDrawer';
 import BrewJournal from './components/BrewJournal';
-import RecipeExplorer from './components/RecipeExplorer';
 import RecipeBuilderModal from './components/RecipeBuilderModal';
 import UserProfileDashboard from './components/UserProfileDashboard';
 import GlobalSearchModal from './components/GlobalSearchModal';
 import AuthModal from './components/AuthModal';
-import BrewMasterCommunity from './components/BrewMasterCommunity';
+import CommunityHubModal from './components/CommunityHubModal';
 import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
 import AdminConsoleModal from './components/AdminConsoleModal';
 import { BREW_METHODS } from './data/brewData';
@@ -65,6 +64,7 @@ export default function App() {
   const [isJournalOpen, setIsJournalOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isCommunityOpen, setIsCommunityOpen] = useState(false);
   const [isRecipeBuilderOpen, setIsRecipeBuilderOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
@@ -133,10 +133,7 @@ export default function App() {
         onOpenJournal={() => setIsJournalOpen(true)}
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenProfile={() => setIsProfileOpen(true)}
-        onOpenCommunity={() => {
-          const commElem = document.getElementById('brew-master-community');
-          if (commElem) commElem.scrollIntoView({ behavior: 'smooth' });
-        }}
+        onOpenCommunity={() => setIsCommunityOpen(true)}
         onOpenLocalCoffee={() => setIsLocalCoffeeOpen(true)}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onOpenAdmin={() => setIsAdminModalOpen(true)}
@@ -259,18 +256,14 @@ export default function App() {
           {/* 2. Knowledge Base Drawer (Terroir Atlas) */}
           <KnowledgeBaseDrawer trackMode={trackMode} />
 
-          {/* Community Shared Recipes Grid */}
-          <div id="community-section">
-            <RecipeExplorer
-              trackMode={trackMode}
-              onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
-            />
-          </div>
-
-          {/* Brew Master Community Forum (Clean Bottom Section) */}
-          <BrewMasterCommunity
+          {/* Dedicated Community Hub Modal (Contains Shared Recipes & Brew Master Forum) */}
+          <CommunityHubModal
+            isOpen={isCommunityOpen}
+            onClose={() => setIsCommunityOpen(false)}
             currentUser={currentUser}
             onOpenAuth={() => setIsAuthModalOpen(true)}
+            trackMode={trackMode}
+            onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
           />
 
           {/* Personal Tasting Journal Modal */}
@@ -351,7 +344,7 @@ export default function App() {
               <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
             </div>
             <div className="text-cream-soft/40">
-              Clean UI Mode Active • Admin Security Enforced
+              Clean UI Mode Active • Dedicated Community Hub
             </div>
           </div>
         </footer>
