@@ -1124,7 +1124,7 @@ export const MASTERCLASSES = [
     title: 'Authentic Indian Masala Chai Decoction & Spiced Milk Brew',
     duration: '5:15',
     thumbnail: './tea_ceremony.jpg',
-    embedId: 'st571DYYTR8',
+    embedId: '4r-rQ0Q9jH4',
     description: 'Simmering whole cardamom, Ceylon cinnamon, ginger root, and Assam black tea with milk and unrefined cane sugar.',
     keyTakeaways: [
       'Crush whole cardamom, cinnamon bark, and ginger root before simmering',
@@ -1169,7 +1169,7 @@ export const MASTERCLASSES = [
     title: 'Specialty Green Tea & Sencha Steeping Masterclass',
     duration: '4:10',
     thumbnail: './tea_ceremony.jpg',
-    embedId: 'st571DYYTR8',
+    embedId: '4r-rQ0Q9jH4',
     description: 'Low-temperature 78°C steeping to preserve sweet grassy umami and avoid bitter tannin extraction.',
     keyTakeaways: [
       'Never use boiling water on green tea leaves (78°C is ideal)',
