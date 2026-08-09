@@ -81,14 +81,33 @@ export default function PrecisionCalculator({
             )}
 
             {setUnitSystem && (
-              <button
-                onClick={() => setUnitSystem(unitSystem === 'metric' ? 'imperial' : 'metric')}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-black/60 border border-white/15 text-stone-200 hover:border-amber-gold/60 transition-all shadow-md active:scale-95"
-                title="Toggle Imperial (oz/°F) vs Metric (g/mL/°C)"
-              >
-                <Scale className="w-3.5 h-3.5 text-amber-gold" />
-                <span>{unitSystem === 'imperial' ? 'Imp (oz/°F)' : 'Met (g/°C)'}</span>
-              </button>
+              <div className="flex items-center p-1 rounded-xl bg-black/60 border border-white/15 text-xs font-mono font-bold shadow-md">
+                <button
+                  onClick={() => setUnitSystem('imperial')}
+                  className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg transition-all active:scale-95 ${
+                    unitSystem === 'imperial'
+                      ? 'btn-tactile-amber text-espresso-950 font-extrabold shadow-sm scale-102'
+                      : 'text-stone-400 hover:text-cream-light'
+                  }`}
+                  title="Switch to Imperial Units (oz/°F)"
+                >
+                  <Scale className="w-3 h-3 text-current" />
+                  <span>Imperial (oz/°F)</span>
+                </button>
+
+                <button
+                  onClick={() => setUnitSystem('metric')}
+                  className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg transition-all active:scale-95 ${
+                    unitSystem === 'metric'
+                      ? 'btn-tactile-amber text-espresso-950 font-extrabold shadow-sm scale-102'
+                      : 'text-stone-400 hover:text-cream-light'
+                  }`}
+                  title="Switch to Metric Units (g/mL/°C)"
+                >
+                  <Scale className="w-3 h-3 text-current" />
+                  <span>Metric (g/mL/°C)</span>
+                </button>
+              </div>
             )}
 
             {setIsMuted && (
