@@ -25,11 +25,16 @@ export default function TroubleshootingHub({ trackMode }) {
   ];
 
   const TEA_LEAF_MATRIX = [
-    { level: 'White Tea Buds', temp: '80°C - 83°C', idealFor: 'Silver Needle / White Peony', visual: 'Unoxidized Spring Buds' },
-    { level: 'Specialty Green Tea', temp: '75°C - 80°C', idealFor: 'Sencha / Gyokuro / Longjing', visual: 'Steamed / Pan-Fired Leaves' },
-    { level: 'Gongfu Oolong Tea', temp: '88°C - 92°C', idealFor: 'Tieguanyin / High Mountain Alishan', visual: 'Tightly Rolled Tea Balls' },
-    { level: 'Orthodox Black Tea', temp: '95°C - 98°C', idealFor: 'Darjeeling / Assam / Earl Grey', visual: 'Fully Oxidized Black Leaf' },
-    { level: 'Aged Pu-erh & Botanicals', temp: '98°C - 100°C', idealFor: 'Yunnan Tea Cakes / Chamomile', visual: 'Compressed Cakes / Herbs' }
+    { level: 'Himalayan Darjeeling', temp: '88°C (190°F)', idealFor: 'Darjeeling First & Second Flush', visual: 'FTGFOP1 Whole Leaf Muscatel' },
+    { level: 'Masala Chai Spices', temp: '98°C (208°F)', idealFor: 'Assam CTC & Whole Spices', visual: 'Cracked Spices & Black Leaf' },
+    { level: 'English Breakfast', temp: '96°C (205°F)', idealFor: 'Assam, Ceylon & Kenyan Blend', visual: 'Orthodox Broken Orange Pekoe' },
+    { level: 'Earl Grey Bergamot', temp: '95°C (203°F)', idealFor: 'Italian Bergamot & Ceylon', visual: 'Citrus Oil Infused Whole Leaf' },
+    { level: 'Specialty Green Tea', temp: '78°C (172°F)', idealFor: 'Japanese Sencha & Longjing', visual: 'Steamed / Pan-Fired Green Leaf' },
+    { level: 'Ceremonial Matcha', temp: '80°C (176°F)', idealFor: 'Uji Stone-Ground Usucha', visual: 'Micro-Milled Tencha Jade Powder' },
+    { level: 'Gongfu Oolong Tea', temp: '88°C (190°F)', idealFor: 'Alishan & Da Hong Pao Oolong', visual: 'Tightly Rolled Tea Balls' },
+    { level: 'Ceylon High-Grown', temp: '95°C (203°F)', idealFor: 'Nuwara Eliya & Dimbula Ceylon', visual: 'BOP Brisk Citrus Copper Leaf' },
+    { level: 'White Tea Buds', temp: '83°C (181°F)', idealFor: 'Silver Needle & White Peony', visual: 'Unoxidized Downy Silver Buds' },
+    { level: 'Turmeric & Botanicals', temp: '98°C (208°F)', idealFor: 'Golden Root & Ginger Infusion', visual: 'Crushed Golden Roots & Herbs' }
   ];
 
   return (

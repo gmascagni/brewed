@@ -162,6 +162,82 @@ export const BREW_METHODS = {
   ],
   tea: [
     {
+      id: 'darjeeling_tea',
+      name: 'Himalayan Darjeeling Tea (The Champagne of Teas)',
+      category: 'tea',
+      featured: true,
+      heroImage: './tea_kettle.jpg',
+      ratio: 50, // 1g per 50ml water
+      defaultCupMl: 240,
+      tempC: 88,
+      tempF: 190,
+      leafGrade: 'FTGFOP1 Whole Leaf',
+      description: 'Grown in high-altitude misty Himalayan ridges. Renowned for delicate muscatel grape clarity, peach notes, and crisp amber finish.',
+      preferredCoffeeTypes: 'First & Second Flush Himalayan Darjeeling (West Bengal, India). High altitude garden lots yielding muscatel, floral, and stone fruit elegance.',
+      phases: [
+        { name: 'Vessel Preheat', durationSec: 15, waterMultiplier: 0, instruction: 'Rinse porcelain or glass teapot with warm water to maintain steep temperature.' },
+        { name: 'Aromatic Himalayan Steep', durationSec: 180, waterMultiplier: 1.0, instruction: 'Pour 88°C water over leaves. Steep 3 minutes for peak muscatel grape bouquet.' },
+        { name: 'Decant & Serve', durationSec: 30, waterMultiplier: 1.0, instruction: 'Strain completely into teacup to stop extraction.' }
+      ]
+    },
+    {
+      id: 'chai_masala',
+      name: 'Masala Chai (Spiced Assam & Botanical Infusion)',
+      category: 'tea',
+      featured: true,
+      heroImage: './tea_ceremony.jpg',
+      ratio: 25, // 1g tea/spice per 25ml liquid
+      defaultCupMl: 250,
+      tempC: 98,
+      tempF: 208,
+      leafGrade: 'CTC Assam Black Tea & Whole Cracked Spices',
+      description: 'Robust, comforting Indian spiced tea simmered with green cardamom, Ceylon cinnamon, organic ginger root, cloves, and black pepper.',
+      preferredCoffeeTypes: 'Brahmaputra Valley Assam CTC with green cardamom, Ceylon cinnamon bark, organic ginger root, and star anise.',
+      phases: [
+        { name: 'Spice & Leaf Decoction Simmer', durationSec: 240, waterMultiplier: 1.0, instruction: 'Boil crushed spices and tea leaves in water for 4 minutes to extract essential oils.' },
+        { name: 'Milk & Sweetener Rest', durationSec: 120, waterMultiplier: 1.0, instruction: 'Add milk and unrefined cane sugar (Panela/Jaggery); bring to gentle froth.' },
+        { name: 'Fine Mesh Strain', durationSec: 30, waterMultiplier: 1.0, instruction: 'Pour through fine sieve into mug.' }
+      ]
+    },
+    {
+      id: 'english_breakfast',
+      name: 'English Breakfast Tea (Malty Assam & Ceylon Blend)',
+      category: 'tea',
+      featured: true,
+      heroImage: './tea_kettle.jpg',
+      ratio: 50, // 1g per 50ml water
+      defaultCupMl: 250,
+      tempC: 96,
+      tempF: 205,
+      leafGrade: 'Orthodox Broken Orange Pekoe',
+      description: 'Classic rich, full-bodied morning black tea blend combining Assam malty strength, Ceylon crispness, and Kenyan amber depth.',
+      preferredCoffeeTypes: 'High-grown Assam, Sri Lankan Ceylon Dimbula, and Rift Valley Kenyan Orthodox leaves offering malty cocoa and toast notes.',
+      phases: [
+        { name: 'Teapot Warm', durationSec: 15, waterMultiplier: 0, instruction: 'Rinse teapot with near-boiling water.' },
+        { name: 'Full Extraction Steep', durationSec: 240, waterMultiplier: 1.0, instruction: 'Steep at 96°C for 4 minutes for robust body without harshness.' },
+        { name: 'Serve & Rest', durationSec: 30, waterMultiplier: 1.0, instruction: 'Remove infuser basket completely.' }
+      ]
+    },
+    {
+      id: 'earl_grey',
+      name: 'Earl Grey Tea (Italian Bergamot Oil Infused)',
+      category: 'tea',
+      featured: true,
+      heroImage: './tea_ceremony.jpg',
+      ratio: 50, // 1g per 50ml water
+      defaultCupMl: 240,
+      tempC: 95,
+      tempF: 203,
+      leafGrade: 'Full-Leaf Black & Cold-Pressed Bergamot Oil',
+      description: 'Aromatic black tea infused with natural cold-pressed oil of Italian bergamot citrus. Fragrant floral citrus aroma balanced with malty cocoa depth.',
+      preferredCoffeeTypes: 'Calabrian organic bergamot oil blended with Orthodox Ceylon and Assam estate black teas.',
+      phases: [
+        { name: 'Vessel Warm', durationSec: 15, waterMultiplier: 0, instruction: 'Rinse ceramic teapot with hot water.' },
+        { name: 'Aromatic Citrus Steep', durationSec: 210, waterMultiplier: 1.0, instruction: 'Steep untouched at 95°C for 3.5 minutes to release citrus aromatics.' },
+        { name: 'Decant', durationSec: 30, waterMultiplier: 1.0, instruction: 'Separate tea leaves from liqueur.' }
+      ]
+    },
+    {
       id: 'green_tea',
       name: 'Specialty Green Tea (Dragonwell / Sencha)',
       category: 'tea',
@@ -171,13 +247,70 @@ export const BREW_METHODS = {
       defaultCupMl: 200,
       tempC: 78,
       tempF: 172,
-      leafGrade: 'Whole Leaf',
-      description: 'Delicate low-temp steeping to preserve fresh umami, sweet grassy aromas, and avoid bitter tannins.',
+      leafGrade: 'Whole Leaf (Steamed / Pan-Fired)',
+      description: 'Delicate low-temp steeping to preserve fresh umami, sweet grassy aromas, and high L-theanine amino acids without bitter tannins.',
       preferredCoffeeTypes: 'Japanese Sencha & Gyokuro, Chinese West Lake Longjing. Steamed & pan-fired green leaves high in L-theanine amino acids.',
       phases: [
         { name: 'Vessel Preheat', durationSec: 15, waterMultiplier: 0, instruction: 'Warm teapot or glass with warm water, then discard water.' },
         { name: '1st Steeping Infusion', durationSec: 120, waterMultiplier: 1.0, instruction: 'Pour 78°C water gently over leaves. Do not agitate.' },
         { name: 'Decant & 2nd Infusion Prep', durationSec: 90, waterMultiplier: 1.0, instruction: 'Pour completely into server. Leaves ready for 2nd steep.' }
+      ]
+    },
+    {
+      id: 'matcha_tea',
+      name: 'Japanese Ceremonial Matcha (Usucha Whisk)',
+      category: 'tea',
+      featured: true,
+      heroImage: './tea_ceremony.jpg',
+      ratio: 35, // 2g matcha per 70ml water
+      defaultCupMl: 100,
+      tempC: 80,
+      tempF: 176,
+      leafGrade: 'Micro-Milled Ceremonial Tencha Powder',
+      description: 'Vibrant jade-green stone-ground powdered tea whisked in a Chawan bowl into a creamy micro-foam. Rich in umami sweetness, chlorophyll, and antioxidants.',
+      preferredCoffeeTypes: 'Uji & Yame First-Harvest Ceremonial Grade Tencha leaves ground on traditional granite stone mills.',
+      phases: [
+        { name: 'Sift & Warm Bowl', durationSec: 20, waterMultiplier: 0, instruction: 'Sift 2g matcha powder through fine mesh into warm Chawan bowl.' },
+        { name: 'Water Add & Bloom', durationSec: 15, waterMultiplier: 1.0, instruction: 'Pour 70mL of 80°C water gently down side of bowl.' },
+        { name: 'Chasen Bamboo Whisk', durationSec: 45, waterMultiplier: 1.0, instruction: 'Whisk rapidly in a zig-zag "W" motion using bamboo Chasen until rich froth forms.' }
+      ]
+    },
+    {
+      id: 'oolong_tea',
+      name: 'Oolong Tea (Gongfu Hand-Rolled)',
+      category: 'tea',
+      featured: false,
+      heroImage: './tea_ceremony.jpg',
+      ratio: 30, // 1g per 30ml water
+      defaultCupMl: 150,
+      tempC: 88,
+      tempF: 190,
+      leafGrade: 'Tightly Rolled Leaf',
+      description: 'High-leaf ratio Gongfu steeping revealing evolving layers of orchid florals, toasted honey, lilac, and rock mineral depth over 5+ infusions.',
+      preferredCoffeeTypes: 'Taiwanese High Mountain Alishan, Wuyi Rock Da Hong Pao, Dong Ding Oolong. Hand-rolled oolongs releasing floral butter, lilac, and rock mineral depth.',
+      phases: [
+        { name: 'Leaf Wash Rinse', durationSec: 10, waterMultiplier: 1.0, instruction: 'Quick 10-second flash pour to wake rolled leaves; discard liquid.' },
+        { name: '1st Infusion', durationSec: 45, waterMultiplier: 1.0, instruction: 'Steep 45 seconds at 88°C for rich aroma peak.' },
+        { name: '2nd Infusion', durationSec: 60, waterMultiplier: 1.0, instruction: 'Add 15s to steep time. Full floral body unfolding.' }
+      ]
+    },
+    {
+      id: 'ceylon_tea',
+      name: 'Ceylon High-Grown Tea (Sri Lankan Black Tea)',
+      category: 'tea',
+      featured: false,
+      heroImage: './tea_kettle.jpg',
+      ratio: 50, // 1g per 50ml water
+      defaultCupMl: 240,
+      tempC: 95,
+      tempF: 203,
+      leafGrade: 'Orthodox High-Grown Ceylon BOP',
+      description: 'Cultivated in the misty Nuwara Eliya and Dimbula mountain peaks of Sri Lanka. Crisp citrus notes, golden copper color, and brisk invigorating finish.',
+      preferredCoffeeTypes: 'Single-estate Nuwara Eliya & Uva Ceylon black teas with citrus zest, woodsy cedar, and crisp brisk tannin.',
+      phases: [
+        { name: 'Vessel Warm', durationSec: 15, waterMultiplier: 0, instruction: 'Rinse teapot with hot water.' },
+        { name: 'Brisk Mountain Steep', durationSec: 210, waterMultiplier: 1.0, instruction: 'Steep at 95°C for 3.5 minutes for bright citrus acidity.' },
+        { name: 'Decant & Serve', durationSec: 30, waterMultiplier: 1.0, instruction: 'Strain completely into cup.' }
       ]
     },
     {
@@ -190,8 +323,8 @@ export const BREW_METHODS = {
       defaultCupMl: 240,
       tempC: 83,
       tempF: 181,
-      leafGrade: 'Buds & Young Leaves',
-      description: 'Subtle, sweet, and velvety texture with notes of honeysuckle and soft melon.',
+      leafGrade: 'Unoxidized Buds & Young Leaves',
+      description: 'Subtle, sweet, and velvety texture with notes of honeysuckle and soft melon. Hand-harvested spring buds with silver downy hairs.',
       preferredCoffeeTypes: 'Fujian Silver Needle (Bai Hao Yin Zhen) & White Peony. Whole unoxidized buds rich in delicate melon and honeysuckle floral oils.',
       phases: [
         { name: 'Vessel Preheat', durationSec: 15, waterMultiplier: 0, instruction: 'Warm ceramic teapot with warm water.' },
@@ -200,59 +333,22 @@ export const BREW_METHODS = {
       ]
     },
     {
-      id: 'oolong_tea',
-      name: 'Oolong Tea (Gongfu Style)',
+      id: 'turmeric_tea',
+      name: 'Golden Turmeric Botanical Tea (Herbal Infusion)',
       category: 'tea',
-      featured: false,
+      featured: true,
       heroImage: './tea_ceremony.jpg',
-      ratio: 30, // 1g per 30ml water
-      defaultCupMl: 150,
-      tempC: 88,
-      tempF: 190,
-      leafGrade: 'Tightly Rolled Leaf',
-      description: 'High-leaf ratio Gongfu steeping revealing evolving layers of orchid florals and roasted honey over multiple infusions.',
-      preferredCoffeeTypes: 'Taiwanese High Mountain Alishan, Wuyi Rock Da Hong Pao, Dong Ding Oolong. Hand-rolled oolongs releasing floral butter, lilac, and rock mineral depth.',
-      phases: [
-        { name: 'Leaf Wash Rinse', durationSec: 10, waterMultiplier: 1.0, instruction: 'Quick 10-second flash pour to wake rolled leaves; discard liquid.' },
-        { name: '1st Infusion', durationSec: 45, waterMultiplier: 1.0, instruction: 'Steep 45 seconds at 88°C for rich aroma peak.' },
-        { name: '2nd Infusion', durationSec: 60, waterMultiplier: 1.0, instruction: 'Add 15s to steep time. Full floral body unfolding.' }
-      ]
-    },
-    {
-      id: 'black_tea',
-      name: 'Full-Leaf Black Tea (Darjeeling / Assam)',
-      category: 'tea',
-      featured: false,
-      heroImage: './tea_kettle.jpg',
-      ratio: 50, // 1g per 50ml water
-      defaultCupMl: 250,
-      tempC: 96,
-      tempF: 205,
-      leafGrade: 'Orthodox Black Leaf',
-      description: 'Bold, comforting malt aromas, crisp stone fruit notes, and rich amber liqueur.',
-      preferredCoffeeTypes: 'Himalayan First Flush Darjeeling & Brahmaputra Valley Assam. Orthodox whole black leaf offering muscatel grape clarity and rich malty cocoa.',
-      phases: [
-        { name: 'Warm Teapot', durationSec: 20, waterMultiplier: 0, instruction: 'Rinse teapot with near-boiling water.' },
-        { name: 'Full Extraction Steep', durationSec: 240, waterMultiplier: 1.0, instruction: 'Steep at 96°C for 4 minutes for robust body without harshness.' },
-        { name: 'Serve & Rest', durationSec: 30, waterMultiplier: 1.0, instruction: 'Remove infuser basket completely.' }
-      ]
-    },
-    {
-      id: 'herbal_puerh',
-      name: 'Pu-erh / Herbal Infusions (Chamomile / Peppermint / Aged Tea)',
-      category: 'tea',
-      featured: false,
-      heroImage: './tea_ceremony.jpg',
-      ratio: 40, // 1g per 40ml water
+      ratio: 40, // 1g botanicals per 40ml water
       defaultCupMl: 250,
       tempC: 98,
       tempF: 208,
-      leafGrade: 'Botanicals / Compressed Cakes',
-      description: 'Deep, grounding earthiness or soothing caffeine-free botanical infusions.',
-      preferredCoffeeTypes: 'Yunnan Aged Cooked Pu-erh (Shou), Chamomile, Peppermint. Deeply fermented tea cakes and whole organic botanicals.',
+      leafGrade: 'Crushed Organic Turmeric Root & Botanicals',
+      description: 'Caffeine-free wellness infusion combining golden turmeric root, ginger, lemongrass, black pepper (for curcumin absorption), and raw honey.',
+      preferredCoffeeTypes: 'Organic Alleppey Turmeric root, ginger root, lemongrass, black pepper, and cinnamon bark.',
       phases: [
-        { name: 'Boiling Rinse', durationSec: 15, waterMultiplier: 1.0, instruction: 'Flash rinse to hydrate herbs/fermented leaves; discard liquid.' },
-        { name: 'Deep Infusion', durationSec: 300, waterMultiplier: 1.0, instruction: 'Steep 5 minutes with boiling water for full extraction.' }
+        { name: 'Botanical Hydration', durationSec: 15, waterMultiplier: 0, instruction: 'Place crushed turmeric and botanicals into infuser.' },
+        { name: 'Deep Botanical Steep', durationSec: 300, waterMultiplier: 1.0, instruction: 'Steep 5 minutes with boiling 98°C water for rich golden extraction.' },
+        { name: 'Honey & Citrus Stir', durationSec: 30, waterMultiplier: 1.0, instruction: 'Stir in raw honey and squeeze of fresh lemon.' }
       ]
     }
   ]
