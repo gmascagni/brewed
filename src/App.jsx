@@ -17,6 +17,7 @@ import AuthModal from './components/AuthModal';
 import CommunityHubModal from './components/CommunityHubModal';
 import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
 import AdminConsoleModal from './components/AdminConsoleModal';
+import Footer from './components/Footer';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
@@ -339,18 +340,8 @@ export default function App() {
 
         </main>
 
-        {/* Streamlined App Footer */}
-        <footer className="mt-16 border-t border-white/10 py-8 px-4 text-center text-xs text-cream-soft/50 backdrop-blur-xl bg-black/40">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <span className="font-serif font-bold text-cream-light text-sm">The Brew App: The Art of Extraction</span>
-              <p className="mt-0.5">Precision Specialty Coffee & Fine Tea Brewing Application</p>
-            </div>
-            <div className="text-cream-soft/40">
-              Clean UI Mode Active • Dedicated Community Hub
-            </div>
-          </div>
-        </footer>
+        {/* Contact HQ Email & App Footer */}
+        <Footer />
 
       </div>
 
