@@ -1,17 +1,9 @@
-import React, { useState } from 'react';
-import { Mail, Copy, Check, ExternalLink, Sparkles, Coffee, ShieldCheck } from 'lucide-react';
+import React from 'react';
+import { Mail, ExternalLink, Sparkles, ShieldCheck } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 
 export default function Footer() {
-  const [copied, setCopied] = useState(false);
   const emailAddress = 'gmascagni@gmail.com';
-
-  const handleCopyEmail = () => {
-    navigator.clipboard.writeText(emailAddress);
-    setCopied(true);
-    trackEvent('contact_copy_email', { email: emailAddress });
-    setTimeout(() => setCopied(false), 2500);
-  };
 
   const handleMailtoClick = () => {
     trackEvent('contact_click_mailto', { email: emailAddress });
@@ -47,15 +39,15 @@ export default function Footer() {
           <div className="flex items-center justify-center lg:justify-start gap-3 text-[11px] font-mono text-stone-400 pt-1">
             <span className="flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Direct Founder Contact</span>
+              <span>Direct Founder Support</span>
             </span>
             <span>•</span>
             <span>https://thebrew.app</span>
           </div>
         </div>
 
-        {/* Right Side: Contact HQ Email Interactive Box */}
-        <div className="w-full lg:w-auto p-5 sm:p-6 rounded-3xl bg-espresso-950/90 border-2 border-amber-gold/50 shadow-2xl flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+        {/* Right Side: Contact HQ Button with Embedded Mailto Link (Email Address Hidden from Visible Text) */}
+        <div className="w-full lg:w-auto p-5 sm:p-6 rounded-3xl bg-espresso-950/90 border-2 border-amber-gold/50 shadow-2xl flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
           
           <div className="p-3.5 rounded-2xl bg-amber-gold/20 text-amber-gold border border-amber-gold/30 shadow-inner flex-shrink-0">
             <Mail className="w-6 h-6 animate-bounce-subtle" />
@@ -63,51 +55,24 @@ export default function Footer() {
 
           <div className="space-y-1">
             <div className="text-[10px] font-mono uppercase tracking-widest font-extrabold text-amber-gold">
-              Contact HQ Support & Info
+              Inquiries & Feedback
             </div>
-            <div className="font-mono text-sm sm:text-base font-bold text-cream-light tracking-wide selection:bg-amber-gold selection:text-espresso-950">
-              {emailAddress}
+            <div className="font-serif text-lg font-bold text-cream-light">
+              Connect With Founder HQ
             </div>
           </div>
 
-          {/* Action Buttons: Direct Mailto & One-Click Copy Email */}
-          <div className="flex items-center gap-2.5 w-full sm:w-auto flex-shrink-0 mt-2 sm:mt-0">
-            
-            {/* Direct Mailto Button */}
-            <a
-              href={`mailto:${emailAddress}?subject=The%20Brew%20App%20Inquiry%20%7C%20Feedback`}
-              onClick={handleMailtoClick}
-              className="flex-1 sm:flex-initial py-3 px-4 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-xl hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
-              title="Open default email client to send message to gmascagni@gmail.com"
-            >
-              <span>Contact HQ</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-
-            {/* One-Click Copy Email Button */}
-            <button
-              onClick={handleCopyEmail}
-              className={`p-3 rounded-2xl border transition-all active:scale-95 flex items-center justify-center gap-1.5 text-xs font-mono font-extrabold ${
-                copied
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                  : 'bg-white/10 text-stone-300 hover:text-cream-light hover:bg-white/20 border-white/15'
-              }`}
-              title="Copy email address to clipboard"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-400" />
-                  <span className="text-[10px]">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4 text-amber-gold" />
-                  <span className="text-[10px] hidden sm:inline">Copy Email</span>
-                </>
-              )}
-            </button>
-
-          </div>
+          {/* Embedded Contact HQ Button */}
+          <a
+            href={`mailto:${emailAddress}?subject=The%20Brew%20App%20Inquiry%20%7C%20Feedback`}
+            onClick={handleMailtoClick}
+            className="w-full sm:w-auto py-3.5 px-6 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-xl hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
+            title="Open email app to send a message to HQ"
+          >
+            <Mail className="w-4 h-4 fill-current" />
+            <span>Contact HQ</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
 
         </div>
 
@@ -115,7 +80,7 @@ export default function Footer() {
 
       {/* Bottom Copyright Line */}
       <div className="mt-8 pt-6 border-t border-white/10 text-center text-[11px] font-mono text-stone-500">
-        © {new Date().getFullYear()} The Brew App HQ • All Rights Reserved • Founder Contact: <a href={`mailto:${emailAddress}`} className="text-amber-gold hover:underline">{emailAddress}</a>
+        © {new Date().getFullYear()} The Brew App HQ • All Rights Reserved
       </div>
 
     </footer>
