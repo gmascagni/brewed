@@ -351,6 +351,249 @@ export const BREW_METHODS = {
         { name: 'Honey & Citrus Stir', durationSec: 30, waterMultiplier: 1.0, instruction: 'Stir in raw honey and squeeze of fresh lemon.' }
       ]
     }
+  ],
+  beer: [
+    {
+      id: 'hazy_ipa',
+      name: 'New England Hazy DIPA (Juicy Hop Bomb)',
+      category: 'beer',
+      featured: true,
+      heroImage: './drip_brewer_hero.jpg',
+      ratio: 1.35,
+      defaultCupMl: 473,
+      tempC: 66,
+      tempF: 151,
+      servingTempF: '44°F - 48°F (7°C - 9°C)',
+      abvRange: '8.0% - 8.5% ABV',
+      ibuRange: '50 - 65 IBU',
+      srmColor: '4 - 6 SRM (Hazy Golden Straw)',
+      glassware: 'Tulip Glass or Nonic Pint',
+      leafGrade: 'Citra, Mosaic & Galaxy Double Dry-Hopped',
+      description: 'Juicy, tropical, and pillowy mouthfeel loaded with mango, passionfruit, and guava aromatics. Flaked oats and wheat create a velvety body with low perception bitterness.',
+      preferredCoffeeTypes: 'US Pacific Northwest Citra, Mosaic, El Dorado, and Australian Galaxy hops paired with Maris Otter & Flaked Oats.',
+      phases: [
+        { name: 'Saccharification Mash Rest', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Mash in at 151°F (66°C) for 60 minutes to convert starches into fermentable sugars.' },
+        { name: 'Lauter & Hop Boil (60 Min)', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Boil wort for 60 mins. Add bittering hops @ 60m and aroma hops @ 15m.' },
+        { name: 'Flameout Whirlpool Steep', durationSec: 1200, waterMultiplier: 1.0, instruction: 'Cool to 175°F (80°C) and whirlpool hops for 20 minutes for massive fruit oils without bitterness.' },
+        { name: 'Chill & Yeast Pitch', durationSec: 600, waterMultiplier: 1.0, instruction: 'Chill wort rapidly to 66°F (19°C) and pitch London Ale III / Verdant IPA yeast.' }
+      ]
+    },
+    {
+      id: 'imperial_stout',
+      name: 'Imperial Stout (Bourbon Barrel & Dark Cocoa)',
+      category: 'beer',
+      featured: true,
+      heroImage: './espresso_hero.jpg',
+      ratio: 1.25,
+      defaultCupMl: 355,
+      tempC: 68,
+      tempF: 154,
+      servingTempF: '52°F - 58°F (11°C - 14°C)',
+      abvRange: '10.5% - 13.0% ABV',
+      ibuRange: '65 - 85 IBU',
+      srmColor: '40+ SRM (Jet Black Pitch)',
+      glassware: 'Snifter or Oversized Glencairn',
+      leafGrade: 'Roasted Barley, Chocolate Malt & Bourbon Oak Chips',
+      description: 'Opaque black, viscous body brimming with dark chocolate fudge, espresso beans, toasted vanilla, and warming bourbon alcohol complexity.',
+      preferredCoffeeTypes: 'Heavy roasted barley, Black Patent, Chocolate Rye, and Carafa Special III with East Kent Goldings hops.',
+      phases: [
+        { name: 'High Temp Mash Rest', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Mash thick at 154°F (68°C) for high dextrins and unfermentable body sweetness.' },
+        { name: 'Vigorous Wort Boil (90 Min)', durationSec: 5400, waterMultiplier: 1.0, instruction: 'Boil for 90 minutes to concentrate sugars and develop rich Maillard melanoidins.' },
+        { name: 'Flameout & Rest', durationSec: 900, waterMultiplier: 1.0, instruction: 'Whirlpool additions and cool wort for high-gravity yeast strain pitch.' }
+      ]
+    },
+    {
+      id: 'west_coast_ipa',
+      name: 'West Coast IPA (Piney Resin & Crisp Bitterness)',
+      category: 'beer',
+      featured: false,
+      heroImage: './drip_brewer_hero.jpg',
+      ratio: 1.35,
+      defaultCupMl: 473,
+      tempC: 65,
+      tempF: 149,
+      servingTempF: '42°F - 46°F (5°C - 8°C)',
+      abvRange: '6.8% - 7.5% ABV',
+      ibuRange: '65 - 80 IBU',
+      srmColor: '6 - 8 SRM (Deep Amber Gold)',
+      glassware: 'IPA Glass or West Coast Shaker Pint',
+      leafGrade: 'Centennial, Simcoe, Cascade & Chinook Hops',
+      description: 'Crystal-clear golden-amber pour with assertive pine resin, grapefruit peel, and damp forest floor bitterness finishing bone-dry.',
+      preferredCoffeeTypes: 'Classic C-Hops (Cascade, Centennial, Columbus, Chinook) paired with 2-Row Pale Malt and Crystal 40L.',
+      phases: [
+        { name: 'Dry Mash Rest', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Mash low at 149°F (65°C) for maximum fermentability and crisp dry finish.' },
+        { name: 'Vigorous Hop Boil (60 Min)', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Boil 60 minutes with bittering, 30m, 15m, and 0m hop additions.' },
+        { name: 'Whirlpool & Chill', durationSec: 900, waterMultiplier: 1.0, instruction: 'Whirlpool piney hops and chill rapidly to 65°F (18°C) for US-05 Chico yeast pitch.' }
+      ]
+    },
+    {
+      id: 'german_pilsner',
+      name: 'German Pilsner (Crisp Noble Saaz & Hallertau)',
+      category: 'beer',
+      featured: true,
+      heroImage: './tea_kettle.jpg',
+      ratio: 1.40,
+      defaultCupMl: 500,
+      tempC: 64,
+      tempF: 148,
+      servingTempF: '38°F - 42°F (3°C - 5°C)',
+      abvRange: '4.8% - 5.2% ABV',
+      ibuRange: '32 - 40 IBU',
+      srmColor: '2 - 4 SRM (Brilliant Pale Straw)',
+      glassware: 'Tall Pilsner Flute or Dimpled Stein',
+      leafGrade: '100% German Weyermann Pilsner Malt & Saaz Hops',
+      description: 'Brilliant straw-gold lager topped with thick snowy foam. Crackery malt sweetness balanced by snappy, floral, spicy Noble hop bite.',
+      preferredCoffeeTypes: 'German Barke Pilsner Malt, Hallertauer Mittelfrüh, and Czech Saaz Noble hops.',
+      phases: [
+        { name: 'Step Mash Rest', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Mash at 148°F (64°C) for crisp attenuation.' },
+        { name: 'Boil & Noble Hops (90 Min)', durationSec: 5400, waterMultiplier: 1.0, instruction: 'Boil 90 minutes to drive off DMS. Add Noble hops at 60m and 15m.' },
+        { name: 'Cold Lager Ferment', durationSec: 600, waterMultiplier: 1.0, instruction: 'Chill to 50°F (10°C) and pitch Bavarian Lager yeast for 4-week cold lagering.' }
+      ]
+    },
+    {
+      id: 'belgian_saison',
+      name: 'Belgian Saison (Spicy Peppery Farmhouse Ale)',
+      category: 'beer',
+      featured: false,
+      heroImage: './tea_ceremony.jpg',
+      ratio: 1.35,
+      defaultCupMl: 375,
+      tempC: 65,
+      tempF: 149,
+      servingTempF: '45°F - 50°F (7°C - 10°C)',
+      abvRange: '6.2% - 6.8% ABV',
+      ibuRange: '25 - 35 IBU',
+      srmColor: '4 - 7 SRM (Hazy Sunburst Yellow)',
+      glassware: 'Stemmed Chalice or Tulip Glass',
+      leafGrade: 'Pilsner Malt, Wheat, Styrian Goldings & French Saison Yeast',
+      description: 'Effervescent, dry farmhouse ale with complex peppery spice, clove, white pear, and earthy herbal notes driven by warm Belgian yeast.',
+      preferredCoffeeTypes: 'Belgian Pilsner malt, Torrified Wheat, East Kent Goldings, and French Saison yeast strain.',
+      phases: [
+        { name: 'Attenuative Mash Rest', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Mash low at 149°F (65°C) to ensure bone-dry fermentability.' },
+        { name: 'Boil & Spice Addition (60 Min)', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Boil 60 minutes. Add bittering hops and optional crushed coriander @ 10m.' },
+        { name: 'Warm Yeast Pitch', durationSec: 600, waterMultiplier: 1.0, instruction: 'Pitch yeast at 72°F (22°C) and allow free rise up to 80°F (27°C) for spicy esters.' }
+      ]
+    },
+    {
+      id: 'sour_gose',
+      name: 'German Gose & Sour Ale (Tart Salted Coriander)',
+      category: 'beer',
+      featured: false,
+      heroImage: './chemex_hero.jpg',
+      ratio: 1.35,
+      defaultCupMl: 473,
+      tempC: 66,
+      tempF: 150,
+      servingTempF: '40°F - 45°F (4°C - 7°C)',
+      abvRange: '4.2% - 4.8% ABV',
+      ibuRange: '8 - 12 IBU',
+      srmColor: '3 - 5 SRM (Pale Cloudy Gold)',
+      glassware: 'Stange or Goblet',
+      leafGrade: 'Lactobacillus Sour Kettle, Sea Salt & Cracked Coriander',
+      description: 'Refreshing wheat sour ale featuring a crisp lactic lemon tartness, subtle pink Himalayan sea salt mineral balance, and herbal coriander.',
+      preferredCoffeeTypes: 'Unmalted Wheat, Pilsner Malt, Lactobacillus Plantarum souring culture, and Indian coriander.',
+      phases: [
+        { name: 'Mash & Kettle Sour Rest', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Mash at 150°F (66°C). Cool to 100°F (38°C) and pitch Lactobacillus for 24h kettle souring.' },
+        { name: 'Boil with Salt & Coriander', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Boil 60 minutes. Add sea salt and cracked coriander @ 10 minutes.' },
+        { name: 'Chill & Ferment', durationSec: 600, waterMultiplier: 1.0, instruction: 'Chill wort to 68°F (20°C) and pitch clean German ale yeast.' }
+      ]
+    },
+    {
+      id: 'hefeweizen',
+      name: 'Bavarian Hefeweizen (Banana & Clove Wheat Ale)',
+      category: 'beer',
+      featured: true,
+      heroImage: './drip_brewer_hero.jpg',
+      ratio: 1.40,
+      defaultCupMl: 500,
+      tempC: 66,
+      tempF: 151,
+      servingTempF: '42°F - 46°F (5°C - 8°C)',
+      abvRange: '5.0% - 5.4% ABV',
+      ibuRange: '10 - 15 IBU',
+      srmColor: '4 - 8 SRM (Cloudy Amber Straw)',
+      glassware: 'Tall Weizen Glass',
+      leafGrade: '50%+ German Malted Wheat & Weihenstephan Yeast',
+      description: 'Unfiltered cloudy gold wheat beer featuring signature aromas of ripe banana esters, clove, nutmeg, and fluffy wheat bread crust.',
+      preferredCoffeeTypes: 'Bavarian Dark Wheat, Pilsner Malt, Hallertauer Hersbrucker hops, and Weihenstephan WLP300 yeast.',
+      phases: [
+        { name: 'Ferulic Acid & Saccharification Rest', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Mash at 113°F (45°C) for 15m for ferulic acid clove precursor, then 151°F (66°C) for 45m.' },
+        { name: 'Gentle Hop Boil (60 Min)', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Boil 60 mins with low IBU Hallertau noble hops @ 60m.' },
+        { name: 'Ferment Unfiltered', durationSec: 600, waterMultiplier: 1.0, instruction: 'Chill to 64°F (18°C) for balanced banana-clove ester ratio.' }
+      ]
+    },
+    {
+      id: 'amber_ale',
+      name: 'American Amber Ale (Toasted Caramel & Cascade)',
+      category: 'beer',
+      featured: false,
+      heroImage: './french_press.jpg',
+      ratio: 1.35,
+      defaultCupMl: 473,
+      tempC: 67,
+      tempF: 152,
+      servingTempF: '45°F - 50°F (7°C - 10°C)',
+      abvRange: '5.5% - 6.2% ABV',
+      ibuRange: '30 - 40 IBU',
+      srmColor: '11 - 16 SRM (Coppery Amber Red)',
+      glassware: 'Nonic Pint or English Ale Glass',
+      leafGrade: 'Crystal 60L Caramel Malt & Cascade Hops',
+      description: 'Harmonious balance of toasted caramel sweetness, biscuit malt, and classic American citrus Cascade hop aromatics with a clean amber finish.',
+      preferredCoffeeTypes: 'American 2-Row, Crystal 60L, Munich Malt, and Cascade / Willamette hops.',
+      phases: [
+        { name: 'Mash Rest', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Mash at 152°F (67°C) for medium body and caramel sweetness.' },
+        { name: 'Boil (60 Min)', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Boil 60 minutes with Cascade additions @ 60m, 15m, and 5m.' },
+        { name: 'Chill & Ferment', durationSec: 600, waterMultiplier: 1.0, instruction: 'Chill to 67°F (19°C) and pitch California Ale yeast.' }
+      ]
+    },
+    {
+      id: 'porter',
+      name: 'Robust Porter (Dark Chocolate & Roasted Malt)',
+      category: 'beer',
+      featured: false,
+      heroImage: './espresso_hero.jpg',
+      ratio: 1.30,
+      defaultCupMl: 473,
+      tempC: 67,
+      tempF: 153,
+      servingTempF: '48°F - 54°F (9°C - 12°C)',
+      abvRange: '5.8% - 6.5% ABV',
+      ibuRange: '35 - 45 IBU',
+      srmColor: '25 - 35 SRM (Deep Dark Ruby Black)',
+      glassware: 'Nonic Pint or English Tankard',
+      leafGrade: 'Chocolate Malt, Black Patent & Fuggle Hops',
+      description: 'Dark ruby-black ale offering layers of baker’s cocoa, dark toasted bread, mild espresso roastiness, and earthy English hop undertones.',
+      preferredCoffeeTypes: 'Pale Ale Malt, Chocolate Malt, Caramel 80L, Black Patent, and Fuggle / Willamette hops.',
+      phases: [
+        { name: 'Full Body Mash Rest', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Mash at 153°F (67°C) for velvety mouthfeel.' },
+        { name: 'Boil (60 Min)', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Boil 60 minutes with bittering hops @ 60m and aroma hops @ 15m.' },
+        { name: 'Ferment', durationSec: 600, waterMultiplier: 1.0, instruction: 'Chill to 66°F (19°C) and pitch English Ale yeast.' }
+      ]
+    },
+    {
+      id: 'belgian_tripel',
+      name: 'Belgian Tripel (Golden Strong Abbey Ale)',
+      category: 'beer',
+      featured: true,
+      heroImage: './tea_ceremony.jpg',
+      ratio: 1.35,
+      defaultCupMl: 330,
+      tempC: 65,
+      tempF: 149,
+      servingTempF: '46°F - 52°F (8°C - 11°C)',
+      abvRange: '8.5% - 9.5% ABV',
+      ibuRange: '30 - 40 IBU',
+      srmColor: '4 - 7 SRM (Glowing Golden Yellow)',
+      glassware: 'Trappist Goblet or Chalice',
+      leafGrade: 'Belgian Pilsner Malt, Clear Candi Sugar & Saaz Hops',
+      description: 'Complex, glowing golden abbey ale with deceptively smooth strength. Notes of spicy clove, fruity banana esters, honeyed candi sugar, and dry warming alcohol.',
+      preferredCoffeeTypes: 'Belgian Pilsner Malt, Belgian Clear Candi Sugar, Styrian Goldings, Saaz, and Westmalle Trappist yeast.',
+      phases: [
+        { name: 'Highly Attenuative Mash', durationSec: 3600, waterMultiplier: 1.0, instruction: 'Mash low at 149°F (65°C) to maximize fermentable sugars.' },
+        { name: 'Boil with Candi Sugar (90 Min)', durationSec: 5400, waterMultiplier: 1.0, instruction: 'Boil 90 minutes. Add clear Belgian Candi sugar @ 15m to boost ABV while keeping body light.' },
+        { name: 'Trappist Fermentation', durationSec: 600, waterMultiplier: 1.0, instruction: 'Chill to 68°F (20°C) and pitch Belgian Abbey yeast, letting temperature rise to 76°F (24°C).' }
+      ]
+    }
   ]
 };
 
@@ -858,6 +1101,69 @@ export const TERROIR_ATLAS = {
         { name: 'Global Tea Hut', offering: 'Lincang Wild Large-Leaf Dian Hong Black Tea', note: 'Golden tipped jungle black tea with rich malt, sweet yam, and floral cocoa complexity.' }
       ]
     }
+  ],
+  beer: [
+    {
+      id: 'yakima_valley',
+      country: 'USA (Pacific Northwest)',
+      flag: '🇺🇸',
+      macroRegion: 'Yakima Valley, Washington (Hop Capital of America)',
+      regions: 'Moxee Valley, Lower Yakima, Benton City',
+      altitude: '200 - 400 meters',
+      soilType: 'Volcanic Silt Loam & Glacial Wash',
+      climate: 'Arid desert climate with 300+ sunny days, irrigated by Cascade snowmelt',
+      genetics: 'Citra (HBC 394), Mosaic (HBC 369), Simcoe, Cascade, Amarillo',
+      processing: 'Pelletized T-90, Cryo Hops & Fresh Hop Kiln Drying',
+      flavorNotes: ['Juicy Mango', 'Passionfruit', 'Damp Pine Resin', 'Grapefruit Zest', 'Sweet Papaya'],
+      acidProfile: 'High Alpha Acids (11% - 15%) & Rich Essential Oils',
+      agronomyDeepDive: 'Yakima Valley produces over 75% of total US hop harvests. Intense desert sunshine combined with Cascade volcanic soil produces world-renowned aroma hops bursting with thiols, myrcene, and tropical citrus oils that define American IPAs.',
+      roastPairing: 'Light Pilsner & Pale Malt Grain Bills',
+      recommendedMethod: 'New England Hazy IPA & West Coast IPA',
+      sourcedBrands: [
+        { name: 'Yakima Chief Hops (YCH)', offering: 'Cryo Hops Citra & Mosaic Blend', note: 'Concentrated lupulin powder delivering explosive mango, guava, and pine aromatics.' },
+        { name: 'Haas Hop Breeding', offering: 'Sabro & Citra Microlots', note: 'Coconut cream, tangerine zest, and tropical fruit complexity.' }
+      ]
+    },
+    {
+      id: 'hallertau_germany',
+      country: 'Germany (Bavaria)',
+      flag: '🇩🇪',
+      macroRegion: 'Hallertau, Bavaria (World’s Largest Continuous Hop Region)',
+      regions: 'Mainburg, Wolnzach, Nandlstadt',
+      altitude: '350 - 500 meters',
+      soilType: 'Rich Loess & Sandy Clay Loam',
+      climate: 'Moderate continental Bavarian climate with abundant summer rain',
+      genetics: 'Hallertauer Mittelfrüh, Hersbrucker, Tradition, Tettnang',
+      processing: 'Whole Leaf Kiln Drying & Gentle Air Curing',
+      flavorNotes: ['Herbal Chamomile', 'Spicy Black Pepper', 'Floral Blossom', 'Woodsy Cedar', 'Subtle Earth'],
+      acidProfile: 'Low Alpha Acids (3.5% - 5.5%), High Humulene & Caryophyllene Oils',
+      agronomyDeepDive: 'Hallertau has cultivated hops for over 1,200 years. The moist Bavarian soil and mild summer climate yield classic "Noble" hops characterized by soft, elegant spicy florals, herbal chamomile, and refined bitterness without harsh astringency.',
+      roastPairing: 'Weyermann German Barke Pilsner & Vienna Malt',
+      recommendedMethod: 'German Pilsner, Hefeweizen & Oktoberfest Lager',
+      sourcedBrands: [
+        { name: 'Weyermann Malting & Hop Reserve', offering: 'Hallertauer Mittelfrüh Noble Hops', note: 'Classic German lager hop offering refined herbal spice, floral jasmine, and crisp balance.' }
+      ]
+    },
+    {
+      id: 'saaz_czech',
+      country: 'Czech Republic (Bohemia)',
+      flag: '🇨🇿',
+      macroRegion: 'Žatec (Saaz) Hop Region, Bohemia',
+      regions: 'Žatec, Louny, Rakovník',
+      altitude: '200 - 300 meters',
+      soilType: 'Red Permian Iron-Rich Clay Soils (Červenka)',
+      climate: 'Sheltered by Ore Mountains with mild rain shadows',
+      genetics: 'Žatecký Poloraný Červeňák (Classic Bohemian Saaz)',
+      processing: 'Traditional Low-Temperature Kiln Drying',
+      flavorNotes: ['Spicy Noble Pepper', 'Woodsy Pine', 'Fresh Herbal Thyme', 'Earthy Clay', 'Subtle Floral'],
+      acidProfile: 'Delicate Alpha Acid (2.5% - 4.0%), High Farnesene Oil',
+      agronomyDeepDive: 'Famous as the backbone of original Bohemian Pilsner lagers since 1842. Grown in Žatec’s red iron-rich clay soils, Saaz hops impart a unique spicy, herbal, and earthy aroma with a soft, clean bitterness.',
+      roastPairing: 'Bohemian Floor-Malted Pilsner Malt',
+      recommendedMethod: 'Bohemian Pilsner & Belgian Abbey Ales',
+      sourcedBrands: [
+        { name: 'Bohemian Hop Growers Guild', offering: 'Certified Saaz Noble Microlot', note: 'Delicate herbal spice, earthy pepper, and soft floral finish.' }
+      ]
+    }
   ]
 };
 
@@ -1338,6 +1644,47 @@ export const TROUBLESHOOTING_GUIDE = {
         'Leaf Quantity: Add +1g of tea leaves or reduce water volume',
         'Vessel Preheat: Warm teapot, gaiwan, or ceramic mug with hot water before steeping',
         'Whole Leaf Room: Use a spacious infuser basket so leaves can fully expand'
+      ]
+    }
+  ],
+  beer: [
+    {
+      id: 'dms',
+      symptom: 'Cooked Corn or Canned Tomato Off-Flavor (DMS)',
+      cause: 'S-Methylmethionine (SMM) precursor in Pilsner malt not boiled off or slow wort cooling',
+      remedies: [
+        'Boil Duration: Extend wort boil to 90 minutes uncovered to vaporize DMS',
+        'Rapid Chill: Use an immersion/counterflow wort chiller to drop temp below 140°F (60°C) immediately',
+        'Uncovered Kettle: Never place kettle lid on during active boil'
+      ]
+    },
+    {
+      id: 'diacetyl',
+      symptom: 'Movie Theater Butter, Butterscotch, or Slick Mouthfeel',
+      cause: 'Diacetyl ester precursor not absorbed by yeast due to premature fermentation cold-crashing',
+      remedies: [
+        'Diacetyl Rest: Raise fermentation temperature by +3°F to +5°F for 48 hours at end of primary fermentation',
+        'Yeast Health: Pitch adequate healthy yeast cells and aerate wort with pure oxygen',
+        'Conditioning: Allow 2 extra days before transferring to keg or bottles'
+      ]
+    },
+    {
+      id: 'acetaldehyde',
+      symptom: 'Green Apple, Latex Paint, or Raw Cider Bite',
+      cause: 'Acetaldehyde intermediate compound before conversion into ethanol by yeast',
+      remedies: [
+        'Fermentation Time: Give yeast extra time to re-absorb acetaldehyde before packaging',
+        'Yeast Strain: Ensure healthy yeast pitch rate (avoid under-pitching expired yeast packets)'
+      ]
+    },
+    {
+      id: 'oxidation',
+      symptom: 'Wet Cardboard, Stale Paper, or Muted Hop Aromatics',
+      cause: 'Oxygen exposure post-fermentation during keg transfer or bottling (Hot Side / Cold Side aeration)',
+      remedies: [
+        'Closed Transfer: Flush kegs with CO2 before transferring fermented beer',
+        'Dry Hop Purge: Flush dry hop additions with CO2 to eliminate trapped air',
+        'Cold Storage: Store packaged IPA & hoppy beer in cold fridge (38°F / 3°C)'
       ]
     }
   ]

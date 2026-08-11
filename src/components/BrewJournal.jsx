@@ -130,6 +130,7 @@ export default function BrewJournal({
     if (activeFilter === 'favorites') return log.isFavorite;
     if (activeFilter === 'coffee') return log.trackMode === 'coffee';
     if (activeFilter === 'tea') return log.trackMode === 'tea';
+    if (activeFilter === 'beer') return log.trackMode === 'beer';
     return true;
   });
 
@@ -260,6 +261,17 @@ export default function BrewJournal({
             >
               <Leaf className="w-3.5 h-3.5" />
               <span>Tea ({logs.filter(l => l.trackMode === 'tea').length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveFilter('beer')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1 ${
+                activeFilter === 'beer'
+                  ? 'bg-amber-gold text-espresso-950 font-extrabold shadow-md'
+                  : 'text-stone-400 hover:text-cream-light'
+              }`}
+            >
+              <span>Beer ({logs.filter(l => l.trackMode === 'beer').length})</span>
             </button>
           </div>
 
