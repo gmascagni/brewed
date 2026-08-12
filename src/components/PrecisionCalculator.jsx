@@ -75,10 +75,14 @@ export default function PrecisionCalculator({
     <div className="space-y-8 animate-fade-in">
       
       {/* 1. Header Card with Embedded Unit (oz/g) & Audio Preferences */}
-      <div className="p-6 md:p-8 rounded-3xl glass-panel-amber relative overflow-hidden shadow-2xl">
+      <div className={`p-6 md:p-8 rounded-3xl relative overflow-hidden shadow-2xl border transition-all duration-500 ${
+        isBeer ? 'glass-panel-beer border-amber-500/40' : isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
+      }`}>
         <div className="flex items-center justify-between gap-4 mb-3">
-          <div className="inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] text-amber-gold">
-            <Sparkles className="w-4 h-4 animate-pulse text-amber-gold" />
+          <div className={`inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] ${
+            isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+          }`}>
+            <Sparkles className="w-4 h-4 animate-pulse" />
             <span>Step 02 of 04 • {isBeer ? 'Beer Mash & ABV Scaler' : 'Precision Scaler & Ratio Matrix'}</span>
           </div>
 
@@ -87,10 +91,10 @@ export default function PrecisionCalculator({
             {isPourOver && (
               <button
                 onClick={() => setIsProTipOpen(true)}
-                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-gold text-espresso-950 hover:bg-amber-gold/90 font-extrabold text-xs uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all animate-pulse"
+                className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl btn-tactile-coffee text-[#140C08] font-extrabold text-xs uppercase tracking-wider shadow-lg hover:scale-105 active:scale-95 transition-all animate-pulse"
                 title="Open Pour Over Pro Tip Masterclass Guide"
               >
-                <Lightbulb className="w-3.5 h-3.5 fill-current text-espresso-950" />
+                <Lightbulb className="w-3.5 h-3.5 fill-current text-[#140C08]" />
                 <span>Pro Tip 💡</span>
               </button>
             )}
@@ -101,7 +105,11 @@ export default function PrecisionCalculator({
                   onClick={() => setUnitSystem('imperial')}
                   className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg transition-all active:scale-95 ${
                     unitSystem === 'imperial'
-                      ? 'btn-tactile-amber text-espresso-950 font-extrabold shadow-sm scale-102'
+                      ? isBeer
+                        ? 'btn-tactile-beer text-[#0F0C05] font-extrabold shadow-sm scale-102'
+                        : isCoffee
+                        ? 'btn-tactile-coffee text-[#140C08] font-extrabold shadow-sm scale-102'
+                        : 'btn-tactile-tea text-white font-extrabold shadow-sm scale-102'
                       : 'text-stone-400 hover:text-cream-light'
                   }`}
                   title="Switch to Imperial Units (oz/°F)"
@@ -114,7 +122,11 @@ export default function PrecisionCalculator({
                   onClick={() => setUnitSystem('metric')}
                   className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg transition-all active:scale-95 ${
                     unitSystem === 'metric'
-                      ? 'btn-tactile-amber text-espresso-950 font-extrabold shadow-sm scale-102'
+                      ? isBeer
+                        ? 'btn-tactile-beer text-[#0F0C05] font-extrabold shadow-sm scale-102'
+                        : isCoffee
+                        ? 'btn-tactile-coffee text-[#140C08] font-extrabold shadow-sm scale-102'
+                        : 'btn-tactile-tea text-white font-extrabold shadow-sm scale-102'
                       : 'text-stone-400 hover:text-cream-light'
                   }`}
                   title="Switch to Metric Units (g/mL/°C)"
@@ -128,10 +140,10 @@ export default function PrecisionCalculator({
             {setIsMuted && (
               <button
                 onClick={() => setIsMuted(!isMuted)}
-                className="p-1.5 px-2.5 rounded-xl bg-black/60 border border-white/15 text-stone-200 hover:border-amber-gold/60 transition-all shadow-md active:scale-95"
+                className="p-1.5 px-2.5 rounded-xl bg-black/60 border border-white/15 text-stone-200 hover:border-white/40 transition-all shadow-md active:scale-95"
                 title={isMuted ? "Unmute Audio Alerts" : "Mute Audio Alerts"}
               >
-                {isMuted ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5 text-amber-gold" />}
+                {isMuted ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5 text-[#D2A06E]" />}
               </button>
             )}
           </div>
@@ -150,7 +162,9 @@ export default function PrecisionCalculator({
 
         {/* Horizontal Scroll Method Picker Quick Tabs */}
         <div className="mt-6 pt-5 border-t border-white/[0.08]">
-          <label className="block text-[10px] uppercase font-mono tracking-[0.2em] font-extrabold text-amber-gold/90 mb-2.5">
+          <label className={`block text-[10px] uppercase font-mono tracking-[0.2em] font-extrabold mb-2.5 ${
+            isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+          }`}>
             Switch Extraction Method / Beer Style:
           </label>
           <div className="flex items-center space-x-2.5 overflow-x-auto pb-1 no-scrollbar">
@@ -163,9 +177,9 @@ export default function PrecisionCalculator({
                   className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
                     isSelected
                       ? isBeer
-                        ? 'bg-amber-500 text-espresso-950 border-amber-500 font-extrabold shadow-[0_0_15px_rgba(245,158,11,0.4)]'
+                        ? 'bg-amber-500 text-[#0F0C05] border-amber-500 font-extrabold shadow-[0_0_15px_rgba(245,158,11,0.4)]'
                         : isCoffee
-                        ? 'bg-amber-gold text-espresso-950 border-amber-gold font-extrabold shadow-[0_0_15px_rgba(212,140,70,0.4)]'
+                        ? 'bg-[#C48B56] text-[#140C08] border-[#C48B56] font-extrabold shadow-[0_0_15px_rgba(166,110,56,0.4)]'
                         : 'bg-sage-300 text-slate-950 border-sage-300 font-extrabold shadow-[0_0_15px_rgba(143,168,153,0.4)]'
                       : 'bg-black/30 text-stone-400 border-white/[0.08] hover:bg-white/[0.08] hover:text-cream-light'
                   }`}
@@ -185,10 +199,16 @@ export default function PrecisionCalculator({
         <div>
           <div className="flex items-center justify-between mb-3.5">
             <label className="text-xs uppercase tracking-[0.15em] font-mono font-extrabold text-stone-300 flex items-center gap-2">
-              {isBeer ? <Beer className="w-4 h-4 text-amber-500" /> : <CupSoda className="w-4 h-4 text-amber-gold" />}
+              {isBeer ? <Beer className="w-4 h-4 text-amber-500" /> : isCoffee ? <CupSoda className="w-4 h-4 text-[#D2A06E]" /> : <CupSoda className="w-4 h-4 text-sage-300" />}
               <span>{isBeer ? `Batch Size (${batchGallons} Gal / ${batchLiters} L)` : `Target Serving (${cupCount} ${cupCount === 1 ? 'Cup' : 'Cups'})`}</span>
             </label>
-            <span className="text-sm font-extrabold font-mono text-cream-light bg-amber-400/20 px-3.5 py-1 rounded-xl border border-amber-400/30 shadow">
+            <span className={`text-sm font-extrabold font-mono text-cream-light px-3.5 py-1 rounded-xl border shadow ${
+              isBeer
+                ? 'bg-amber-400/20 border-amber-400/30'
+                : isCoffee
+                ? 'bg-[#A66E38]/20 border-[#A66E38]/30 text-[#D2A06E]'
+                : 'bg-sage-500/20 border-sage-500/30 text-sage-300'
+            }`}>
               {isBeer ? `${batchGallons} Gal` : cupCount}
             </span>
           </div>
@@ -226,7 +246,7 @@ export default function PrecisionCalculator({
                   className={`px-3.5 py-3 rounded-2xl text-xs font-bold border transition-all active:scale-95 ${
                     cupMl === vol.ml && customWaterMl === null
                       ? isCoffee
-                        ? 'bg-amber-500/25 border-amber-400 text-amber-gold font-extrabold shadow-[0_0_20px_rgba(212,140,70,0.2)]'
+                        ? 'bg-[#A66E38]/25 border-[#C48B56] text-[#D2A06E] font-extrabold shadow-[0_0_20px_rgba(166,110,56,0.2)]'
                         : 'bg-emerald-500/25 border-sage-300 text-sage-300 font-extrabold shadow-[0_0_20px_rgba(143,168,153,0.2)]'
                       : 'bg-black/40 border-white/[0.08] text-stone-400 hover:bg-white/[0.08] hover:border-white/20'
                   }`}
@@ -268,9 +288,13 @@ export default function PrecisionCalculator({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
         
         {/* Grain Bill / Dry Dose Card */}
-        <div className="p-7 md:p-8 rounded-3xl bg-[#14110E]/90 border border-amber-gold/30 shadow-2xl relative overflow-hidden group flex flex-col justify-between">
+        <div className={`p-7 md:p-8 rounded-3xl bg-[#14110E]/90 border shadow-2xl relative overflow-hidden group flex flex-col justify-between ${
+          isBeer ? 'border-amber-400/30' : isCoffee ? 'border-[#A66E38]/40' : 'border-sage-500/40'
+        }`}>
           <div>
-            <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-[0.15em] font-mono text-amber-gold mb-2.5">
+            <div className={`flex items-center justify-between text-xs font-extrabold uppercase tracking-[0.15em] font-mono mb-2.5 ${
+              isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+            }`}>
               <span className="flex items-center gap-2">
                 <Scale className="w-4 h-4" />
                 <span>{isBeer ? 'Total Grain Bill Weight' : isCoffee ? 'Dry Coffee Grounds' : 'Tea Leaves'}</span>
@@ -287,7 +311,7 @@ export default function PrecisionCalculator({
           <div className="mt-5 pt-4 border-t border-white/[0.08]">
             <div className="flex items-center justify-between text-[11px] text-stone-300 font-medium mb-2">
               <span className="flex items-center gap-1.5">
-                <Sliders className="w-3.5 h-3.5 text-amber-gold" />
+                <Sliders className={`w-3.5 h-3.5 ${isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
                 <span>{isBeer ? `Mash Thickness Ratio: ${mashRatioQtLb} qt/lb` : `Extraction Ratio: 1 : ${currentRatio}`}</span>
               </span>
             </div>
@@ -343,9 +367,11 @@ export default function PrecisionCalculator({
 
           <button
             onClick={onNextStep}
-            className="py-4 px-9 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all"
+            className={`py-4 px-9 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all ${
+              isBeer ? 'btn-tactile-beer text-[#0F0C05]' : isCoffee ? 'btn-tactile-coffee text-[#140C08]' : 'btn-tactile-tea text-white'
+            }`}
           >
-            <span>Step 03: {isBeer ? 'Malt & Hops' : 'Grind & Beans'}</span>
+            <span>Step 03: {isBeer ? 'Malt & Hops' : 'Grind & Specs'}</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

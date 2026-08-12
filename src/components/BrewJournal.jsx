@@ -241,9 +241,9 @@ export default function BrewJournal({
 
             <button
               onClick={() => setActiveFilter('coffee')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 activeFilter === 'coffee'
-                  ? 'bg-amber-gold text-espresso-950 font-extrabold shadow-md'
+                  ? 'btn-tactile-coffee text-[#140C08] font-extrabold shadow-md'
                   : 'text-stone-400 hover:text-cream-light'
               }`}
             >
@@ -253,9 +253,9 @@ export default function BrewJournal({
 
             <button
               onClick={() => setActiveFilter('tea')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 activeFilter === 'tea'
-                  ? 'bg-amber-gold text-espresso-950 font-extrabold shadow-md'
+                  ? 'btn-tactile-tea text-white font-extrabold shadow-md'
                   : 'text-stone-400 hover:text-cream-light'
               }`}
             >
@@ -265,12 +265,13 @@ export default function BrewJournal({
 
             <button
               onClick={() => setActiveFilter('beer')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1 ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                 activeFilter === 'beer'
-                  ? 'bg-amber-gold text-espresso-950 font-extrabold shadow-md'
+                  ? 'btn-tactile-beer text-[#0F0C05] font-extrabold shadow-md'
                   : 'text-stone-400 hover:text-cream-light'
               }`}
             >
+              <Beer className="w-3.5 h-3.5" />
               <span>Beer ({logs.filter(l => l.trackMode === 'beer').length})</span>
             </button>
           </div>

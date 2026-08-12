@@ -4,10 +4,12 @@ import V60ProTipModal from './V60ProTipModal';
 
 export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
   const isCoffee = trackMode === 'coffee';
+  const isTea = trackMode === 'tea';
+  const isBeer = trackMode === 'beer';
   const isPourOver = activeMethod?.id === 'pour_over' || activeMethod?.id === 'chemex' || activeMethod?.id === 'classic_pour_over';
   const [isProTipOpen, setIsProTipOpen] = useState(false);
 
-  const heroImage = activeMethod?.heroImage || (isCoffee ? './coffee_setup.jpg' : './tea_kettle.jpg');
+  const heroImage = activeMethod?.heroImage || (isCoffee ? './coffee_setup.jpg' : isBeer ? './drip_brewer.jpg' : './tea_kettle.jpg');
 
   const isMetric = unitSystem === 'metric';
   const tempDisplay = isMetric 
@@ -16,7 +18,7 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
 
   return (
     <section className={`relative overflow-hidden rounded-3xl mb-10 transition-all duration-700 shadow-2xl border ${
-      isCoffee ? 'glass-panel-amber border-amber-gold/30' : 'glass-panel-sage border-sage-500/35'
+      isBeer ? 'glass-panel-beer border-amber-500/35' : isCoffee ? 'glass-panel-coffee border-[#A66E38]/35' : 'glass-panel-tea border-sage-500/35'
     } group`}>
       {/* Dynamic Background Image inside Hero Container */}
       <div className="absolute inset-0 z-0">
@@ -27,29 +29,31 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
           className="w-full h-full object-cover object-center transform scale-105 filter brightness-[0.7] contrast-110 group-hover:scale-100 transition-transform duration-1000"
         />
         <div className={`absolute inset-0 ${
-          isCoffee 
-            ? 'bg-gradient-to-r from-espresso-950 via-espresso-950/85 to-transparent' 
-            : 'bg-gradient-to-r from-slate-950 via-slate-950/85 to-transparent'
+          isBeer
+            ? 'bg-gradient-to-r from-[#171107] via-[#171107]/85 to-transparent'
+            : isCoffee 
+            ? 'bg-gradient-to-r from-[#140D09] via-[#140D09]/85 to-transparent' 
+            : 'bg-gradient-to-r from-[#0B130E] via-[#0B130E]/85 to-transparent'
         }`} />
-        <div className="absolute inset-0 bg-gradient-to-t from-espresso-950 via-transparent to-transparent opacity-90" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0908] via-transparent to-transparent opacity-90" />
       </div>
 
       {/* Hero Content Overlay */}
       <div className="relative z-10 p-8 md:p-12 lg:p-14 max-w-3xl">
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-xl text-xs uppercase tracking-widest font-extrabold text-cream-light border border-white/20 shadow-lg">
-            <Sparkles className={`w-3.5 h-3.5 ${isCoffee ? 'text-amber-gold' : 'text-sage-300'}`} />
-            <span>{isCoffee ? 'Method Specifications & Preferred Beans' : 'Method Specifications & Preferred Leaves'}</span>
+            <Sparkles className={`w-3.5 h-3.5 ${isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
+            <span>{isBeer ? 'Method Specifications & Craft Hop Bill' : isCoffee ? 'Method Specifications & Preferred Beans' : 'Method Specifications & Preferred Leaves'}</span>
           </div>
 
           {/* Pro Tip Button for Pour-Over */}
           {isPourOver && (
             <button
               onClick={() => setIsProTipOpen(true)}
-              className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-amber-gold text-espresso-950 hover:bg-amber-gold/90 font-extrabold text-xs uppercase tracking-wider shadow-xl hover:scale-105 active:scale-95 transition-all animate-pulse"
+              className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full btn-tactile-coffee text-[#140C08] font-extrabold text-xs uppercase tracking-wider shadow-xl hover:scale-105 active:scale-95 transition-all animate-pulse"
               title="Open 1-Cup V60 Pro Tip Technique & Temperature Guide"
             >
-              <Lightbulb className="w-3.5 h-3.5 fill-current text-espresso-950" />
+              <Lightbulb className="w-3.5 h-3.5 fill-current text-[#140C08]" />
               <span>Pro Tip 💡</span>
             </button>
           )}
@@ -67,7 +71,9 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
           
           <div className="glass-panel p-4 rounded-2xl flex items-center space-x-3.5 hover:-translate-y-1 transition-all duration-300">
-            <div className={`p-3 rounded-xl shadow-inner ${isCoffee ? 'bg-amber-gold/25 text-amber-gold border border-amber-gold/30' : 'bg-sage-500/25 text-sage-300 border border-sage-500/30'}`}>
+            <div className={`p-3 rounded-xl shadow-inner ${
+              isBeer ? 'bg-amber-500/25 text-amber-300 border border-amber-400/30' : isCoffee ? 'bg-[#A66E38]/25 text-[#D2A06E] border border-[#A66E38]/30' : 'bg-sage-500/25 text-sage-300 border border-sage-500/30'
+            }`}>
               <Thermometer className="w-5 h-5" />
             </div>
             <div>
@@ -77,22 +83,26 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
           </div>
 
           <div className="glass-panel p-4 rounded-2xl flex items-center space-x-3.5 hover:-translate-y-1 transition-all duration-300">
-            <div className={`p-3 rounded-xl shadow-inner ${isCoffee ? 'bg-amber-gold/25 text-amber-gold border border-amber-gold/30' : 'bg-sage-500/25 text-sage-300 border border-sage-500/30'}`}>
+            <div className={`p-3 rounded-xl shadow-inner ${
+              isBeer ? 'bg-amber-500/25 text-amber-300 border border-amber-400/30' : isCoffee ? 'bg-[#A66E38]/25 text-[#D2A06E] border border-[#A66E38]/30' : 'bg-sage-500/25 text-sage-300 border border-sage-500/30'
+            }`}>
               <Gauge className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[10px] text-cream-soft/60 uppercase font-bold tracking-wider">{isCoffee ? 'Grind Size' : 'Leaf Style'}</div>
-              <div className="text-sm font-bold text-cream-light">{isCoffee ? (activeMethod?.grind || 'Medium-Fine') : (activeMethod?.leafGrade || 'Whole Leaf')}</div>
+              <div className="text-[10px] text-cream-soft/60 uppercase font-bold tracking-wider">{isBeer ? 'IBU Bitterness' : isCoffee ? 'Grind Size' : 'Leaf Style'}</div>
+              <div className="text-sm font-bold text-cream-light">{isBeer ? (activeMethod?.ibuRange || '50 IBU') : isCoffee ? (activeMethod?.grind || 'Medium-Fine') : (activeMethod?.leafGrade || 'Whole Leaf')}</div>
             </div>
           </div>
 
           <div className="glass-panel p-4 rounded-2xl flex items-center space-x-3.5 hover:-translate-y-1 transition-all duration-300 col-span-2 sm:col-span-1">
-            <div className={`p-3 rounded-xl shadow-inner ${isCoffee ? 'bg-amber-gold/25 text-amber-gold border border-amber-gold/30' : 'bg-sage-500/25 text-sage-300 border border-sage-500/30'}`}>
+            <div className={`p-3 rounded-xl shadow-inner ${
+              isBeer ? 'bg-amber-500/25 text-amber-300 border border-amber-400/30' : isCoffee ? 'bg-[#A66E38]/25 text-[#D2A06E] border border-[#A66E38]/30' : 'bg-sage-500/25 text-sage-300 border border-sage-500/30'
+            }`}>
               <Droplets className="w-5 h-5" />
             </div>
             <div>
               <div className="text-[10px] text-cream-soft/60 uppercase font-bold tracking-wider">Ratio</div>
-              <div className="text-base font-extrabold text-cream-light font-mono">1 : {activeMethod?.ratio || 15}</div>
+              <div className="text-base font-extrabold text-cream-light font-mono">{isBeer ? `${activeMethod?.ratio} qt/lb` : `1 : ${activeMethod?.ratio || 15}`}</div>
             </div>
           </div>
 

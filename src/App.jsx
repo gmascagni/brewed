@@ -341,7 +341,7 @@ export default function App() {
         </main>
 
         {/* Contact HQ Email & App Footer */}
-        <Footer />
+        <Footer trackMode={trackMode} />
 
       </div>
 

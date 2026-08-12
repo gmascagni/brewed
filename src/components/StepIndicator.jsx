@@ -3,11 +3,13 @@ import { Coffee, Leaf, Scale, Gauge, Timer, CheckCircle2 } from 'lucide-react';
 
 export default function StepIndicator({ currentStep, setCurrentStep, trackMode }) {
   const isCoffee = trackMode === 'coffee';
+  const isTea = trackMode === 'tea';
+  const isBeer = trackMode === 'beer';
 
   const STEPS = [
-    { id: 1, title: 'Choose Method', subtitle: isCoffee ? '6 Devices' : '5 Teas', icon: isCoffee ? Coffee : Leaf },
-    { id: 2, title: 'Ratio & Scaler', subtitle: 'Cups & Volume', icon: Scale },
-    { id: 3, title: 'Grind & Beans', subtitle: 'Micron & Roasts', icon: Gauge },
+    { id: 1, title: 'Choose Method', subtitle: isBeer ? '10 Beers' : isCoffee ? '8 Devices' : '10 Teas', icon: isBeer ? Beer : isCoffee ? Coffee : Leaf },
+    { id: 2, title: 'Ratio & Scaler', subtitle: isBeer ? 'Batch & Water' : 'Cups & Volume', icon: Scale },
+    { id: 3, title: isBeer ? 'Malt & Hops' : 'Grind & Specs', subtitle: isBeer ? 'SRM & IBU' : isCoffee ? 'Micron & Roasts' : 'Leaf & Steeps', icon: Gauge },
     { id: 4, title: 'Guided Brew', subtitle: 'Timer & Extr.', icon: Timer }
   ];
 
@@ -29,9 +31,11 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
                 onClick={() => setCurrentStep(step.id)}
                 className={`w-full group flex items-center justify-center sm:justify-start space-x-1 sm:space-x-2 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border transition-all duration-300 active:scale-95 ${
                   isActive
-                    ? isCoffee
-                      ? 'btn-tactile-amber text-espresso-950 font-extrabold shadow-[0_0_20px_rgba(212,140,70,0.5)] scale-[1.02] border-amber-gold'
-                      : 'btn-tactile-sage text-slate-950 font-extrabold shadow-[0_0_20px_rgba(143,168,153,0.5)] scale-[1.02] border-sage-300'
+                    ? isBeer
+                      ? 'btn-tactile-beer text-[#0F0C05] font-extrabold shadow-[0_0_20px_rgba(245,158,11,0.5)] scale-[1.02] border-amber-400'
+                      : isCoffee
+                      ? 'btn-tactile-coffee text-[#140C08] font-extrabold shadow-[0_0_20px_rgba(166,110,56,0.5)] scale-[1.02] border-[#C48B56]'
+                      : 'btn-tactile-tea text-white font-extrabold shadow-[0_0_20px_rgba(81,158,100,0.5)] scale-[1.02] border-sage-300'
                     : isCompleted
                     ? 'bg-[#181412]/90 border-emerald-500/40 text-emerald-300 hover:bg-[#201B18]'
                     : 'bg-[#12100E]/80 border-white/15 text-stone-300 hover:text-cream-light hover:bg-white/[0.08] hover:border-white/25'

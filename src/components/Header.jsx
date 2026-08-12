@@ -14,17 +14,23 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
         <div className="flex items-center space-x-3">
           <div className={`p-2.5 rounded-2xl ${
             isBeer
-              ? 'bg-amber-600/20 text-amber-300 border border-amber-400/40 shadow-[0_0_20px_rgba(245,158,11,0.2)]'
+              ? 'bg-amber-500/20 text-amber-300 border border-amber-400/40 shadow-[0_0_20px_rgba(245,158,11,0.3)]'
               : isCoffee 
-              ? 'bg-amber-500/20 text-amber-gold border border-amber-400/40 shadow-[0_0_20px_rgba(212,140,70,0.2)]' 
-              : 'bg-sage-500/20 text-sage-300 border border-sage-500/40 shadow-[0_0_20px_rgba(143,168,153,0.2)]'
+              ? 'bg-[#A66E38]/25 text-[#D2A06E] border border-[#A66E38]/40 shadow-[0_0_20px_rgba(166,110,56,0.3)]' 
+              : 'bg-sage-500/20 text-sage-300 border border-sage-500/40 shadow-[0_0_20px_rgba(143,168,153,0.3)]'
           } transition-all duration-500`}>
             {isBeer ? <Beer className="w-5 h-5 animate-pulse" /> : isCoffee ? <Coffee className="w-5 h-5 animate-pulse" /> : <Leaf className="w-5 h-5 animate-pulse" />}
           </div>
           <div>
             <h1 className="font-serif text-xl font-bold tracking-wider text-cream-light flex items-center gap-2">
               <span>The Brew App</span>
-              <span className="whitespace-nowrap text-[9px] uppercase font-mono px-2 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/40">
+              <span className={`whitespace-nowrap text-[9px] uppercase font-mono px-2 py-0.5 rounded-full border ${
+                isBeer
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-400/40'
+                  : isCoffee
+                  ? 'bg-[#A66E38]/20 text-[#D2A06E] border-[#A66E38]/40'
+                  : 'bg-sage-500/20 text-sage-300 border-sage-500/40'
+              }`}>
                 Master
               </span>
             </h1>
@@ -32,16 +38,16 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
           </div>
         </div>
 
-        {/* Center 3-Track Switcher: The Coffee Lab vs The Tea Room vs The Craft Cellar */}
-        <div className="flex items-center p-1 rounded-2xl bg-[#14110E] border border-white/[0.12] text-xs font-bold shadow-inner">
+        {/* Center 3-Track Switcher: Coffee (Brownish) vs Tea (Green) vs Beer (Golden) */}
+        <div className="flex items-center p-1.5 rounded-2xl bg-[#14110E] border border-white/[0.12] text-xs font-bold shadow-inner gap-1">
           <button
             onClick={() => setTrackMode('coffee')}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl transition-all duration-300 ${
+            className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl transition-all duration-300 ${
               isCoffee 
-                ? 'btn-tactile-amber text-espresso-950 scale-102 shadow-lg' 
-                : 'text-stone-400 hover:text-cream-light'
+                ? 'btn-tactile-coffee text-[#140C08] font-extrabold scale-102 shadow-lg' 
+                : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.05]'
             }`}
-            title="Switch to The Coffee Lab"
+            title="Switch to Coffee Lab (Brown Theme)"
           >
             <Coffee className="w-3.5 h-3.5" />
             <span>Coffee</span>
@@ -49,12 +55,12 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
 
           <button
             onClick={() => setTrackMode('tea')}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl transition-all duration-300 ${
+            className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl transition-all duration-300 ${
               isTea 
-                ? 'btn-tactile-sage text-cream-light scale-102 shadow-lg' 
-                : 'text-stone-400 hover:text-cream-light'
+                ? 'btn-tactile-tea text-white font-extrabold scale-102 shadow-lg' 
+                : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.05]'
             }`}
-            title="Switch to The Tea Room"
+            title="Switch to Tea Room (Green Theme)"
           >
             <Leaf className="w-3.5 h-3.5" />
             <span>Tea</span>
@@ -62,12 +68,12 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
 
           <button
             onClick={() => setTrackMode('beer')}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl transition-all duration-300 ${
+            className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl transition-all duration-300 ${
               isBeer 
-                ? 'bg-amber-600 text-cream-light border border-amber-400/60 scale-102 shadow-lg' 
-                : 'text-stone-400 hover:text-cream-light'
+                ? 'btn-tactile-beer text-[#0F0C05] font-extrabold scale-102 shadow-lg' 
+                : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.05]'
             }`}
-            title="Switch to The Craft Cellar (Beer)"
+            title="Switch to Craft Cellar (Beer Golden Theme)"
           >
             <Beer className="w-3.5 h-3.5" />
             <span>Beer</span>

@@ -42,82 +42,152 @@
     0 0 20px 0 rgba(0, 0, 0, 0.5);
 }
 
+/* 1. COFFEE TRACK (BROWN THEME) */
+.glass-panel-coffee {
+  background: linear-gradient(145deg, rgba(42, 28, 18, 0.92) 0%, rgba(20, 13, 9, 0.96) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(166, 110, 56, 0.35);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(232, 195, 158, 0.22),
+    0 24px 48px -12px rgba(14, 11, 8, 0.95),
+    0 0 35px -5px rgba(166, 110, 56, 0.2);
+}
+
 .glass-panel-amber {
-  background: linear-gradient(145deg, rgba(36, 26, 20, 0.88) 0%, rgba(18, 14, 12, 0.94) 100%);
+  background: linear-gradient(145deg, rgba(42, 28, 18, 0.92) 0%, rgba(20, 13, 9, 0.96) 100%);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(212, 140, 70, 0.22);
+  border: 1px solid rgba(166, 110, 56, 0.35);
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 215, 170, 0.18),
-    0 24px 48px -12px rgba(10, 8, 7, 0.95),
-    0 0 35px -5px rgba(212, 140, 70, 0.15);
+    inset 0 1px 1px 0 rgba(232, 195, 158, 0.22),
+    0 24px 48px -12px rgba(14, 11, 8, 0.95),
+    0 0 35px -5px rgba(166, 110, 56, 0.2);
 }
 
-.glass-panel-sage {
-  background: linear-gradient(145deg, rgba(24, 34, 28, 0.88) 0%, rgba(14, 20, 16, 0.94) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(143, 168, 153, 0.25);
-  box-shadow: 
-    inset 0 1px 1px 0 rgba(200, 230, 210, 0.18),
-    0 24px 48px -12px rgba(14, 20, 16, 0.95),
-    0 0 35px -5px rgba(143, 168, 153, 0.15);
-}
-
-/* Tactile Craft 3D Gold Accent Button */
-.btn-tactile-amber {
-  background: linear-gradient(180deg, #E29D56 0%, #D48C46 50%, #B8722E 100%);
+.btn-tactile-coffee, .btn-tactile-amber {
+  background: linear-gradient(180deg, #C48B56 0%, #A66E38 50%, #7E4B21 100%);
   box-shadow: 
     inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
-    inset 0 -2px 0 0 rgba(0, 0, 0, 0.35),
-    0 0 25px 2px rgba(212, 140, 70, 0.45);
-  border: 1px solid rgba(255, 200, 150, 0.35);
+    inset 0 -2px 0 0 rgba(0, 0, 0, 0.4),
+    0 0 25px 2px rgba(166, 110, 56, 0.45);
+  border: 1px solid rgba(232, 195, 158, 0.4);
+  color: #140C08;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.btn-tactile-amber:hover {
-  background: linear-gradient(180deg, #EEA962 0%, #E29D56 50%, #C67F3A 100%);
+.btn-tactile-coffee:hover, .btn-tactile-amber:hover {
+  background: linear-gradient(180deg, #D2A06E 0%, #C48B56 50%, #8B5A2B 100%);
   box-shadow: 
     inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
-    0 0 35px 6px rgba(212, 140, 70, 0.65);
+    0 0 35px 6px rgba(196, 139, 86, 0.65);
   transform: scale(1.05) translateY(-2px);
 }
 
-.btn-tactile-amber:active {
+.btn-tactile-coffee:active, .btn-tactile-amber:active {
   transform: scale(0.96) translateY(1px);
   box-shadow: 
-    inset 0 2px 4px 0 rgba(0, 0, 0, 0.4),
-    0 4px 10px -2px rgba(212, 140, 70, 0.4);
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.5),
+    0 4px 10px -2px rgba(166, 110, 56, 0.4);
 }
 
-.btn-tactile-sage {
-  background: linear-gradient(180deg, #6F967E 0%, #5E7E6A 50%, #476352 100%);
+/* 2. TEA TRACK (GREEN THEME) */
+.glass-panel-tea, .glass-panel-sage {
+  background: linear-gradient(145deg, rgba(20, 36, 26, 0.92) 0%, rgba(10, 20, 14, 0.96) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(94, 150, 106, 0.35);
   box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.35),
-    inset 0 -2px 0 0 rgba(0, 0, 0, 0.35),
-    0 0 25px 2px rgba(94, 126, 106, 0.45);
-  border: 1px solid rgba(180, 220, 195, 0.35);
+    inset 0 1px 1px 0 rgba(180, 230, 195, 0.22),
+    0 24px 48px -12px rgba(10, 20, 14, 0.95),
+    0 0 35px -5px rgba(94, 150, 106, 0.2);
+}
+
+.btn-tactile-tea, .btn-tactile-sage {
+  background: linear-gradient(180deg, #519E64 0%, #3B804E 50%, #265B34 100%);
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 0 rgba(0, 0, 0, 0.4),
+    0 0 25px 2px rgba(81, 158, 100, 0.45);
+  border: 1px solid rgba(180, 230, 195, 0.4);
+  color: #FFFFFF;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.btn-tactile-sage:hover {
-  background: linear-gradient(180deg, #7FA88F 0%, #6F967E 50%, #51715E 100%);
+.btn-tactile-tea:hover, .btn-tactile-sage:hover {
+  background: linear-gradient(180deg, #65B579 0%, #519E64 50%, #306E40 100%);
   box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.45),
-    0 0 35px 6px rgba(94, 126, 106, 0.65);
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+    0 0 35px 6px rgba(81, 158, 100, 0.65);
   transform: scale(1.05) translateY(-2px);
 }
 
-.btn-tactile-sage:active {
+.btn-tactile-tea:active, .btn-tactile-sage:active {
   transform: scale(0.96) translateY(1px);
   box-shadow: 
-    inset 0 2px 4px 0 rgba(0, 0, 0, 0.4),
-    0 4px 10px -2px rgba(94, 126, 106, 0.4);
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.5),
+    0 4px 10px -2px rgba(81, 158, 100, 0.4);
+}
+
+/* 3. BEER TRACK (GOLDEN THEME) */
+.glass-panel-beer, .glass-panel-gold {
+  background: linear-gradient(145deg, rgba(45, 34, 12, 0.92) 0%, rgba(22, 16, 6, 0.96) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(254, 240, 138, 0.25),
+    0 24px 48px -12px rgba(16, 12, 4, 0.95),
+    0 0 35px -5px rgba(245, 158, 11, 0.25);
+}
+
+.btn-tactile-beer, .btn-tactile-gold {
+  background: linear-gradient(180deg, #FBBF24 0%, #F59E0B 50%, #D97706 100%);
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 0 0 rgba(0, 0, 0, 0.4),
+    0 0 25px 2px rgba(245, 158, 11, 0.5);
+  border: 1px solid rgba(254, 240, 138, 0.5);
+  color: #0F0C05;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-tactile-beer:hover, .btn-tactile-gold:hover {
+  background: linear-gradient(180deg, #FCD34D 0%, #FBBF24 50%, #E58E0B 100%);
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.6),
+    0 0 35px 6px rgba(245, 158, 11, 0.7);
+  transform: scale(1.05) translateY(-2px);
+}
+
+.btn-tactile-beer:active, .btn-tactile-gold:active {
+  transform: scale(0.96) translateY(1px);
+  box-shadow: 
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.5),
+    0 4px 10px -2px rgba(245, 158, 11, 0.4);
 }
 
 /* Metallic Shimmer Text */
+.text-shimmer-coffee {
+  background: linear-gradient(135deg, #FFF8F0 0%, #D2A06E 50%, #FFF8F0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-shimmer-tea {
+  background: linear-gradient(135deg, #F4FBF6 0%, #8FA899 50%, #F4FBF6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-shimmer-beer {
+  background: linear-gradient(135deg, #FEFCE8 0%, #FBBF24 50%, #FEFCE8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .text-shimmer-amber {
-  background: linear-gradient(135deg, #FFF8F0 0%, #D48C46 50%, #FFF8F0 100%);
+  background: linear-gradient(135deg, #FFF8F0 0%, #D2A06E 50%, #FFF8F0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
