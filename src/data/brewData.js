@@ -1168,9 +1168,10 @@ export const TERROIR_ATLAS = {
 };
 
 export const MASTERCLASSES = [
-  // Moka Pot Videos (methodId: 'moka_pot')
+  // --- COFFEE MASTERCLASSES (track: 'coffee') ---
   {
     id: 'mc_mokapot_bialetti',
+    track: 'coffee',
     methodId: 'moka_pot',
     method: 'Moka Pot',
     title: 'Mastering the Stovetop Moka Pot (Bialetti Technique & Water Preheat)',
@@ -1186,6 +1187,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_mokapot_beans',
+    track: 'coffee',
     methodId: 'moka_pot',
     method: 'Moka Pot',
     title: 'Preferred Coffee Beans & Fine-Medium Grind for Moka Pot',
@@ -1198,10 +1200,9 @@ export const MASTERCLASSES = [
       'Choose low-acidity beans rich in dark chocolate & toasted hazelnut notes'
     ]
   },
-
-  // Chemex Videos (methodId: 'chemex')
   {
     id: 'mc_chemex_technique',
+    track: 'coffee',
     methodId: 'chemex',
     method: 'Chemex Glass Brewer',
     title: 'Mastering the Chemex Glass Brewer & Bonded Filters',
@@ -1217,6 +1218,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_chemex_beans',
+    track: 'coffee',
     methodId: 'chemex',
     method: 'Chemex Glass Brewer',
     title: 'Best Coffee Beans & Ratios for Chemex Clarity',
@@ -1229,10 +1231,9 @@ export const MASTERCLASSES = [
       'Thick paper filter removes bitter oils for pristine clarity'
     ]
   },
-
-  // Classic Pour Over Videos (methodId: 'classic_pour_over')
   {
     id: 'mc_classic_pourover_technique',
+    track: 'coffee',
     methodId: 'classic_pour_over',
     method: 'Classic Pour Over',
     title: 'Mastering the Classic Pour Over (Universal Cone & Flat-Bottom Drippers)',
@@ -1248,6 +1249,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_classic_pourover_beans',
+    track: 'coffee',
     methodId: 'classic_pour_over',
     method: 'Classic Pour Over',
     title: 'Best Coffee Beans & SCA 1:16 Golden Ratios for Pour Over',
@@ -1261,10 +1263,9 @@ export const MASTERCLASSES = [
       'Prevents sour under-extraction and bitter over-extraction'
     ]
   },
-
-  // Hario V60 Videos (methodId: 'pour_over')
   {
     id: 'mc_pourover_v60',
+    track: 'coffee',
     methodId: 'pour_over',
     method: 'Hario V60 Dripper',
     title: 'Hario V60 Concentric Pouring Technique',
@@ -1280,6 +1281,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_pourover_beans',
+    track: 'coffee',
     methodId: 'pour_over',
     method: 'Hario V60 Dripper',
     title: 'Preferred Single-Origin Beans for Hario V60 Clarity',
@@ -1295,6 +1297,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_golden_ratio',
+    track: 'coffee',
     methodId: 'pour_over',
     method: 'Hario V60 Dripper',
     title: 'The Golden Ratio of Coffee Brewing (1:16 & SCA Golden Cup Standard)',
@@ -1308,15 +1311,14 @@ export const MASTERCLASSES = [
       'Prevents sour under-extraction (<18%) and bitter over-extraction (>22%)'
     ]
   },
-
-  // French Press Videos (methodId: 'french_press')
   {
     id: 'mc_frenchpress_hoffmann',
+    track: 'coffee',
     methodId: 'french_press',
     method: 'French Press',
     title: 'Ultimate French Press: Crust Breaking & Silt Skimming',
     duration: '5:30',
-    thumbnail: './french_press.jpg',
+    thumbnail: './french_press_hero.jpg',
     embedId: 'st571DYYTR8',
     description: 'Master the James Hoffmann immersion technique: 4-minute steep, gently breaking the crust, and skimming foam for a crystal-clean body.',
     keyTakeaways: [
@@ -1327,11 +1329,12 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_frenchpress_roasts',
+    track: 'coffee',
     methodId: 'french_press',
     method: 'French Press',
     title: 'French Press Bean Selection, Grind & Common Mistakes',
     duration: '4:15',
-    thumbnail: './french_press.jpg',
+    thumbnail: './french_press_hero.jpg',
     embedId: 'VFj3Y6lC9D4',
     description: 'Learn why heavy-bodied Sumatran Giling Basah, Brazilian Yellow Bourbon, and medium-dark roasts shine best in immersion brewing, and how to avoid bitter over-extraction.',
     keyTakeaways: [
@@ -1342,11 +1345,12 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_frenchpress_coldbrew',
+    track: 'coffee',
     methodId: 'french_press',
     method: 'French Press',
     title: 'French Press Cold Brew & Concentrated Iced Immersion',
     duration: '4:45',
-    thumbnail: './french_press.jpg',
+    thumbnail: './french_press_hero.jpg',
     embedId: '4W2p0i3W_K0',
     description: 'Turn your French Press into an overnight 12-hour cold brew steep chamber to produce a smooth, chocolatey, low-acidity concentrate.',
     keyTakeaways: [
@@ -1355,15 +1359,14 @@ export const MASTERCLASSES = [
       'Serve over ice with milk or cold foam'
     ]
   },
-
-  // Drip Coffee Maker Videos (methodId: 'drip_brewer')
   {
     id: 'mc_drip_home',
+    track: 'coffee',
     methodId: 'drip_brewer',
     method: 'Automatic Drip',
     title: 'Maximizing Your Home Drip Coffee Machine',
     duration: '3:45',
-    thumbnail: './drip_brewer.jpg',
+    thumbnail: './drip_brewer_hero.jpg',
     embedId: '8d-9Y2S92v0',
     description: 'Simple tweaks to get cafe-quality batch brew from standard home electric coffee makers.',
     keyTakeaways: [
@@ -1372,10 +1375,9 @@ export const MASTERCLASSES = [
       'Use filtered water with 120-150 ppm mineral content'
     ]
   },
-
-  // Espresso Videos (methodId: 'espresso')
   {
     id: 'mc_espresso_prep',
+    track: 'coffee',
     methodId: 'espresso',
     method: 'Espresso',
     title: 'Espresso Puck Prep, WDT & 9-Bar Extraction',
@@ -1389,10 +1391,9 @@ export const MASTERCLASSES = [
       'Aim for 1:2 yield ratio in 25-30 seconds'
     ]
   },
-
-  // AeroPress Videos (methodId: 'aeropress')
   {
     id: 'mc_aeropress_inverted',
+    track: 'coffee',
     methodId: 'aeropress',
     method: 'AeroPress',
     title: 'Inverted AeroPress Champion Technique',
@@ -1407,9 +1408,10 @@ export const MASTERCLASSES = [
     ]
   },
 
-  // --- TEA MASTERCLASSES (All 10 World Teas Covered with Verified Working Video Embeds) ---
+  // --- TEA MASTERCLASSES (track: 'tea') ---
   {
     id: 'mc_darjeeling_tea',
+    track: 'tea',
     methodId: 'darjeeling_tea',
     method: 'Himalayan Darjeeling',
     title: 'Mastering Himalayan Darjeeling First & Second Flush',
@@ -1425,6 +1427,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_chai_masala',
+    track: 'tea',
     methodId: 'chai_masala',
     method: 'Masala Chai',
     title: 'Authentic Indian Masala Chai Decoction & Spiced Milk Brew',
@@ -1440,6 +1443,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_english_breakfast',
+    track: 'tea',
     methodId: 'english_breakfast',
     method: 'English Breakfast',
     title: 'English Breakfast Tea Steeping & Malty Blend Perfection',
@@ -1455,6 +1459,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_earl_grey',
+    track: 'tea',
     methodId: 'earl_grey',
     method: 'Earl Grey',
     title: 'Earl Grey Bergamot Essential Oil Extraction & Citrus Notes',
@@ -1470,6 +1475,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_green_steeping',
+    track: 'tea',
     methodId: 'green_tea',
     method: 'Green Tea',
     title: 'Specialty Green Tea & Sencha Steeping Masterclass',
@@ -1485,6 +1491,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_matcha_tea',
+    track: 'tea',
     methodId: 'matcha_tea',
     method: 'Ceremonial Matcha',
     title: 'Japanese Ceremonial Matcha Whisking Technique (Usucha)',
@@ -1500,6 +1507,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_gongfu_oolong',
+    track: 'tea',
     methodId: 'oolong_tea',
     method: 'Oolong Tea',
     title: 'Gongfu Oolong Tea Washing & Flash Infusions',
@@ -1515,6 +1523,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_ceylon_tea',
+    track: 'tea',
     methodId: 'ceylon_tea',
     method: 'Ceylon Tea',
     title: 'Sri Lankan High-Grown Ceylon Tea Steeping Masterclass',
@@ -1530,6 +1539,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_white_needle',
+    track: 'tea',
     methodId: 'white_tea',
     method: 'White Tea',
     title: 'White Tea & Silver Needle Steeping Masterclass',
@@ -1545,6 +1555,7 @@ export const MASTERCLASSES = [
   },
   {
     id: 'mc_turmeric_tea',
+    track: 'tea',
     methodId: 'turmeric_tea',
     method: 'Golden Turmeric',
     title: 'Golden Turmeric Botanical Herbal Decoction & Wellness Brew',
@@ -1556,6 +1567,72 @@ export const MASTERCLASSES = [
       'Steep botanicals at 98°C for 5 full minutes',
       'Black pepper enhances curcumin absorption by 2000%',
       'Stir in raw honey and fresh lemon squeeze before serving'
+    ]
+  },
+
+  // --- BEER MASTERCLASSES (track: 'beer') ---
+  {
+    id: 'mc_hazy_ipa',
+    track: 'beer',
+    methodId: 'hazy_ipa',
+    method: 'New England Hazy DIPA',
+    title: 'Brewing New England Hazy IPAs: Double Dry-Hopping & Hop Whirlpool',
+    duration: '6:15',
+    thumbnail: './beer_hazy_dipa_hero.jpg',
+    embedId: '1oB1oDrDkHM',
+    description: 'Learn how whirlpool hop additions at 175°F (80°C) and active fermentation biotransformation dry-hopping maximize tropical mango & passionfruit hop oils without bitter astringency.',
+    keyTakeaways: [
+      'Whirlpool hops at 175°F (80°C) for 20 mins to extract essential oils without bittering',
+      'Double dry-hop during active fermentation for biotransformation sweetness',
+      'Flaked oats & wheat create a pillowy, velvety mouthfeel'
+    ]
+  },
+  {
+    id: 'mc_imperial_stout',
+    track: 'beer',
+    methodId: 'imperial_stout',
+    method: 'Imperial Stout',
+    title: 'High-Gravity Imperial Stout Mashing & Bourbon Barrel Aging',
+    duration: '7:10',
+    thumbnail: './beer_stout_hero.jpg',
+    embedId: 'AI4ynXzkSQo',
+    description: 'Mastering high-density saccharification mashing at 154°F (68°C), 90-minute wort boiling for Maillard melanoidins, and oak bourbon barrel conditioning.',
+    keyTakeaways: [
+      'Mash thick at 154°F (68°C) for high unfermentable body sweetness',
+      'Boil for 90 minutes to concentrate wort sugars and develop deep Maillard complexity',
+      'Pitch high-gravity yeast strain with pure oxygen aeration'
+    ]
+  },
+  {
+    id: 'mc_west_coast_ipa',
+    track: 'beer',
+    methodId: 'west_coast_ipa',
+    method: 'West Coast IPA',
+    title: 'West Coast IPA Brewing: Piney Resin Bittering & Crisp Attenuation',
+    duration: '5:45',
+    thumbnail: './beer_west_coast_hero.jpg',
+    embedId: 'vFcS01wMSxM',
+    description: 'Low-temp mashing at 149°F (65°C) for dry attenuation, 60-minute C-hop boil additions (Cascade, Simcoe, Centennial), and closed CO2 transfer.',
+    keyTakeaways: [
+      'Mash at 149°F (65°C) for maximum fermentability and crisp dry finish',
+      'Layer bittering @ 60m, flavor @ 15m, and piney aroma @ flameout',
+      'Use closed transfers to prevent oxygen exposure and cardboard off-flavors'
+    ]
+  },
+  {
+    id: 'mc_german_pilsner',
+    track: 'beer',
+    methodId: 'german_pilsner',
+    method: 'German Pilsner',
+    title: 'Authentic German Pilsner Lagering & Noble Saaz Hop Boiling',
+    duration: '6:30',
+    thumbnail: './beer_pilsner_hero.jpg',
+    embedId: 'st571DYYTR8',
+    description: 'Step mashing German Barke Pilsner malt, 90-minute boil to drive off DMS, cold fermentation at 50°F (10°C), and 4-week cold lagering.',
+    keyTakeaways: [
+      'Boil 90 minutes uncovered to completely eliminate DMS cooked corn off-flavor',
+      'Ferment cold at 50°F (10°C) with Bavarian lager yeast strain',
+      'Lager cold at 34°F (1°C) for 4 weeks for brilliant clarity and snappy bite'
     ]
   }
 ];

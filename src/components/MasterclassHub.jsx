@@ -14,8 +14,11 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
 
   const activeMethodId = activeMethod?.id;
 
-  // Filter videos for the active method, with smart fallbacks
-  let filteredVideos = MASTERCLASSES.filter((item) => {
+  // STAGE 1: FILTER STRICTLY BY TRACK MODE ('coffee' | 'tea' | 'beer')
+  const trackVideos = MASTERCLASSES.filter((item) => item.track === trackMode);
+
+  // STAGE 2: FILTER BY ACTIVE METHOD PREFERENCE WITHIN TRACK
+  let filteredVideos = trackVideos.filter((item) => {
     if (!activeMethodId) return true;
     if (activeMethodId === 'classic_pour_over') {
       return item.methodId === 'classic_pour_over' || item.methodId === 'pour_over' || item.methodId === 'chemex';
@@ -23,15 +26,15 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
     return item.methodId === activeMethodId;
   });
 
-  // Fallback: If method has no specific videos, show all videos matching trackMode
+  // Fallback within active track: If method has no specific videos, show all videos matching trackMode
   if (filteredVideos.length === 0) {
-    filteredVideos = MASTERCLASSES;
+    filteredVideos = trackVideos;
   }
 
-  // Active Video Player Selection
-  const currentActiveVideo = (activeVideo && MASTERCLASSES.some(v => v.id === activeVideo.id))
+  // Active Video Player Selection (Must belong to active trackMode)
+  const currentActiveVideo = (activeVideo && trackVideos.some(v => v.id === activeVideo.id))
     ? activeVideo
-    : null;
+    : (filteredVideos.length > 0 ? filteredVideos[0] : (trackVideos.length > 0 ? trackVideos[0] : null));
 
   const handleToggleExpand = () => {
     setIsExpanded((prev) => !prev);
