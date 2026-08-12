@@ -1579,7 +1579,7 @@ export const MASTERCLASSES = [
     title: 'Brewing New England Hazy IPAs: Double Dry-Hopping & Hop Whirlpool',
     duration: '6:15',
     thumbnail: './beer_hazy_dipa_hero.jpg',
-    embedId: '1oB1oDrDkHM',
+    embedId: '4lxKaf_MeSQ',
     description: 'Learn how whirlpool hop additions at 175°F (80°C) and active fermentation biotransformation dry-hopping maximize tropical mango & passionfruit hop oils without bitter astringency.',
     keyTakeaways: [
       'Whirlpool hops at 175°F (80°C) for 20 mins to extract essential oils without bittering',
@@ -1595,7 +1595,7 @@ export const MASTERCLASSES = [
     title: 'High-Gravity Imperial Stout Mashing & Bourbon Barrel Aging',
     duration: '7:10',
     thumbnail: './beer_stout_hero.jpg',
-    embedId: 'AI4ynXzkSQo',
+    embedId: 'p6peZsbrGYY',
     description: 'Mastering high-density saccharification mashing at 154°F (68°C), 90-minute wort boiling for Maillard melanoidins, and oak bourbon barrel conditioning.',
     keyTakeaways: [
       'Mash thick at 154°F (68°C) for high unfermentable body sweetness',
@@ -1611,7 +1611,7 @@ export const MASTERCLASSES = [
     title: 'West Coast IPA Brewing: Piney Resin Bittering & Crisp Attenuation',
     duration: '5:45',
     thumbnail: './beer_west_coast_hero.jpg',
-    embedId: 'vFcS01wMSxM',
+    embedId: 'kYJzH1eL1eU',
     description: 'Low-temp mashing at 149°F (65°C) for dry attenuation, 60-minute C-hop boil additions (Cascade, Simcoe, Centennial), and closed CO2 transfer.',
     keyTakeaways: [
       'Mash at 149°F (65°C) for maximum fermentability and crisp dry finish',
@@ -1627,7 +1627,7 @@ export const MASTERCLASSES = [
     title: 'Authentic German Pilsner Lagering & Noble Saaz Hop Boiling',
     duration: '6:30',
     thumbnail: './beer_pilsner_hero.jpg',
-    embedId: 'st571DYYTR8',
+    embedId: 'e_eOaF0tM5w',
     description: 'Step mashing German Barke Pilsner malt, 90-minute boil to drive off DMS, cold fermentation at 50°F (10°C), and 4-week cold lagering.',
     keyTakeaways: [
       'Boil 90 minutes uncovered to completely eliminate DMS cooked corn off-flavor',
@@ -1643,7 +1643,7 @@ export const MASTERCLASSES = [
     title: 'Brewing Farmhouse Belgian Saison: High Temp Fermentation & Pepper Esters',
     duration: '5:40',
     thumbnail: './beer_hazy_dipa_hero.jpg',
-    embedId: '1oB1oDrDkHM',
+    embedId: '9jP0X_9gW1w',
     description: 'High temperature fermentation up to 85°F (29°C) with French Saison yeast strains yielding spicy peppery phenols and dry champagne finish.',
     keyTakeaways: [
       'Allow fermentation temp to free-rise to 80°F-85°F for spicy pepper esters',
@@ -1659,7 +1659,7 @@ export const MASTERCLASSES = [
     title: 'Kettle Sour Gose: Lactobacillus Acidification & Salt Coriander Boiling',
     duration: '6:10',
     thumbnail: './beer_pilsner_hero.jpg',
-    embedId: 'AI4ynXzkSQo',
+    embedId: '9g0H290L0aI',
     description: 'Kettle souring wort with Lactobacillus to pH 3.4, boiling with crushed Indian coriander seeds and pink Himalayan sea salt.',
     keyTakeaways: [
       'Sour un-hopped wort with Lactobacillus at 100°F (38°C) for 24-48 hours',
@@ -1675,7 +1675,7 @@ export const MASTERCLASSES = [
     title: 'Bavarian Hefeweizen Mashing: Ferulic Acid Rest & Clove Banana Esters',
     duration: '5:50',
     thumbnail: './beer_pilsner_hero.jpg',
-    embedId: 'vFcS01wMSxM',
+    embedId: '8TvDaypgU5o',
     description: 'Performing a 113°F (45°C) ferulic acid rest to generate 4-vinyl guaiacol clove aroma precursors, followed by open fermentation.',
     keyTakeaways: [
       'Rest mash at 113°F (45°C) for 15 mins for ferulic acid clove precursor',
@@ -1691,7 +1691,7 @@ export const MASTERCLASSES = [
     title: 'American Amber Ale: Crystal Caramel Malt & Cascade Hop Balance',
     duration: '5:15',
     thumbnail: './beer_west_coast_hero.jpg',
-    embedId: 'st571DYYTR8',
+    embedId: 'Gk74-p_t82Y',
     description: 'Blending 2-Row pale malt with Crystal 60L and Munich malt to achieve deep ruby-amber color and toasted caramel biscuit flavor.',
     keyTakeaways: [
       'Mash at 152°F (67°C) for medium body and caramel sweetness',
@@ -1707,7 +1707,7 @@ export const MASTERCLASSES = [
     title: 'Robust Porter: Roasted Barley Mash & Dark Chocolate Depth',
     duration: '6:00',
     thumbnail: './beer_stout_hero.jpg',
-    embedId: '4W2p0i3W_K0',
+    embedId: 'p6peZsbrGYY',
     description: 'Mashing chocolate malt, Black Patent, and Carafa III to extract layers of baker’s cocoa, dark espresso, and toasted bread.',
     keyTakeaways: [
       'Mash at 153°F (67°C) for velvety mouthfeel',
@@ -1723,7 +1723,7 @@ export const MASTERCLASSES = [
     title: 'Trappist Belgian Tripel: Candi Sugar Boiling & High ABV Attenuation',
     duration: '6:45',
     thumbnail: './beer_hazy_dipa_hero.jpg',
-    embedId: 'j6VlT_jUVPc',
+    embedId: 'kYJzH1eL1eU',
     description: 'Boiling Belgian Pilsner malt with clear candi sugar to achieve glowing golden color, high 9.0% ABV, and dry effervescent body.',
     keyTakeaways: [
       'Mash low at 149°F (65°C) for high fermentability',
