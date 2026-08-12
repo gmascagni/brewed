@@ -18,113 +18,128 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
 
   return (
     <div className="space-y-10 md:space-y-12 animate-fade-in">
-      {/* Step Header with Radial Ambient Glow */}
+      {/* Step Header with Extraction Method Background Image */}
       <div className={`p-8 md:p-10 lg:p-12 rounded-3xl relative overflow-hidden shadow-2xl border transition-all duration-500 ${
         isBeer ? 'glass-panel-beer border-amber-500/40' : isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
       }`}>
-        <div className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none ${
-          isBeer ? 'bg-amber-500/15' : isCoffee ? 'bg-[#A66E38]/15' : 'bg-emerald-500/20'
-        }`} />
-
-        <div className={`inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] mb-3 ${
-          isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
-        }`}>
-          <Sparkles className="w-4 h-4 animate-pulse" />
-          <span>Step 01 of 04 • Atelier Selection</span>
+        {/* Background Extraction Image Overlay */}
+        <div className="absolute inset-0 z-0 opacity-35 pointer-events-none">
+          <img
+            key={activeMethod?.heroImage || trackMode}
+            src={activeMethod?.heroImage || (isBeer ? './beer_hazy_dipa_hero.jpg' : isCoffee ? './pour_over_hero.jpg' : './tea_ceremony.jpg')}
+            alt="Extraction Background"
+            className="w-full h-full object-cover object-center transform scale-105 filter contrast-125 brightness-90"
+          />
+          <div className={`absolute inset-0 ${
+            isBeer
+              ? 'bg-gradient-to-r from-[#171107] via-[#171107]/85 to-[#171107]/50'
+              : isCoffee
+              ? 'bg-gradient-to-r from-[#140D09] via-[#140D09]/85 to-[#140D09]/50'
+              : 'bg-gradient-to-r from-[#0B130E] via-[#0B130E]/85 to-[#0B130E]/50'
+          }`} />
         </div>
 
-        <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-extrabold text-cream-light mb-3 leading-tight drop-shadow">
-          Master the Craft of Brewed Extraction
-        </h2>
-        
-        <p className="text-xs md:text-sm text-stone-300 max-w-3xl leading-relaxed font-normal mb-8">
-          Precision specialty coffee ratio calculator, fine tea steeping timers, craft beer mash & ABV calculators, and troubleshooting guide. Select your brewing path below:
-        </p>
+        <div className="relative z-10">
+          <div className={`inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] mb-3 ${
+            isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+          }`}>
+            <Sparkles className="w-4 h-4 animate-pulse" />
+            <span>Step 01 of 04 • Atelier Selection</span>
+          </div>
 
-        {/* 3-Path Entry Buttons: The Coffee Lab vs The Tea Room vs The Craft Cellar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-extrabold text-cream-light mb-3 leading-tight drop-shadow-lg">
+            Master the Craft of Brewed Extraction
+          </h2>
           
-          {/* 1. The Coffee Lab Button */}
-          <button
-            type="button"
-            onClick={() => setTrackMode && setTrackMode('coffee')}
-            className={`p-5 md:p-6 rounded-2xl border text-left transition-all duration-300 cursor-pointer active:scale-95 group ${
-              isCoffee
-                ? 'btn-tactile-coffee text-[#140C08] ring-2 ring-[#C48B56]/50 shadow-2xl scale-[1.02]'
-                : 'bg-black/50 border-white/10 text-stone-300 opacity-70 hover:opacity-100 hover:border-[#A66E38]/50 hover:bg-black/70'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`p-3 rounded-xl transition-colors ${
-                isCoffee ? 'bg-black/30 text-current border border-current/20' : 'bg-[#A66E38]/20 text-[#D2A06E] border border-[#A66E38]/30'
-              }`}>
-                <Coffee className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className={`font-serif text-base md:text-lg font-bold ${isCoffee ? 'text-[#140C08]' : 'text-cream-light group-hover:text-[#D2A06E] transition-colors'}`}>
-                  The Coffee Lab
-                </h3>
-                <p className={`text-[11px] ${isCoffee ? 'text-[#140C08]/90 font-medium' : 'text-stone-400'}`}>
-                  SCA Ratios, Burr Grinders & Pour Over
-                </p>
-              </div>
-            </div>
-          </button>
+          <p className="text-xs md:text-sm text-stone-300 max-w-3xl leading-relaxed font-normal mb-8 drop-shadow">
+            Precision specialty coffee ratio calculator, fine tea steeping timers, craft beer mash & ABV calculators, and troubleshooting guide. Select your brewing path below:
+          </p>
 
-          {/* 2. The Tea Room Button */}
-          <button
-            type="button"
-            onClick={() => setTrackMode && setTrackMode('tea')}
-            className={`p-5 md:p-6 rounded-2xl border text-left transition-all duration-300 cursor-pointer active:scale-95 group ${
-              isTea
-                ? 'btn-tactile-tea text-white ring-2 ring-sage-400/50 shadow-2xl scale-[1.02]'
-                : 'bg-black/50 border-white/10 text-stone-300 opacity-70 hover:opacity-100 hover:border-sage-400/50 hover:bg-black/70'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`p-3 rounded-xl transition-colors ${
-                isTea ? 'bg-black/30 text-current border border-current/20' : 'bg-sage-500/20 text-sage-300 border border-sage-500/30'
-              }`}>
-                <Leaf className="w-6 h-6" />
+          {/* 3-Path Entry Buttons: The Coffee Lab vs The Tea Room vs The Craft Cellar */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            
+            {/* 1. The Coffee Lab Button */}
+            <button
+              type="button"
+              onClick={() => setTrackMode && setTrackMode('coffee')}
+              className={`p-5 md:p-6 rounded-2xl border text-left transition-all duration-300 cursor-pointer active:scale-95 group backdrop-blur-md ${
+                isCoffee
+                  ? 'btn-tactile-coffee text-[#140C08] ring-2 ring-[#C48B56]/50 shadow-2xl scale-[1.02]'
+                  : 'bg-black/50 border-white/10 text-stone-300 opacity-70 hover:opacity-100 hover:border-[#A66E38]/50 hover:bg-black/70'
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <div className={`p-3 rounded-xl transition-colors ${
+                  isCoffee ? 'bg-black/30 text-current border border-current/20' : 'bg-[#A66E38]/20 text-[#D2A06E] border border-[#A66E38]/30'
+                }`}>
+                  <Coffee className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className={`font-serif text-base md:text-lg font-bold ${isCoffee ? 'text-[#140C08]' : 'text-cream-light group-hover:text-[#D2A06E] transition-colors'}`}>
+                    The Coffee Lab
+                  </h3>
+                  <p className={`text-[11px] ${isCoffee ? 'text-[#140C08]/90 font-medium' : 'text-stone-400'}`}>
+                    SCA Ratios, Burr Grinders & Pour Over
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className={`font-serif text-base md:text-lg font-bold ${isTea ? 'text-white' : 'text-cream-light group-hover:text-sage-300 transition-colors'}`}>
-                  The Tea Room
-                </h3>
-                <p className={`text-[11px] ${isTea ? 'text-white/90 font-medium' : 'text-stone-400'}`}>
-                  Gongfu Gaiwan, Steeping & Terroirs
-                </p>
-              </div>
-            </div>
-          </button>
+            </button>
 
-          {/* 3. The Craft Cellar Button */}
-          <button
-            type="button"
-            onClick={() => setTrackMode && setTrackMode('beer')}
-            className={`p-5 md:p-6 rounded-2xl border text-left transition-all duration-300 cursor-pointer active:scale-95 group ${
-              isBeer
-                ? 'btn-tactile-beer text-[#0F0C05] ring-2 ring-amber-400/60 shadow-2xl scale-[1.02]'
-                : 'bg-black/50 border-white/10 text-stone-300 opacity-70 hover:opacity-100 hover:border-amber-500/50 hover:bg-black/70'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`p-3 rounded-xl transition-colors ${
-                isBeer ? 'bg-black/40 text-amber-200 border border-amber-300/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-              }`}>
-                <Beer className="w-6 h-6" />
+            {/* 2. The Tea Room Button */}
+            <button
+              type="button"
+              onClick={() => setTrackMode && setTrackMode('tea')}
+              className={`p-5 md:p-6 rounded-2xl border text-left transition-all duration-300 cursor-pointer active:scale-95 group backdrop-blur-md ${
+                isTea
+                  ? 'btn-tactile-tea text-white ring-2 ring-sage-400/50 shadow-2xl scale-[1.02]'
+                  : 'bg-black/50 border-white/10 text-stone-300 opacity-70 hover:opacity-100 hover:border-sage-400/50 hover:bg-black/70'
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <div className={`p-3 rounded-xl transition-colors ${
+                  isTea ? 'bg-black/30 text-current border border-current/20' : 'bg-sage-500/20 text-sage-300 border border-sage-500/30'
+                }`}>
+                  <Leaf className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className={`font-serif text-base md:text-lg font-bold ${isTea ? 'text-white' : 'text-cream-light group-hover:text-sage-300 transition-colors'}`}>
+                    The Tea Room
+                  </h3>
+                  <p className={`text-[11px] ${isTea ? 'text-white/90 font-medium' : 'text-stone-400'}`}>
+                    Gongfu Gaiwan, Steeping & Terroirs
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className={`font-serif text-base md:text-lg font-bold ${isBeer ? 'text-[#0F0C05]' : 'text-cream-light group-hover:text-amber-300 transition-colors'}`}>
-                  The Craft Cellar
-                </h3>
-                <p className={`text-[11px] ${isBeer ? 'text-[#0F0C05]/90 font-medium' : 'text-stone-400'}`}>
-                  Mash Ratios, Hop Boils & ABV Math
-                </p>
-              </div>
-            </div>
-          </button>
+            </button>
 
+            {/* 3. The Craft Cellar Button */}
+            <button
+              type="button"
+              onClick={() => setTrackMode && setTrackMode('beer')}
+              className={`p-5 md:p-6 rounded-2xl border text-left transition-all duration-300 cursor-pointer active:scale-95 group backdrop-blur-md ${
+                isBeer
+                  ? 'btn-tactile-beer text-[#0F0C05] ring-2 ring-amber-400/60 shadow-2xl scale-[1.02]'
+                  : 'bg-black/50 border-white/10 text-stone-300 opacity-70 hover:opacity-100 hover:border-amber-500/50 hover:bg-black/70'
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <div className={`p-3 rounded-xl transition-colors ${
+                  isBeer ? 'bg-black/40 text-amber-200 border border-amber-300/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                }`}>
+                  <Beer className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className={`font-serif text-base md:text-lg font-bold ${isBeer ? 'text-[#0F0C05]' : 'text-cream-light group-hover:text-amber-300 transition-colors'}`}>
+                    The Craft Cellar
+                  </h3>
+                  <p className={`text-[11px] ${isBeer ? 'text-[#0F0C05]/90 font-medium' : 'text-stone-400'}`}>
+                    Mash Ratios, Hop Boils & ABV Math
+                  </p>
+                </div>
+              </div>
+            </button>
+
+          </div>
         </div>
       </div>
 

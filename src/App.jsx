@@ -17,6 +17,7 @@ import AuthModal from './components/AuthModal';
 import CommunityHubModal from './components/CommunityHubModal';
 import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
 import AdminConsoleModal from './components/AdminConsoleModal';
+import BrewShopSection from './components/BrewShopSection';
 import Footer from './components/Footer';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
@@ -140,20 +141,20 @@ export default function App() {
         : 'bg-[#08110B] text-[#EBF7EE] selection:bg-sage-400 selection:text-[#07130B]'
     }`}>
 
-      {/* Dynamic Background Image Overlay Reflective of Selected Extraction Method */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-20 transition-opacity duration-1000">
+      {/* High-Definition Extraction Method Background Image Overlay */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30 md:opacity-40 transition-all duration-1000">
         <img
           key={currentActiveMethod?.heroImage || trackMode}
           src={currentActiveMethod?.heroImage || (isBeer ? './beer_hazy_dipa_hero.jpg' : isCoffee ? './pour_over_hero.jpg' : './tea_ceremony.jpg')}
           alt={currentActiveMethod?.name || 'Extraction Background'}
-          className="w-full h-full object-cover object-center filter blur-2xl scale-110 transform transition-transform duration-1000"
+          className="w-full h-full object-cover object-center filter blur-[2px] scale-105 transform transition-transform duration-1000 brightness-90 contrast-110"
         />
         <div className={`absolute inset-0 ${
           isBeer
-            ? 'bg-gradient-to-b from-[#110C04]/85 via-[#110C04]/60 to-[#110C04]/90'
+            ? 'bg-gradient-to-b from-[#110C04]/80 via-[#110C04]/55 to-[#110C04]/90'
             : isCoffee
-            ? 'bg-gradient-to-b from-[#0E0906]/85 via-[#0E0906]/60 to-[#0E0906]/90'
-            : 'bg-gradient-to-b from-[#08110B]/85 via-[#08110B]/60 to-[#08110B]/90'
+            ? 'bg-gradient-to-b from-[#0E0906]/80 via-[#0E0906]/55 to-[#0E0906]/90'
+            : 'bg-gradient-to-b from-[#08110B]/80 via-[#08110B]/55 to-[#08110B]/90'
         }`} />
       </div>
       
@@ -289,6 +290,9 @@ export default function App() {
               setActiveVideo={setActiveVideo}
             />
           </div>
+
+          {/* Amazon Affiliate Equipment & Gear Store */}
+          <BrewShopSection trackMode={trackMode} activeMethod={currentActiveMethod} />
 
           {/* 1. Diagnostics Drawer (Troubleshooting & Water) */}
           <DiagnosticsDrawer trackMode={trackMode} />

@@ -393,5 +393,52 @@ export const PRODUCTS_DATA = [
     amazonUrl: `https://www.amazon.com/s?k=Yunnan+Sourcing+Aged+Shou+Ripe+Pu-erh+Tea+Cake&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './tea_ceremony.jpg',
     description: 'Post-fermented tea cake from Menghai with deep camphor wood, damp earth sweetness, and velvet chocolate body.'
+  },
+
+  // --- CRAFT BEER & HOMEBREW GEAR ---
+  {
+    id: 'northern_brewer_starter_kit',
+    name: 'Northern Brewer Deluxe Homebrew Starter Kit (5 Gallon Carboy & Kettle)',
+    category: 'method_kit',
+    methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner', 'saison', 'sour_gose', 'hefeweizen', 'amber_ale', 'porter', 'tripel'],
+    badge: 'Homebrew Gold Standard',
+    rating: 4.9,
+    reviewsCount: 4120,
+    priceRange: '$139 - $169',
+    topRated: true,
+    asin: 'B01798AW8M',
+    amazonUrl: `https://www.amazon.com/s?k=Northern+Brewer+Deluxe+Homebrew+Starter+Kit&tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './beer_hazy_dipa_hero.jpg',
+    description: 'Complete 5-gallon brew kettle, glass fermenter carboy, auto-siphon tubing, sanitizer, and hydrometer for craft brewing.'
+  },
+  {
+    id: 'heavy_duty_barley_mill',
+    name: 'Heavy Duty 2-Roller Grain Mill Barley Crusher with Metal Base',
+    category: 'grinders_scales',
+    methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner', 'saison', 'sour_gose', 'hefeweizen', 'amber_ale', 'porter', 'tripel'],
+    badge: 'Roller Gap 0.038"',
+    rating: 4.8,
+    reviewsCount: 1890,
+    priceRange: '$79 - $95',
+    topRated: true,
+    asin: 'B07Q5W48JL',
+    amazonUrl: `https://www.amazon.com/s?k=2+Roller+Grain+Mill+Barley+Crusher&tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './beer_stout_hero.jpg',
+    description: 'Adjustable dual stainless steel knurled rollers designed to crush malt husks cleanly for 85%+ mash conversion efficiency.'
+  },
+  {
+    id: 'craft_beer_glassware_set',
+    name: 'Spiegelau Craft Beer Glasses Tasting Kit (Tulip, IPA & Stout Glasses)',
+    category: 'universal',
+    methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner', 'saison', 'sour_gose', 'hefeweizen', 'amber_ale', 'porter', 'tripel'],
+    badge: 'Sommelier Choice',
+    rating: 4.9,
+    reviewsCount: 3450,
+    priceRange: '$38 - $48',
+    topRated: true,
+    asin: 'B00BTPUT3S',
+    amazonUrl: `https://www.amazon.com/s?k=Spiegelau+Craft+Beer+Glasses+Tasting+Kit&tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './beer_pilsner_hero.jpg',
+    description: 'German lead-free crystal glassware specifically shaped to enhance hop aromatics, foam retention, and head stability.'
   }
 ];
