@@ -1,96 +1,43 @@
 export const AMAZON_AFFILIATE_TAG = 'thebrewapp13-20';
 
-export const PRODUCT_CATEGORIES = [
-  { id: 'method_kit', label: 'Method Kit' },
-  { id: 'universal', label: 'Universal Essentials' },
-  { id: 'top_rated', label: 'Top Rated ⭐ 4.9+' },
-  { id: 'grinders_scales', label: 'Grinders & Scales' },
-  { id: 'water_kettles', label: 'Water & Kettles' },
-  { id: 'beans_tea', label: 'Beans & Teas' }
-];
+// Category Tabs per Track
+export const PRODUCT_CATEGORIES = {
+  coffee: [
+    { id: 'all', label: 'All Coffee Gear' },
+    { id: 'method_kit', label: 'Coffee Kits' },
+    { id: 'grinders_scales', label: 'Grinders & Scales' },
+    { id: 'water_kettles', label: 'Water & Kettles' },
+    { id: 'beans_tea', label: 'Whole Bean Coffees' },
+    { id: 'top_rated', label: 'Top Rated ⭐ 4.9+' }
+  ],
+  tea: [
+    { id: 'all', label: 'All Tea Gear' },
+    { id: 'method_kit', label: 'Tea Steeping Kits' },
+    { id: 'teapots_whisks', label: 'Gaiwans & Whisks' },
+    { id: 'water_kettles', label: 'Kettles & Water' },
+    { id: 'beans_tea', label: 'Imperial Loose Leaf Teas' },
+    { id: 'top_rated', label: 'Top Rated ⭐ 4.9+' }
+  ],
+  beer: [
+    { id: 'all', label: 'All Beer Gear' },
+    { id: 'method_kit', label: 'Homebrew Kits' },
+    { id: 'grinders_scales', label: 'Grain Mills & Scalers' },
+    { id: 'fermenters_kettles', label: 'Kettles & Fermenters' },
+    { id: 'glassware', label: 'Craft Beer Glassware' },
+    { id: 'top_rated', label: 'Top Rated ⭐ 4.9+' }
+  ]
+};
 
 export const PRODUCTS_DATA = [
-  // --- UNIVERSAL ESSENTIALS ---
-  {
-    id: 'tds_water_tester',
-    name: 'Digital TDS Water Quality Tester Purity Meter',
-    category: 'universal',
-    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
-    badge: 'Water Profiler',
-    rating: 4.9,
-    reviewsCount: 14200,
-    priceRange: '$12 - $16',
-    topRated: true,
-    asin: 'B001E88GE0',
-    amazonUrl: `https://www.amazon.com/s?k=Digital+TDS+Water+Quality+Tester+Purity+Meter&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './tea_kettle.jpg',
-    description: 'Instant PPM (Parts Per Million) digital reader for testing home tap water, mineral content, and RO filtration profiles.'
-  },
-  {
-    id: 'pocket_gram_scale',
-    name: 'Mini Precision Digital Gram Scale 0.01g Accuracy',
-    category: 'universal',
-    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
-    badge: 'Ultra Precision',
-    rating: 4.9,
-    reviewsCount: 28400,
-    priceRange: '$11 - $15',
-    topRated: true,
-    asin: 'B0012LOQUQ',
-    amazonUrl: `https://www.amazon.com/s?k=Mini+Precision+Digital+Gram+Scale+0.01g+Accuracy&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './espresso_hero.jpg',
-    description: 'Backlit LCD pocket scale with 0.01g micro-accuracy for dosing dry coffee beans, espresso shots, and fine tea leaves.'
-  },
-  {
-    id: 'measuring_spoons_set',
-    name: 'Stainless Steel Coffee Scoops Measuring Spoons Set',
-    category: 'universal',
-    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
-    badge: 'Kitchen Staple',
-    rating: 4.9,
-    reviewsCount: 6800,
-    priceRange: '$9 - $12',
-    topRated: true,
-    asin: 'B07MZD72TY',
-    amazonUrl: `https://www.amazon.com/s?k=Stainless+Steel+Coffee+Scoops+Measuring+Spoons+Set&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './coffee_setup.jpg',
-    description: 'Ergonomic 15mL (1 tbsp) and 30mL (2 tbsp) solid stainless steel scoops engineered with engraved metric and imperial markings.'
-  },
-  {
-    id: 'airscape_canister',
-    name: 'Airscape Stainless Steel Vacuum Coffee Canister',
-    category: 'universal',
-    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress'],
-    badge: 'Fresher Coffee',
-    rating: 4.8,
-    reviewsCount: 11200,
-    priceRange: '$34 - $39',
-    asin: 'B00167XN14',
-    amazonUrl: `https://www.amazon.com/s?k=Airscape+Stainless+Steel+Vacuum+Coffee+Canister&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './coffee_setup.jpg',
-    description: 'Patented inner plunger lid forces air out of the canister, locking out oxygen and preserving fresh roast aromas.'
-  },
-  {
-    id: 'double_wall_glasses',
-    name: 'JoyJolt Double Wall Insulated Glass Mugs Set',
-    category: 'universal',
-    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
-    badge: 'Thermal Glass',
-    rating: 4.8,
-    reviewsCount: 15400,
-    priceRange: '$18 - $24',
-    asin: 'B073X5P6P8',
-    amazonUrl: `https://www.amazon.com/s?k=JoyJolt+Double+Wall+Insulated+Glass+Mugs+Set&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './espresso_hero.jpg',
-    description: 'Borosilicate double-walled floating glass design that keeps hot drinks piping hot while remaining cool to the touch.'
-  },
-
-  // --- METHOD SPECIFIC GEAR ---
+  // ==========================================
+  // 1. COFFEE STORE PRODUCTS (track: 'coffee')
+  // ==========================================
   {
     id: 'v60_dripper_kit',
     name: 'Hario V60 Ceramic Coffee Dripper Starter Set',
+    track: 'coffee',
     category: 'method_kit',
-    methodIds: ['pour_over'],
+    methodIds: ['pour_over', 'classic_pour_over'],
     badge: 'Barista Choice',
     rating: 4.9,
     reviewsCount: 3420,
@@ -104,9 +51,10 @@ export const PRODUCTS_DATA = [
   {
     id: 'v60_paper_filters',
     name: 'Hario V60 Paper Filters Size 02 100 Count',
+    track: 'coffee',
     category: 'method_kit',
-    methodIds: ['pour_over'],
-    badge: 'Essential',
+    methodIds: ['pour_over', 'classic_pour_over'],
+    badge: 'Essential Filters',
     rating: 4.8,
     reviewsCount: 8900,
     priceRange: '$9 - $12',
@@ -118,34 +66,37 @@ export const PRODUCTS_DATA = [
   {
     id: 'chemex_8cup',
     name: 'Chemex Classic 8 Cup Glass Pour Over Coffeemaker',
+    track: 'coffee',
     category: 'method_kit',
-    methodIds: ['pour_over'],
+    methodIds: ['chemex'],
     badge: 'Design Icon',
     rating: 4.8,
     reviewsCount: 5120,
     priceRange: '$48 - $54',
     asin: 'B0000CF2UT',
     amazonUrl: `https://www.amazon.com/s?k=Chemex+Classic+8+Cup+Glass+Pour+Over+Coffeemaker&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './pour_over_hero.jpg',
+    image: './chemex_hero.jpg',
     description: 'Non-porous Borosilicate glass carafe with polished wood collar and leather tie. Uses heavy Chemex bond filters.'
   },
   {
     id: 'bodum_french_press',
     name: 'Bodum Chambord French Press Coffee Maker 34 oz',
+    track: 'coffee',
     category: 'method_kit',
     methodIds: ['french_press'],
-    badge: 'Classic Benchmark',
+    badge: 'Immersion Classic',
     rating: 4.7,
     reviewsCount: 12450,
     priceRange: '$35 - $42',
     asin: 'B00005LM76',
     amazonUrl: `https://www.amazon.com/s?k=Bodum+Chambord+French+Press+Coffee+Maker+34+oz&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './french_press.jpg',
+    image: './french_press_hero.jpg',
     description: 'Heat-resistant borosilicate glass with stainless steel frame and 3-part mesh plunger for heavy chocolate body.'
   },
   {
     id: 'bialetti_moka_express',
     name: 'Bialetti Moka Express Stovetop Espresso Maker 6 Cup',
+    track: 'coffee',
     category: 'method_kit',
     methodIds: ['moka_pot'],
     badge: 'Italian Legend',
@@ -160,6 +111,7 @@ export const PRODUCTS_DATA = [
   {
     id: 'aeropress_original',
     name: 'AeroPress Original Coffee and Espresso Maker',
+    track: 'coffee',
     category: 'method_kit',
     methodIds: ['aeropress'],
     badge: 'Travel Champion',
@@ -173,69 +125,9 @@ export const PRODUCTS_DATA = [
     description: 'Patented air-pressure immersion technology brewing zero-bitterness coffee in 60 seconds.'
   },
   {
-    id: 'gaiwan_tea_set',
-    name: 'Gongfu Ceramic Gaiwan Teapot Tea Set',
-    category: 'method_kit',
-    methodIds: ['green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
-    badge: 'Ceremony Grade',
-    rating: 4.8,
-    reviewsCount: 840,
-    priceRange: '$32 - $39',
-    asin: 'B08F2B1QZP',
-    amazonUrl: `https://www.amazon.com/s?k=Gongfu+Ceramic+Gaiwan+Teapot+Tea+Set&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './tea_ceremony.jpg',
-    description: 'Traditional 150mL porcelain lidded Gaiwan set for precision multi-steep Gongfu tea infusions.'
-  },
-
-  // --- WATER KETTLER & REMINERALIZATION ---
-  {
-    id: 'fellow_stagg_ekg',
-    name: 'Fellow Stagg EKG Electric Gooseneck Kettle 0.9L',
-    category: 'water_kettles',
-    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
-    badge: 'Gold Standard',
-    rating: 4.8,
-    reviewsCount: 7800,
-    priceRange: '$165 - $195',
-    asin: 'B077JBQZPX',
-    amazonUrl: `https://www.amazon.com/s?k=Fellow+Stagg+EKG+Electric+Gooseneck+Kettle&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './tea_kettle.jpg',
-    description: 'PID degree-by-degree temperature control (135°F - 212°F) with precision counterbalanced gooseneck pour spout.'
-  },
-  {
-    id: 'cosori_gooseneck_timer',
-    name: 'COSORI Electric Gooseneck Kettle with Stopwatch Timer & Variable Temp Control',
-    category: 'water_kettles',
-    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
-    badge: 'Built-in Timer & PID',
-    rating: 4.8,
-    reviewsCount: 14200,
-    priceRange: '$65 - $79',
-    topRated: true,
-    asin: 'B08BG4578S',
-    amazonUrl: `https://www.amazon.com/s?k=Electric+Gooseneck+Kettle+with+Timer+and+Variable+Temperature&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './tea_kettle.jpg',
-    description: 'Precision 1°F temperature presets with integrated extraction stopwatch timer, food-grade 304 stainless steel, and 5g/sec pour rate control.'
-  },
-  {
-    id: 'third_wave_water',
-    name: 'Third Wave Water Coffee Mineral Packets 12 Pack',
-    category: 'water_kettles',
-    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
-    badge: 'SCA Mineral Profile',
-    rating: 4.8,
-    reviewsCount: 1650,
-    priceRange: '$15 - $18',
-    asin: 'B077J399B6',
-    amazonUrl: `https://www.amazon.com/s?k=Third+Wave+Water+Coffee+Mineral+Packets&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './tea_kettle.jpg',
-    description: 'Remineralizes distilled or RO water with exact magnesium, calcium, and sodium ratios to eliminate papery sourness.'
-  },
-
-  // --- GRINDERS & SCALES ---
-  {
     id: 'baratza_encore',
     name: 'Baratza Encore Conical Burr Coffee Grinder',
+    track: 'coffee',
     category: 'grinders_scales',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'aeropress'],
     badge: 'Home Grinder King',
@@ -250,8 +142,9 @@ export const PRODUCTS_DATA = [
   {
     id: 'timemore_black_mirror',
     name: 'Timemore Black Mirror Basic Digital Coffee Scale with Timer',
+    track: 'coffee',
     category: 'grinders_scales',
-    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress', 'green_tea', 'white_tea', 'oolong_tea', 'black_tea', 'herbal_puerh'],
+    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress'],
     badge: 'Precision 0.1g',
     rating: 4.7,
     reviewsCount: 3100,
@@ -262,24 +155,39 @@ export const PRODUCTS_DATA = [
     description: 'Ultra-fast 0.1g precision sensor with auto-starting brew timer, hidden LED display, and USB-C rechargeable battery.'
   },
   {
-    id: 'fellow_ode_gen2',
-    name: 'Fellow Ode Gen 2 Brew Burr Grinder',
-    category: 'grinders_scales',
+    id: 'fellow_stagg_ekg',
+    name: 'Fellow Stagg EKG Electric Gooseneck Kettle 0.9L',
+    track: 'coffee',
+    category: 'water_kettles',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'aeropress'],
-    badge: 'Luxury Specialty',
+    badge: 'Gold Standard',
     rating: 4.8,
-    reviewsCount: 1420,
-    priceRange: '$345 - $395',
-    asin: 'B0B8P5Y8K4',
-    amazonUrl: `https://www.amazon.com/s?k=Fellow+Ode+Gen+2+Brew+Burr+Grinder&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './coarse_grind.jpg',
-    description: '64mm stainless steel flat burrs, anti-static technology, and single-dose hopper for high clarity pour-overs.'
+    reviewsCount: 7800,
+    priceRange: '$165 - $195',
+    asin: 'B077JBQZPX',
+    amazonUrl: `https://www.amazon.com/s?k=Fellow+Stagg+EKG+Electric+Gooseneck+Kettle&tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './tea_kettle.jpg',
+    description: 'PID degree-by-degree temperature control (135°F - 212°F) with precision counterbalanced gooseneck pour spout.'
   },
-
-  // --- BEANS & SPECIALTY TEAS ---
+  {
+    id: 'third_wave_water',
+    name: 'Third Wave Water Coffee Mineral Packets 12 Pack',
+    track: 'coffee',
+    category: 'water_kettles',
+    methodIds: ['pour_over', 'french_press', 'drip_brewer', 'moka_pot', 'espresso', 'aeropress'],
+    badge: 'SCA Mineral Profile',
+    rating: 4.8,
+    reviewsCount: 1650,
+    priceRange: '$15 - $18',
+    asin: 'B077J399B6',
+    amazonUrl: `https://www.amazon.com/s?k=Third+Wave+Water+Coffee+Mineral+Packets&tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './tea_kettle.jpg',
+    description: 'Remineralizes distilled or RO water with exact magnesium, calcium, and sodium ratios to eliminate papery sourness.'
+  },
   {
     id: 'onyx_tropical_weather',
     name: 'Onyx Coffee Lab Tropical Weather Ethiopian Whole Bean 10 oz',
+    track: 'coffee',
     category: 'beans_tea',
     methodIds: ['pour_over', 'french_press', 'aeropress'],
     badge: 'Roaster of the Year',
@@ -295,6 +203,7 @@ export const PRODUCTS_DATA = [
   {
     id: 'blue_bottle_three_africas',
     name: 'Blue Bottle Coffee Three Africas Organic Whole Bean 12 oz',
+    track: 'coffee',
     category: 'beans_tea',
     methodIds: ['pour_over', 'french_press', 'drip_brewer', 'aeropress'],
     badge: 'Cult Favorite',
@@ -307,39 +216,63 @@ export const PRODUCTS_DATA = [
     image: './coffee_setup.jpg',
     description: 'Blend of two Ethiopian single-origins and a Ugandan bean featuring golden raisin, dried blueberry, and dark chocolate.'
   },
+
+  // =======================================
+  // 2. TEA STORE PRODUCTS (track: 'tea')
+  // =======================================
   {
-    id: 'intelligentsia_frequency',
-    name: 'Intelligentsia Frequency Blend Medium Roast Whole Bean 12 oz',
-    category: 'beans_tea',
-    methodIds: ['pour_over', 'drip_brewer', 'moka_pot', 'french_press'],
-    badge: 'Specialty Pioneer',
+    id: 'gaiwan_tea_set',
+    name: 'Gongfu Ceramic Gaiwan Teapot Tea Set',
+    track: 'tea',
+    category: 'method_kit',
+    methodIds: ['darjeeling_tea', 'chai_masala', 'english_breakfast', 'green_tea', 'matcha_ceremony', 'oolong_tea', 'ceylon_tea', 'white_tea', 'turmeric_tea'],
+    badge: 'Ceremony Grade',
     rating: 4.8,
-    reviewsCount: 1850,
-    priceRange: '$17 - $21',
-    asin: 'B007R98JCY',
-    amazonUrl: `https://www.amazon.com/s?k=Intelligentsia+Frequency+Blend+Medium+Roast+Whole+Bean&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './coffee_setup.jpg',
-    description: 'Balanced direct-trade blend of Central & South American beans with milk chocolate, lemongrass, and raw honey notes.'
+    reviewsCount: 840,
+    priceRange: '$32 - $39',
+    asin: 'B08F2B1QZP',
+    amazonUrl: `https://www.amazon.com/s?k=Gongfu+Ceramic+Gaiwan+Teapot+Tea+Set&tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './tea_ceremony.jpg',
+    description: 'Traditional 150mL porcelain lidded Gaiwan set for precision multi-steep Gongfu tea infusions.'
   },
   {
-    id: 'la_colombe_corsica',
-    name: 'La Colombe Corsica Dark Roast Whole Bean Coffee 12 oz',
-    category: 'beans_tea',
-    methodIds: ['french_press', 'espresso', 'moka_pot', 'drip_brewer'],
-    badge: 'Deep & Cocoa',
+    id: 'bamboo_chasen_matcha_whisk',
+    name: 'Japanese Bamboo Chasen Matcha Whisk & Chawan Scoop Set',
+    track: 'tea',
+    category: 'teapots_whisks',
+    methodIds: ['matcha_ceremony'],
+    badge: 'Uji Handcrafted',
+    rating: 4.9,
+    reviewsCount: 4210,
+    priceRange: '$18 - $24',
+    topRated: true,
+    asin: 'B07MZD72TY',
+    amazonUrl: `https://www.amazon.com/s?k=Japanese+Bamboo+Chasen+Matcha+Whisk+Set&tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './tea_ceremony.jpg',
+    description: 'Hand-split 100-prong golden bamboo Chasen whisk designed to create creamy micro-foam froth for ceremonial Matcha.'
+  },
+  {
+    id: 'cosori_gooseneck_timer',
+    name: 'COSORI Electric Gooseneck Kettle with Variable Temp Control & Presets',
+    track: 'tea',
+    category: 'water_kettles',
+    methodIds: ['darjeeling_tea', 'chai_masala', 'english_breakfast', 'green_tea', 'matcha_ceremony', 'oolong_tea', 'ceylon_tea', 'white_tea', 'turmeric_tea'],
+    badge: 'Tea Temp Presets',
     rating: 4.8,
-    reviewsCount: 6400,
-    priceRange: '$15 - $18',
-    asin: 'B00863L99I',
-    amazonUrl: `https://www.amazon.com/s?k=La+Colombe+Corsica+Dark+Roast+Whole+Bean+Coffee&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: './espresso_hero.jpg',
-    description: 'Signature dark roast named after an island in the Mediterranean with deep baker’s chocolate, red wine, and cocoa nib notes.'
+    reviewsCount: 14200,
+    priceRange: '$65 - $79',
+    topRated: true,
+    asin: 'B08BG4578S',
+    amazonUrl: `https://www.amazon.com/s?k=Electric+Gooseneck+Kettle+with+Timer+and+Variable+Temperature&tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './tea_kettle.jpg',
+    description: 'Precision temperature presets for Green Tea (180°F), White Tea (185°F), Oolong (190°F), and Black Tea (205°F).'
   },
   {
     id: 'ippodo_matcha_ummon',
     name: 'Ippodo Tea Ummon-no-mukai Ceremonial Grade Matcha 20g Tin',
+    track: 'tea',
     category: 'beans_tea',
-    methodIds: ['green_tea'],
+    methodIds: ['matcha_ceremony'],
     badge: 'Kyoto Imperial',
     rating: 4.9,
     reviewsCount: 1150,
@@ -353,6 +286,7 @@ export const PRODUCTS_DATA = [
   {
     id: 'harney_dragon_pearl',
     name: 'Harney and Sons Supreme Dragon Pearl Jasmine Green Tea',
+    track: 'tea',
     category: 'beans_tea',
     methodIds: ['green_tea', 'white_tea'],
     badge: 'Floral Excellence',
@@ -368,8 +302,9 @@ export const PRODUCTS_DATA = [
   {
     id: 'vahdam_english_breakfast',
     name: 'Vahdam Imperial English Breakfast Loose Leaf Black Tea 100g',
+    track: 'tea',
     category: 'beans_tea',
-    methodIds: ['black_tea', 'herbal_puerh'],
+    methodIds: ['english_breakfast', 'darjeeling_tea', 'ceylon_tea'],
     badge: '100% Single Origin',
     rating: 4.8,
     reviewsCount: 7800,
@@ -382,8 +317,9 @@ export const PRODUCTS_DATA = [
   {
     id: 'yunnan_sourcing_puerh',
     name: 'Yunnan Sourcing Aged Shou Ripe Pu-erh Tea Cake 100g',
+    track: 'tea',
     category: 'beans_tea',
-    methodIds: ['herbal_puerh', 'black_tea'],
+    methodIds: ['turmeric_tea', 'english_breakfast'],
     badge: 'Aged Imperial',
     rating: 4.9,
     reviewsCount: 310,
@@ -395,10 +331,13 @@ export const PRODUCTS_DATA = [
     description: 'Post-fermented tea cake from Menghai with deep camphor wood, damp earth sweetness, and velvet chocolate body.'
   },
 
-  // --- CRAFT BEER & HOMEBREW GEAR ---
+  // ========================================
+  // 3. BEER STORE PRODUCTS (track: 'beer')
+  // ========================================
   {
     id: 'northern_brewer_starter_kit',
     name: 'Northern Brewer Deluxe Homebrew Starter Kit (5 Gallon Carboy & Kettle)',
+    track: 'beer',
     category: 'method_kit',
     methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner', 'saison', 'sour_gose', 'hefeweizen', 'amber_ale', 'porter', 'tripel'],
     badge: 'Homebrew Gold Standard',
@@ -414,6 +353,7 @@ export const PRODUCTS_DATA = [
   {
     id: 'heavy_duty_barley_mill',
     name: 'Heavy Duty 2-Roller Grain Mill Barley Crusher with Metal Base',
+    track: 'beer',
     category: 'grinders_scales',
     methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner', 'saison', 'sour_gose', 'hefeweizen', 'amber_ale', 'porter', 'tripel'],
     badge: 'Roller Gap 0.038"',
@@ -429,7 +369,8 @@ export const PRODUCTS_DATA = [
   {
     id: 'craft_beer_glassware_set',
     name: 'Spiegelau Craft Beer Glasses Tasting Kit (Tulip, IPA & Stout Glasses)',
-    category: 'universal',
+    track: 'beer',
+    category: 'glassware',
     methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner', 'saison', 'sour_gose', 'hefeweizen', 'amber_ale', 'porter', 'tripel'],
     badge: 'Sommelier Choice',
     rating: 4.9,
@@ -440,5 +381,20 @@ export const PRODUCTS_DATA = [
     amazonUrl: `https://www.amazon.com/s?k=Spiegelau+Craft+Beer+Glasses+Tasting+Kit&tag=${AMAZON_AFFILIATE_TAG}`,
     image: './beer_pilsner_hero.jpg',
     description: 'German lead-free crystal glassware specifically shaped to enhance hop aromatics, foam retention, and head stability.'
+  },
+  {
+    id: 'triple_scale_hydrometer',
+    name: 'Brewing Triple Scale Hydrometer & Test Jar for Original Gravity & ABV',
+    track: 'beer',
+    category: 'method_kit',
+    methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner'],
+    badge: 'Gravity & ABV Tool',
+    rating: 4.8,
+    reviewsCount: 6120,
+    priceRange: '$16 - $21',
+    asin: 'B075R0G4M5',
+    amazonUrl: `https://www.amazon.com/s?k=Brewing+Triple+Scale+Hydrometer+Test+Jar&tag=${AMAZON_AFFILIATE_TAG}`,
+    image: './beer_west_coast_hero.jpg',
+    description: 'Glass hydrometer reading specific gravity (0.990 - 1.160), Brix, and potential alcohol % for mash attenuation tracking.'
   }
 ];
