@@ -98,6 +98,7 @@ export default function App() {
     setActiveMethod(newMethods[0]);
     setCustomRatio(null);
     setCustomWaterMl(null);
+    if (setActiveVideo) setActiveVideo(null);
     trackEvent('switch_track_mode', { track_mode: newTrack });
   };
 
@@ -105,6 +106,7 @@ export default function App() {
     setActiveMethod(method);
     setCustomRatio(null);
     setCustomWaterMl(null);
+    if (setActiveVideo) setActiveVideo(null);
     setCurrentStep(2);
     trackEvent('select_method', { method_id: method.id, method_name: method.name });
   };

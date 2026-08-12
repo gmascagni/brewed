@@ -1634,6 +1634,102 @@ export const MASTERCLASSES = [
       'Ferment cold at 50°F (10°C) with Bavarian lager yeast strain',
       'Lager cold at 34°F (1°C) for 4 weeks for brilliant clarity and snappy bite'
     ]
+  },
+  {
+    id: 'mc_saison',
+    track: 'beer',
+    methodId: 'saison',
+    method: 'Belgian Saison',
+    title: 'Brewing Farmhouse Belgian Saison: High Temp Fermentation & Pepper Esters',
+    duration: '5:40',
+    thumbnail: './beer_hazy_dipa_hero.jpg',
+    embedId: '1oB1oDrDkHM',
+    description: 'High temperature fermentation up to 85°F (29°C) with French Saison yeast strains yielding spicy peppery phenols and dry champagne finish.',
+    keyTakeaways: [
+      'Allow fermentation temp to free-rise to 80°F-85°F for spicy pepper esters',
+      'Mash low at 148°F (64°C) for 85%+ dry attenuation',
+      'Crisp rustic dry finish with floral Saaz Noble hops'
+    ]
+  },
+  {
+    id: 'mc_sour_gose',
+    track: 'beer',
+    methodId: 'sour_gose',
+    method: 'Sour Gose',
+    title: 'Kettle Sour Gose: Lactobacillus Acidification & Salt Coriander Boiling',
+    duration: '6:10',
+    thumbnail: './beer_pilsner_hero.jpg',
+    embedId: 'AI4ynXzkSQo',
+    description: 'Kettle souring wort with Lactobacillus to pH 3.4, boiling with crushed Indian coriander seeds and pink Himalayan sea salt.',
+    keyTakeaways: [
+      'Sour un-hopped wort with Lactobacillus at 100°F (38°C) for 24-48 hours',
+      'Boil sour wort with coriander and sea salt for tart refreshing mouthfeel',
+      'Ferment with clean German ale yeast strain'
+    ]
+  },
+  {
+    id: 'mc_hefeweizen',
+    track: 'beer',
+    methodId: 'hefeweizen',
+    method: 'Bavarian Hefeweizen',
+    title: 'Bavarian Hefeweizen Mashing: Ferulic Acid Rest & Clove Banana Esters',
+    duration: '5:50',
+    thumbnail: './beer_pilsner_hero.jpg',
+    embedId: 'vFcS01wMSxM',
+    description: 'Performing a 113°F (45°C) ferulic acid rest to generate 4-vinyl guaiacol clove aroma precursors, followed by open fermentation.',
+    keyTakeaways: [
+      'Rest mash at 113°F (45°C) for 15 mins for ferulic acid clove precursor',
+      'Ferment at 64°F (18°C) with Weihenstephan yeast for balanced banana-clove ratio',
+      'Serve unfiltered with natural yeast suspension in tall Weizen glass'
+    ]
+  },
+  {
+    id: 'mc_amber_ale',
+    track: 'beer',
+    methodId: 'amber_ale',
+    method: 'American Amber Ale',
+    title: 'American Amber Ale: Crystal Caramel Malt & Cascade Hop Balance',
+    duration: '5:15',
+    thumbnail: './beer_west_coast_hero.jpg',
+    embedId: 'st571DYYTR8',
+    description: 'Blending 2-Row pale malt with Crystal 60L and Munich malt to achieve deep ruby-amber color and toasted caramel biscuit flavor.',
+    keyTakeaways: [
+      'Mash at 152°F (67°C) for medium body and caramel sweetness',
+      'Layer Cascade hops at 60m, 15m, and 5m for classic citrus resin',
+      'Clean crisp California ale yeast fermentation'
+    ]
+  },
+  {
+    id: 'mc_porter',
+    track: 'beer',
+    methodId: 'porter',
+    method: 'Robust Porter',
+    title: 'Robust Porter: Roasted Barley Mash & Dark Chocolate Depth',
+    duration: '6:00',
+    thumbnail: './beer_stout_hero.jpg',
+    embedId: '4W2p0i3W_K0',
+    description: 'Mashing chocolate malt, Black Patent, and Carafa III to extract layers of baker’s cocoa, dark espresso, and toasted bread.',
+    keyTakeaways: [
+      'Mash at 153°F (67°C) for velvety mouthfeel',
+      'Add roasted grains late in mash or vorlauf to prevent harsh astringency',
+      'Earthy Fuggle and Willamette hop additions'
+    ]
+  },
+  {
+    id: 'mc_belgian_tripel',
+    track: 'beer',
+    methodId: 'belgian_tripel',
+    method: 'Belgian Tripel',
+    title: 'Trappist Belgian Tripel: Candi Sugar Boiling & High ABV Attenuation',
+    duration: '6:45',
+    thumbnail: './beer_hazy_dipa_hero.jpg',
+    embedId: 'j6VlT_jUVPc',
+    description: 'Boiling Belgian Pilsner malt with clear candi sugar to achieve glowing golden color, high 9.0% ABV, and dry effervescent body.',
+    keyTakeaways: [
+      'Mash low at 149°F (65°C) for high fermentability',
+      'Add clear Belgian Candi sugar during boil to boost ABV without heavy body',
+      'Ferment warm with Trappist Westmalle yeast for banana clove alcohol warmness'
+    ]
   }
 ];
 
