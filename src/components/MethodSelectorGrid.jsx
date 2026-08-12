@@ -23,7 +23,7 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
         isBeer ? 'glass-panel-beer border-amber-500/40' : isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
       }`}>
         <div className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none ${
-          isBeer ? 'bg-amber-500/15' : isCoffee ? 'bg-[#A66E38]/15' : 'bg-emerald-500/15'
+          isBeer ? 'bg-amber-500/15' : isCoffee ? 'bg-[#A66E38]/15' : 'bg-emerald-500/20'
         }`} />
 
         <div className={`inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] mb-3 ${
@@ -142,11 +142,15 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
               className={`p-8 md:p-9 rounded-3xl border text-left transition-all duration-300 relative flex flex-col justify-between group shadow-xl hover:-translate-y-1.5 ${
                 isSelected
                   ? isBeer
-                    ? 'bg-amber-500/15 border-amber-400/70 text-cream-light ring-1 ring-amber-400/40 shadow-[0_15px_40px_-10px_rgba(245,158,11,0.3)] backdrop-blur-xl'
+                    ? 'bg-amber-500/20 border-amber-400/70 text-cream-light ring-1 ring-amber-400/40 shadow-[0_15px_40px_-10px_rgba(245,158,11,0.35)] backdrop-blur-xl'
                     : isCoffee
-                    ? 'bg-[#A66E38]/15 border-[#C48B56]/70 text-cream-light ring-1 ring-[#C48B56]/40 shadow-[0_15px_40px_-10px_rgba(166,110,56,0.3)] backdrop-blur-xl'
-                    : 'bg-emerald-500/15 border-emerald-400/60 text-cream-light ring-1 ring-emerald-400/40 shadow-[0_15px_40px_-10px_rgba(143,168,153,0.25)] backdrop-blur-xl'
-                  : 'bg-[#14110E]/80 border-white/[0.08] text-stone-300 hover:bg-[#1C1814] hover:border-white/20'
+                    ? 'bg-[#A66E38]/20 border-[#C48B56]/70 text-cream-light ring-1 ring-[#C48B56]/40 shadow-[0_15px_40px_-10px_rgba(166,110,56,0.35)] backdrop-blur-xl'
+                    : 'bg-emerald-500/20 border-sage-400/70 text-cream-light ring-1 ring-sage-400/40 shadow-[0_15px_40px_-10px_rgba(81,158,100,0.35)] backdrop-blur-xl'
+                  : isBeer
+                  ? 'bg-[#19130A]/80 border-white/[0.08] text-stone-300 hover:bg-[#241C10] hover:border-amber-400/30'
+                  : isCoffee
+                  ? 'bg-[#18120D]/80 border-white/[0.08] text-stone-300 hover:bg-[#221B14] hover:border-[#A66E38]/30'
+                  : 'bg-[#0E1A11]/80 border-white/[0.08] text-stone-300 hover:bg-[#15271A] hover:border-sage-500/30'
               }`}
             >
               {/* Method Card Header */}
@@ -158,7 +162,7 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
                         ? 'bg-amber-500 text-espresso-950 shadow-[0_0_15px_rgba(245,158,11,0.5)] font-bold'
                         : isCoffee
                         ? 'bg-[#C48B56] text-[#140C08] shadow-[0_0_15px_rgba(166,110,56,0.5)] font-bold'
-                        : 'bg-sage-300 text-slate-950 shadow-[0_0_15px_rgba(143,168,153,0.5)] font-bold'
+                        : 'bg-sage-300 text-slate-950 shadow-[0_0_15px_rgba(81,158,100,0.5)] font-bold'
                       : isBeer
                       ? 'bg-white/[0.06] text-amber-400 border border-white/[0.08]'
                       : isCoffee
@@ -221,7 +225,9 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
                   <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-stone-400">
                     {isBeer ? 'Mash Temp:' : 'Water Temp:'}
                   </span>
-                  <span className="flex items-center gap-1.5 font-bold text-cyan-300">
+                  <span className={`flex items-center gap-1.5 font-bold ${
+                    isBeer ? 'text-amber-300' : isCoffee ? 'text-cyan-300' : 'text-sage-300'
+                  }`}>
                     <Thermometer className="w-3.5 h-3.5 opacity-80" />
                     {tempStr}
                   </span>

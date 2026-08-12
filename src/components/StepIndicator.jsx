@@ -1,5 +1,5 @@
 import React from 'react';
-import { Coffee, Leaf, Scale, Gauge, Timer, CheckCircle2 } from 'lucide-react';
+import { Coffee, Leaf, Beer, Scale, Gauge, Timer, CheckCircle2 } from 'lucide-react';
 
 export default function StepIndicator({ currentStep, setCurrentStep, trackMode }) {
   const isCoffee = trackMode === 'coffee';
@@ -14,7 +14,13 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
   ];
 
   return (
-    <nav className="w-full bg-[#0D0B0A]/95 border-t border-white/10 py-2 px-2 sm:px-4 lg:px-8 transition-all">
+    <nav className={`w-full py-2 px-2 sm:px-4 lg:px-8 transition-colors duration-500 border-t ${
+      isBeer
+        ? 'bg-[#130E06]/95 border-amber-500/30'
+        : isCoffee
+        ? 'bg-[#120B07]/95 border-[#A66E38]/30'
+        : 'bg-[#07130B]/95 border-sage-500/30'
+    }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between relative gap-1 sm:gap-3">
         
         {/* Background Connecting Timeline Line */}
@@ -37,7 +43,11 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
                       ? 'btn-tactile-coffee text-[#140C08] font-extrabold shadow-[0_0_20px_rgba(166,110,56,0.5)] scale-[1.02] border-[#C48B56]'
                       : 'btn-tactile-tea text-white font-extrabold shadow-[0_0_20px_rgba(81,158,100,0.5)] scale-[1.02] border-sage-300'
                     : isCompleted
-                    ? 'bg-[#181412]/90 border-emerald-500/40 text-emerald-300 hover:bg-[#201B18]'
+                    ? isBeer
+                      ? 'bg-[#1C150A]/90 border-amber-500/40 text-amber-300 hover:bg-[#261E0E]'
+                      : isCoffee
+                      ? 'bg-[#1C140D]/90 border-[#A66E38]/40 text-[#D2A06E] hover:bg-[#251B12]'
+                      : 'bg-[#0E1A11]/90 border-sage-500/40 text-sage-300 hover:bg-[#142418]'
                     : 'bg-[#12100E]/80 border-white/15 text-stone-300 hover:text-cream-light hover:bg-white/[0.08] hover:border-white/25'
                 }`}
               >
@@ -46,13 +56,17 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
                   isActive
                     ? 'bg-black/30 text-current font-bold'
                     : isCompleted
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                    ? isBeer
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                      : isCoffee
+                      ? 'bg-[#A66E38]/20 text-[#D2A06E] border border-[#A66E38]/40'
+                      : 'bg-sage-500/20 text-sage-300 border border-sage-500/40'
                     : 'bg-white/10 text-stone-400 group-hover:text-cream-light'
                 }`}>
                   {isCompleted ? <CheckCircle2 className="w-3 h-3" /> : <StepIcon className="w-3 h-3" />}
                 </div>
 
-                {/* Step Metadata & Title (Visible on Mobile & Desktop) */}
+                {/* Step Metadata & Title */}
                 <div className="text-left min-w-0">
                   <div className="text-[9px] sm:text-[10px] uppercase font-mono tracking-wider font-extrabold truncate opacity-90">
                     0{step.id} • <span className="hidden xs:inline">{step.title}</span><span className="xs:hidden">{step.title.split(' ')[0]}</span>

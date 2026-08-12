@@ -343,7 +343,6 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
   useEffect(() => {
     if (!isOpen) return;
 
-    // Load Leaflet CSS dynamically if not present
     if (!document.getElementById('leaflet-css-cdn')) {
       const link = document.createElement('link');
       link.id = 'leaflet-css-cdn';
@@ -352,24 +351,20 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
       document.head.appendChild(link);
     }
 
-    // Load Leaflet JS dynamically
     const initLeafletMap = () => {
       if (!window.L || !mapContainerRef.current) return;
 
-      // Clean up previous map instance if re-initializing
       if (leafletInstanceRef.current) {
         leafletInstanceRef.current.remove();
         leafletInstanceRef.current = null;
       }
 
-      // Initialize Leaflet Map centered at user's GPS position
       const map = window.L.map(mapContainerRef.current, {
         center: [userLocation.lat, userLocation.lng],
         zoom: 12,
         zoomControl: true
       });
 
-      // CartoDB Voyager Tile Layer showing real streets, roads, highways & neighborhood labels
       window.L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         subdomains: 'abcd',
@@ -377,23 +372,24 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
       }).addTo(map);
 
       leafletInstanceRef.current = map;
-
-      // Create Layer Group for Pins
-      const markersGroup = window.L.layerGroup().addTo(map);
-      markersGroupRef.current = markersGroup;
-
       renderLeafletMarkers();
     };
 
     if (window.L) {
-      setTimeout(initLeafletMap, 100);
+      initLeafletMap();
     } else {
       const script = document.createElement('script');
-      script.id = 'leaflet-js-cdn';
       script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.onload = () => setTimeout(initLeafletMap, 100);
+      script.onload = initLeafletMap;
       document.head.appendChild(script);
     }
+
+    return () => {
+      if (leafletInstanceRef.current) {
+        leafletInstanceRef.current.remove();
+        leafletInstanceRef.current = null;
+      }
+    };
   }, [isOpen, userLocation]);
 
   // Update Leaflet Pins & Pan to Selected Shop

@@ -113,6 +113,13 @@ export default function App() {
   };
 
   const isCoffee = trackMode === 'coffee';
+  const isTea = trackMode === 'tea';
+  const isBeer = trackMode === 'beer';
+
+  // Sync body theme class whenever track changes
+  useEffect(() => {
+    document.body.className = `theme-${trackMode}`;
+  }, [trackMode]);
   
   // Guarantee active method belongs to current track
   const currentActiveMethod = (activeMethod && methods.some(m => m.id === activeMethod.id))
@@ -125,10 +132,22 @@ export default function App() {
   const dryDoseGrams = calculatedTotalWaterMl > 0 ? Math.round((calculatedTotalWaterMl / effectiveRatio) * 10) / 10 : 0;
 
   return (
-    <div className="min-h-screen bg-[#0A0908] text-cream-soft font-sans selection:bg-amber-gold selection:text-espresso-950 flex flex-col">
+    <div className={`min-h-screen font-sans flex flex-col transition-colors duration-700 ${
+      isBeer
+        ? 'bg-[#110C04] text-[#FEFCE8] selection:bg-amber-400 selection:text-[#0F0C05]'
+        : isCoffee
+        ? 'bg-[#0E0906] text-[#F8F5F1] selection:bg-[#C48B56] selection:text-[#140C08]'
+        : 'bg-[#08110B] text-[#EBF7EE] selection:bg-sage-400 selection:text-[#07130B]'
+    }`}>
       
       {/* 100% Bulletproof Sticky Top Header Container (Sticky on Android, iOS, & Desktop) */}
-      <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#0A0908]/95 border-b border-amber-gold/30 shadow-2xl transition-colors duration-500">
+      <header className={`sticky top-0 z-50 backdrop-blur-2xl transition-all duration-700 border-b shadow-2xl ${
+        isBeer
+          ? 'bg-[#181207]/95 border-amber-500/40 shadow-[0_10px_30px_rgba(245,158,11,0.15)]'
+          : isCoffee
+          ? 'bg-[#160E09]/95 border-[#A66E38]/40 shadow-[0_10px_30px_rgba(166,110,56,0.15)]'
+          : 'bg-[#0B1710]/95 border-sage-500/40 shadow-[0_10px_30px_rgba(94,150,106,0.15)]'
+      }`}>
         <Header
           trackMode={trackMode}
           setTrackMode={handleTrackSwitch}
@@ -336,6 +355,7 @@ export default function App() {
           <LocalCoffeeFinderModal
             isOpen={isLocalCoffeeOpen}
             onClose={() => setIsLocalCoffeeOpen(false)}
+            trackMode={trackMode}
           />
 
         </main>
