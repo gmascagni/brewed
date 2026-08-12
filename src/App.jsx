@@ -132,15 +132,32 @@ export default function App() {
   const dryDoseGrams = calculatedTotalWaterMl > 0 ? Math.round((calculatedTotalWaterMl / effectiveRatio) * 10) / 10 : 0;
 
   return (
-    <div className={`min-h-screen font-sans flex flex-col transition-colors duration-700 ${
+    <div className={`min-h-screen font-sans flex flex-col transition-colors duration-700 relative ${
       isBeer
         ? 'bg-[#110C04] text-[#FEFCE8] selection:bg-amber-400 selection:text-[#0F0C05]'
         : isCoffee
         ? 'bg-[#0E0906] text-[#F8F5F1] selection:bg-[#C48B56] selection:text-[#140C08]'
         : 'bg-[#08110B] text-[#EBF7EE] selection:bg-sage-400 selection:text-[#07130B]'
     }`}>
+
+      {/* Dynamic Background Image Overlay Reflective of Selected Extraction Method */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-20 transition-opacity duration-1000">
+        <img
+          key={currentActiveMethod?.heroImage || trackMode}
+          src={currentActiveMethod?.heroImage || (isBeer ? './beer_hazy_dipa_hero.jpg' : isCoffee ? './pour_over_hero.jpg' : './tea_ceremony.jpg')}
+          alt={currentActiveMethod?.name || 'Extraction Background'}
+          className="w-full h-full object-cover object-center filter blur-2xl scale-110 transform transition-transform duration-1000"
+        />
+        <div className={`absolute inset-0 ${
+          isBeer
+            ? 'bg-gradient-to-b from-[#110C04]/85 via-[#110C04]/60 to-[#110C04]/90'
+            : isCoffee
+            ? 'bg-gradient-to-b from-[#0E0906]/85 via-[#0E0906]/60 to-[#0E0906]/90'
+            : 'bg-gradient-to-b from-[#08110B]/85 via-[#08110B]/60 to-[#08110B]/90'
+        }`} />
+      </div>
       
-      {/* 100% Bulletproof Sticky Top Header Container (Sticky on Android, iOS, & Desktop) */}
+      {/* 100% Bulletproof Sticky Top Header Container */}
       <header className={`sticky top-0 z-50 backdrop-blur-2xl transition-all duration-700 border-b shadow-2xl ${
         isBeer
           ? 'bg-[#181207]/95 border-amber-500/40 shadow-[0_10px_30px_rgba(245,158,11,0.15)]'

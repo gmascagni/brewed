@@ -42,14 +42,11 @@ export default function PrecisionCalculator({
   const doseDisplay = isMetric ? `${dryDoseGrams.toFixed(1)} g` : `${dryDoseOz} oz (${dryDoseGrams.toFixed(1)}g)`;
 
   // Beer Math Calculations
-  // Batch Size in Gallons or Liters
-  const batchGallons = cupCount; // 1 to 6 gallons
+  const batchGallons = cupCount; // 1 to 10 gallons
   const batchLiters = (batchGallons * 3.78541).toFixed(1);
   const mashRatioQtLb = currentRatio; // e.g. 1.35 qt/lb
-  // Grain Weight (lbs) ~ estimated 2.2 lbs per gallon for 1.055 OG
   const grainWeightLbs = (batchGallons * 2.2).toFixed(1);
   const grainWeightKg = (grainWeightLbs * 0.453592).toFixed(1);
-  // Strike Water (Quarts) = Grain Weight * Mash Ratio
   const strikeWaterQt = (grainWeightLbs * mashRatioQtLb).toFixed(1);
   const strikeWaterGal = (strikeWaterQt / 4).toFixed(1);
   const strikeWaterLiters = (strikeWaterQt * 0.946353).toFixed(1);
@@ -143,7 +140,9 @@ export default function PrecisionCalculator({
                 className="p-1.5 px-2.5 rounded-xl bg-black/60 border border-white/15 text-stone-200 hover:border-white/40 transition-all shadow-md active:scale-95"
                 title={isMuted ? "Unmute Audio Alerts" : "Mute Audio Alerts"}
               >
-                {isMuted ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className="w-3.5 h-3.5 text-[#D2A06E]" />}
+                {isMuted ? <VolumeX className="w-3.5 h-3.5 text-rose-400" /> : <Volume2 className={`w-3.5 h-3.5 ${
+                  isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+                }`} />}
               </button>
             )}
           </div>
@@ -177,11 +176,11 @@ export default function PrecisionCalculator({
                   className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
                     isSelected
                       ? isBeer
-                        ? 'bg-amber-500 text-[#0F0C05] border-amber-500 font-extrabold shadow-[0_0_15px_rgba(245,158,11,0.4)]'
+                        ? 'btn-tactile-beer text-[#0F0C05] font-extrabold shadow-[0_0_15px_rgba(245,158,11,0.4)]'
                         : isCoffee
-                        ? 'bg-[#C48B56] text-[#140C08] border-[#C48B56] font-extrabold shadow-[0_0_15px_rgba(166,110,56,0.4)]'
-                        : 'bg-sage-300 text-slate-950 border-sage-300 font-extrabold shadow-[0_0_15px_rgba(143,168,153,0.4)]'
-                      : 'bg-black/30 text-stone-400 border-white/[0.08] hover:bg-white/[0.08] hover:text-cream-light'
+                        ? 'btn-tactile-coffee text-[#140C08] font-extrabold shadow-[0_0_15px_rgba(166,110,56,0.4)]'
+                        : 'btn-tactile-tea text-white font-extrabold shadow-[0_0_15px_rgba(81,158,100,0.4)]'
+                      : 'bg-black/40 text-stone-400 border-white/[0.08] hover:bg-white/[0.08] hover:text-cream-light'
                   }`}
                 >
                   {method.name}
@@ -193,18 +192,20 @@ export default function PrecisionCalculator({
       </div>
 
       {/* 2. Interactive Quantity & Size Stepper Card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 bg-[#0F0D0C]/80 p-6 md:p-8 rounded-3xl border border-white/[0.08] shadow-inner">
+      <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 p-6 md:p-8 rounded-3xl border shadow-inner ${
+        isBeer ? 'bg-[#151009]/80 border-amber-500/20' : isCoffee ? 'bg-[#140E0A]/80 border-[#A66E38]/20' : 'bg-[#0B150F]/80 border-sage-500/20'
+      }`}>
         
         {/* Cup / Batch Size Slider */}
         <div>
           <div className="flex items-center justify-between mb-3.5">
             <label className="text-xs uppercase tracking-[0.15em] font-mono font-extrabold text-stone-300 flex items-center gap-2">
-              {isBeer ? <Beer className="w-4 h-4 text-amber-500" /> : isCoffee ? <CupSoda className="w-4 h-4 text-[#D2A06E]" /> : <CupSoda className="w-4 h-4 text-sage-300" />}
+              {isBeer ? <Beer className="w-4 h-4 text-amber-400" /> : isCoffee ? <CupSoda className="w-4 h-4 text-[#D2A06E]" /> : <CupSoda className="w-4 h-4 text-sage-300" />}
               <span>{isBeer ? `Batch Size (${batchGallons} Gal / ${batchLiters} L)` : `Target Serving (${cupCount} ${cupCount === 1 ? 'Cup' : 'Cups'})`}</span>
             </label>
             <span className={`text-sm font-extrabold font-mono text-cream-light px-3.5 py-1 rounded-xl border shadow ${
               isBeer
-                ? 'bg-amber-400/20 border-amber-400/30'
+                ? 'bg-amber-500/20 border-amber-400/30 text-amber-300'
                 : isCoffee
                 ? 'bg-[#A66E38]/20 border-[#A66E38]/30 text-[#D2A06E]'
                 : 'bg-sage-500/20 border-sage-500/30 text-sage-300'
@@ -220,7 +221,7 @@ export default function PrecisionCalculator({
             step="1"
             value={cupCount}
             onChange={(e) => handleCupCountChange(parseInt(e.target.value))}
-            className="w-full h-3 bg-[#1A1613] rounded-xl appearance-none cursor-pointer mb-3.5"
+            className="w-full h-3 bg-black/60 rounded-xl appearance-none cursor-pointer mb-3.5"
           />
 
           <div className="flex justify-between text-[11px] text-stone-400 font-mono font-medium">
@@ -247,7 +248,7 @@ export default function PrecisionCalculator({
                     cupMl === vol.ml && customWaterMl === null
                       ? isCoffee
                         ? 'bg-[#A66E38]/25 border-[#C48B56] text-[#D2A06E] font-extrabold shadow-[0_0_20px_rgba(166,110,56,0.2)]'
-                        : 'bg-emerald-500/25 border-sage-300 text-sage-300 font-extrabold shadow-[0_0_20px_rgba(143,168,153,0.2)]'
+                        : 'bg-sage-500/25 border-sage-400 text-sage-300 font-extrabold shadow-[0_0_20px_rgba(81,158,100,0.2)]'
                       : 'bg-black/40 border-white/[0.08] text-stone-400 hover:bg-white/[0.08] hover:border-white/20'
                   }`}
                 >
@@ -262,21 +263,21 @@ export default function PrecisionCalculator({
               Beer Style Parameters:
             </label>
             <div className="grid grid-cols-2 gap-2.5 text-xs font-mono">
-              <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-cream-light">
+              <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-400/30 text-cream-light">
                 <span className="text-[10px] text-amber-400 block uppercase font-bold">Target ABV Range</span>
-                <span className="font-extrabold text-sm">{activeMethod?.abvRange || '5.5% - 7.5%'}</span>
+                <span className="font-extrabold text-sm text-amber-300">{activeMethod?.abvRange || '5.5% - 7.5%'}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-cream-light">
-                <span className="text-[10px] text-emerald-400 block uppercase font-bold">Bitterness Index</span>
-                <span className="font-extrabold text-sm">{activeMethod?.ibuRange || '40 IBU'}</span>
+              <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-400/30 text-cream-light">
+                <span className="text-[10px] text-amber-400 block uppercase font-bold">Bitterness Index</span>
+                <span className="font-extrabold text-sm text-amber-300">{activeMethod?.ibuRange || '40 IBU'}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 text-cream-light">
-                <span className="text-[10px] text-yellow-400 block uppercase font-bold">SRM Color Index</span>
-                <span className="font-extrabold text-sm">{activeMethod?.srmColor || '6 SRM'}</span>
+              <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-400/30 text-cream-light">
+                <span className="text-[10px] text-amber-400 block uppercase font-bold">SRM Color Index</span>
+                <span className="font-extrabold text-sm text-amber-300">{activeMethod?.srmColor || '6 SRM'}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cream-light">
-                <span className="text-[10px] text-cyan-400 block uppercase font-bold">Glassware Pairing</span>
-                <span className="font-extrabold text-sm">{activeMethod?.glassware || 'Nonic Pint'}</span>
+              <div className="p-3 rounded-2xl bg-amber-500/15 border border-amber-400/30 text-cream-light">
+                <span className="text-[10px] text-amber-400 block uppercase font-bold">Glassware Pairing</span>
+                <span className="font-extrabold text-sm text-amber-300">{activeMethod?.glassware || 'Nonic Pint'}</span>
               </div>
             </div>
           </div>
@@ -289,7 +290,7 @@ export default function PrecisionCalculator({
         
         {/* Grain Bill / Dry Dose Card */}
         <div className={`p-7 md:p-8 rounded-3xl bg-[#14110E]/90 border shadow-2xl relative overflow-hidden group flex flex-col justify-between ${
-          isBeer ? 'border-amber-400/30' : isCoffee ? 'border-[#A66E38]/40' : 'border-sage-500/40'
+          isBeer ? 'border-amber-400/40' : isCoffee ? 'border-[#A66E38]/40' : 'border-sage-500/40'
         }`}>
           <div>
             <div className={`flex items-center justify-between text-xs font-extrabold uppercase tracking-[0.15em] font-mono mb-2.5 ${
@@ -331,9 +332,13 @@ export default function PrecisionCalculator({
         </div>
 
         {/* Water Volume Output Card */}
-        <div className="p-7 md:p-8 rounded-3xl bg-[#14110E]/90 border border-cyan-400/30 shadow-2xl relative overflow-hidden group flex flex-col justify-between">
+        <div className={`p-7 md:p-8 rounded-3xl bg-[#14110E]/90 border shadow-2xl relative overflow-hidden group flex flex-col justify-between ${
+          isBeer ? 'border-amber-400/40' : isCoffee ? 'border-[#A66E38]/40' : 'border-sage-500/40'
+        }`}>
           <div>
-            <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-[0.15em] font-mono text-cyan-400 mb-2.5">
+            <div className={`flex items-center justify-between text-xs font-extrabold uppercase tracking-[0.15em] font-mono mb-2.5 ${
+              isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+            }`}>
               <span className="flex items-center gap-2">
                 <CupSoda className="w-4 h-4" />
                 <span>{isBeer ? 'Mash Strike Water Volume' : 'Total Hot Water'}</span>
@@ -347,8 +352,10 @@ export default function PrecisionCalculator({
           </div>
 
           <div className="mt-5 pt-4 border-t border-white/[0.08] text-xs font-mono text-stone-300">
-            <span className="text-cyan-300 font-bold">Mash Strike Temperature Target: </span>
-            <span>{isMetric ? `${((activeMethod?.tempC || 66) + 4)}°C` : `${((activeMethod?.tempF || 151) + 8)}°F`} (Strike water heating offset)</span>
+            <span className={`font-bold ${isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`}>
+              Mash Strike Temperature Target: 
+            </span>
+            <span> {isMetric ? `${((activeMethod?.tempC || 66) + 4)}°C` : `${((activeMethod?.tempF || 151) + 8)}°F`} (Strike water heating offset)</span>
           </div>
         </div>
 
