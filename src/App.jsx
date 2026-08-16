@@ -17,7 +17,7 @@ import AuthModal from './components/AuthModal';
 import CommunityHubModal from './components/CommunityHubModal';
 import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
 import AdminConsoleModal from './components/AdminConsoleModal';
-import BrewShopSection from './components/BrewShopSection';
+import ShopDrawer from './components/ShopDrawer';
 import Footer from './components/Footer';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
@@ -293,8 +293,8 @@ export default function App() {
             />
           </div>
 
-          {/* Amazon Affiliate Equipment & Gear Store */}
-          <BrewShopSection trackMode={trackMode} activeMethod={currentActiveMethod} />
+          {/* Amazon Affiliate Equipment & Gear Store Drawer (Collapsed by Default) */}
+          <ShopDrawer trackMode={trackMode} activeMethod={currentActiveMethod} />
 
           {/* 1. Diagnostics Drawer (Troubleshooting & Water) */}
           <DiagnosticsDrawer trackMode={trackMode} />
