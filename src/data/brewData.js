@@ -26,7 +26,7 @@ export const BREW_METHODS = {
       category: 'coffee',
       featured: false,
       heroImage: './pour_over_hero.jpg',
-      ratio: 15, // 1:15 ratio (1g coffee to 15ml water)
+      ratio: 16, // 1:16 Golden Ratio (1g coffee to 16ml water)
       defaultCupMl: 240,
       tempC: 94,
       tempF: 201,

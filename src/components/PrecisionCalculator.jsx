@@ -310,14 +310,20 @@ export default function PrecisionCalculator({
 
           {/* Mash Ratio Slider */}
           <div className="mt-5 pt-4 border-t border-white/[0.08]">
-            <div className="flex items-center justify-between text-[11px] text-stone-300 font-medium mb-2">
-              <span className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between text-[11px] text-stone-300 font-medium mb-2.5">
+              <span className="flex items-center gap-1.5 font-bold">
                 <Sliders className={`w-3.5 h-3.5 ${isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
                 <span>{isBeer ? `Mash Thickness Ratio: ${mashRatioQtLb} qt/lb` : `Extraction Ratio: 1 : ${currentRatio}`}</span>
               </span>
+
+              {isCoffee && (currentRatio === 16 || currentRatio === 16.0) && (
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 text-[10px] font-mono font-extrabold uppercase tracking-wider flex items-center gap-1 animate-pulse shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                  <span>SCA Golden Ratio (1:16) ⭐</span>
+                </span>
+              )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-3">
               <input
                 type="range"
                 min={isBeer ? "1.00" : isCoffee ? "10" : "20"}
@@ -328,6 +334,103 @@ export default function PrecisionCalculator({
                 className="w-full h-2.5 bg-black/60 rounded-lg appearance-none cursor-pointer"
               />
             </div>
+
+            {/* Quick Ratio Preset Pills Bar */}
+            <div className="flex items-center space-x-2 pt-1 overflow-x-auto no-scrollbar">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 font-bold mr-1 flex-shrink-0">Presets:</span>
+              {isCoffee ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setCustomRatio(15)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
+                      currentRatio === 15 ? 'bg-amber-gold/30 text-amber-gold border-amber-gold' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
+                    }`}
+                  >
+                    1:15 (Intense)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCustomRatio(16)}
+                    className={`px-3 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 flex items-center gap-1 ${
+                      currentRatio === 16 ? 'bg-amber-400 text-espresso-950 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
+                    }`}
+                  >
+                    <span>1:16 (Golden Ratio ⭐)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCustomRatio(17)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
+                      currentRatio === 17 ? 'bg-amber-gold/30 text-amber-gold border-amber-gold' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
+                    }`}
+                  >
+                    1:17 (Mellow)
+                  </button>
+                </>
+              ) : isTea ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setCustomRatio(30)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
+                      currentRatio === 30 ? 'bg-sage-300 text-slate-950 border-sage-300' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
+                    }`}
+                  >
+                    1:30 (Gongfu)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCustomRatio(50)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
+                      currentRatio === 50 ? 'bg-sage-300 text-slate-950 border-sage-300' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
+                    }`}
+                  >
+                    1:50 (Standard)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCustomRatio(60)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
+                      currentRatio === 60 ? 'bg-sage-300 text-slate-950 border-sage-300' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
+                    }`}
+                  >
+                    1:60 (Light)
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setCustomRatio(1.25)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
+                      currentRatio === 1.25 ? 'bg-amber-400 text-espresso-950 border-amber-400' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
+                    }`}
+                  >
+                    1.25 qt/lb (Thick)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCustomRatio(1.35)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
+                      currentRatio === 1.35 ? 'bg-amber-400 text-espresso-950 border-amber-400' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
+                    }`}
+                  >
+                    1.35 qt/lb (Std)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCustomRatio(1.50)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
+                      currentRatio === 1.50 ? 'bg-amber-400 text-espresso-950 border-amber-400' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
+                    }`}
+                  >
+                    1.50 qt/lb (Thin)
+                  </button>
+                </>
+              )}
+            </div>
+
           </div>
         </div>
 
