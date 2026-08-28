@@ -274,6 +274,7 @@ export default function App() {
                 trackMode={trackMode}
                 activeMethod={currentActiveMethod}
                 dryDoseGrams={dryDoseGrams}
+                unitSystem={unitSystem}
                 isMuted={isMuted}
                 onPrevStep={() => setCurrentStep(3)}
                 onOpenJournal={() => setIsJournalOpen(true)}

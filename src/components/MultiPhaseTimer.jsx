@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft, BookOpen } from 'lucide-react';
+import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft, BookOpen, Thermometer } from 'lucide-react';
 import { playPhaseChime, playCompletionChime, stopCompletionChime } from '../utils/audioSynth';
 import V60ProTipModal from './V60ProTipModal';
 
-export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, isMuted, onPrevStep, onOpenJournal }) {
+export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, unitSystem = 'imperial', isMuted, onPrevStep, onOpenJournal }) {
   const isCoffee = trackMode === 'coffee';
   const isTea = trackMode === 'tea';
   const isBeer = trackMode === 'beer';
@@ -225,15 +225,39 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
             }
           </p>
 
-          {targetPhaseWaterMl > 0 && !isCompleted && (
-            <div className={`mt-3.5 text-xs font-mono font-extrabold py-1.5 px-5 rounded-full inline-block border shadow ${
-              isBeer
-                ? 'bg-amber-400/15 text-amber-300 border-amber-400/30'
-                : isCoffee
-                ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
-                : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
-            }`}>
-              Target Pour Water: ~{targetPhaseWaterMl} mL
+          {/* Target Extraction Metrics (Water Pour & Water Temp) */}
+          {!isCompleted && (
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+              {targetPhaseWaterMl > 0 && (
+                <div className={`text-xs font-mono font-extrabold py-2 px-5 rounded-full inline-flex items-center gap-1.5 border shadow ${
+                  isBeer
+                    ? 'bg-amber-400/15 text-amber-300 border-amber-400/30'
+                    : isCoffee
+                    ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
+                    : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
+                }`}>
+                  <span>Target Pour Water:</span>
+                  <span className="text-cream-light font-black">~{targetPhaseWaterMl} mL</span>
+                </div>
+              )}
+
+              {(activeMethod?.tempF || activeMethod?.tempC) && (
+                <div className={`text-xs font-mono font-extrabold py-2 px-5 rounded-full inline-flex items-center gap-1.5 border shadow ${
+                  isBeer
+                    ? 'bg-amber-400/15 text-amber-300 border-amber-400/30'
+                    : isCoffee
+                    ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
+                    : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
+                }`}>
+                  <Thermometer className="w-3.5 h-3.5" />
+                  <span>{isBeer ? 'Target Mash Temp:' : 'Water Temp:'}</span>
+                  <span className="text-cream-light font-black">
+                    {unitSystem === 'metric'
+                      ? `${activeMethod?.tempC || 93}°C (${activeMethod?.tempF || 200}°F)`
+                      : `${activeMethod?.tempF || 200}°F (${activeMethod?.tempC || 93}°C)`}
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
