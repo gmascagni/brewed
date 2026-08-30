@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Gauge, Sparkles, Eye, X, Compass, Sliders, CheckCircle2, Beer, Flame } from 'lucide-react';
+import { Gauge, Sparkles, Eye, X } from 'lucide-react';
 import { GRIND_VISUAL_GUIDE } from '../data/brewData';
 
 export default function GrindVisualGuide({ activeMethod }) {
-  const isBeer = activeMethod?.category === 'beer';
   const [selectedGrindId, setSelectedGrindId] = useState('medium_fine');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -15,7 +14,7 @@ export default function GrindVisualGuide({ activeMethod }) {
     else if (methodId === 'espresso') setSelectedGrindId('extra_fine');
     else if (methodId === 'moka_pot') setSelectedGrindId('fine');
     else if (methodId === 'drip_brewer') setSelectedGrindId('medium');
-    else if (methodId === 'pour_over') setSelectedGrindId('medium_fine');
+    else if (methodId === 'pour_over' || methodId === 'classic_pour_over') setSelectedGrindId('medium_fine');
     else if (methodId === 'aeropress') setSelectedGrindId('medium_fine');
     else if (activeMethod.grind) {
       const g = activeMethod.grind.toLowerCase();
@@ -41,181 +40,88 @@ export default function GrindVisualGuide({ activeMethod }) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
         <div>
           <div className="inline-flex items-center space-x-2 text-xs font-extrabold uppercase tracking-widest text-amber-gold mb-1.5">
-            {isBeer ? <Beer className="w-4 h-4 animate-pulse text-amber-400" /> : <Gauge className="w-4 h-4 animate-pulse" />}
-            <span>{isBeer ? 'Malt Roller Mill Gap & Hop Addition Guide' : 'Coffee Grind Coarseness Visual Reference Guide'}</span>
+            <Gauge className="w-4 h-4 animate-pulse" />
+            <span>Coffee Grind Coarseness Visual Reference Guide</span>
           </div>
           <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light drop-shadow-md">
-            {isBeer ? `Malt Crush & Hop Schedule for ${activeMethod?.name}` : 'Burr Grinder Settings & Macro Texture Photos'}
+            Burr Grinder Settings & Macro Texture Photos
           </h3>
           <p className="text-xs md:text-sm text-cream-soft/70 mt-1">
-            {isBeer
-              ? `Grain roller gap calibration (0.038") and hop boil schedule optimized for ${activeMethod?.name}`
-              : `Preselected for ${activeMethod?.name} • Click any Burr Grinder setting to inspect high-definition macro photos`}
+            Preselected for {activeMethod?.name || 'Your Method'} • Click any Burr Grinder setting to inspect high-definition macro photos
           </p>
         </div>
 
         <span className="text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/40 shadow-inner">
-          {isBeer ? `Style: ${activeMethod?.name}` : `Auto-Matched: ${activeGrind.name}`}
+          Auto-Matched: {activeGrind.name}
         </span>
       </div>
 
-      {isBeer ? (
-        /* Dedicated Beer Malt Mill & Hop Schedule Panel */
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* 1. Grain Mill Roller Gap Card */}
-            <div className="p-6 rounded-3xl bg-espresso-950/90 border border-amber-500/30 shadow-xl space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-2">
-                  <Gauge className="w-4 h-4" />
-                  <span>Grain Roller Mill Gap</span>
-                </span>
-                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300">
-                  Target: 0.038" (0.95 mm)
-                </span>
+      {/* Burr Grinder Settings Buttons Grid with Instant Photo Bubble Badges */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        {GRIND_VISUAL_GUIDE.map((item) => {
+          const isSelected = item.id === activeGrind.id;
+          return (
+            <div
+              key={item.id}
+              onClick={() => setSelectedGrindId(item.id)}
+              className={`p-4 rounded-2xl border text-center transition-all duration-300 hover:-translate-y-1 shadow-xl cursor-pointer flex flex-col justify-between group ${
+                isSelected
+                  ? 'btn-tactile-amber text-espresso-950 scale-105 font-extrabold ring-2 ring-amber-gold'
+                  : 'bg-espresso-900/80 border-white/10 text-cream-soft hover:bg-white/10 hover:border-white/20'
+              }`}
+            >
+              <div>
+                <div className="text-xs font-extrabold tracking-wide drop-shadow mb-1">{item.name}</div>
+                <div className="text-[11px] font-mono font-bold text-amber-gold mb-1">{item.micron}</div>
+                <div className={`text-[10px] truncate mb-3 ${isSelected ? 'opacity-90 font-semibold' : 'text-cream-soft/60'}`}>
+                  {item.textureComparison.split('/')[0]}
+                </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-xs text-cream-soft/90 space-y-2">
-                <p>
-                  <strong>Barley Husk Integrity:</strong> Set roller gap to <strong>0.038" (0.95 mm)</strong>. Crushing should crack the starchy endosperm while keeping husk hulls intact to form a natural filter bed during lauter.
-                </p>
-                <p>
-                  <strong>Wheat & Oats Offset:</strong> For huskless grains (Wheat/Oats), tighten gap slightly to <strong>0.030" (0.75 mm)</strong>.
-                </p>
-              </div>
-
-              {/* Amazon Affiliate Callout */}
-              <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono">
-                <span className="text-stone-400">Need a 2-Roller Barley Malt Mill?</span>
-                <a
-                  href="https://www.amazon.com/s?k=2-Roller+Barley+Malt+Mill+Homebrew&tag=thebrewapp13-20"
-                  target="_blank"
-                  rel="nofollow sponsored noopener"
-                  className="px-3.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold hover:bg-amber-500/30 transition-all"
-                >
-                  Check Mill on Amazon ↗
-                </a>
-              </div>
+              <button
+                onClick={(e) => handleOpenPhotoBubble(item, e)}
+                className={`mt-2 py-1.5 px-2 rounded-xl text-[10px] font-extrabold tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 ${
+                  isSelected
+                    ? 'bg-espresso-950 text-amber-gold hover:bg-black'
+                    : 'bg-amber-gold/20 text-amber-gold hover:bg-amber-gold hover:text-espresso-950 border border-amber-gold/30'
+                }`}
+                title={`Inspect macro photo bubble for ${item.name}`}
+              >
+                <Eye className="w-3 h-3" />
+                <span>Inspect Photo</span>
+              </button>
             </div>
+          );
+        })}
+      </div>
 
-            {/* 2. Hop Addition Schedule Card */}
-            <div className="p-6 rounded-3xl bg-espresso-950/90 border border-emerald-500/30 shadow-xl space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
-                  <Flame className="w-4 h-4" />
-                  <span>Hop Addition Schedule</span>
-                </span>
-                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300">
-                  {activeMethod?.ibuRange || 'Bitterness Target'}
-                </span>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-xs text-cream-soft/90 space-y-2 font-mono">
-                <div className="flex justify-between border-b border-white/10 pb-1.5">
-                  <span className="text-amber-400 font-bold">60 Min (Boil Start):</span>
-                  <span>Bittering Hops (High Alpha Acid)</span>
-                </div>
-                <div className="flex justify-between border-b border-white/10 pb-1.5">
-                  <span className="text-emerald-400 font-bold">15 Min (Mid Boil):</span>
-                  <span>Flavor & Citrus Aromatics</span>
-                </div>
-                <div className="flex justify-between border-b border-white/10 pb-1.5">
-                  <span className="text-cyan-400 font-bold">0 Min (Whirlpool @ 175°F):</span>
-                  <span>Aroma Essential Oils (No bitterness)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-yellow-400 font-bold">Dry Hopping (Fermenter):</span>
-                  <span>Double Dry Hop (Day 3 & Day 7)</span>
-                </div>
-              </div>
-
-              {/* Amazon Affiliate Callout */}
-              <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono">
-                <span className="text-stone-400">Brew Kettle & Thermometer:</span>
-                <a
-                  href="https://www.amazon.com/s?k=Stainless+Steel+Brew+Kettle+with+Thermometer&tag=thebrewapp13-20"
-                  target="_blank"
-                  rel="nofollow sponsored noopener"
-                  className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold hover:bg-emerald-500/30 transition-all"
-                >
-                  Check Kettle on Amazon ↗
-                </a>
-              </div>
-            </div>
-
+      {/* Active Preselected Grind Details Card */}
+      <div className="p-6 rounded-3xl bg-espresso-950/90 border border-white/15 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="space-y-2 max-w-2xl">
+          <div className="flex items-center space-x-3">
+            <h4 className="font-serif text-xl font-bold text-cream-light">
+              {activeGrind.name} Grind Setting ({activeGrind.micron})
+            </h4>
+            <span className="text-xs font-mono font-extrabold px-2.5 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30">
+              {activeGrind.textureComparison}
+            </span>
+          </div>
+          <p className="text-xs text-cream-soft/90 font-medium leading-relaxed">
+            {activeGrind.burrSettingTip}
+          </p>
+          <div className="text-xs text-stone-400 font-medium">
+            <strong className="text-amber-gold">Flavor Extraction Profile:</strong> {activeGrind.sensoryImpact}
           </div>
         </div>
-      ) : (
-        /* Burr Grinder Settings Buttons Grid with Instant Photo Bubble Badges for Coffee */
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-            {GRIND_VISUAL_GUIDE.map((item) => {
-              const isSelected = item.id === activeGrind.id;
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => setSelectedGrindId(item.id)}
-                  className={`p-4 rounded-2xl border text-center transition-all duration-300 hover:-translate-y-1 shadow-xl cursor-pointer flex flex-col justify-between group ${
-                    isSelected
-                      ? 'btn-tactile-amber text-espresso-950 scale-105 font-extrabold ring-2 ring-amber-gold'
-                      : 'bg-espresso-900/80 border-white/10 text-cream-soft hover:bg-white/10 hover:border-white/20'
-                  }`}
-                >
-                  <div>
-                    <div className="text-xs font-extrabold tracking-wide drop-shadow mb-1">{item.name}</div>
-                    <div className="text-[11px] font-mono font-bold text-amber-gold mb-1">{item.micron}</div>
-                    <div className={`text-[10px] truncate mb-3 ${isSelected ? 'opacity-90 font-semibold' : 'text-cream-soft/60'}`}>
-                      {item.textureComparison.split('/')[0]}
-                    </div>
-                  </div>
 
-                  <button
-                    onClick={(e) => handleOpenPhotoBubble(item, e)}
-                    className={`mt-2 py-1.5 px-2 rounded-xl text-[10px] font-extrabold tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 ${
-                      isSelected
-                        ? 'bg-espresso-950 text-amber-gold hover:bg-black'
-                        : 'bg-amber-gold/20 text-amber-gold hover:bg-amber-gold hover:text-espresso-950 border border-amber-gold/30'
-                    }`}
-                    title={`Inspect macro photo bubble for ${item.name}`}
-                  >
-                    <Eye className="w-3 h-3" />
-                    <span>Inspect Photo</span>
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Active Preselected Grind Details Card */}
-          <div className="p-6 rounded-3xl bg-espresso-950/90 border border-white/15 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-2xl">
-              <div className="flex items-center space-x-3">
-                <h4 className="font-serif text-xl font-bold text-cream-light">
-                  {activeGrind.name} Grind Setting ({activeGrind.micron})
-                </h4>
-                <span className="text-xs font-mono font-extrabold px-2.5 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/30">
-                  {activeGrind.textureComparison}
-                </span>
-              </div>
-              <p className="text-xs text-cream-soft/90 font-medium leading-relaxed">
-                {activeGrind.burrSettingTip}
-              </p>
-              <div className="text-xs text-stone-400 font-medium">
-                <strong className="text-amber-gold">Flavor Extraction Profile:</strong> {activeGrind.sensoryImpact}
-              </div>
-            </div>
-
-            <button
-              onClick={(e) => handleOpenPhotoBubble(activeGrind, e)}
-              className="py-3 px-6 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs tracking-wider uppercase flex items-center gap-2 shadow-xl hover:scale-105 active:scale-95 transition-all whitespace-nowrap flex-shrink-0"
-            >
-              <Eye className="w-4 h-4" />
-              <span>Expand Macro Photo Bubble</span>
-            </button>
-          </div>
-        </>
-      )}
+        <button
+          onClick={(e) => handleOpenPhotoBubble(activeGrind, e)}
+          className="py-3 px-6 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs tracking-wider uppercase flex items-center gap-2 shadow-xl hover:scale-105 active:scale-95 transition-all whitespace-nowrap flex-shrink-0"
+        >
+          <Eye className="w-4 h-4" />
+          <span>Expand Macro Photo Bubble</span>
+        </button>
+      </div>
 
       {/* MACRO PHOTO BUBBLE MODAL POPUP */}
       {isModalOpen && (

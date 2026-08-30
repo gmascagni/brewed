@@ -1,10 +1,8 @@
 import React from 'react';
-import { Coffee, Leaf, Beer, BookOpen, Search, User, Users, ShieldCheck, MapPin } from 'lucide-react';
+import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin } from 'lucide-react';
 
 export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenLocalCoffee, onOpenAuth, currentUser }) {
   const isCoffee = trackMode === 'coffee';
-  const isTea = trackMode === 'tea';
-  const isBeer = trackMode === 'beer';
 
   return (
     <div className="px-4 lg:px-8 py-2.5 transition-colors duration-500">
@@ -13,41 +11,37 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
         {/* Logo & Brand Title */}
         <div className="flex items-center space-x-3">
           <div className={`p-2.5 rounded-2xl transition-all duration-500 ${
-            isBeer
-              ? 'bg-amber-500/20 text-amber-300 border border-amber-400/40 shadow-[0_0_20px_rgba(245,158,11,0.3)]'
-              : isCoffee 
+            isCoffee 
               ? 'bg-[#A66E38]/25 text-[#D2A06E] border border-[#A66E38]/40 shadow-[0_0_20px_rgba(166,110,56,0.3)]' 
               : 'bg-sage-500/25 text-sage-300 border border-sage-500/40 shadow-[0_0_20px_rgba(94,150,106,0.3)]'
           }`}>
-            {isBeer ? <Beer className="w-5 h-5 animate-pulse" /> : isCoffee ? <Coffee className="w-5 h-5 animate-pulse" /> : <Leaf className="w-5 h-5 animate-pulse" />}
+            {isCoffee ? <Coffee className="w-5 h-5 animate-pulse" /> : <Leaf className="w-5 h-5 animate-pulse" />}
           </div>
           <div>
             <h1 className="font-serif text-xl font-bold tracking-wider text-cream-light flex items-center gap-2">
               <span>The Brew App</span>
               <span className={`whitespace-nowrap text-[9px] uppercase font-mono px-2 py-0.5 rounded-full border transition-colors ${
-                isBeer
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-400/40'
-                  : isCoffee
+                isCoffee
                   ? 'bg-[#A66E38]/20 text-[#D2A06E] border-[#A66E38]/40'
                   : 'bg-sage-500/20 text-sage-300 border-sage-500/40'
               }`}>
                 Master
               </span>
             </h1>
-            <p className="text-[10px] text-stone-400 font-mono">Precision Coffee, Tea & Beer Guide</p>
+            <p className="text-[10px] text-stone-400 font-mono">Precision Coffee & Tea Guide</p>
           </div>
         </div>
 
-        {/* Center 3-Track Switcher: Coffee (Brown) vs Tea (Green) vs Beer (Golden) */}
+        {/* Center 2-Track Switcher: Coffee (Brown) vs Tea (Green) */}
         <div className="flex items-center p-1.5 rounded-2xl bg-[#14110E] border border-white/[0.12] text-xs font-bold shadow-inner gap-1">
           <button
             onClick={() => setTrackMode('coffee')}
-            className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl transition-all duration-300 ${
+            className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl transition-all duration-300 ${
               isCoffee 
                 ? 'btn-tactile-coffee text-[#140C08] font-extrabold scale-102 shadow-lg' 
                 : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.05]'
             }`}
-            title="Switch to The Coffee Lab (Brown Theme)"
+            title="Switch to The Coffee Lab"
           >
             <Coffee className="w-3.5 h-3.5" />
             <span>Coffee</span>
@@ -55,50 +49,35 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
 
           <button
             onClick={() => setTrackMode('tea')}
-            className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl transition-all duration-300 ${
-              isTea 
+            className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl transition-all duration-300 ${
+              !isCoffee 
                 ? 'btn-tactile-tea text-white font-extrabold scale-102 shadow-lg' 
                 : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.05]'
             }`}
-            title="Switch to The Tea Room (Green Theme)"
+            title="Switch to The Tea Room"
           >
             <Leaf className="w-3.5 h-3.5" />
             <span>Tea</span>
-          </button>
-
-          <button
-            onClick={() => setTrackMode('beer')}
-            className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl transition-all duration-300 ${
-              isBeer 
-                ? 'btn-tactile-beer text-[#0F0C05] font-extrabold scale-102 shadow-lg' 
-                : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.05]'
-            }`}
-            title="Switch to The Craft Cellar (Beer Golden Theme)"
-          >
-            <Beer className="w-3.5 h-3.5" />
-            <span>Beer</span>
           </button>
         </div>
 
         {/* Right Action Controls */}
         <div className="flex items-center space-x-2 text-xs">
 
-          {/* Shop Local Button Dynamic for Coffee, Tea, and Beer Tracks */}
+          {/* Shop Local Button Dynamic for Coffee vs Tea */}
           {onOpenLocalCoffee && (
             <button
               onClick={onOpenLocalCoffee}
               className={`flex items-center space-x-1.5 px-3.5 py-2 rounded-xl font-extrabold shadow-lg hover:scale-105 active:scale-95 transition-all ${
-                isBeer
-                  ? 'btn-tactile-beer text-[#0F0C05]'
-                  : isCoffee
+                isCoffee
                   ? 'btn-tactile-coffee text-[#140C08]'
                   : 'btn-tactile-tea text-white'
               }`}
-              title={isBeer ? 'Shop Local Breweries & Craft Taprooms' : isCoffee ? 'Shop Local Coffee & Roasters' : 'Shop Local Tea & Specialty Tea Houses'}
+              title={isCoffee ? 'Shop Local Coffee & Roasters' : 'Shop Local Tea & Specialty Tea Houses'}
             >
-              {isBeer ? <Beer className="w-3.5 h-3.5" /> : isCoffee ? <Coffee className="w-3.5 h-3.5" /> : <Leaf className="w-3.5 h-3.5" />}
+              {isCoffee ? <Coffee className="w-3.5 h-3.5" /> : <Leaf className="w-3.5 h-3.5" />}
               <span className="hidden sm:inline">
-                {isBeer ? 'Shop Local Brewery' : isCoffee ? 'Shop Local Coffee' : 'Shop Local Tea'}
+                {isCoffee ? 'Shop Local Coffee' : 'Shop Local Tea'}
               </span>
               <span className="text-[10px] bg-black/40 text-current px-1.5 py-0.5 rounded-full font-mono font-bold">📍</span>
             </button>
@@ -109,9 +88,7 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
             <button
               onClick={onOpenSearch}
               className={`p-2.5 rounded-xl bg-white/[0.08] border transition-all active:scale-95 shadow-md ${
-                isBeer
-                  ? 'text-stone-200 hover:text-amber-300 hover:border-amber-400/50 border-white/[0.12]'
-                  : isCoffee
+                isCoffee
                   ? 'text-stone-200 hover:text-[#D2A06E] hover:border-[#A66E38]/50 border-white/[0.12]'
                   : 'text-stone-200 hover:text-sage-300 hover:border-sage-500/50 border-white/[0.12]'
               }`}
@@ -126,9 +103,7 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
             <button
               onClick={onOpenCommunity}
               className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
-                isBeer
-                  ? 'bg-amber-950/50 border-amber-400/40 text-amber-300 hover:bg-amber-900/60'
-                  : isCoffee
+                isCoffee
                   ? 'bg-[#2A1C12]/50 border-[#A66E38]/40 text-[#D2A06E] hover:bg-[#38261A]/60'
                   : 'bg-emerald-950/50 border-sage-500/40 text-sage-300 hover:bg-emerald-900/60'
               }`}
@@ -140,51 +115,51 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
             </button>
           )}
 
-          {/* Tasting Journal Button */}
+          {/* Brew Journal Trigger */}
           {onOpenJournal && (
             <button
               onClick={onOpenJournal}
-              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
-                isBeer
-                  ? 'bg-white/[0.08] border-white/[0.12] text-cream-light hover:border-amber-400/60 hover:text-amber-300'
-                  : isCoffee
-                  ? 'bg-white/[0.08] border-white/[0.12] text-cream-light hover:border-[#A66E38]/60 hover:text-[#D2A06E]'
-                  : 'bg-white/[0.08] border-white/[0.12] text-cream-light hover:border-sage-500/60 hover:text-sage-300'
+              className={`p-2.5 rounded-xl bg-white/[0.08] border transition-all active:scale-95 shadow-md ${
+                isCoffee
+                  ? 'text-stone-200 hover:text-[#D2A06E] hover:border-[#A66E38]/50 border-white/[0.12]'
+                  : 'text-stone-200 hover:text-sage-300 hover:border-sage-500/50 border-white/[0.12]'
               }`}
-              title="Open Personal Tasting Journal"
+              title="Open Tasting Journal"
             >
               <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">Journal</span>
             </button>
           )}
 
-          {/* User Profile / Auth Dashboard Button */}
-          <button
-            onClick={currentUser ? onOpenProfile : onOpenAuth}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl font-mono font-bold transition-all active:scale-95 shadow-md border ${
-              currentUser
-                ? isBeer
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-400/40 hover:bg-amber-500/30'
-                  : isCoffee
-                  ? 'bg-[#A66E38]/20 text-[#D2A06E] border-[#A66E38]/40 hover:bg-[#A66E38]/30'
-                  : 'bg-sage-500/20 text-sage-300 border-sage-500/40 hover:bg-sage-500/30'
-                : isBeer
-                ? 'btn-tactile-beer text-[#0F0C05]'
-                : isCoffee
-                ? 'btn-tactile-coffee text-[#140C08]'
-                : 'btn-tactile-tea text-white'
-            }`}
-            title={currentUser ? `Logged in as ${currentUser.displayName}` : 'Sign In or Create Account'}
-          >
-            {currentUser?.avatar ? (
-              <img src={currentUser.avatar} alt="Avatar" className="w-4 h-4 rounded-full object-cover border border-current" />
-            ) : (
-              <User className="w-4 h-4" />
-            )}
-            <span className="hidden sm:inline truncate max-w-[100px]">
-              {currentUser ? currentUser.displayName.split(' ')[0] : 'Sign In'}
-            </span>
-          </button>
+          {/* User Profile Avatar / Sign In Trigger */}
+          {currentUser ? (
+            <button
+              onClick={onOpenProfile}
+              className="flex items-center space-x-2 p-1 pl-1.5 pr-2.5 rounded-xl bg-white/[0.08] border border-white/[0.12] hover:border-amber-gold/50 transition-all shadow-md group"
+              title="Open Barista Profile Dashboard"
+            >
+              <img
+                src={currentUser.avatar || './avatar_cartoon_female_barista.jpg'}
+                alt={currentUser.displayName}
+                className="w-6 h-6 rounded-full object-cover border border-amber-gold"
+              />
+              <span className="font-mono text-[11px] font-bold text-cream-light group-hover:text-amber-gold transition-colors hidden lg:inline max-w-[90px] truncate">
+                {currentUser.displayName}
+              </span>
+            </button>
+          ) : (
+            <button
+              onClick={onOpenAuth}
+              className={`px-3 py-2 rounded-xl font-bold font-mono text-[11px] uppercase tracking-wider flex items-center space-x-1.5 transition-all shadow-md active:scale-95 ${
+                isCoffee
+                  ? 'btn-tactile-coffee text-[#140C08]'
+                  : 'btn-tactile-tea text-white'
+              }`}
+              title="Sign In or Create Account"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </button>
+          )}
 
         </div>
 

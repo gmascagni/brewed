@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { HelpCircle, Droplet, Gauge, Flame, AlertCircle, ChevronRight, CheckCircle2, RefreshCw, Eye, X, Sparkles, Leaf, Beer } from 'lucide-react';
+import { HelpCircle, Droplet, Gauge, AlertCircle, ChevronRight, CheckCircle2, Eye, X, Sparkles, Leaf } from 'lucide-react';
 import { TROUBLESHOOTING_GUIDE } from '../data/brewData';
 
 export default function TroubleshootingHub({ trackMode }) {
   const isCoffee = trackMode === 'coffee';
-  const isTea = trackMode === 'tea';
-  const isBeer = trackMode === 'beer';
 
   const guides = TROUBLESHOOTING_GUIDE[trackMode] || TROUBLESHOOTING_GUIDE.coffee;
   const [selectedSymptomId, setSelectedSymptomId] = useState(guides[0]?.id || 'sour');
@@ -42,24 +40,22 @@ export default function TroubleshootingHub({ trackMode }) {
 
   return (
     <section className={`mt-12 p-7 md:p-9 rounded-3xl ${
-      isBeer ? 'glass-panel-beer border-amber-500/40' : isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
+      isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
     } shadow-2xl transition-all duration-500 relative`}>
       
       {/* Section Header */}
       <div className="mb-8 pb-4 border-b border-white/10">
         <div className={`inline-flex items-center space-x-2 text-xs font-extrabold uppercase tracking-widest mb-1.5 ${
-          isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+          isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
         }`}>
-          {isBeer ? <Beer className="w-4 h-4" /> : isCoffee ? <HelpCircle className="w-4 h-4" /> : <Leaf className="w-4 h-4" />}
-          <span>{isBeer ? 'Craft Beer Off-Flavor Diagnostics' : isCoffee ? 'Coffee Extraction Diagnostics' : 'Tea Steeping Diagnostics'}</span>
+          {isCoffee ? <HelpCircle className="w-4 h-4" /> : <Leaf className="w-4 h-4" />}
+          <span>{isCoffee ? 'Coffee Extraction Diagnostics' : 'Tea Steeping Diagnostics'}</span>
         </div>
         <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light drop-shadow-md">
-          {isBeer ? 'Homebrew Fermentation & Off-Flavor Diagnostics' : isCoffee ? 'Home Coffee Extraction Diagnostics & Variable Control' : 'Fine Tea Steeping Diagnostics & Leaf Variable Control'}
+          {isCoffee ? 'Home Coffee Extraction Diagnostics & Variable Control' : 'Fine Tea Steeping Diagnostics & Leaf Variable Control'}
         </h3>
         <p className="text-xs md:text-sm text-cream-soft/70 mt-1">
-          {isBeer
-            ? 'Identify homebrew defects (DMS corn, Diacetyl butter, green apple, oxidation) and fix yeast health, mash temps, and sanitation.'
-            : isCoffee 
+          {isCoffee 
             ? 'Identify coffee brew defects (sourness, bitterness, astringency) and adjust grind size, water quality, and temperature.' 
             : 'Identify tea steeping defects (scalding, harshness, grassy notes) and adjust water temp, steep time, and leaf ratio.'}
         </p>
@@ -70,8 +66,8 @@ export default function TroubleshootingHub({ trackMode }) {
         {/* Left Column: Interactive Extraction Symptom Diagnostics */}
         <div>
           <h4 className="text-sm uppercase tracking-wider font-extrabold text-cream-light mb-4 flex items-center gap-2 drop-shadow">
-            <AlertCircle className={`w-4 h-4 ${isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
-            <span>Interactive {isBeer ? 'Beer Off-Flavor' : isCoffee ? 'Coffee' : 'Tea'} Taste Diagnostics:</span>
+            <AlertCircle className={`w-4 h-4 ${isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
+            <span>Interactive {isCoffee ? 'Coffee' : 'Tea'} Taste Diagnostics:</span>
           </h4>
 
           {/* Symptom Picker Buttons */}
@@ -84,9 +80,7 @@ export default function TroubleshootingHub({ trackMode }) {
                   onClick={() => setSelectedSymptomId(item.id)}
                   className={`p-4 rounded-2xl border text-left transition-all duration-300 hover:-translate-y-0.5 ${
                     isSelected
-                      ? isBeer
-                        ? 'btn-tactile-beer text-[#0F0C05] font-extrabold scale-105'
-                        : isCoffee 
+                      ? isCoffee 
                         ? 'btn-tactile-coffee text-[#140C08] font-extrabold scale-105'
                         : 'btn-tactile-tea text-white font-extrabold scale-105'
                       : 'bg-espresso-900/70 border-white/10 text-cream-soft hover:bg-white/10 hover:border-white/20 shadow-md'
@@ -104,10 +98,10 @@ export default function TroubleshootingHub({ trackMode }) {
           {/* Diagnosis Result Card */}
           {selectedGuide && (
             <div className={`p-6 rounded-3xl bg-espresso-950/95 border shadow-2xl ${
-              isBeer ? 'border-amber-400/40' : isCoffee ? 'border-[#A66E38]/40' : 'border-sage-500/40'
+              isCoffee ? 'border-[#A66E38]/40' : 'border-sage-500/40'
             }`}>
               <div className={`text-xs font-extrabold uppercase tracking-wider mb-2 ${
-                isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+                isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
               }`}>
                 Root Cause Analysis:
               </div>
@@ -133,8 +127,8 @@ export default function TroubleshootingHub({ trackMode }) {
         {/* Right Column: Visual Reference Matrix */}
         <div>
           <h4 className="text-sm uppercase tracking-wider font-extrabold text-cream-light mb-4 flex items-center gap-2 drop-shadow">
-            <Gauge className={`w-4 h-4 ${isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
-            <span>{isBeer ? 'Craft Beer Fermentation Specs' : isCoffee ? 'Particle Size & Burr Alignment Matrix' : 'Fine Tea Leaf & Water Temp Matrix'}</span>
+            <Gauge className={`w-4 h-4 ${isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
+            <span>{isCoffee ? 'Particle Size & Burr Alignment Matrix' : 'Fine Tea Leaf & Water Temp Matrix'}</span>
           </h4>
 
           {isCoffee ? (
@@ -166,7 +160,7 @@ export default function TroubleshootingHub({ trackMode }) {
                 </div>
               ))}
             </div>
-          ) : isTea ? (
+          ) : (
             <div className="space-y-3">
               {TEA_LEAF_MATRIX.map((item, idx) => (
                 <div key={idx} className="p-4 rounded-2xl bg-espresso-950/80 border border-white/10 hover:border-sage-400/50 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
@@ -183,21 +177,6 @@ export default function TroubleshootingHub({ trackMode }) {
                   </div>
                 </div>
               ))}
-            </div>
-          ) : (
-            <div className="space-y-3 text-xs font-mono">
-              <div className="p-4 rounded-2xl bg-espresso-950/80 border border-amber-400/30 text-cream-light space-y-2">
-                <div className="text-amber-400 font-bold uppercase">Pitching Rates & Fermentation Temp</div>
-                <p className="text-stone-300 text-[11px]">
-                  Lager Yeasts require cold primary fermentation (48°F - 54°F / 9°C - 12°C) with 1.5 million cells/mL/°P. Ale Yeasts ferment warm (64°F - 72°F / 18°C - 22°C).
-                </p>
-              </div>
-              <div className="p-4 rounded-2xl bg-espresso-950/80 border border-amber-400/30 text-cream-light space-y-2">
-                <div className="text-amber-400 font-bold uppercase">Sanitation & Cold Side Control</div>
-                <p className="text-stone-300 text-[11px]">
-                  All equipment post-boil must be sanitized with no-rinse Star San (pH &lt; 3.0) to prevent wild bacteria or souring contamination.
-                </p>
-              </div>
             </div>
           )}
         </div>

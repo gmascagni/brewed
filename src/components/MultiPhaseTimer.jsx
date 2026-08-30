@@ -5,8 +5,6 @@ import V60ProTipModal from './V60ProTipModal';
 
 export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, unitSystem = 'imperial', isMuted, onPrevStep, onOpenJournal }) {
   const isCoffee = trackMode === 'coffee';
-  const isTea = trackMode === 'tea';
-  const isBeer = trackMode === 'beer';
   const phases = activeMethod?.phases || [];
 
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
@@ -112,145 +110,134 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
   return (
     <div className={`p-8 md:p-10 lg:p-12 rounded-3xl ${
-      isBeer ? 'glass-panel-beer border-amber-500/40' : isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
+      isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
     } shadow-2xl transition-all duration-500 relative overflow-hidden`}>
       
       {/* Background Radial Glow */}
       <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none ${
-        isBeer ? 'bg-amber-500/10' : isCoffee ? 'bg-[#A66E38]/10' : 'bg-emerald-500/10'
+        isCoffee ? 'bg-[#A66E38]/10' : 'bg-emerald-500/10'
       }`} />
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-white/[0.08]">
+      {/* Header Info */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10 relative z-10">
         <div>
-          <h3 className="font-serif text-3xl font-bold text-cream-light flex items-center gap-3 drop-shadow-md">
-            <TimerIcon className={`w-7 h-7 ${isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
-            <span>Step 04 • Multi-Phase Extraction Timer</span>
+          <div className={`inline-flex items-center space-x-2 text-xs font-mono font-extrabold uppercase tracking-[0.2em] mb-1.5 ${
+            isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+          }`}>
+            <Sparkles className="w-4 h-4 animate-pulse" />
+            <span>Step 04 of 04 • Multi-Phase Extraction Timer</span>
+          </div>
+
+          <h3 className="font-serif text-3xl md:text-4xl font-extrabold text-cream-light drop-shadow-md">
+            {activeMethod?.name || 'Guided Extraction'}
           </h3>
-          <p className="text-xs md:text-sm text-stone-300 mt-1">Audio/visual countdown guiding blooming, steep, and drawdown phases</p>
+          <p className="text-xs md:text-sm text-stone-300 mt-1">
+            Phase {currentPhaseIndex + 1} of {phases.length || 1}: <strong className="text-cream-light font-bold">{activePhase?.name}</strong>
+          </p>
         </div>
 
-        {/* Pro Tip Button for Pour-Over */}
-        {isPourOver && (
-          <button
-            onClick={() => setIsProTipOpen(true)}
-            className="inline-flex items-center space-x-2 px-4 py-2 rounded-full btn-tactile-coffee text-[#140C08] font-extrabold text-xs uppercase tracking-wider shadow-xl hover:scale-105 active:scale-95 transition-all whitespace-nowrap animate-pulse"
-            title="Open 1-Cup V60 Pro Tip Technique & Temperature Guide"
-          >
-            <span>Pro Tip 💡</span>
-          </button>
-        )}
-
-        <span className={`text-xs font-mono font-extrabold tracking-wider uppercase px-4 py-1.5 rounded-full border shadow-inner ${
-          isRunning 
-            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 animate-pulse shadow-emerald-500/10' 
-            : 'bg-white/10 text-stone-300 border-white/15'
-        }`}>
-          {isCompleted ? 'Brew Complete ✨' : isRunning ? 'Extraction Active...' : 'Ready'}
-        </span>
+        {/* Status Badge */}
+        <div className="flex items-center space-x-2">
+          {isCompleted ? (
+            <span className="px-4 py-2 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold text-xs flex items-center gap-1.5 shadow-lg animate-bounce">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Extraction Complete! ☕</span>
+            </span>
+          ) : isRunning ? (
+            <span className="px-4 py-2 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold text-xs flex items-center gap-1.5 shadow-lg animate-pulse">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
+              <span>Pouring in Progress</span>
+            </span>
+          ) : (
+            <span className="px-4 py-2 rounded-2xl bg-white/10 text-stone-300 border border-white/15 font-mono font-bold text-xs">
+              Timer Ready
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* Main Timer Dial Area with Glowing Ring */}
-      <div className="flex flex-col items-center justify-center my-6 relative">
+      {/* Main Timer Display */}
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-10 my-6 relative z-10">
         
-        {/* SVG Circular Progress Ring */}
-        <div className={`relative w-64 h-64 flex items-center justify-center rounded-full p-2 ${
-          isRunning ? 'animate-pulse-glow' : ''
-        }`}>
-          <svg className="w-full h-full transform -rotate-90 filter drop-shadow-2xl" viewBox="0 0 200 200">
+        {/* Circular Countdown Ring */}
+        <div className="relative w-56 h-56 flex items-center justify-center flex-shrink-0">
+          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
             {/* Background Track */}
             <circle
               cx="100"
               cy="100"
               r={radius}
-              className="stroke-[#14110E]"
+              className="text-white/10"
               strokeWidth="12"
+              stroke="currentColor"
               fill="transparent"
             />
-            {/* Active Animated Progress Arc */}
+            {/* Progress Fill */}
             <circle
               cx="100"
               cy="100"
               r={radius}
-              className={`transition-all duration-500 ease-linear ${
-                isBeer ? 'stroke-amber-400' : isCoffee ? 'stroke-[#D2A06E]' : 'stroke-sage-300'
+              className={`transition-all duration-500 ${
+                isCoffee ? 'text-[#D2A06E]' : 'text-sage-400'
               }`}
               strokeWidth="12"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
+              stroke="currentColor"
               fill="transparent"
             />
           </svg>
 
-          {/* Center Timer Display */}
-          <div className="absolute flex flex-col items-center text-center">
-            <div className={`text-[11px] font-mono uppercase tracking-[0.2em] font-extrabold mb-1 ${
-              isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
-            }`}>
-              Phase {currentPhaseIndex + 1} / {phases.length}
-            </div>
-
-            <div className={`text-5xl md:text-6xl font-extrabold font-mono tracking-tight drop-shadow-lg ${
-              isCompleted ? 'text-emerald-400' : 'text-cream-light'
-            }`}>
+          {/* Center Digital Clock */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <span className="font-mono text-5xl font-black text-cream-light tracking-tight drop-shadow-lg">
               {formatTime(timeLeft)}
-            </div>
-
-            <div className="text-xs font-mono font-bold text-stone-400 mt-1 bg-black/40 px-3 py-1 rounded-full border border-white/[0.08]">
-              {Math.floor(timeLeft / 60)}m {timeLeft % 60}s remaining
-            </div>
-
-            <div className={`text-xs font-serif font-bold mt-2 max-w-[170px] truncate ${
-              isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
-            }`}>
+            </span>
+            <span className="text-[11px] font-mono uppercase tracking-widest text-stone-400 mt-1 font-semibold">
               {activePhase?.name}
-            </div>
+            </span>
           </div>
         </div>
 
-        {/* Phase Action Raised Card */}
-        <div className="w-full mt-8 p-6 rounded-3xl bg-[#120F0D]/95 border border-white/[0.12] text-center shadow-2xl backdrop-blur-xl">
-          <div className={`text-xs font-mono font-extrabold uppercase tracking-[0.2em] mb-2 flex items-center justify-center gap-2 ${
-            isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
-          }`}>
-            <Sparkles className="w-4 h-4 animate-pulse" />
-            <span>Active Extraction Instruction</span>
+        {/* Phase Instruction & Active Target Pour Box */}
+        <div className="max-w-md w-full space-y-4 text-center lg:text-left">
+          <div className="p-6 rounded-3xl bg-black/40 border border-white/10 shadow-inner space-y-3">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-stone-400 font-extrabold flex items-center justify-center lg:justify-start gap-1.5">
+              <Sparkles className={`w-3.5 h-3.5 ${isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
+              <span>Active Extraction Instruction</span>
+            </div>
+            
+            <p className="text-sm md:text-base text-cream-light font-medium leading-relaxed">
+              {activePhase?.instruction || 'Follow standard extraction pulse pouring technique.'}
+            </p>
           </div>
 
-          <p className="text-sm md:text-base font-semibold text-cream-light leading-relaxed">
-            {isCompleted 
-              ? '🎉 Brew process complete! Pour into your pre-heated ceramic vessel and savor.' 
-              : activePhase?.instruction
-            }
-          </p>
+          {/* Target Water Pour & Water Temp Indicator */}
+          {targetPhaseWaterMl && (
+            <div className="space-y-2">
+              <div className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-mono font-bold shadow-md ${
+                isCoffee
+                  ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
+                  : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
+              }`}>
+                <span>Target Pour Water:</span>
+                <span className="text-cream-light text-sm font-black">
+                  ~{targetPhaseWaterMl} mL ({Math.round(targetPhaseWaterMl / 29.5735 * 10) / 10} fl oz)
+                </span>
+              </div>
 
-          {/* Target Extraction Metrics (Water Pour & Water Temp) */}
-          {!isCompleted && (
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-              {targetPhaseWaterMl > 0 && (
-                <div className={`text-xs font-mono font-extrabold py-2 px-5 rounded-full inline-flex items-center gap-1.5 border shadow ${
-                  isBeer
-                    ? 'bg-amber-400/15 text-amber-300 border-amber-400/30'
-                    : isCoffee
+              {/* Water Temperature Indicator */}
+              {(activeMethod?.tempC || activeMethod?.tempF) && (
+                <div className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs font-mono font-bold shadow-md ${
+                  isCoffee
                     ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
                     : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
                 }`}>
-                  <span>Target Pour Water:</span>
-                  <span className="text-cream-light font-black">~{targetPhaseWaterMl} mL</span>
-                </div>
-              )}
-
-              {(activeMethod?.tempF || activeMethod?.tempC) && (
-                <div className={`text-xs font-mono font-extrabold py-2 px-5 rounded-full inline-flex items-center gap-1.5 border shadow ${
-                  isBeer
-                    ? 'bg-amber-400/15 text-amber-300 border-amber-400/30'
-                    : isCoffee
-                    ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
-                    : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
-                }`}>
-                  <Thermometer className="w-3.5 h-3.5" />
-                  <span>{isBeer ? 'Target Mash Temp:' : 'Water Temp:'}</span>
+                  <div className="flex items-center gap-1.5">
+                    <Thermometer className="w-3.5 h-3.5 text-cyan-300" />
+                    <span>Water Temp:</span>
+                  </div>
                   <span className="text-cream-light font-black">
                     {unitSystem === 'metric'
                       ? `${activeMethod?.tempC || 93}°C (${activeMethod?.tempF || 200}°F)`
@@ -280,8 +267,6 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
           className={`px-10 py-4.5 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-3 shadow-2xl transition-all hover:scale-105 active:scale-95 ${
             isRunning
               ? 'bg-amber-600 text-cream-light border border-amber-500 shadow-amber-600/30'
-              : isBeer
-              ? 'btn-tactile-beer text-[#0F0C05]'
               : isCoffee
               ? 'btn-tactile-coffee text-[#140C08]'
               : 'btn-tactile-tea text-white'
@@ -304,7 +289,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       {/* Phase Roadmap Progress Timeline */}
       <div className="mt-10 pt-8 border-t border-white/[0.08]">
         <label className={`block text-[11px] font-mono uppercase tracking-[0.2em] font-extrabold mb-4 ${
-          isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+          isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
         }`}>
           Extraction Phase Roadmap:
         </label>
@@ -318,9 +303,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
                 key={idx}
                 className={`p-4 rounded-2xl border flex items-center justify-between text-xs transition-all ${
                   isCurrent
-                    ? isBeer
-                      ? 'bg-amber-500/20 border-amber-400/60 text-cream-light font-bold shadow-lg shadow-amber-500/10 backdrop-blur-md'
-                      : isCoffee
+                    ? isCoffee
                       ? 'bg-[#A66E38]/20 border-[#C48B56]/60 text-cream-light font-bold shadow-lg shadow-[#A66E38]/10 backdrop-blur-md'
                       : 'bg-emerald-500/20 border-emerald-400/60 text-cream-light font-bold shadow-lg shadow-emerald-500/10 backdrop-blur-md'
                     : isPast
@@ -331,9 +314,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
                 <div className="flex items-center space-x-3">
                   <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-extrabold shadow ${
                     isCurrent
-                      ? isBeer
-                        ? 'bg-amber-400 text-[#0F0C05]'
-                        : isCoffee
+                      ? isCoffee
                         ? 'bg-[#C48B56] text-[#140C08]'
                         : 'bg-sage-300 text-slate-950'
                       : 'bg-slate-800 text-stone-400 border border-white/10'
@@ -359,7 +340,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       <div className="mt-8 p-4 rounded-2xl bg-black/60 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         <div className="flex items-center space-x-2 text-stone-300">
           <TimerIcon className={`w-4 h-4 flex-shrink-0 animate-pulse ${
-            isBeer ? 'text-amber-400' : isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
+            isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
           }`} />
           <span>Precision extractions require electric gooseneck kettles with built-in timers & degree PID control (Fellow Stagg EKG, COSORI Smart Kettle).</span>
         </div>
@@ -371,9 +352,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
           data-link-id="gooseneck_kettles_with_timers"
           data-context="step4_guided_timer_kettle"
           className={`px-4 py-2 rounded-xl border font-extrabold text-[11px] uppercase tracking-wider transition-all whitespace-nowrap flex-shrink-0 ${
-            isBeer
-              ? 'bg-amber-400/20 text-amber-300 hover:bg-amber-400/30 border-amber-400/40'
-              : isCoffee
+            isCoffee
               ? 'bg-[#A66E38]/20 text-[#D2A06E] hover:bg-[#A66E38]/30 border-[#A66E38]/40'
               : 'bg-sage-500/20 text-sage-300 hover:bg-sage-500/30 border-sage-500/40'
           }`}
@@ -390,7 +369,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
             className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-white/[0.08] text-cream-light font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 hover:bg-white/[0.15] transition-all border border-white/[0.12]"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>Step 03: {isBeer ? 'Malt & Hops' : 'Grind & Specs'}</span>
+            <span>Step 03: Grind & Specs</span>
           </button>
         )}
 
@@ -398,7 +377,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
           <button
             onClick={onOpenJournal}
             className={`w-full sm:w-auto py-4 px-9 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all ${
-              isBeer ? 'btn-tactile-beer text-[#0F0C05]' : isCoffee ? 'btn-tactile-coffee text-[#140C08]' : 'btn-tactile-tea text-white'
+              isCoffee ? 'btn-tactile-coffee text-[#140C08]' : 'btn-tactile-tea text-white'
             }`}
           >
             <BookOpen className="w-4 h-4" />
