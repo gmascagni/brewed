@@ -2,7 +2,7 @@ export const BREW_METHODS = {
   coffee: [
     {
       id: 'classic_pour_over',
-      name: 'Classic Pour Over',
+      name: 'Flat-Bottom Pour Over (Kalita)',
       category: 'coffee',
       featured: true,
       heroImage: './pour_over_hero.jpg',
@@ -10,14 +10,15 @@ export const BREW_METHODS = {
       defaultCupMl: 240,
       tempC: 93,
       tempF: 200,
-      grind: 'Medium-Fine',
-      micron: '450 - 650 µm',
-      description: 'Universal pour-over extraction method suitable for all standard cone, wedge, and flat-bottom drippers. Delivers clean, balanced acidity and rich aromatic clarity.',
-      preferredCoffeeTypes: 'Light to Medium Roasts. Central American, Colombian, and East African single-origin coffees.',
+      grind: 'Medium',
+      micron: '550 - 700 µm',
+      description: 'Flat-bed geometry with 3-hole restricted drainage for uniform extraction, rich sweetness, and forgiving brew dynamics.',
+      preferredCoffeeTypes: 'Medium & Light-Medium Roasts. Central American, Colombian, and balanced washed coffees for caramel, milk chocolate, and ripe stone fruit sweetness.',
       phases: [
-        { name: 'Bloom Phase', durationSec: 45, waterMultiplier: 3, instruction: 'Pour 3x coffee weight in circular motion. Let coffee bloom and de-gas.' },
-        { name: 'Pulse Pouring', durationSec: 60, waterMultiplier: 0.6, instruction: 'Pour in steady spiral pulses to keep water level consistent.' },
-        { name: 'Final Drawdown', durationSec: 75, waterMultiplier: 1.0, instruction: 'Top up remaining water and allow complete bed drawdown.' }
+        { name: 'Bloom Phase', durationSec: 45, waterMultiplier: 3, instruction: 'Saturate grounds evenly with 3x coffee weight in circular motion. Let coffee bloom and de-gas.' },
+        { name: 'First Pulse Pour', durationSec: 45, waterMultiplier: 0.5, instruction: 'Pour in gentle spirals from center outward to raise the slurry level evenly.' },
+        { name: 'Second Pulse Pour', durationSec: 45, waterMultiplier: 0.8, instruction: 'Pour second pulse in steady circles, maintaining consistent slurry temperature.' },
+        { name: 'Final Drawdown', durationSec: 60, waterMultiplier: 1.0, instruction: 'Top up final water in center. Allow even flat-bed drawdown.' }
       ]
     },
     {

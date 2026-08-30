@@ -1,7 +1,7 @@
 import React from 'react';
 import { Coffee, Leaf, Beer, BookOpen, Search, User, Users, ShieldCheck, MapPin } from 'lucide-react';
 
-export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenLocalCoffee, onOpenAuth, onOpenAdmin, isAdmin, currentUser }) {
+export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenLocalCoffee, onOpenAuth, currentUser }) {
   const isCoffee = trackMode === 'coffee';
   const isTea = trackMode === 'tea';
   const isBeer = trackMode === 'beer';
@@ -82,18 +82,6 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
 
         {/* Right Action Controls */}
         <div className="flex items-center space-x-2 text-xs">
-          
-          {/* Admin Console Button */}
-          {onOpenAdmin && isAdmin && (
-            <button
-              onClick={onOpenAdmin}
-              className="flex items-center space-x-1 px-3 py-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 font-mono font-bold hover:bg-rose-500/30 transition-all active:scale-95 shadow-md"
-              title="Open Admin Control Console"
-            >
-              <ShieldCheck className="w-4 h-4 text-rose-400" />
-              <span className="hidden xl:inline">Admin</span>
-            </button>
-          )}
 
           {/* Shop Local Button Dynamic for Coffee, Tea, and Beer Tracks */}
           {onOpenLocalCoffee && (

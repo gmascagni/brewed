@@ -16,12 +16,24 @@ import GlobalSearchModal from './components/GlobalSearchModal';
 import AuthModal from './components/AuthModal';
 import CommunityHubModal from './components/CommunityHubModal';
 import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
-import AdminConsoleModal from './components/AdminConsoleModal';
 import ShopDrawer from './components/ShopDrawer';
 import Footer from './components/Footer';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
+
+const DEFAULT_LOCAL_PROFILES = [
+  {
+    username: '@barista_pro',
+    displayName: 'Alex Rivers',
+    email: 'alex@specialtybrew.org',
+    avatar: './avatar_cartoon_female_barista.jpg',
+    bio: 'Specialty Coffee Association Certified Barista • Obsessed with high-altitude washed Ethiopians & 1:16 pour-overs.',
+    role: 'user',
+    streakDays: 14,
+    totalBrewsLogged: 142
+  }
+];
 
 export default function App() {
   // Main Application State
@@ -30,37 +42,46 @@ export default function App() {
   const [isMuted, setIsMuted] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1 | 2 | 3 | 4
 
-  // User Accounts & Master Admin Account State (@clpiken)
-  const [usersList, setUsersList] = useState([
-    {
-      username: '@clpiken',
-      displayName: 'clpiken',
-      email: 'clpiken@thebrew.app',
-      avatar: './avatar_roast_beans.jpg',
-      bio: 'Platform Owner & Master Administrator of The Brew App',
-      role: 'admin',
-      streakDays: 30,
-      totalBrewsLogged: 500
-    },
-    {
-      username: '@barista_clara',
-      displayName: 'Clara Vance',
-      email: 'clara@specialtybrew.org',
-      avatar: './avatar_cartoon_female_barista.jpg',
-      bio: 'Specialty Coffee Association Certified Barista • Obsessed with high-altitude washed Ethiopians & 1:16 pour-overs.',
-      role: 'user',
-      streakDays: 14,
-      totalBrewsLogged: 142
+  // User Accounts State (Persisted in localStorage)
+  const [usersList, setUsersList] = useState(() => {
+    try {
+      const saved = localStorage.getItem('the_brew_app_local_users');
+      return saved ? JSON.parse(saved) : DEFAULT_LOCAL_PROFILES;
+    } catch {
+      return DEFAULT_LOCAL_PROFILES;
     }
-  ]);
+  });
 
-  // Currently Active Logged In User (Null by default for guest visitors)
-  const [currentUser, setCurrentUser] = useState(null); 
-  const isAdmin = Boolean(currentUser && (
-    currentUser.username?.toLowerCase() === '@clpiken' ||
-    currentUser.email?.toLowerCase().includes('clpiken') ||
-    currentUser.role === 'admin'
-  ));
+  // Currently Active Logged In User (Persisted in localStorage)
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('the_brew_app_active_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Sync usersList and currentUser to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('the_brew_app_local_users', JSON.stringify(usersList));
+    } catch (err) {
+      console.warn('Unable to persist usersList to localStorage:', err);
+    }
+  }, [usersList]);
+
+  useEffect(() => {
+    try {
+      if (currentUser) {
+        localStorage.setItem('the_brew_app_active_user', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('the_brew_app_active_user');
+      }
+    } catch (err) {
+      console.warn('Unable to persist currentUser to localStorage:', err);
+    }
+  }, [currentUser]);
 
   // Platform Modal States
   const [isJournalOpen, setIsJournalOpen] = useState(false);
@@ -69,7 +90,6 @@ export default function App() {
   const [isCommunityOpen, setIsCommunityOpen] = useState(false);
   const [isRecipeBuilderOpen, setIsRecipeBuilderOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [isLocalCoffeeOpen, setIsLocalCoffeeOpen] = useState(false);
 
   // Active Method & Scaling State
@@ -177,8 +197,6 @@ export default function App() {
           onOpenCommunity={() => setIsCommunityOpen(true)}
           onOpenLocalCoffee={() => setIsLocalCoffeeOpen(true)}
           onOpenAuth={() => setIsAuthModalOpen(true)}
-          onOpenAdmin={() => setIsAdminModalOpen(true)}
-          isAdmin={isAdmin}
           currentUser={currentUser}
         />
         
@@ -365,17 +383,7 @@ export default function App() {
             onLogout={() => setCurrentUser(null)}
           />
 
-          {/* Admin Moderation Console Modal */}
-          <AdminConsoleModal
-            isOpen={isAdminModalOpen}
-            onClose={() => setIsAdminModalOpen(false)}
-            users={usersList}
-            onDeleteUser={handleDeleteUser}
-            posts={[]}
-            onDeletePost={() => {}}
-          />
-
-          {/* Specialty Coffee Shop Finder Modal (GPS 10-Mile Radar) */}
+          {/* Specialty Coffee Shop Finder Modal */}
           <LocalCoffeeFinderModal
             isOpen={isLocalCoffeeOpen}
             onClose={() => setIsLocalCoffeeOpen(false)}

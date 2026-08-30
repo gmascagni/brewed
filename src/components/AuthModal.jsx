@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { X, User, Mail, Lock, Shield, Sparkles, CheckCircle2, Edit3, Camera, Image, LogOut, AlertCircle } from 'lucide-react';
+import { X, User, Mail, Sparkles, CheckCircle2, Edit3, Image, LogOut, AlertCircle, Shield } from 'lucide-react';
 import { AVATAR_PRESETS } from '../data/avatarPresets';
 import { trackEvent } from '../utils/analytics';
 
-export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile, onLogout, usersList }) {
+export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile, onLogout, usersList = [] }) {
   if (!isOpen) return null;
 
-  const [mode, setMode] = useState(currentUser ? 'edit' : 'login'); // 'login' | 'signup' | 'edit'
+  const [mode, setMode] = useState(currentUser ? 'edit' : usersList.length > 0 ? 'login' : 'signup'); // 'login' | 'signup' | 'edit'
   const [email, setEmail] = useState(currentUser?.email || '');
-  const [password, setPassword] = useState('');
   const [username, setUsername] = useState(currentUser?.username || '');
   const [displayName, setDisplayName] = useState(currentUser?.displayName || '');
   const [bio, setBio] = useState(currentUser?.bio || '');
@@ -25,52 +24,48 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
       return;
     }
 
-    // SIGN IN MODE: Must match an existing registered account in usersList!
+    // SWITCH / SELECT PROFILE MODE
     if (mode === 'login') {
-      const existingUser = (usersList || []).find(
+      const existingUser = usersList.find(
         (u) => u.email.toLowerCase() === cleanEmail || u.username.toLowerCase() === `@${cleanEmail.replace('@', '')}`
       );
 
       if (!existingUser) {
-        setErrorMessage(`No account found for "${email}". Please click "Create Account" below to register first!`);
+        setErrorMessage(`No local profile found for "${email}". Click "Create Profile" to make one!`);
         return;
       }
 
       onSaveProfile(existingUser);
       trackEvent('user_login', { username: existingUser.username });
-      alert(`Welcome back, ${existingUser.displayName} (${existingUser.username})!`);
       onClose();
       return;
     }
 
-    // CREATE ACCOUNT MODE: Register new account
+    // CREATE PROFILE MODE
     if (mode === 'signup') {
       const cleanHandle = username.trim().startsWith('@') ? username.trim() : `@${username.trim() || cleanEmail.split('@')[0]}`;
-      const duplicateUser = (usersList || []).find(
+      const duplicateUser = usersList.find(
         (u) => u.email.toLowerCase() === cleanEmail || u.username.toLowerCase() === cleanHandle.toLowerCase()
       );
 
       if (duplicateUser) {
-        setErrorMessage(`An account already exists for ${cleanEmail} (${cleanHandle}). Please switch to "Sign In".`);
+        setErrorMessage(`A profile already exists for ${cleanEmail} (${cleanHandle}). Please switch to "Select Profile".`);
         return;
       }
-
-      const isMasterAdmin = cleanHandle.toLowerCase() === '@clpiken' || cleanEmail.includes('clpiken');
 
       const newUserObj = {
         email: cleanEmail,
         username: cleanHandle,
         displayName: displayName.trim() || cleanEmail.split('@')[0],
-        bio: bio.trim() || 'Specialty Coffee & Fine Tea Enthusiast',
+        bio: bio.trim() || 'Specialty Coffee, Fine Tea & Craft Beer Enthusiast',
         avatar: avatar || AVATAR_PRESETS[0].url,
-        role: isMasterAdmin ? 'admin' : 'user',
+        role: 'user',
         streakDays: 1,
         totalBrewsLogged: 1
       };
 
       onSaveProfile(newUserObj);
       trackEvent('user_signup', { username: newUserObj.username });
-      alert(`Account registered successfully as ${newUserObj.displayName} (${newUserObj.username})!`);
       onClose();
       return;
     }
@@ -78,21 +73,19 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
     // EDIT PROFILE MODE
     if (mode === 'edit') {
       const cleanHandle = username.trim().startsWith('@') ? username.trim() : `@${username.trim() || cleanEmail.split('@')[0]}`;
-      const isMasterAdmin = cleanHandle.toLowerCase() === '@clpiken' || cleanEmail.includes('clpiken');
 
       const updatedUserObj = {
         ...currentUser,
         email: cleanEmail,
         username: cleanHandle,
         displayName: displayName.trim() || cleanEmail.split('@')[0],
-        bio: bio.trim() || 'Specialty Coffee & Fine Tea Enthusiast',
+        bio: bio.trim() || 'Specialty Coffee, Fine Tea & Craft Beer Enthusiast',
         avatar: avatar || AVATAR_PRESETS[0].url,
-        role: isMasterAdmin ? 'admin' : (currentUser?.role || 'user')
+        role: 'user'
       };
 
       onSaveProfile(updatedUserObj);
       trackEvent('update_profile', { username: updatedUserObj.username });
-      alert('Profile changes saved successfully!');
       onClose();
     }
   };
@@ -112,16 +105,20 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
         {/* Header Tabs */}
         <div className="flex items-center space-x-2 text-xs font-mono font-extrabold uppercase tracking-widest text-amber-gold mb-2">
           <Sparkles className="w-4 h-4 animate-pulse" />
-          <span>Brew Master Authentication</span>
+          <span>Local Barista Profile • Saved Locally</span>
         </div>
 
-        <h3 className="font-serif text-2xl font-bold text-cream-light mb-2">
-          {mode === 'edit' ? 'Manage Your Account' : mode === 'signup' ? 'Create New Account' : 'Sign In to Your Account'}
+        <h3 className="font-serif text-2xl font-bold text-cream-light mb-1">
+          {mode === 'edit' ? 'Manage Your Profile' : mode === 'signup' ? 'Create New Profile' : 'Select Active Profile'}
         </h3>
+
+        <p className="text-xs text-stone-400 mb-4">
+          Profiles, tasting notes, and custom recipes are saved directly in your browser's local storage.
+        </p>
 
         {currentUser && (
           <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-gold/30 text-xs font-mono mb-4 text-amber-gold flex items-center justify-between">
-            <span>Currently Signed In: <strong>{currentUser.displayName} ({currentUser.username})</strong></span>
+            <span>Active: <strong>{currentUser.displayName} ({currentUser.username})</strong></span>
             {onLogout && (
               <button
                 type="button"
@@ -140,19 +137,21 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
 
         {/* Mode Switcher Pills */}
         <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-black/50 border border-white/10 mb-4 text-xs font-bold">
-          <button
-            type="button"
-            onClick={() => { setMode('login'); setErrorMessage(''); }}
-            className={`flex-1 py-2 rounded-xl transition-all ${mode === 'login' ? 'bg-amber-gold text-espresso-950 shadow' : 'text-stone-400 hover:text-cream-light'}`}
-          >
-            Sign In
-          </button>
+          {usersList.length > 0 && (
+            <button
+              type="button"
+              onClick={() => { setMode('login'); setErrorMessage(''); }}
+              className={`flex-1 py-2 rounded-xl transition-all ${mode === 'login' ? 'bg-amber-gold text-espresso-950 shadow' : 'text-stone-400 hover:text-cream-light'}`}
+            >
+              Select Profile
+            </button>
+          )}
           <button
             type="button"
             onClick={() => { setMode('signup'); setErrorMessage(''); }}
             className={`flex-1 py-2 rounded-xl transition-all ${mode === 'signup' ? 'bg-amber-gold text-espresso-950 shadow' : 'text-stone-400 hover:text-cream-light'}`}
           >
-            Create Account
+            Create Profile
           </button>
           {currentUser && (
             <button
@@ -173,10 +172,44 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
           </div>
         )}
 
+        {/* Existing Profile Quick Pick (in Select mode) */}
+        {mode === 'login' && usersList.length > 0 && (
+          <div className="space-y-2 mb-4">
+            <label className="block text-stone-400 font-bold uppercase tracking-wider text-[10px]">Saved Local Profiles:</label>
+            <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+              {usersList.map((u) => (
+                <button
+                  key={u.username}
+                  type="button"
+                  onClick={() => {
+                    onSaveProfile(u);
+                    trackEvent('user_login', { username: u.username });
+                    onClose();
+                  }}
+                  className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all ${
+                    currentUser?.username === u.username
+                      ? 'bg-amber-gold/20 border-amber-gold text-cream-light'
+                      : 'bg-black/40 border-white/10 text-stone-300 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <img src={u.avatar || AVATAR_PRESETS[0].url} alt={u.displayName} className="w-7 h-7 rounded-full object-cover border border-amber-gold/40" />
+                    <div>
+                      <div className="font-bold text-xs text-cream-light">{u.displayName}</div>
+                      <div className="font-mono text-[10px] text-stone-400">{u.username}</div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono text-amber-gold font-bold">Use Profile →</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleAuthSubmit} className="space-y-4 text-xs">
           
           <div>
-            <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Email Address</label>
+            <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Email / Identifier</label>
             <input
               type="email"
               required
@@ -250,7 +283,7 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
               </div>
 
               <div>
-                <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Bio / Bio Quote</label>
+                <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Bio / Favorite Brews</label>
                 <textarea
                   rows="2"
                   value={bio}
@@ -262,25 +295,11 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
             </>
           )}
 
-          {mode !== 'edit' && (
-            <div>
-              <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
-              />
-            </div>
-          )}
-
           <button
             type="submit"
             className="w-full mt-4 py-4 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider shadow-xl active:scale-95 transition-all"
           >
-            {mode === 'edit' ? 'Save Profile Changes' : mode === 'signup' ? 'Create Account & Start Brewing' : 'Sign In'}
+            {mode === 'edit' ? 'Save Profile Changes' : mode === 'signup' ? 'Create Profile & Save Locally' : 'Switch to Profile'}
           </button>
 
         </form>

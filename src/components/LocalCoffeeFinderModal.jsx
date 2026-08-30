@@ -227,11 +227,11 @@ const SPECIALTY_COFFEE_SHOPS_DB = [
 export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
-  // Default User Location: Atlanta, GA (33.7490, -84.3880) until browser GPS provides actual lat/lng
+  // Default Hub Location: Atlanta, GA until user explicitly clicks "Find Shops Near Me" or searches a city
   const [userLocation, setUserLocation] = useState({
     lat: 33.7490,
     lng: -84.3880,
-    label: 'Atlanta, GA (Detected Hub)'
+    label: 'Featured Hub: Atlanta, GA'
   });
   const [isLocating, setIsLocating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -253,7 +253,7 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
       setUserLocation({
         lat: geo.lat,
         lng: geo.lng,
-        label: `${geo.label} Radar`
+        label: `${geo.label} Hub`
       });
     } else {
       Object.keys(CITY_GEOCODE_MAP).forEach((cityKey) => {
@@ -262,14 +262,14 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
           setUserLocation({
             lat: geo.lat,
             lng: geo.lng,
-            label: `${geo.label} Radar`
+            label: `${geo.label} Hub`
           });
         }
       });
     }
   };
 
-  // Request Browser Real GPS Location
+  // Request Browser GPS Location explicitly when user clicks the button
   const handleGetLocation = () => {
     setIsLocating(true);
     if ('geolocation' in navigator) {
@@ -280,7 +280,7 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
           setUserLocation({
             lat,
             lng,
-            label: `GPS Position (${lat.toFixed(3)}, ${lng.toFixed(3)})`
+            label: `My Location (${lat.toFixed(3)}, ${lng.toFixed(3)})`
           });
           setIsLocating(false);
           trackEvent('find_local_coffee_geo_success', { lat, lng });
@@ -288,11 +288,6 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
         (error) => {
           console.warn('Geolocation access denied or timed out:', error);
           setIsLocating(false);
-          setUserLocation({
-            lat: 33.7490,
-            lng: -84.3880,
-            label: 'Atlanta, GA (Default Hub)'
-          });
         },
         { timeout: 8000 }
       );
@@ -300,10 +295,6 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
       setIsLocating(false);
     }
   };
-
-  useEffect(() => {
-    handleGetLocation();
-  }, []);
 
   // Compute DYNAMIC Haversine Distance in Miles for every shop relative to userLocation
   const shopsWithDistances = SPECIALTY_COFFEE_SHOPS_DB.map((shop) => {
@@ -464,10 +455,10 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
             <div>
               <div className="inline-flex items-center space-x-2 text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold">
                 <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                <span>Brew GPS Radar • Real Street Map Engine</span>
+                <span>Curated Directory • Featured Craft Coffee Hubs</span>
               </div>
               <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light">
-                Shop Local Coffee 📍
+                Featured Specialty Roasters & Cafes 📍
               </h2>
             </div>
           </div>
@@ -491,7 +482,7 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
               type="text"
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="Search city (e.g. Alpharetta), zip, or shop..."
+              placeholder="Search by city (e.g. Atlanta, Seattle), zip, or roaster..."
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-cream-light focus:outline-none focus:border-amber-gold"
             />
           </div>
@@ -504,7 +495,7 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
               className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-amber-500/20 border border-amber-gold/40 text-amber-gold font-bold hover:bg-amber-500/30 transition-all active:scale-95 disabled:opacity-50"
             >
               <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
-              <span>{isLocating ? 'Locating...' : 'Refresh GPS Radar'}</span>
+              <span>{isLocating ? 'Locating...' : '📍 Find Shops Near Me'}</span>
             </button>
 
             {/* Radius Selector */}
