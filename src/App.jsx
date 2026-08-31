@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import StepIndicator from './components/StepIndicator';
 import MethodSelectorGrid from './components/MethodSelectorGrid';
@@ -20,6 +21,7 @@ import ShopDrawer from './components/ShopDrawer';
 import Footer from './components/Footer';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
+import { getMethodJsonLd, updatePageSeo } from './utils/seo';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
 const DEFAULT_LOCAL_PROFILES = [
@@ -36,6 +38,9 @@ const DEFAULT_LOCAL_PROFILES = [
 ];
 
 export default function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   // Main Application State
   const [trackMode, setTrackMode] = useState('coffee'); // 'coffee' | 'tea'
   const [unitSystem, setUnitSystem] = useState('imperial'); // 'imperial' | 'metric'
@@ -111,6 +116,60 @@ export default function App() {
     }
   }, []);
 
+  // Synchronize React Router URL with Active Method and Steps
+  useEffect(() => {
+    const path = location.pathname;
+
+    if (path.startsWith('/methods/')) {
+      const methodId = path.replace('/methods/', '').replace(/\/$/, '');
+      const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+      const found = allMethods.find(m => m.id === methodId);
+
+      if (found) {
+        setActiveMethod(found);
+        if (found.category && found.category !== trackMode) {
+          setTrackMode(found.category);
+        }
+        if (currentStep === 1) {
+          setCurrentStep(2);
+        }
+
+        // Update Dynamic SEO & JSON-LD Structured Data
+        updatePageSeo(
+          `How to Brew ${found.name}`,
+          found.description,
+          `https://thebrew.app/methods/${found.id}`
+        );
+
+        // Inject / Update JSON-LD Script tag in <head>
+        const jsonLdData = getMethodJsonLd(found);
+        if (jsonLdData) {
+          let script = document.getElementById('json-ld-structured-data');
+          if (!script) {
+            script = document.createElement('script');
+            script.id = 'json-ld-structured-data';
+            script.type = 'application/ld+json';
+            document.head.appendChild(script);
+          }
+          script.textContent = JSON.stringify(jsonLdData);
+        }
+      }
+    } else if (path === '/' || path === '') {
+      setCurrentStep(1);
+      updatePageSeo(
+        'The Art of Extraction',
+        'Precision specialty coffee & fine tea extraction ratio scaler, multi-phase countdown timer, burr grinder macro texture guide, and troubleshooting compendium.',
+        'https://thebrew.app/'
+      );
+
+      // Clean up JSON-LD on homepage
+      const existingScript = document.getElementById('json-ld-structured-data');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    }
+  }, [location.pathname]);
+
   // Sync active method when track mode switches
   const handleTrackSwitch = (newTrack) => {
     setTrackMode(newTrack);
@@ -128,11 +187,8 @@ export default function App() {
     setCustomWaterMl(null);
     if (setActiveVideo) setActiveVideo(null);
     setCurrentStep(2);
+    navigate(`/methods/${method.id}`);
     trackEvent('select_method', { method_id: method.id, method_name: method.name });
-  };
-
-  const handleDeleteUser = (usernameToDelete) => {
-    setUsersList(usersList.filter((u) => u.username !== usernameToDelete));
   };
 
   const isCoffee = trackMode === 'coffee';
@@ -196,7 +252,14 @@ export default function App() {
         {/* Step Progress Bar Pinned Inside Sticky Top Bar */}
         <StepIndicator
           currentStep={currentStep}
-          setCurrentStep={setCurrentStep}
+          setCurrentStep={(stepNum) => {
+            setCurrentStep(stepNum);
+            if (stepNum === 1) {
+              navigate('/');
+            } else if (currentActiveMethod) {
+              navigate(`/methods/${currentActiveMethod.id}`);
+            }
+          }}
           trackMode={trackMode}
         />
       </header>
@@ -214,7 +277,12 @@ export default function App() {
               methods={methods}
               activeMethod={currentActiveMethod}
               setActiveMethod={handleSelectMethodFromGrid}
-              onNextStep={() => setCurrentStep(2)}
+              onNextStep={() => {
+                setCurrentStep(2);
+                if (currentActiveMethod) {
+                  navigate(`/methods/${currentActiveMethod.id}`);
+                }
+              }}
               unitSystem={unitSystem}
             />
           )}
@@ -226,7 +294,10 @@ export default function App() {
                 trackMode={trackMode}
                 methods={methods}
                 activeMethod={currentActiveMethod}
-                setActiveMethod={setActiveMethod}
+                setActiveMethod={(m) => {
+                  setActiveMethod(m);
+                  navigate(`/methods/${m.id}`);
+                }}
                 cupCount={cupCount}
                 setCupCount={setCupCount}
                 cupMl={cupMl}
@@ -240,7 +311,10 @@ export default function App() {
                 isMuted={isMuted}
                 setIsMuted={setIsMuted}
                 onNextStep={() => setCurrentStep(3)}
-                onPrevStep={() => setCurrentStep(1)}
+                onPrevStep={() => {
+                  setCurrentStep(1);
+                  navigate('/');
+                }}
               />
             </div>
           )}
@@ -280,7 +354,7 @@ export default function App() {
 
           {/* STEP 04: GUIDED BREW TIMER */}
           {currentStep === 4 && (
-            <div className="animate-fade-in max-w-4xl mx-auto">
+            <div className="animate-fade-in space-y-8">
               <MultiPhaseTimer
                 trackMode={trackMode}
                 activeMethod={currentActiveMethod}
@@ -293,38 +367,24 @@ export default function App() {
             </div>
           )}
 
-          {/* Video Masterclass Tutorials */}
-          <div className="mt-10">
-            <MasterclassHub
-              trackMode={trackMode}
-              activeMethod={currentActiveMethod}
-              isSplitScreen={isSplitScreen}
-              setIsSplitScreen={setIsSplitScreen}
-              activeVideo={activeVideo}
-              setActiveVideo={setActiveVideo}
-            />
-          </div>
-
-          {/* Amazon Affiliate Equipment & Gear Store Drawer (Collapsed by Default) */}
-          <ShopDrawer trackMode={trackMode} activeMethod={currentActiveMethod} />
-
-          {/* 1. Diagnostics Drawer (Troubleshooting & Water) */}
-          <DiagnosticsDrawer trackMode={trackMode} />
-
-          {/* 2. Knowledge Base Drawer (Terroir Atlas) */}
-          <KnowledgeBaseDrawer trackMode={trackMode} />
-
-          {/* Dedicated Community Hub Modal (Contains Shared Recipes & Brew Master Forum) */}
-          <CommunityHubModal
-            isOpen={isCommunityOpen}
-            onClose={() => setIsCommunityOpen(false)}
-            currentUser={currentUser}
-            onOpenAuth={() => setIsAuthModalOpen(true)}
+          {/* Collapsible Video Masterclasses Drawer */}
+          <MasterclassHub
             trackMode={trackMode}
-            onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
+            activeMethod={currentActiveMethod}
+            activeVideo={activeVideo}
+            setActiveVideo={setActiveVideo}
           />
 
-          {/* Personal Tasting Journal Modal */}
+          {/* Collapsible Diagnostics & Water Chemistry Drawer */}
+          <DiagnosticsDrawer trackMode={trackMode} />
+
+          {/* Collapsible Knowledge Base & Terroir Atlas Drawer */}
+          <KnowledgeBaseDrawer trackMode={trackMode} />
+
+          {/* Collapsible Equipment & Gear Store Drawer */}
+          <ShopDrawer trackMode={trackMode} activeMethod={currentActiveMethod} />
+
+          {/* Tasting Journal Modal */}
           <BrewJournal
             isOpen={isJournalOpen}
             onClose={() => setIsJournalOpen(false)}
@@ -336,17 +396,33 @@ export default function App() {
             unitSystem={unitSystem}
           />
 
-          {/* Global Multi-Index Search Overlay */}
+          {/* Multi-Index Global Search Modal */}
           <GlobalSearchModal
             isOpen={isSearchOpen}
             onClose={() => setIsSearchOpen(false)}
             onSelectMethod={(method) => {
-              setActiveMethod(method);
-              setCurrentStep(2);
+              handleSelectMethodFromGrid(method);
             }}
           />
 
-          {/* User Profile & Badges Dashboard */}
+          {/* Community Hub Modal */}
+          <CommunityHubModal
+            isOpen={isCommunityOpen}
+            onClose={() => setIsCommunityOpen(false)}
+            trackMode={trackMode}
+            currentUser={currentUser}
+            onOpenAuth={() => setIsAuthModalOpen(true)}
+            onSelectRecipe={(recipe) => {
+              const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+              const match = allMethods.find(m => m.id === recipe.methodId);
+              if (match) {
+                handleSelectMethodFromGrid(match);
+              }
+              if (recipe.ratio) setCustomRatio(recipe.ratio);
+            }}
+          />
+
+          {/* Barista User Profile Modal */}
           <UserProfileDashboard
             isOpen={isProfileOpen}
             onClose={() => setIsProfileOpen(false)}

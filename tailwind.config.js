@@ -62,8 +62,8 @@ export default {
         }
       },
       fontFamily: {
-        serif: ['Cinzel', 'Playfair Display', 'serif'],
-        sans: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+        serif: ['Cinzel', 'serif'],
+        sans: ['Plus Jakarta Sans', 'sans-serif'],
       }
     },
   },

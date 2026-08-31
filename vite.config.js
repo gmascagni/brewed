@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './',
+  base: '/',
   build: {
     assetsDir: 'static', // Prevents GitHub Pages Jekyll /assets/ folder routing conflict
   },
