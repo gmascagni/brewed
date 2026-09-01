@@ -24,9 +24,6 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
   // STAGE 2: FILTER BY ACTIVE METHOD PREFERENCE WITHIN TRACK
   let filteredVideos = trackVideos.filter((item) => {
     if (!activeMethodId) return true;
-    if (activeMethodId === 'classic_pour_over') {
-      return item.methodId === 'classic_pour_over' || item.methodId === 'pour_over' || item.methodId === 'chemex';
-    }
     return item.methodId === activeMethodId;
   });
 

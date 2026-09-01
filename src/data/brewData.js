@@ -1329,11 +1329,91 @@ export const MASTERCLASSES = [
     ]
   },
   {
+    id: 'mc_chemex_hoffmann',
+    track: 'coffee',
+    methodId: 'chemex',
+    method: 'Chemex Glass Brewer',
+    title: 'James Hoffmann: The Chemex Brewer & Bonded Filters Guide',
+    duration: '12:45',
+    thumbnail: './chemex_hero.jpg',
+    embedId: 'F3M9Yh6-8J0',
+    description: 'James Hoffmann explores the iconic Chemex hourglass brewer, specialized bonded paper filters, and how to dial in grind size to prevent stalling.',
+    keyTakeaways: [
+      'Chemex filters are 20-30% thicker than standard pour over paper filters',
+      'Coarser grind size is mandatory to keep drawdown under 4:30 minutes',
+      'Ensure the 3-fold side of the filter faces the pouring spout to allow air venting'
+    ]
+  },
+  {
+    id: 'mc_chemex_hedrick',
+    track: 'coffee',
+    methodId: 'chemex',
+    method: 'Chemex Glass Brewer',
+    title: 'Lance Hedrick: Complete Chemex Brew Guide & Technique',
+    duration: '14:10',
+    thumbnail: './chemex_hero.jpg',
+    embedId: '6v4E6j5E10o',
+    description: 'Lance Hedrick demonstrates how to brew sweet, clean, full-bodied coffee on the Chemex with pulse pouring and bypass control.',
+    keyTakeaways: [
+      'High pouring agitation keeps fines from clogging the filter tip',
+      'Target a 1:16.6 ratio (30g coffee to 500g water)',
+      'Swirl gently during bloom to fully saturate all grounds'
+    ]
+  },
+  {
+    id: 'mc_chemex_beans',
+    track: 'coffee',
+    methodId: 'chemex',
+    method: 'Chemex Glass Brewer',
+    title: 'A Beginner\'s Guide To Buying Coffee Beans',
+    duration: '11:20',
+    thumbnail: './pourover_beans_thumb.jpg',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'Learn which coffee bean roasts and origins shine brightest through thick Chemex paper filtration.',
+    keyTakeaways: [
+      'Washed Ethiopian and Kenyan coffees produce clean floral notes',
+      'Light-medium roasts prevent heavy bitter sediment in large Chemex batches',
+      'Look for roast dates within 2 to 4 weeks of brewing'
+    ]
+  },
+  {
+    id: 'mc_moka_pot_hoffmann',
+    track: 'coffee',
+    methodId: 'moka_pot',
+    method: 'Moka Pot',
+    title: 'James Hoffmann: The Ultimate Moka Pot Technique',
+    duration: '10:30',
+    thumbnail: './moka_pot_hero.jpg',
+    embedId: 'BfDLoIvb0w4',
+    description: 'Master the stovetop Moka Pot with pre-heated water, low heat, and cooling the base to eliminate bitter metallic taste.',
+    keyTakeaways: [
+      'Start with boiling water in the lower chamber to avoid roasting the coffee bed',
+      'Brew on lowest possible heat setting to maintain slow, gentle laminar flow',
+      'Immediately run base under cold tap water when sputtering begins to stop extraction'
+    ]
+  },
+  {
+    id: 'mc_moka_pot_beans',
+    track: 'coffee',
+    methodId: 'moka_pot',
+    method: 'Moka Pot',
+    title: 'A Beginner\'s Guide To Buying Coffee Beans',
+    duration: '11:20',
+    thumbnail: './pourover_beans_thumb.jpg',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'Choosing roast profiles and processing methods that deliver rich chocolate and caramel notes in concentrated stovetop extraction.',
+    keyTakeaways: [
+      'Medium to medium-dark roasts produce rich crema and chocolate body',
+      'Natural Brazilian and Central American coffees excel under pressure',
+      'Avoid ultra-dark Italian roasts to prevent ash/burnt off-notes'
+    ]
+  },
+  {
     id: 'mc_frenchpress_hoffmann',
     track: 'coffee',
     methodId: 'french_press',
     method: 'French Press',
-    title: 'Ultimate French Press: Crust Breaking & Silt Skimming',
+    title: 'James Hoffmann: The Ultimate French Press Technique',
     duration: '5:30',
     thumbnail: './french_press_hero.jpg',
     embedId: 'st571DYYTR8',
@@ -1349,31 +1429,15 @@ export const MASTERCLASSES = [
     track: 'coffee',
     methodId: 'french_press',
     method: 'French Press',
-    title: 'French Press Bean Selection, Grind & Common Mistakes',
-    duration: '4:15',
+    title: 'A Beginner\'s Guide To Buying Coffee Beans',
+    duration: '11:20',
     thumbnail: './french_press_hero.jpg',
-    embedId: 'VFj3Y6lC9D4',
-    description: 'Learn why heavy-bodied Sumatran Giling Basah, Brazilian Yellow Bourbon, and medium-dark roasts shine best in immersion brewing, and how to avoid bitter over-extraction.',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'Learn why heavy-bodied Sumatran Giling Basah, Brazilian Yellow Bourbon, and medium-dark roasts shine best in immersion brewing.',
     keyTakeaways: [
       'Choose low-acidity beans rich in natural oils and cocoa depth',
       'Coarse grind size prevents metal mesh clogging',
       'Pairs best with dark chocolate & toasted nut profiles'
-    ]
-  },
-  {
-    id: 'mc_frenchpress_coldbrew',
-    track: 'coffee',
-    methodId: 'french_press',
-    method: 'French Press',
-    title: 'French Press Cold Brew & Concentrated Iced Immersion',
-    duration: '4:45',
-    thumbnail: './french_press_hero.jpg',
-    embedId: '4W2p0i3W_K0',
-    description: 'Turn your French Press into an overnight 12-hour cold brew steep chamber to produce a smooth, chocolatey, low-acidity concentrate.',
-    keyTakeaways: [
-      'Use 1:8 coarse coffee-to-water ratio for cold brew concentrate',
-      'Steep at room temp for 12-16 hours before depressing plunger',
-      'Serve over ice with milk or cold foam'
     ]
   },
   {
@@ -1409,19 +1473,51 @@ export const MASTERCLASSES = [
     ]
   },
   {
-    id: 'mc_aeropress_inverted',
+    id: 'mc_aeropress_ultimate',
     track: 'coffee',
     methodId: 'aeropress',
     method: 'AeroPress',
-    title: 'Inverted AeroPress Champion Technique',
-    duration: '4:40',
+    title: 'James Hoffmann: The Ultimate AeroPress Technique',
+    duration: '13:15',
     thumbnail: './aeropress_hero.jpg',
-    embedId: 'j6VlT_jUVPc',
-    description: 'The inverted steep and gentle press method for sweet, zero-acidity cups.',
+    embedId: 'j6VlT_24T84',
+    description: 'The standard non-inverted technique by James Hoffmann for clean, sweet, and highly reproducible AeroPress extraction.',
     keyTakeaways: [
-      'Steep inverted for 60 seconds with 10 vigorous stirs',
-      'Attach filter cap and flip carefully onto sturdy mug',
-      'Plunge slowly over 30 seconds until subtle hiss'
+      'Use 11g of medium-fine coffee to 200g of boiling water',
+      'Insert plunger slightly to create a vacuum seal and stop dripping',
+      'Gently swirl at 2:00, then press gently for 30 seconds at 2:30'
+    ]
+  },
+  {
+    id: 'mc_siphon_guide',
+    track: 'coffee',
+    methodId: 'siphon',
+    method: 'Siphon Coffee Maker',
+    title: 'James Hoffmann: The Coffee Siphon (Vacuum Pot) Guide',
+    duration: '11:50',
+    thumbnail: './pour_over_hero.jpg',
+    embedId: 'F3M9Yh6-8J0',
+    description: 'Vapor pressure dynamics, temperature stability, and cloth filter filtration in vacuum coffee makers.',
+    keyTakeaways: [
+      'Vapor pressure forces water into upper chamber at steady temperature',
+      'Stir grounds gently to achieve full immersion without disturbing cloth filter',
+      'Vacuum draws brewed coffee down through cloth for unparalleled clarity'
+    ]
+  },
+  {
+    id: 'mc_cold_brew_guide',
+    track: 'coffee',
+    methodId: 'cold_brew',
+    method: 'Cold Brew',
+    title: 'How To Make Perfect Cold Brew at Home',
+    duration: '8:45',
+    thumbnail: './pour_over_hero.jpg',
+    embedId: '4W2p0i3W_K0',
+    description: '12-hour cold immersion extraction ratios, coarse grind sizing, and dual filtration methods.',
+    keyTakeaways: [
+      'Use 1:8 ratio for rich concentrate or 1:12 for ready-to-drink',
+      'Coarsest possible grind size prevents cloudiness and bitter silt',
+      'Filter through paper or ultra-fine mesh to preserve bright chocolate notes'
     ]
   },
 
