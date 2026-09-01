@@ -1249,19 +1249,35 @@ export const MASTERCLASSES = [
     ]
   },
   {
+    id: 'mc_classic_pourover_kalita',
+    track: 'coffee',
+    methodId: 'classic_pour_over',
+    method: 'Flat-Bottom Pour Over',
+    title: 'How To Brew Flat-Bottom Pour Over (Kalita Wave)',
+    duration: '6:15',
+    thumbnail: './pourover_technique_thumb.jpg',
+    embedId: 'c0Qe_ASbfNM',
+    description: 'Step-by-step masterclass on flat-bottom drippers, pulse pouring mechanics, and achieving even extraction across the coffee bed.',
+    keyTakeaways: [
+      'Three-hole geometry promotes even flow and consistent bed saturation',
+      'Pulse pours in gentle concentric spirals without touching paper flutes',
+      'Ideal for dense washed Ethiopian and high-altitude Central American coffees'
+    ]
+  },
+  {
     id: 'mc_classic_pourover_beans',
     track: 'coffee',
     methodId: 'classic_pour_over',
     method: 'Classic Pour Over',
-    title: 'Best Coffee Beans & SCA 1:16 Golden Ratios for Pour Over',
-    duration: '5:10',
-    thumbnail: './golden_ratio_thumb.jpg',
-    embedId: '1oB1oDrDkHM',
-    description: 'Learn why the 1:16 ratio and medium-fine grind size produce sparkling acidity and rich floral sweetness in pour-over brewing.',
+    title: 'A Beginner\'s Guide To Buying Coffee Beans',
+    duration: '11:20',
+    thumbnail: './pourover_beans_thumb.jpg',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'James Hoffmann explains how to choose single-origin coffee beans, understanding roast dates, processing methods, varieties, and flavor notes.',
     keyTakeaways: [
-      '1:16 ratio equals 60 grams of coffee per 1 Liter of water',
-      'Ideal for washed Ethiopian, Guatemalan, and Colombian single origins',
-      'Prevents sour under-extraction and bitter over-extraction'
+      'Always look for a roast date within 2-4 weeks of brewing',
+      'Washed process yields sparkling floral & citrus acidity',
+      'Natural/Honey process brings fruit sweetness and heavier body'
     ]
   },
   {
@@ -1269,15 +1285,15 @@ export const MASTERCLASSES = [
     track: 'coffee',
     methodId: 'pour_over',
     method: 'Hario V60 Dripper',
-    title: 'Hario V60 Concentric Pouring Technique',
-    duration: '4:15',
+    title: 'James Hoffmann: A Better 1-Cup V60 Technique',
+    duration: '9:18',
     thumbnail: './pourover_technique_thumb.jpg',
     embedId: 'AI4ynXzkSQo',
-    description: 'Learn how spiral pour rate, bed height, and water turbulence dictate extraction clarity in Hario V60 conical drippers.',
+    description: 'James Hoffmann demonstrates his refined single-cup V60 technique using a 5-pour structure to maximize sweetness and clarity.',
     keyTakeaways: [
       'Pour gently in center-outward concentric spirals',
-      'Never hit paper walls directly to prevent water bypass',
-      'Maintain steady thermal mass during bloom'
+      '5-pour structure prevents excessive bypass in smaller 1-cup doses',
+      'Maintain water temperature and gentle swirl after final pour'
     ]
   },
   {
@@ -1285,15 +1301,15 @@ export const MASTERCLASSES = [
     track: 'coffee',
     methodId: 'pour_over',
     method: 'Hario V60 Dripper',
-    title: 'Preferred Single-Origin Beans for Hario V60 Clarity',
-    duration: '5:04',
+    title: 'A Beginner\'s Guide To Buying Coffee Beans',
+    duration: '11:20',
     thumbnail: './pourover_beans_thumb.jpg',
-    embedId: 'VFj3Y6lC9D4',
-    description: 'Discover why high-altitude washed Ethiopian Yirgacheffe and Kenyan SL-28 excel under paper filter filtration.',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'James Hoffmann breaks down coffee bean labels, roast profiles, terroir origins, and how to choose the right specialty beans for pour over.',
     keyTakeaways: [
       'Highlight sparkling citric acidity and jasmine bergamot florals',
-      'Paper filter captures oils for tea-like body clarity',
-      'Ideal for light to medium-light Nordic specialty roasts'
+      'Light to medium-light roasts preserve delicate origin character',
+      'Paper filter captures oils for crystalline cup clarity'
     ]
   },
   {
@@ -1301,11 +1317,11 @@ export const MASTERCLASSES = [
     track: 'coffee',
     methodId: 'pour_over',
     method: 'Hario V60 Dripper',
-    title: 'The Golden Ratio of Coffee Brewing (1:16 & SCA Golden Cup Standard)',
-    duration: '5:10',
+    title: 'The Ultimate V60 Technique (SCA 1:16 Golden Ratio)',
+    duration: '13:42',
     thumbnail: './golden_ratio_thumb.jpg',
     embedId: '1oB1oDrDkHM',
-    description: 'Learn why the 1:16 coffee-to-water ratio is called the Golden Ratio by World Barista Champions and how it targets 18%-22% extraction yield.',
+    description: 'The world-famous standard 1:16 V60 technique by James Hoffmann for 2-cup pour-over brewing, targeting 18%-22% extraction yield.',
     keyTakeaways: [
       '1:16 ratio equals 60 grams of coffee per 1 Liter of water (~2 tbsp per 6 fl oz)',
       'Targets ideal 18% to 22% soluble extraction yield benchmark',
