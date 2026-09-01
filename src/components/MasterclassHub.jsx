@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { Video, Play, Bookmark, CheckCircle, Clock, Sparkles, ChevronDown, ChevronUp, Film } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Video, Play, Bookmark, CheckCircle, Clock, Sparkles, ChevronDown, ChevronUp, Film, Maximize2, X } from 'lucide-react';
 import { MASTERCLASSES } from '../data/brewData';
 
 export default function MasterclassHub({ trackMode, activeMethod, activeVideo, setActiveVideo }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [bookmarkedIds, setBookmarkedIds] = useState([]);
+  const [localActiveVideo, setLocalActiveVideo] = useState(null);
+  const [shouldAutoplay, setShouldAutoplay] = useState(false);
+  const [theaterModalVideo, setTheaterModalVideo] = useState(null);
+  const playerRef = useRef(null);
 
   const toggleBookmark = (id) => {
     setBookmarkedIds((prev) =>
@@ -14,7 +18,7 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
 
   const activeMethodId = activeMethod?.id;
 
-  // STAGE 1: FILTER STRICTLY BY TRACK MODE ('coffee' | 'tea' | 'beer')
+  // STAGE 1: FILTER STRICTLY BY TRACK MODE ('coffee' | 'tea')
   const trackVideos = MASTERCLASSES.filter((item) => item.track === trackMode);
 
   // STAGE 2: FILTER BY ACTIVE METHOD PREFERENCE WITHIN TRACK
@@ -31,20 +35,33 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
     filteredVideos = trackVideos;
   }
 
-  // Active Video Player Selection (Must belong to active trackMode)
-  const currentActiveVideo = (activeVideo && trackVideos.some(v => v.id === activeVideo.id))
-    ? activeVideo
-    : (filteredVideos.length > 0 ? filteredVideos[0] : (trackVideos.length > 0 ? trackVideos[0] : null));
+  // Active Video Player Selection (Syncs from parent prop or local selection)
+  const currentActiveVideo = localActiveVideo || (activeVideo && trackVideos.some(v => v.id === activeVideo.id) ? activeVideo : filteredVideos[0]);
+
+  // Reset local video when method or track changes
+  useEffect(() => {
+    setLocalActiveVideo(null);
+    setShouldAutoplay(false);
+  }, [activeMethodId, trackMode]);
 
   const handleToggleExpand = () => {
     setIsExpanded((prev) => !prev);
   };
 
-  const handleSelectVideo = (video) => {
+  const handleSelectVideo = (video, autoplay = true) => {
+    setLocalActiveVideo(video);
+    setShouldAutoplay(autoplay);
     if (setActiveVideo) {
       setActiveVideo(video);
     }
-    setIsExpanded(true); // Automatically expand section when a video is clicked
+    setIsExpanded(true); // Ensure section is expanded
+
+    // Smoothly scroll up to the player panel so user immediately sees video
+    setTimeout(() => {
+      if (playerRef.current) {
+        playerRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 100);
   };
 
   return (
@@ -87,27 +104,44 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
           
           {/* Active Video Embedded Player Panel */}
           {currentActiveVideo && (
-            <div className="p-5 md:p-6 rounded-3xl bg-espresso-950/95 border-2 border-amber-gold/50 shadow-2xl overflow-hidden">
-              <div className="flex items-center justify-between mb-4">
+            <div
+              ref={playerRef}
+              className="p-5 md:p-6 rounded-3xl bg-espresso-950/95 border-2 border-amber-gold/50 shadow-2xl overflow-hidden scroll-mt-24 transition-all"
+            >
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                 <h4 className="font-serif text-xl font-bold text-cream-light flex items-center gap-2.5 drop-shadow">
-                  <Video className="w-6 h-6 text-amber-gold" />
+                  <Video className="w-6 h-6 text-amber-gold animate-pulse" />
                   <span>{currentActiveVideo.title}</span>
                 </h4>
-                <button
-                  onClick={() => setActiveVideo && setActiveVideo(null)}
-                  className="text-xs text-stone-400 hover:text-amber-gold font-bold underline"
-                >
-                  Close Player
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setTheaterModalVideo(currentActiveVideo)}
+                    className="p-2 rounded-xl bg-white/10 text-cream-light hover:text-amber-gold hover:bg-white/20 transition-all flex items-center gap-1.5 text-xs font-mono font-bold"
+                    title="Watch in Theater Mode"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Theater View</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setLocalActiveVideo(null);
+                      if (setActiveVideo) setActiveVideo(null);
+                    }}
+                    className="text-xs text-stone-400 hover:text-amber-gold font-bold underline"
+                  >
+                    Reset Player
+                  </button>
+                </div>
               </div>
 
               {/* YouTube Responsive Embed */}
               <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black mb-5 border border-white/15 shadow-2xl">
                 <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${currentActiveVideo.embedId}?autoplay=0&rel=0`}
+                  key={currentActiveVideo.id + (shouldAutoplay ? '_auto' : '')}
+                  src={`https://www.youtube-nocookie.com/embed/${currentActiveVideo.embedId}?autoplay=${shouldAutoplay ? 1 : 0}&rel=0`}
                   title={currentActiveVideo.title}
                   className="w-full h-full border-0"
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               </div>
@@ -143,9 +177,10 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
               return (
                 <div
                   key={item.id}
-                  className={`rounded-3xl border transition-all duration-300 overflow-hidden group flex flex-col justify-between hover:-translate-y-1.5 ${
+                  onClick={() => handleSelectVideo(item, true)}
+                  className={`rounded-3xl border transition-all duration-300 overflow-hidden group flex flex-col justify-between hover:-translate-y-1.5 cursor-pointer ${
                     isActive
-                      ? 'bg-amber-gold/20 border-amber-gold shadow-2xl shadow-amber-gold/20 scale-[1.02]'
+                      ? 'bg-amber-gold/20 border-amber-gold shadow-2xl shadow-amber-gold/30 ring-2 ring-amber-gold/60 scale-[1.02]'
                       : 'bg-espresso-900/70 border-white/10 hover:border-white/25 hover:bg-slate-900/80 shadow-xl'
                   }`}
                 >
@@ -158,12 +193,27 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
                     />
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
 
+                    {/* Active Playing Badge */}
+                    {isActive && (
+                      <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-amber-gold text-espresso-950 text-[10px] font-mono font-extrabold uppercase tracking-wider flex items-center gap-1.5 shadow-xl animate-pulse">
+                        <span className="w-2 h-2 rounded-full bg-espresso-950 animate-ping" />
+                        <span>Now Playing</span>
+                      </div>
+                    )}
+
                     {/* Play Badge Overlay */}
                     <button
-                      onClick={() => handleSelectVideo(item)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectVideo(item, true);
+                      }}
                       className="absolute inset-0 flex items-center justify-center"
                     >
-                      <div className="w-12 h-12 rounded-full btn-tactile-amber text-espresso-950 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform ${
+                        isActive
+                          ? 'bg-amber-gold text-espresso-950 shadow-amber-gold/50'
+                          : 'btn-tactile-amber text-espresso-950'
+                      }`}>
                         <Play className="w-5 h-5 fill-current ml-0.5" />
                       </div>
                     </button>
@@ -176,7 +226,10 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
 
                     {/* Bookmark Toggle */}
                     <button
-                      onClick={() => toggleBookmark(item.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleBookmark(item.id);
+                      }}
                       className="absolute top-2.5 right-2.5 p-2 rounded-full bg-black/60 backdrop-blur-md text-cream-light hover:text-amber-gold transition-colors border border-white/10"
                     >
                       <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-amber-gold text-amber-gold' : ''}`} />
@@ -189,7 +242,7 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
                       <div className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold mb-1.5">
                         {item.method} Tutorial
                       </div>
-                      <h4 className="font-serif text-sm font-bold text-cream-light mb-2 line-clamp-2 drop-shadow">
+                      <h4 className="font-serif text-sm font-bold text-cream-light mb-2 line-clamp-2 drop-shadow group-hover:text-amber-gold transition-colors">
                         {item.title}
                       </h4>
                       <p className="text-xs text-cream-soft/70 line-clamp-2 font-medium">
@@ -198,11 +251,18 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
                     </div>
 
                     <button
-                      onClick={() => handleSelectVideo(item)}
-                      className="mt-5 w-full py-2.5 rounded-2xl bg-white/10 border border-white/15 hover:bg-white/20 text-xs font-extrabold text-cream-light transition-all shadow active:scale-95 flex items-center justify-center gap-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectVideo(item, true);
+                      }}
+                      className={`mt-5 w-full py-2.5 rounded-2xl text-xs font-extrabold transition-all shadow active:scale-95 flex items-center justify-center gap-2 border ${
+                        isActive
+                          ? 'bg-amber-gold text-espresso-950 border-amber-gold font-extrabold shadow-amber-gold/30'
+                          : 'bg-white/10 border-white/15 hover:bg-white/20 text-cream-light'
+                      }`}
                     >
-                      <Play className="w-3.5 h-3.5 fill-current text-amber-gold" />
-                      <span>Watch Tutorial</span>
+                      <Play className={`w-3.5 h-3.5 fill-current ${isActive ? 'text-espresso-950' : 'text-amber-gold'}`} />
+                      <span>{isActive ? 'Playing in Player Above' : 'Watch Tutorial'}</span>
                     </button>
                   </div>
                 </div>
@@ -210,6 +270,34 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
             })}
           </div>
 
+        </div>
+      )}
+
+      {/* Full Theater Modal View */}
+      {theaterModalVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-fade-in">
+          <div className="relative max-w-4xl w-full rounded-3xl bg-espresso-950 border-2 border-amber-gold p-6 shadow-2xl">
+            <button
+              onClick={() => setTheaterModalVideo(null)}
+              className="absolute top-4 right-4 p-2.5 rounded-full bg-white/10 text-cream-light hover:bg-white/20 transition-all z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h4 className="font-serif text-xl font-bold text-cream-light mb-4 flex items-center gap-2">
+              <Video className="w-5 h-5 text-amber-gold" />
+              <span>{theaterModalVideo.title}</span>
+            </h4>
+            <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black mb-4 border border-white/20 shadow-2xl">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${theaterModalVideo.embedId}?autoplay=1&rel=0`}
+                title={theaterModalVideo.title}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+            <p className="text-xs text-cream-soft/80">{theaterModalVideo.description}</p>
+          </div>
         </div>
       )}
 

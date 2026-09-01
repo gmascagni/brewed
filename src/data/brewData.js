@@ -1288,7 +1288,7 @@ export const MASTERCLASSES = [
     title: 'Preferred Single-Origin Beans for Hario V60 Clarity',
     duration: '5:04',
     thumbnail: './pourover_beans_thumb.jpg',
-    embedId: '1oB1oDrDkHM',
+    embedId: 'VFj3Y6lC9D4',
     description: 'Discover why high-altitude washed Ethiopian Yirgacheffe and Kenyan SL-28 excel under paper filter filtration.',
     keyTakeaways: [
       'Highlight sparkling citric acidity and jasmine bergamot florals',
