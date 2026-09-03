@@ -1171,97 +1171,19 @@ export const TERROIR_ATLAS = {
 export const MASTERCLASSES = [
   // --- COFFEE MASTERCLASSES (track: 'coffee') ---
   {
-    id: 'mc_mokapot_bialetti',
-    track: 'coffee',
-    methodId: 'moka_pot',
-    method: 'Moka Pot',
-    title: 'Mastering the Stovetop Moka Pot (Bialetti Technique & Water Preheat)',
-    duration: '5:15',
-    thumbnail: './moka_pot_hero.jpg',
-    embedId: 'vFcS01wMSxM',
-    description: 'Learn how preheating water in the lower chamber and stopping extraction with a cold towel prevents metallic burnt bitterness in Moka Pot coffee.',
-    keyTakeaways: [
-      'Fill lower chamber with boiling water to prevent overheating coffee grounds',
-      'Do not tamp grounds tightly in funnel basket',
-      'Wrap base in cold wet towel immediately when sputtering begins'
-    ]
-  },
-  {
-    id: 'mc_mokapot_beans',
-    track: 'coffee',
-    methodId: 'moka_pot',
-    method: 'Moka Pot',
-    title: 'Preferred Coffee Beans & Fine-Medium Grind for Moka Pot',
-    duration: '4:20',
-    thumbnail: './moka_pot_hero.jpg',
-    embedId: 'vFcS01wMSxM',
-    description: 'Why medium-dark Italian roasts, Brazilian Yellow Bourbon, and 350-500 µm table salt grinds produce rich crema and syrupy espresso-like body.',
-    keyTakeaways: [
-      'Grind slightly coarser than espresso (table salt texture)',
-      'Choose low-acidity beans rich in dark chocolate & toasted hazelnut notes'
-    ]
-  },
-  {
-    id: 'mc_chemex_technique',
-    track: 'coffee',
-    methodId: 'chemex',
-    method: 'Chemex Glass Brewer',
-    title: 'Mastering the Chemex Glass Brewer & Bonded Filters',
-    duration: '5:30',
-    thumbnail: './chemex_hero.jpg',
-    embedId: '1oB1oDrDkHM',
-    description: 'Learn how thick bonded paper filters and slow pulse pouring yield ultra-clean, sediment-free specialty coffee.',
-    keyTakeaways: [
-      'Use 3-fold thick side facing the spout to prevent air channel blockages',
-      'Medium-Coarse grind size (650-800 µm) prevents filter clogging',
-      'Rinse filter thoroughly with hot water before adding coffee grounds'
-    ]
-  },
-  {
-    id: 'mc_chemex_beans',
-    track: 'coffee',
-    methodId: 'chemex',
-    method: 'Chemex Glass Brewer',
-    title: 'Best Coffee Beans & Ratios for Chemex Clarity',
-    duration: '4:45',
-    thumbnail: './chemex_hero.jpg',
-    embedId: 'AI4ynXzkSQo',
-    description: 'Why light roast washed Ethiopian and Kenyan beans shine in Chemex with 1:16 ratio for floral notes.',
-    keyTakeaways: [
-      'Ideal for light washed roasts with delicate floral & fruit notes',
-      'Thick paper filter removes bitter oils for pristine clarity'
-    ]
-  },
-  {
-    id: 'mc_classic_pourover_technique',
+    id: 'mc_classic_pourover_v60',
     track: 'coffee',
     methodId: 'classic_pour_over',
     method: 'Classic Pour Over',
-    title: 'Mastering the Classic Pour Over (Universal Cone & Flat-Bottom Drippers)',
-    duration: '4:30',
-    thumbnail: './pourover_technique_thumb.jpg',
+    title: 'James Hoffmann: The Ultimate Pour Over Technique',
+    duration: '13:42',
+    thumbnail: './golden_ratio_thumb.jpg',
     embedId: 'AI4ynXzkSQo',
-    description: 'Universal step-by-step masterclass covering bloom degassing, spiral pulse pouring, and maintaining a flat coffee bed across all pour-over drippers.',
+    description: 'The world-famous standard pour-over technique by James Hoffmann for clean, sweet, and repeatable cup extraction.',
     keyTakeaways: [
       'Pour 3x coffee weight for a 45-second bloom degassing phase',
-      'Keep kettle spout low to prevent excessive agitation and clogging',
-      'Maintain steady water bed level with 5g/sec spiral pulse pours'
-    ]
-  },
-  {
-    id: 'mc_classic_pourover_kalita',
-    track: 'coffee',
-    methodId: 'classic_pour_over',
-    method: 'Flat-Bottom Pour Over',
-    title: 'How To Brew Flat-Bottom Pour Over (Kalita Wave)',
-    duration: '6:15',
-    thumbnail: './pourover_technique_thumb.jpg',
-    embedId: 'c0Qe_ASbfNM',
-    description: 'Step-by-step masterclass on flat-bottom drippers, pulse pouring mechanics, and achieving even extraction across the coffee bed.',
-    keyTakeaways: [
-      'Three-hole geometry promotes even flow and consistent bed saturation',
-      'Pulse pours in gentle concentric spirals without touching paper flutes',
-      'Ideal for dense washed Ethiopian and high-altitude Central American coffees'
+      'Keep kettle spout low to prevent excessive bed turbulence',
+      'Gentle swirl after bloom and final pour creates a flat bed'
     ]
   },
   {
@@ -1269,26 +1191,26 @@ export const MASTERCLASSES = [
     track: 'coffee',
     methodId: 'classic_pour_over',
     method: 'Classic Pour Over',
-    title: 'A Beginner\'s Guide To Buying Coffee Beans',
+    title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
     thumbnail: './pourover_beans_thumb.jpg',
     embedId: 'O9YnLFrM7Fs',
-    description: 'James Hoffmann explains how to choose single-origin coffee beans, understanding roast dates, processing methods, varieties, and flavor notes.',
+    description: 'James Hoffmann breaks down coffee bean labels, roast profiles, terroir origins, and freshness dates.',
     keyTakeaways: [
       'Always look for a roast date within 2-4 weeks of brewing',
       'Washed process yields sparkling floral & citrus acidity',
-      'Natural/Honey process brings fruit sweetness and heavier body'
+      'Light to medium roasts preserve delicate origin character'
     ]
   },
   {
-    id: 'mc_pourover_v60',
+    id: 'mc_pourover_v60_better',
     track: 'coffee',
     methodId: 'pour_over',
     method: 'Hario V60 Dripper',
     title: 'James Hoffmann: A Better 1-Cup V60 Technique',
     duration: '9:18',
     thumbnail: './pourover_technique_thumb.jpg',
-    embedId: 'AI4ynXzkSQo',
+    embedId: '1oB1oDrDkHM',
     description: 'James Hoffmann demonstrates his refined single-cup V60 technique using a 5-pour structure to maximize sweetness and clarity.',
     keyTakeaways: [
       'Pour gently in center-outward concentric spirals',
@@ -1297,35 +1219,35 @@ export const MASTERCLASSES = [
     ]
   },
   {
+    id: 'mc_pourover_v60_ultimate',
+    track: 'coffee',
+    methodId: 'pour_over',
+    method: 'Hario V60 Dripper',
+    title: 'James Hoffmann: The Ultimate V60 Technique (SCA 1:16 Ratio)',
+    duration: '13:42',
+    thumbnail: './golden_ratio_thumb.jpg',
+    embedId: 'AI4ynXzkSQo',
+    description: 'The benchmark 2-cup V60 technique by James Hoffmann, targeting 18%-22% extraction yield.',
+    keyTakeaways: [
+      '1:16 ratio equals 60 grams of coffee per 1 Liter of water',
+      'Maintain steady thermal mass during bloom',
+      'Gentle swirl ensures a level bed with zero high-and-dry grounds'
+    ]
+  },
+  {
     id: 'mc_pourover_beans',
     track: 'coffee',
     methodId: 'pour_over',
     method: 'Hario V60 Dripper',
-    title: 'A Beginner\'s Guide To Buying Coffee Beans',
+    title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
     thumbnail: './pourover_beans_thumb.jpg',
     embedId: 'O9YnLFrM7Fs',
-    description: 'James Hoffmann breaks down coffee bean labels, roast profiles, terroir origins, and how to choose the right specialty beans for pour over.',
+    description: 'Choosing single origins, understanding roast levels, and picking the right coffees for conical paper filtration.',
     keyTakeaways: [
       'Highlight sparkling citric acidity and jasmine bergamot florals',
-      'Light to medium-light roasts preserve delicate origin character',
-      'Paper filter captures oils for crystalline cup clarity'
-    ]
-  },
-  {
-    id: 'mc_golden_ratio',
-    track: 'coffee',
-    methodId: 'pour_over',
-    method: 'Hario V60 Dripper',
-    title: 'The Ultimate V60 Technique (SCA 1:16 Golden Ratio)',
-    duration: '13:42',
-    thumbnail: './golden_ratio_thumb.jpg',
-    embedId: '1oB1oDrDkHM',
-    description: 'The world-famous standard 1:16 V60 technique by James Hoffmann for 2-cup pour-over brewing, targeting 18%-22% extraction yield.',
-    keyTakeaways: [
-      '1:16 ratio equals 60 grams of coffee per 1 Liter of water (~2 tbsp per 6 fl oz)',
-      'Targets ideal 18% to 22% soluble extraction yield benchmark',
-      'Prevents sour under-extraction (<18%) and bitter over-extraction (>22%)'
+      'Paper filter captures oils for crystalline cup clarity',
+      'Single origins from Ethiopia, Kenya, and Colombia excel in V60'
     ]
   },
   {
@@ -1333,31 +1255,15 @@ export const MASTERCLASSES = [
     track: 'coffee',
     methodId: 'chemex',
     method: 'Chemex Glass Brewer',
-    title: 'James Hoffmann: The Chemex Brewer & Bonded Filters Guide',
-    duration: '12:45',
+    title: 'James Hoffmann: The Chemex',
+    duration: '10:45',
     thumbnail: './chemex_hero.jpg',
-    embedId: 'F3M9Yh6-8J0',
-    description: 'James Hoffmann explores the iconic Chemex hourglass brewer, specialized bonded paper filters, and how to dial in grind size to prevent stalling.',
+    embedId: 'ikt-X5x7yoc',
+    description: 'James Hoffmann explores the Chemex hourglass brewer, specialized bonded paper filters, and how grind size dictates drawdown time.',
     keyTakeaways: [
-      'Chemex filters are 20-30% thicker than standard pour over paper filters',
-      'Coarser grind size is mandatory to keep drawdown under 4:30 minutes',
-      'Ensure the 3-fold side of the filter faces the pouring spout to allow air venting'
-    ]
-  },
-  {
-    id: 'mc_chemex_hedrick',
-    track: 'coffee',
-    methodId: 'chemex',
-    method: 'Chemex Glass Brewer',
-    title: 'Lance Hedrick: Complete Chemex Brew Guide & Technique',
-    duration: '14:10',
-    thumbnail: './chemex_hero.jpg',
-    embedId: '6v4E6j5E10o',
-    description: 'Lance Hedrick demonstrates how to brew sweet, clean, full-bodied coffee on the Chemex with pulse pouring and bypass control.',
-    keyTakeaways: [
-      'High pouring agitation keeps fines from clogging the filter tip',
-      'Target a 1:16.6 ratio (30g coffee to 500g water)',
-      'Swirl gently during bloom to fully saturate all grounds'
+      'Chemex bonded filters are 20-30% thicker than standard pour over paper',
+      'Coarser grind size is required to prevent flow stall',
+      'Keep the 3-fold filter side facing the spout for air venting'
     ]
   },
   {
@@ -1365,47 +1271,15 @@ export const MASTERCLASSES = [
     track: 'coffee',
     methodId: 'chemex',
     method: 'Chemex Glass Brewer',
-    title: 'A Beginner\'s Guide To Buying Coffee Beans',
+    title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
     thumbnail: './pourover_beans_thumb.jpg',
     embedId: 'O9YnLFrM7Fs',
-    description: 'Learn which coffee bean roasts and origins shine brightest through thick Chemex paper filtration.',
+    description: 'Selecting beans with delicate aromatic florals and bright fruit notes that shine through heavy Chemex filtration.',
     keyTakeaways: [
-      'Washed Ethiopian and Kenyan coffees produce clean floral notes',
-      'Light-medium roasts prevent heavy bitter sediment in large Chemex batches',
+      'Washed Ethiopian and Kenyan coffees produce sparkling cups',
+      'Light-medium roasts prevent heavy bitter sediment in large batches',
       'Look for roast dates within 2 to 4 weeks of brewing'
-    ]
-  },
-  {
-    id: 'mc_moka_pot_hoffmann',
-    track: 'coffee',
-    methodId: 'moka_pot',
-    method: 'Moka Pot',
-    title: 'James Hoffmann: The Ultimate Moka Pot Technique',
-    duration: '10:30',
-    thumbnail: './moka_pot_hero.jpg',
-    embedId: 'BfDLoIvb0w4',
-    description: 'Master the stovetop Moka Pot with pre-heated water, low heat, and cooling the base to eliminate bitter metallic taste.',
-    keyTakeaways: [
-      'Start with boiling water in the lower chamber to avoid roasting the coffee bed',
-      'Brew on lowest possible heat setting to maintain slow, gentle laminar flow',
-      'Immediately run base under cold tap water when sputtering begins to stop extraction'
-    ]
-  },
-  {
-    id: 'mc_moka_pot_beans',
-    track: 'coffee',
-    methodId: 'moka_pot',
-    method: 'Moka Pot',
-    title: 'A Beginner\'s Guide To Buying Coffee Beans',
-    duration: '11:20',
-    thumbnail: './pourover_beans_thumb.jpg',
-    embedId: 'O9YnLFrM7Fs',
-    description: 'Choosing roast profiles and processing methods that deliver rich chocolate and caramel notes in concentrated stovetop extraction.',
-    keyTakeaways: [
-      'Medium to medium-dark roasts produce rich crema and chocolate body',
-      'Natural Brazilian and Central American coffees excel under pressure',
-      'Avoid ultra-dark Italian roasts to prevent ash/burnt off-notes'
     ]
   },
   {
@@ -1425,15 +1299,15 @@ export const MASTERCLASSES = [
     ]
   },
   {
-    id: 'mc_frenchpress_roasts',
+    id: 'mc_frenchpress_beans',
     track: 'coffee',
     methodId: 'french_press',
     method: 'French Press',
-    title: 'A Beginner\'s Guide To Buying Coffee Beans',
+    title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
     thumbnail: './french_press_hero.jpg',
     embedId: 'O9YnLFrM7Fs',
-    description: 'Learn why heavy-bodied Sumatran Giling Basah, Brazilian Yellow Bourbon, and medium-dark roasts shine best in immersion brewing.',
+    description: 'Learn why heavy-bodied Sumatran, Brazilian, and medium-dark roasts shine best in immersion brewing.',
     keyTakeaways: [
       'Choose low-acidity beans rich in natural oils and cocoa depth',
       'Coarse grind size prevents metal mesh clogging',
@@ -1441,47 +1315,47 @@ export const MASTERCLASSES = [
     ]
   },
   {
-    id: 'mc_drip_home',
+    id: 'mc_moka_pot_hoffmann',
     track: 'coffee',
-    methodId: 'drip_brewer',
-    method: 'Automatic Drip',
-    title: 'Maximizing Your Home Drip Coffee Machine',
-    duration: '3:45',
-    thumbnail: './drip_brewer_hero.jpg',
-    embedId: '8d-9Y2S92v0',
-    description: 'Simple tweaks to get cafe-quality batch brew from standard home electric coffee makers.',
+    methodId: 'moka_pot',
+    method: 'Moka Pot',
+    title: 'James Hoffmann: The Ultimate Moka Pot Technique',
+    duration: '10:30',
+    thumbnail: './moka_pot_hero.jpg',
+    embedId: 'BfDLoIvb0w4',
+    description: 'Master the stovetop Moka Pot with pre-heated water, low heat, and cooling the base to eliminate bitter metallic taste.',
     keyTakeaways: [
-      'Pre-rinse paper filters to eliminate papery taste',
-      'Level coffee bed evenly before starting brew cycle',
-      'Use filtered water with 120-150 ppm mineral content'
+      'Start with boiling water in the lower chamber to avoid roasting grounds',
+      'Brew on lowest heat to maintain slow, gentle flow',
+      'Run base under cold water immediately when sputtering begins'
     ]
   },
   {
-    id: 'mc_espresso_prep',
+    id: 'mc_moka_pot_beans',
     track: 'coffee',
-    methodId: 'espresso',
-    method: 'Espresso',
-    title: 'Espresso Puck Prep, WDT & 9-Bar Extraction',
-    duration: '6:20',
-    thumbnail: './espresso_hero.jpg',
-    embedId: '1U_4OqUo_pE',
-    description: 'Master WDT needle distribution, level tamping, and dialing-in 1:2 extraction yields.',
+    methodId: 'moka_pot',
+    method: 'Moka Pot',
+    title: "A Beginner's Guide To Buying Coffee Beans",
+    duration: '11:20',
+    thumbnail: './pourover_beans_thumb.jpg',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'Choosing roast profiles and processing methods that deliver rich chocolate and caramel notes in stovetop extraction.',
     keyTakeaways: [
-      'Eliminate puck clumps with WDT needle distribution',
-      'Tamp level with 30 lbs of firm pressure',
-      'Aim for 1:2 yield ratio in 25-30 seconds'
+      'Medium to medium-dark roasts produce rich crema and chocolate body',
+      'Natural Brazilian and Central American coffees excel under pressure',
+      'Avoid ultra-dark roasts to prevent ash/burnt off-notes'
     ]
   },
   {
-    id: 'mc_aeropress_ultimate',
+    id: 'mc_aeropress_hoffmann',
     track: 'coffee',
     methodId: 'aeropress',
     method: 'AeroPress',
     title: 'James Hoffmann: The Ultimate AeroPress Technique',
     duration: '13:15',
     thumbnail: './aeropress_hero.jpg',
-    embedId: 'j6VlT_24T84',
-    description: 'The standard non-inverted technique by James Hoffmann for clean, sweet, and highly reproducible AeroPress extraction.',
+    embedId: 'j6VlT_jUVPc',
+    description: 'The standard technique by James Hoffmann for clean, sweet, and highly reproducible AeroPress extraction.',
     keyTakeaways: [
       'Use 11g of medium-fine coffee to 200g of boiling water',
       'Insert plunger slightly to create a vacuum seal and stop dripping',
@@ -1489,129 +1363,369 @@ export const MASTERCLASSES = [
     ]
   },
   {
-    id: 'mc_siphon_guide',
+    id: 'mc_aeropress_beans',
+    track: 'coffee',
+    methodId: 'aeropress',
+    method: 'AeroPress',
+    title: "A Beginner's Guide To Buying Coffee Beans",
+    duration: '11:20',
+    thumbnail: './aeropress_hero.jpg',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'Choosing the right coffee beans and roast profiles for rapid immersion-pressure brewing.',
+    keyTakeaways: [
+      'Versatile across all roast levels from light Nordic to dark roasts',
+      'Paper filter eliminates all silt while extracting floral sweetness',
+      'Experiment with single-origin natural coffees for juicy berry notes'
+    ]
+  },
+  {
+    id: 'mc_espresso_dialin',
+    track: 'coffee',
+    methodId: 'espresso',
+    method: 'Espresso',
+    title: 'James Hoffmann: How I Dial-In Espresso',
+    duration: '12:10',
+    thumbnail: './espresso_hero.jpg',
+    embedId: 'lFwJF-_SUr0',
+    description: 'Master dose, grind adjustments, puck distribution, and dialing-in 1:2 extraction yields.',
+    keyTakeaways: [
+      'Keep dose locked and adjust grind size to hit target shot time',
+      'Eliminate puck clumps with WDT needle distribution',
+      'Aim for 1:2 yield ratio in 25-30 seconds'
+    ]
+  },
+  {
+    id: 'mc_espresso_beans',
+    track: 'coffee',
+    methodId: 'espresso',
+    method: 'Espresso',
+    title: "A Beginner's Guide To Buying Coffee Beans",
+    duration: '11:20',
+    thumbnail: './espresso_hero.jpg',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'Choosing espresso blends and single origins that produce thick syrupy crema without harsh sourness.',
+    keyTakeaways: [
+      'Medium roasts balance sweetness, body, and acidity in 9-bar extraction',
+      'Look for roast dates between 10-30 days for optimal CO2 degassing',
+      'Chocolate, caramel, and berry notes shine through espresso machines'
+    ]
+  },
+  {
+    id: 'mc_coldbrew_hoffmann',
+    track: 'coffee',
+    methodId: 'cold_brew',
+    method: 'Cold Brew',
+    title: 'James Hoffmann: Everything I Learned About Cold Brew Coffee',
+    duration: '14:20',
+    thumbnail: './pour_over_hero.jpg',
+    embedId: 'AB0QLjroFss',
+    description: 'Everything you need to know about cold water extraction, brewing variables, and taste comparisons.',
+    keyTakeaways: [
+      'Use 1:8 coarse coffee-to-water ratio for cold brew concentrate',
+      'Steep at room temp for 12-16 hours for optimal solubility',
+      'Filter thoroughly through paper or cloth to remove fine silt'
+    ]
+  },
+  {
+    id: 'mc_coldbrew_beans',
+    track: 'coffee',
+    methodId: 'cold_brew',
+    method: 'Cold Brew',
+    title: "A Beginner's Guide To Buying Coffee Beans",
+    duration: '11:20',
+    thumbnail: './pour_over_hero.jpg',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'Choosing origins and roast levels that produce ultra-smooth, low-acidity cold brew concentrate.',
+    keyTakeaways: [
+      'Natural processed Central/South American coffees add rich chocolate and sweet fruit',
+      'Dark roasts create bold smoky iced coffee bases',
+      'Always grind coarse right before steeping'
+    ]
+  },
+  {
+    id: 'mc_siphon_hoffmann',
     track: 'coffee',
     methodId: 'siphon',
     method: 'Siphon Coffee Maker',
-    title: 'James Hoffmann: The Coffee Siphon (Vacuum Pot) Guide',
+    title: 'James Hoffmann: The Coffee Siphon (Vacuum Pot)',
     duration: '11:50',
     thumbnail: './pour_over_hero.jpg',
-    embedId: 'F3M9Yh6-8J0',
+    embedId: 'mvmRtPGR4C4',
     description: 'Vapor pressure dynamics, temperature stability, and cloth filter filtration in vacuum coffee makers.',
     keyTakeaways: [
       'Vapor pressure forces water into upper chamber at steady temperature',
       'Stir grounds gently to achieve full immersion without disturbing cloth filter',
-      'Vacuum draws brewed coffee down through cloth for unparalleled clarity'
+      'Vacuum draws brewed coffee down through cloth for crystal clarity'
     ]
   },
   {
-    id: 'mc_cold_brew_guide',
+    id: 'mc_siphon_beans',
     track: 'coffee',
-    methodId: 'cold_brew',
-    method: 'Cold Brew',
-    title: 'How To Make Perfect Cold Brew at Home',
-    duration: '8:45',
+    methodId: 'siphon',
+    method: 'Siphon Coffee Maker',
+    title: "A Beginner's Guide To Buying Coffee Beans",
+    duration: '11:20',
     thumbnail: './pour_over_hero.jpg',
-    embedId: '4W2p0i3W_K0',
-    description: '12-hour cold immersion extraction ratios, coarse grind sizing, and dual filtration methods.',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'Selecting delicate floral single origins that benefit from high extraction temperatures and cloth filtration.',
     keyTakeaways: [
-      'Use 1:8 ratio for rich concentrate or 1:12 for ready-to-drink',
-      'Coarsest possible grind size prevents cloudiness and bitter silt',
-      'Filter through paper or ultra-fine mesh to preserve bright chocolate notes'
+      'Washed Ethiopian Yirgacheffe and Geisha varieties excel under vacuum brewing',
+      'Cloth filter lets aromatic oils through while stopping all fine grit',
+      'Use fresh light-roasted specialty coffees for tea-like complexity'
+    ]
+  },
+  {
+    id: 'mc_drip_avoidbad',
+    track: 'coffee',
+    methodId: 'drip_brewer',
+    method: 'Automatic Drip',
+    title: 'James Hoffmann: How To Avoid A Bad Brew',
+    duration: '11:45',
+    thumbnail: './drip_brewer_hero.jpg',
+    embedId: 'mMwscUNKbPk',
+    description: 'Mastering extraction balance, avoiding channeling, and getting cafe-quality batch brew from standard home electric coffee makers.',
+    keyTakeaways: [
+      'Pre-rinse paper filters to eliminate papery taste',
+      'Level coffee bed evenly before starting brew cycle',
+      'Use filtered water with 120-150 ppm mineral content'
+    ]
+  },
+  {
+    id: 'mc_drip_beans',
+    track: 'coffee',
+    methodId: 'drip_brewer',
+    method: 'Automatic Drip',
+    title: "A Beginner's Guide To Buying Coffee Beans",
+    duration: '11:20',
+    thumbnail: './drip_brewer_hero.jpg',
+    embedId: 'O9YnLFrM7Fs',
+    description: 'Choosing crowd-pleasing medium roasts and single origins for smooth morning batch brewing.',
+    keyTakeaways: [
+      'Medium roasts with caramel, toffee, and milk chocolate notes work best',
+      'Look for roast dates within 2-4 weeks',
+      'Grind medium to match machine basket geometry'
     ]
   },
 
   // --- TEA MASTERCLASSES (track: 'tea') ---
   {
-    id: 'mc_darjeeling_tea',
+    id: 'mc_gongfu_steps',
     track: 'tea',
-    methodId: 'darjeeling_tea',
-    method: 'Himalayan Darjeeling',
-    title: 'Mastering Himalayan Darjeeling First & Second Flush',
-    duration: '4:45',
-    thumbnail: './tea_kettle.jpg',
-    embedId: '1oB1oDrDkHM',
-    description: 'Learn how high-altitude 88°C steeping unlocks muscatel grape clarity and peach notes without harsh astringency.',
+    methodId: 'oolong_tea',
+    method: 'Oolong Tea',
+    title: 'The 14 Steps of Gong Fu Tea (Walkthrough Guide)',
+    duration: '12:30',
+    thumbnail: './tea_ceremony.jpg',
+    embedId: 'vxYWCijfZn0',
+    description: 'A step-by-step walkthrough guide by Mei Leaf on gaiwan handling, leaf awakening, and multi-steep oolong infusions.',
     keyTakeaways: [
-      'Steep at 88°C (190°F) for 3 minutes for peak muscatel bouquet',
-      'Use 1:50 ratio (1g tea per 50ml water) in porcelain or glass',
-      'Preheat vessel to maintain steady water temperature'
+      'Rinse leaves for 5-10s to open rolled oolong tea balls',
+      'Pour water down gaiwan rim to avoid scorching delicate leaves',
+      'Increase steep time by 5-10 seconds per subsequent infusion'
     ]
   },
   {
-    id: 'mc_chai_masala',
+    id: 'mc_gongfu_teaware',
+    track: 'tea',
+    methodId: 'oolong_tea',
+    method: 'Oolong Tea',
+    title: 'Gong Fu Tea Teaware 101',
+    duration: '14:15',
+    thumbnail: './tea_ceremony.jpg',
+    embedId: 'Ia4oup1v4tU',
+    description: 'Mei Leaf breaks down essential teaware from simple gaiwans to Yixing clay pots and fairness cups.',
+    keyTakeaways: [
+      'Porcelain gaiwans offer pure, uncolored flavor assessment',
+      'Yixing clay softens minerals and rounds out roasted oolongs',
+      'Use a fairness cup (Cha Hai) to ensure even strength for all cups'
+    ]
+  },
+  {
+    id: 'mc_green_explained',
+    track: 'tea',
+    methodId: 'green_tea',
+    method: 'Green Tea',
+    title: 'Chinese Green Tea Explained: 11 Famous Teas',
+    duration: '18:40',
+    thumbnail: './tea_ceremony.jpg',
+    embedId: 'nOUSfwF5Z3U',
+    description: 'Mei Leaf compares 11 legendary green teas, explaining harvest timing, pan-firing, and temperature control.',
+    keyTakeaways: [
+      'Never use boiling water on green tea leaves (75°C-80°C is ideal)',
+      'Preheat glassware and decant completely between infusions',
+      'Preserves sweet grassy umami and prevents bitter astringency'
+    ]
+  },
+  {
+    id: 'mc_steamed_green',
+    track: 'tea',
+    methodId: 'green_tea',
+    method: 'Green Tea',
+    title: "China's Famous Steamed Green Tea Tasting",
+    duration: '15:10',
+    thumbnail: './tea_ceremony.jpg',
+    embedId: '1S8PRIvqV60',
+    description: 'Exploring steamed green tea processing, leaf chlorophyll preservation, and marine sweetness.',
+    keyTakeaways: [
+      'Steaming halts oxidation while preserving emerald green color',
+      'Yields rich marine umami, nori, and sweet grassy aromatics',
+      'Steep short 60-90 second infusions in porcelain or glass'
+    ]
+  },
+  {
+    id: 'mc_white_silverneedle',
+    track: 'tea',
+    methodId: 'white_tea',
+    method: 'White Tea',
+    title: 'Silver Needle White Tea Masterclass',
+    duration: '6:15',
+    thumbnail: './tea_kettle.jpg',
+    embedId: '74kotpiKUo0',
+    description: 'Red Blossom Tea Company explores premium single-bud Silver Needle (Bai Hao Yin Zhen) harvesting and gentle steeping.',
+    keyTakeaways: [
+      'Steep at 85°C (185°F) for 3-4 minutes without leaf agitation',
+      'Whole unoxidized trichome buds release honeysuckle sweetness',
+      'Lowest processing of any tea preserves delicate antioxidants'
+    ]
+  },
+  {
+    id: 'mc_white_baimudan',
+    track: 'tea',
+    methodId: 'white_tea',
+    method: 'White Tea',
+    title: 'Bai Mu Dan (White Peony) Steeping Guide',
+    duration: '5:45',
+    thumbnail: './tea_kettle.jpg',
+    embedId: '6cHTJcTnaHo',
+    description: 'Steeping two-leaves-and-a-bud White Peony for melon sweetness and soft floral bouquet.',
+    keyTakeaways: [
+      'Blend of buds and young leaves adds deeper body than pure needle teas',
+      'Steep at 85°C in a glass or gaiwan',
+      'Tasting notes of ripe honeydew melon, wild flowers, and raw honey'
+    ]
+  },
+  {
+    id: 'mc_chai_ranveer',
     track: 'tea',
     methodId: 'chai_masala',
     method: 'Masala Chai',
-    title: 'Authentic Indian Masala Chai Decoction & Spiced Milk Brew',
-    duration: '5:15',
+    title: 'Authentic Indian Masala Chai & Spices',
+    duration: '8:50',
     thumbnail: './tea_ceremony.jpg',
-    embedId: '4r-rQ0Q9jH4',
-    description: 'Simmering whole cardamom, Ceylon cinnamon, ginger root, and Assam black tea with milk and unrefined cane sugar.',
+    embedId: 'ptrblJdZT6I',
+    description: 'Chef Ranveer Brar shares the authentic Indian Masala Chai decoction technique, whole spice roasting, and milk simmering.',
     keyTakeaways: [
-      'Crush whole cardamom, cinnamon bark, and ginger root before simmering',
+      'Crush whole cardamom, cinnamon bark, and ginger before simmering',
       'Boil spices & Assam CTC tea for 4 minutes to extract essential oils',
-      'Add milk and Panela sugar, bring to gentle froth and strain'
+      'Add milk and unrefined sugar, bring to gentle froth and strain'
     ]
   },
   {
-    id: 'mc_english_breakfast',
+    id: 'mc_chai_caffeinefree',
+    track: 'tea',
+    methodId: 'chai_masala',
+    method: 'Masala Chai',
+    title: 'Botanical Spiced Chai Decoction',
+    duration: '5:10',
+    thumbnail: './tea_ceremony.jpg',
+    embedId: 'U-UI9iqANMc',
+    description: 'Red Blossom Tea Company demonstrates whole spice decoctions with cinnamon, cardamom, and clove.',
+    keyTakeaways: [
+      'Slow simmering unlocks fat-soluble spice oils into whole milk',
+      'Cinnamon bark and clove provide natural warming sweetness',
+      'Excellent hot or iced'
+    ]
+  },
+  {
+    id: 'mc_english_assam',
     track: 'tea',
     methodId: 'english_breakfast',
     method: 'English Breakfast',
-    title: 'English Breakfast Tea Steeping & Malty Blend Perfection',
-    duration: '4:10',
+    title: 'Formosa Red Assam & Full-Bodied Black Tea',
+    duration: '6:30',
     thumbnail: './tea_kettle.jpg',
-    embedId: '8d-9Y2S92v0',
-    description: 'How to steep robust Assam, Ceylon, and Kenyan black tea blends at 96°C for malty cocoa depth.',
+    embedId: '9FaPoLb4iSs',
+    description: 'Steeping robust Assam black tea at 95°C for rich malty depth, cocoa notes, and honey sweetness.',
     keyTakeaways: [
-      'Steep Orthodox black tea at 96°C for 4 minutes',
-      'Pairs perfectly with a splash of warm milk',
-      'Remove leaves completely to prevent bitter tannin build-up'
+      'Steep full-leaf black tea at 95°C-98°C for 3-4 minutes',
+      'Bold malty tannins pair wonderfully with a splash of whole milk',
+      'Decant completely to prevent bitter over-extraction'
     ]
   },
   {
-    id: 'mc_earl_grey',
+    id: 'mc_black_dianhong',
+    track: 'tea',
+    methodId: 'english_breakfast',
+    method: 'English Breakfast',
+    title: 'Yunnan Dianhong Black Tea Masterclass',
+    duration: '16:20',
+    thumbnail: './tea_kettle.jpg',
+    embedId: 'tV7lANeLAeE',
+    description: 'Mei Leaf explores Yunnan Dianhong black teas, golden buds, and complex sweet potato and cocoa notes.',
+    keyTakeaways: [
+      'Golden tip rich leaves offer sweet chocolate and malt without harsh astringency',
+      'Steep at 90°C-95°C for rich golden amber liqueur',
+      'Naturally sweet without requiring added sugar'
+    ]
+  },
+  {
+    id: 'mc_darjeeling_elevation',
+    track: 'tea',
+    methodId: 'darjeeling_tea',
+    method: 'Himalayan Darjeeling',
+    title: 'How High Elevation Impacts First & Second Flush Teas',
+    duration: '7:45',
+    thumbnail: './tea_kettle.jpg',
+    embedId: 'KfobDIwdhio',
+    description: 'Red Blossom Tea Company explains how high Himalayan elevation and diurnal temperature swings produce muscatel grape clarity.',
+    keyTakeaways: [
+      'High elevation slows leaf growth, concentrating aromatic essential oils',
+      'Steep at 88°C-90°C for 3 minutes for crisp muscatel bouquet',
+      'First flush yields crisp floral notes; second flush yields rich stone fruit'
+    ]
+  },
+  {
+    id: 'mc_ceylon_origin',
+    track: 'tea',
+    methodId: 'ceylon_tea',
+    method: 'Ceylon Tea',
+    title: 'High-Grown Red Leaf & Oxidation Dynamics',
+    duration: '6:15',
+    thumbnail: './tea_kettle.jpg',
+    embedId: 'PHpq2tc-VKk',
+    description: 'Understanding high-grown black tea oxidation, citrus clementine brightness, and brisk copper liquor.',
+    keyTakeaways: [
+      'High-grown elevation produces brisk citric acidity and cedar wood finish',
+      'Steep at 95°C for 3.5 minutes',
+      'Refreshing served hot or iced with lemon peel'
+    ]
+  },
+  {
+    id: 'mc_earl_grey_scented',
     track: 'tea',
     methodId: 'earl_grey',
     method: 'Earl Grey',
-    title: 'Earl Grey Bergamot Essential Oil Extraction & Citrus Notes',
-    duration: '4:20',
+    title: 'Scented Black Teas & Essential Bergamot Oils',
+    duration: '7:10',
     thumbnail: './tea_ceremony.jpg',
-    embedId: 'AI4ynXzkSQo',
-    description: 'Steeping Calabrian bergamot-infused black tea at 95°C for fragrant citrus bouquet.',
+    embedId: 'IWQJLn5ABRk',
+    description: 'Red Blossom Tea Company explores traditional scented black teas and natural essential oil infusing.',
     keyTakeaways: [
-      'Steep at 95°C for 3.5 minutes without agitating leaves',
       'Natural cold-pressed bergamot oil releases sweet citrus aromatics',
+      'Steep at 95°C for 3.5 minutes without agitating leaves',
       'Great black tea base for London Fog lattes'
     ]
   },
   {
-    id: 'mc_green_steeping',
-    track: 'tea',
-    methodId: 'green_tea',
-    method: 'Green Tea',
-    title: 'Specialty Green Tea & Sencha Steeping Masterclass',
-    duration: '4:10',
-    thumbnail: './tea_ceremony.jpg',
-    embedId: '4r-rQ0Q9jH4',
-    description: 'Low-temperature 78°C steeping to preserve sweet grassy umami and avoid bitter tannin extraction.',
-    keyTakeaways: [
-      'Never use boiling water on green tea leaves (78°C is ideal)',
-      'Steep for 2 minutes untouched in glass or Tokoname teapot',
-      'Decant completely between infusions for multiple steeps'
-    ]
-  },
-  {
-    id: 'mc_matcha_tea',
+    id: 'mc_matcha_guide',
     track: 'tea',
     methodId: 'matcha_tea',
     method: 'Ceremonial Matcha',
-    title: 'Japanese Ceremonial Matcha Whisking Technique (Usucha)',
-    duration: '4:50',
+    title: 'Matcha Whisking, Latte Prep & Frothing Guide',
+    duration: '9:40',
     thumbnail: './tea_ceremony.jpg',
-    embedId: '1U_4OqUo_pE',
-    description: 'Sifting ceremonial tencha powder and whisking with a bamboo Chasen into rich, creamy micro-foam.',
+    embedId: 'MWzqidSeEy0',
+    description: 'European Coffee Trip explores authentic ceremonial matcha powder whisking, frothing, and milk integration.',
     keyTakeaways: [
       'Sift 2g matcha powder through fine sieve to eliminate clumps',
       'Whisk in rapid "W" motion using bamboo Chasen for 45 seconds',
@@ -1619,229 +1733,35 @@ export const MASTERCLASSES = [
     ]
   },
   {
-    id: 'mc_gongfu_oolong',
+    id: 'mc_matcha_genmai',
     track: 'tea',
-    methodId: 'oolong_tea',
-    method: 'Oolong Tea',
-    title: 'Gongfu Oolong Tea Washing & Flash Infusions',
-    duration: '4:50',
+    methodId: 'matcha_tea',
+    method: 'Ceremonial Matcha',
+    title: 'Genmai Matcha Ceremonial Whisking Guide',
+    duration: '5:30',
     thumbnail: './tea_ceremony.jpg',
-    embedId: 'j6VlT_jUVPc',
-    description: 'Understand leaf awakening, gaiwan handling, temperature drop, and timing multi-steep oolongs.',
+    embedId: 'DqtigeEKI2Y',
+    description: 'Red Blossom Tea Company demonstrates traditional matcha whisking mechanics and roasted rice tea infusions.',
     keyTakeaways: [
-      'Rinse leaves for 5-10s to open rolled tea balls',
-      'Pour water down gaiwan rim to avoid burning delicate leaves',
-      'Increase steep time by 5-10 seconds per subsequent infusion'
+      'Preheat chawan matcha bowl with hot water',
+      'Whisk briskly until velvety micro-foam coats the surface',
+      'Savor fresh within minutes of preparation'
     ]
   },
   {
-    id: 'mc_ceylon_tea',
-    track: 'tea',
-    methodId: 'ceylon_tea',
-    method: 'Ceylon Tea',
-    title: 'Sri Lankan High-Grown Ceylon Tea Steeping Masterclass',
-    duration: '4:15',
-    thumbnail: './tea_kettle.jpg',
-    embedId: 'AI4ynXzkSQo',
-    description: 'Unlocking bright clementine acidity and golden copper color from Nuwara Eliya Ceylon black tea.',
-    keyTakeaways: [
-      'Steep high-grown Ceylon leaves at 95°C for 3.5 minutes',
-      'Bright citrus acidity with woodsy cedar finish',
-      'Excellent served hot or iced with lemon'
-    ]
-  },
-  {
-    id: 'mc_white_needle',
-    track: 'tea',
-    methodId: 'white_tea',
-    method: 'White Tea',
-    title: 'White Tea & Silver Needle Steeping Masterclass',
-    duration: '4:25',
-    thumbnail: './tea_kettle.jpg',
-    embedId: '1oB1oDrDkHM',
-    description: 'Unlocking honeysuckle floral essential oils in Fujian Silver Needle (Bai Hao Yin Zhen) leaves.',
-    keyTakeaways: [
-      'Steep at 83°C for 3 minutes without leaf agitation',
-      'Whole unoxidized buds release delicate melon sweetness',
-      'Lowest caffeine content among camellia sinensis teas'
-    ]
-  },
-  {
-    id: 'mc_turmeric_tea',
+    id: 'mc_turmeric_tisane',
     track: 'tea',
     methodId: 'turmeric_tea',
     method: 'Golden Turmeric',
-    title: 'Golden Turmeric Botanical Herbal Decoction & Wellness Brew',
-    duration: '5:10',
+    title: 'Botanical Herbal Tisane & Wellness Decoction Guide',
+    duration: '6:50',
     thumbnail: './tea_ceremony.jpg',
-    embedId: '4W2p0i3W_K0',
-    description: 'Boiling organic turmeric root, ginger, lemongrass, and black pepper for maximum curcumin bioavailability.',
+    embedId: 'RiBKUy_rEVQ',
+    description: 'Red Blossom Tea Company demonstrates brewing botanical herbal tisanes, ginger root, and turmeric infusions.',
     keyTakeaways: [
-      'Steep botanicals at 98°C for 5 full minutes',
-      'Black pepper enhances curcumin absorption by 2000%',
-      'Stir in raw honey and fresh lemon squeeze before serving'
-    ]
-  },
-
-  // --- BEER MASTERCLASSES (track: 'beer') ---
-  {
-    id: 'mc_hazy_ipa',
-    track: 'beer',
-    methodId: 'hazy_ipa',
-    method: 'New England Hazy DIPA',
-    title: 'Brewing New England Hazy IPAs: Double Dry-Hopping & Hop Whirlpool',
-    duration: '6:15',
-    thumbnail: './beer_hazy_dipa_hero.jpg',
-    embedId: '4lxKaf_MeSQ',
-    description: 'Learn how whirlpool hop additions at 175°F (80°C) and active fermentation biotransformation dry-hopping maximize tropical mango & passionfruit hop oils without bitter astringency.',
-    keyTakeaways: [
-      'Whirlpool hops at 175°F (80°C) for 20 mins to extract essential oils without bittering',
-      'Double dry-hop during active fermentation for biotransformation sweetness',
-      'Flaked oats & wheat create a pillowy, velvety mouthfeel'
-    ]
-  },
-  {
-    id: 'mc_imperial_stout',
-    track: 'beer',
-    methodId: 'imperial_stout',
-    method: 'Imperial Stout',
-    title: 'High-Gravity Imperial Stout Mashing & Bourbon Barrel Aging',
-    duration: '7:10',
-    thumbnail: './beer_stout_hero.jpg',
-    embedId: 'p6peZsbrGYY',
-    description: 'Mastering high-density saccharification mashing at 154°F (68°C), 90-minute wort boiling for Maillard melanoidins, and oak bourbon barrel conditioning.',
-    keyTakeaways: [
-      'Mash thick at 154°F (68°C) for high unfermentable body sweetness',
-      'Boil for 90 minutes to concentrate wort sugars and develop deep Maillard complexity',
-      'Pitch high-gravity yeast strain with pure oxygen aeration'
-    ]
-  },
-  {
-    id: 'mc_west_coast_ipa',
-    track: 'beer',
-    methodId: 'west_coast_ipa',
-    method: 'West Coast IPA',
-    title: 'West Coast IPA Brewing: Piney Resin Bittering & Crisp Attenuation',
-    duration: '5:45',
-    thumbnail: './beer_west_coast_hero.jpg',
-    embedId: 'kYJzH1eL1eU',
-    description: 'Low-temp mashing at 149°F (65°C) for dry attenuation, 60-minute C-hop boil additions (Cascade, Simcoe, Centennial), and closed CO2 transfer.',
-    keyTakeaways: [
-      'Mash at 149°F (65°C) for maximum fermentability and crisp dry finish',
-      'Layer bittering @ 60m, flavor @ 15m, and piney aroma @ flameout',
-      'Use closed transfers to prevent oxygen exposure and cardboard off-flavors'
-    ]
-  },
-  {
-    id: 'mc_german_pilsner',
-    track: 'beer',
-    methodId: 'german_pilsner',
-    method: 'German Pilsner',
-    title: 'Authentic German Pilsner Lagering & Noble Saaz Hop Boiling',
-    duration: '6:30',
-    thumbnail: './beer_pilsner_hero.jpg',
-    embedId: 'e_eOaF0tM5w',
-    description: 'Step mashing German Barke Pilsner malt, 90-minute boil to drive off DMS, cold fermentation at 50°F (10°C), and 4-week cold lagering.',
-    keyTakeaways: [
-      'Boil 90 minutes uncovered to completely eliminate DMS cooked corn off-flavor',
-      'Ferment cold at 50°F (10°C) with Bavarian lager yeast strain',
-      'Lager cold at 34°F (1°C) for 4 weeks for brilliant clarity and snappy bite'
-    ]
-  },
-  {
-    id: 'mc_saison',
-    track: 'beer',
-    methodId: 'saison',
-    method: 'Belgian Saison',
-    title: 'Brewing Farmhouse Belgian Saison: High Temp Fermentation & Pepper Esters',
-    duration: '5:40',
-    thumbnail: './beer_hazy_dipa_hero.jpg',
-    embedId: '9jP0X_9gW1w',
-    description: 'High temperature fermentation up to 85°F (29°C) with French Saison yeast strains yielding spicy peppery phenols and dry champagne finish.',
-    keyTakeaways: [
-      'Allow fermentation temp to free-rise to 80°F-85°F for spicy pepper esters',
-      'Mash low at 148°F (64°C) for 85%+ dry attenuation',
-      'Crisp rustic dry finish with floral Saaz Noble hops'
-    ]
-  },
-  {
-    id: 'mc_sour_gose',
-    track: 'beer',
-    methodId: 'sour_gose',
-    method: 'Sour Gose',
-    title: 'Kettle Sour Gose: Lactobacillus Acidification & Salt Coriander Boiling',
-    duration: '6:10',
-    thumbnail: './beer_pilsner_hero.jpg',
-    embedId: '9g0H290L0aI',
-    description: 'Kettle souring wort with Lactobacillus to pH 3.4, boiling with crushed Indian coriander seeds and pink Himalayan sea salt.',
-    keyTakeaways: [
-      'Sour un-hopped wort with Lactobacillus at 100°F (38°C) for 24-48 hours',
-      'Boil sour wort with coriander and sea salt for tart refreshing mouthfeel',
-      'Ferment with clean German ale yeast strain'
-    ]
-  },
-  {
-    id: 'mc_hefeweizen',
-    track: 'beer',
-    methodId: 'hefeweizen',
-    method: 'Bavarian Hefeweizen',
-    title: 'Bavarian Hefeweizen Mashing: Ferulic Acid Rest & Clove Banana Esters',
-    duration: '5:50',
-    thumbnail: './beer_pilsner_hero.jpg',
-    embedId: '8TvDaypgU5o',
-    description: 'Performing a 113°F (45°C) ferulic acid rest to generate 4-vinyl guaiacol clove aroma precursors, followed by open fermentation.',
-    keyTakeaways: [
-      'Rest mash at 113°F (45°C) for 15 mins for ferulic acid clove precursor',
-      'Ferment at 64°F (18°C) with Weihenstephan yeast for balanced banana-clove ratio',
-      'Serve unfiltered with natural yeast suspension in tall Weizen glass'
-    ]
-  },
-  {
-    id: 'mc_amber_ale',
-    track: 'beer',
-    methodId: 'amber_ale',
-    method: 'American Amber Ale',
-    title: 'American Amber Ale: Crystal Caramel Malt & Cascade Hop Balance',
-    duration: '5:15',
-    thumbnail: './beer_west_coast_hero.jpg',
-    embedId: 'Gk74-p_t82Y',
-    description: 'Blending 2-Row pale malt with Crystal 60L and Munich malt to achieve deep ruby-amber color and toasted caramel biscuit flavor.',
-    keyTakeaways: [
-      'Mash at 152°F (67°C) for medium body and caramel sweetness',
-      'Layer Cascade hops at 60m, 15m, and 5m for classic citrus resin',
-      'Clean crisp California ale yeast fermentation'
-    ]
-  },
-  {
-    id: 'mc_porter',
-    track: 'beer',
-    methodId: 'porter',
-    method: 'Robust Porter',
-    title: 'Robust Porter: Roasted Barley Mash & Dark Chocolate Depth',
-    duration: '6:00',
-    thumbnail: './beer_stout_hero.jpg',
-    embedId: 'p6peZsbrGYY',
-    description: 'Mashing chocolate malt, Black Patent, and Carafa III to extract layers of baker’s cocoa, dark espresso, and toasted bread.',
-    keyTakeaways: [
-      'Mash at 153°F (67°C) for velvety mouthfeel',
-      'Add roasted grains late in mash or vorlauf to prevent harsh astringency',
-      'Earthy Fuggle and Willamette hop additions'
-    ]
-  },
-  {
-    id: 'mc_belgian_tripel',
-    track: 'beer',
-    methodId: 'belgian_tripel',
-    method: 'Belgian Tripel',
-    title: 'Trappist Belgian Tripel: Candi Sugar Boiling & High ABV Attenuation',
-    duration: '6:45',
-    thumbnail: './beer_hazy_dipa_hero.jpg',
-    embedId: 'kYJzH1eL1eU',
-    description: 'Boiling Belgian Pilsner malt with clear candi sugar to achieve glowing golden color, high 9.0% ABV, and dry effervescent body.',
-    keyTakeaways: [
-      'Mash low at 149°F (65°C) for high fermentability',
-      'Add clear Belgian Candi sugar during boil to boost ABV without heavy body',
-      'Ferment warm with Trappist Westmalle yeast for banana clove alcohol warmness'
+      'Simmer whole botanicals at 98°C for 5 full minutes',
+      'Pairs perfectly with raw honey and fresh citrus squeeze',
+      'Caffeine-free and packed with natural soothing aromatics'
     ]
   }
 ];
