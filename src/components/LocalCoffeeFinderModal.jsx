@@ -452,34 +452,91 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
         .map-shop-btn {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          padding: 6px 12px;
+          height: 28px;
+          min-width: 28px;
+          padding: 0 6px;
           border-radius: 9999px;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-          font-size: 11.5px;
-          font-weight: 800;
+          font-size: 11px;
+          font-weight: 700;
           cursor: pointer;
-          box-shadow: 0 6px 20px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.4);
+          box-shadow: 0 4px 14px rgba(0,0,0,0.6);
           white-space: nowrap;
-          transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+          transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+          overflow: hidden;
           pointer-events: auto;
         }
-        .map-shop-btn:hover {
-          transform: translateY(-2px) scale(1.08);
-          box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-          z-index: 9999 !important;
+        .map-shop-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          flex-shrink: 0;
+        }
+        .map-shop-name {
+          max-width: 0;
+          opacity: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          transition: max-width 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease, margin 0.28s ease;
+          margin-left: 0;
+        }
+        .map-shop-dist {
+          max-width: 0;
+          opacity: 0;
+          overflow: hidden;
+          white-space: nowrap;
+          transition: max-width 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease, margin 0.28s ease;
+          margin-left: 0;
+          font-size: 9.5px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-weight: 800;
+          padding: 1px 6px;
+          border-radius: 9999px;
+        }
+        .map-shop-btn:hover,
+        .map-shop-btn-active {
+          padding: 0 10px;
+          height: 32px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.8), 0 0 16px rgba(212, 140, 70, 0.7);
+          z-index: 99999 !important;
+        }
+        .map-shop-btn:hover .map-shop-name,
+        .map-shop-btn-active .map-shop-name {
+          max-width: 180px;
+          opacity: 1;
+          margin-left: 5px;
+        }
+        .map-shop-btn:hover .map-shop-dist,
+        .map-shop-btn-active .map-shop-dist {
+          max-width: 60px;
+          opacity: 1;
+          margin-left: 6px;
         }
         .map-shop-btn-active {
           background: #D48C46 !important;
           color: #0c0a09 !important;
-          border: 2.5px solid #ffffff !important;
-          box-shadow: 0 0 20px rgba(212, 140, 70, 0.9), 0 8px 24px rgba(0,0,0,0.7) !important;
-          transform: scale(1.12);
+          border: 2px solid #ffffff !important;
+          transform: scale(1.08);
+        }
+        .map-shop-btn-active .map-shop-dist {
+          background: #1c1917;
+          color: #ffffff;
         }
         .map-shop-btn-inactive {
           background: #1c1917;
           color: #f5f5f4;
-          border: 2px solid #78350f;
+          border: 1.5px solid #d97706;
+        }
+        .map-shop-btn-inactive:hover {
+          background: #292524;
+          border-color: #f59e0b;
+          transform: scale(1.06);
+        }
+        .map-shop-btn-inactive .map-shop-dist {
+          background: #059669;
+          color: #ffffff;
         }
       `;
       document.head.appendChild(style);
@@ -563,7 +620,7 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
     `);
     userMarker.addTo(group);
 
-    // 2. Add Coffee Shop Button Markers for Every Location
+    // 2. Add Coffee Shop Button Markers for Every Location (Compact with Hover Expansion)
     filteredShops.forEach((shop) => {
       const isSelected = shop.id === activeShop?.id;
 
@@ -571,15 +628,13 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
         className: `shop-pin-marker-${shop.id}`,
         html: `
           <div class="map-shop-btn ${isSelected ? 'map-shop-btn-active' : 'map-shop-btn-inactive'}">
-            <span>☕</span>
-            <span style="letter-spacing:-0.01em; max-width:140px; overflow:hidden; text-overflow:ellipsis;">${shop.name}</span>
-            <span style="font-size:9.5px; opacity:${isSelected ? '1' : '0.85'}; background:${isSelected ? '#1c1917' : '#059669'}; color:#ffffff; padding:1px 6px; border-radius:9999px; font-family:monospace; font-weight:bold;">
-              ${shop.calculatedDistanceMiles}mi
-            </span>
+            <span class="map-shop-icon">${shop.isCurated ? '⭐' : '☕'}</span>
+            <span class="map-shop-name">${shop.name}</span>
+            <span class="map-shop-dist">${shop.calculatedDistanceMiles}mi</span>
           </div>
         `,
-        iconSize: [160, 36],
-        iconAnchor: [80, 18]
+        iconSize: [200, 36],
+        iconAnchor: [14, 16]
       });
 
       const marker = window.L.marker([shop.lat, shop.lng], { 
