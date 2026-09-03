@@ -330,6 +330,21 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
 
   const activeShop = shopsWithDistances.find((s) => s.id === selectedShopId) || filteredShops[0] || shopsWithDistances[0];
 
+  // Map Navigation Helpers
+  const handleCenterGPS = () => {
+    if (leafletInstanceRef.current) {
+      leafletInstanceRef.current.flyTo([userLocation.lat, userLocation.lng], 14, { animate: true, duration: 1 });
+    }
+  };
+
+  const handleFitAllShops = () => {
+    if (leafletInstanceRef.current && window.L) {
+      const bounds = window.L.latLngBounds([[userLocation.lat, userLocation.lng]]);
+      filteredShops.forEach((s) => bounds.extend([s.lat, s.lng]));
+      leafletInstanceRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    }
+  };
+
   // Leaflet Dynamic Loading & Real Roads Map Initialization
   useEffect(() => {
     if (!isOpen) return;
@@ -340,6 +355,96 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
       link.rel = 'stylesheet';
       link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
       document.head.appendChild(link);
+    }
+
+    if (!document.getElementById('leaflet-custom-pin-styles')) {
+      const style = document.createElement('style');
+      style.id = 'leaflet-custom-pin-styles';
+      style.innerHTML = `
+        @keyframes gpsRadarPulse {
+          0% { transform: scale(0.6); opacity: 0.95; }
+          70% { transform: scale(2.6); opacity: 0; }
+          100% { transform: scale(2.8); opacity: 0; }
+        }
+        .gps-beacon-container {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          pointer-events: auto;
+          cursor: pointer;
+        }
+        .gps-beacon-wave {
+          position: absolute;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: rgba(14, 165, 233, 0.55);
+          animation: gpsRadarPulse 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        .gps-beacon-core {
+          position: relative;
+          z-index: 2;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #0284c7, #0369a1);
+          border: 3px solid #ffffff;
+          box-shadow: 0 0 16px rgba(2, 132, 199, 0.9), 0 4px 10px rgba(0,0,0,0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+        }
+        .gps-beacon-badge {
+          margin-top: 4px;
+          background: rgba(15, 23, 42, 0.95);
+          color: #38bdf8;
+          border: 1.5px solid #0284c7;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 10px;
+          font-weight: 800;
+          padding: 2px 8px;
+          border-radius: 9999px;
+          box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+          white-space: nowrap;
+          letter-spacing: 0.04em;
+        }
+        .map-shop-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 9999px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          font-size: 11.5px;
+          font-weight: 800;
+          cursor: pointer;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.4);
+          white-space: nowrap;
+          transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+          pointer-events: auto;
+        }
+        .map-shop-btn:hover {
+          transform: translateY(-2px) scale(1.08);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+          z-index: 9999 !important;
+        }
+        .map-shop-btn-active {
+          background: #D48C46 !important;
+          color: #0c0a09 !important;
+          border: 2.5px solid #ffffff !important;
+          box-shadow: 0 0 20px rgba(212, 140, 70, 0.9), 0 8px 24px rgba(0,0,0,0.7) !important;
+          transform: scale(1.12);
+        }
+        .map-shop-btn-inactive {
+          background: #1c1917;
+          color: #f5f5f4;
+          border: 2px solid #78350f;
+        }
+      `;
+      document.head.appendChild(style);
     }
 
     const initLeafletMap = () => {
@@ -361,7 +466,10 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
       }).addTo(map);
 
+      const markersGroup = window.L.layerGroup().addTo(map);
+      markersGroupRef.current = markersGroup;
       leafletInstanceRef.current = map;
+
       renderLeafletMarkers();
     };
 
@@ -379,6 +487,7 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
         leafletInstanceRef.current.remove();
         leafletInstanceRef.current = null;
       }
+      markersGroupRef.current = null;
     };
   }, [isOpen, userLocation]);
 
@@ -390,56 +499,81 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
     const group = markersGroupRef.current;
     group.clearLayers();
 
-    // 1. Add User GPS Marker (Blue Pulsing Pinpoint)
+    // 1. Add User GPS Location Beacon (Pulsing Radar + Badge)
     const userIcon = window.L.divIcon({
-      className: 'custom-gps-user-pin',
-      html: `<div style="background:#0284c7; border:2px solid #ffffff; width:22px; height:22px; border-radius:50%; box-shadow:0 0 15px #38bdf8; display:flex; align-items:center; justify-content:center; font-size:10px;">📍</div>`,
-      iconSize: [22, 22],
-      iconAnchor: [11, 11]
+      className: 'custom-gps-user-beacon',
+      html: `
+        <div class="gps-beacon-container">
+          <div class="gps-beacon-wave"></div>
+          <div class="gps-beacon-core">🎯</div>
+          <div class="gps-beacon-badge">📍 YOU ARE HERE</div>
+        </div>
+      `,
+      iconSize: [120, 50],
+      iconAnchor: [60, 16]
     });
-    window.L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
-      .bindPopup(`<strong style="font-family:sans-serif; font-size:12px;">📍 Your Position (${userLocation.label})</strong>`)
-      .addTo(group);
 
-    // 2. Add Coffee Shop Pinpoint Markers
+    const userMarker = window.L.marker([userLocation.lat, userLocation.lng], { icon: userIcon, zIndexOffset: 1000 });
+    userMarker.bindPopup(`
+      <div style="font-family:sans-serif; padding:6px; min-width:160px;">
+        <div style="font-weight:bold; color:#0284c7; font-size:12px; margin-bottom:3px; display:flex; align-items:center; gap:4px;">
+          <span>🎯</span><span>Your GPS Position</span>
+        </div>
+        <div style="font-size:11px; color:#1e293b; font-weight:600;">${userLocation.label}</div>
+        <div style="font-size:10px; color:#64748b; margin-top:3px; font-family:monospace;">${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}</div>
+      </div>
+    `);
+    userMarker.addTo(group);
+
+    // 2. Add Coffee Shop Button Markers for Every Location
     shopsWithDistances.forEach((shop) => {
       const isSelected = shop.id === activeShop?.id;
-      const pinColor = isSelected ? '#D48C46' : '#1E1915';
-      const textColor = isSelected ? '#000000' : '#F8F5F1';
-      const borderCol = isSelected ? '#F59E0B' : '#ffffff';
 
       const shopIcon = window.L.divIcon({
         className: `shop-pin-marker-${shop.id}`,
         html: `
-          <div style="background:${pinColor}; color:${textColor}; border:2px solid ${borderCol}; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:11px; font-family:sans-serif; box-shadow:0 6px 16px rgba(0,0,0,0.6); display:flex; align-items:center; gap:4px; whitespace-nowrap; transform:${isSelected ? 'scale(1.15)' : 'scale(1)'}; transition:all 0.3s ease;">
-            <span>☕ ${shop.name}</span>
-            <span style="font-size:9px; opacity:0.85;">(${shop.calculatedDistanceMiles}mi)</span>
+          <div class="map-shop-btn ${isSelected ? 'map-shop-btn-active' : 'map-shop-btn-inactive'}">
+            <span>☕</span>
+            <span style="letter-spacing:-0.01em;">${shop.name}</span>
+            <span style="font-size:9.5px; opacity:${isSelected ? '1' : '0.85'}; background:${isSelected ? '#1c1917' : '#059669'}; color:#ffffff; padding:1px 6px; border-radius:9999px; font-family:monospace; font-weight:bold;">
+              ${shop.calculatedDistanceMiles}mi
+            </span>
           </div>
         `,
-        iconSize: [120, 28],
-        iconAnchor: [60, 14]
+        iconSize: [160, 36],
+        iconAnchor: [80, 18]
       });
 
-      const marker = window.L.marker([shop.lat, shop.lng], { icon: shopIcon });
+      const marker = window.L.marker([shop.lat, shop.lng], { 
+        icon: shopIcon,
+        zIndexOffset: isSelected ? 500 : 100 
+      });
+
+      marker.bindPopup(`
+        <div style="font-family:sans-serif; padding:6px; min-width:200px;">
+          <div style="font-weight:bold; font-size:13px; color:#1c1917; margin-bottom:2px;">☕ ${shop.name}</div>
+          <div style="font-size:11px; color:#64748b; margin-bottom:6px;">${shop.address}</div>
+          <div style="font-size:11px; color:#059669; font-weight:bold; margin-bottom:8px;">★ ${shop.rating} • ${shop.hours}</div>
+          <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.name + ' ' + shop.address)}" target="_blank" rel="noopener noreferrer" style="display:inline-block; background:#D48C46; color:#ffffff; font-weight:bold; font-size:11px; padding:5px 10px; border-radius:8px; text-decoration:none;">
+            🧭 Get Directions
+          </a>
+        </div>
+      `);
+
       marker.on('click', () => {
         setSelectedShopId(shop.id);
-        map.flyTo([shop.lat, shop.lng], 15, { animate: true, duration: 1.2 });
+        map.flyTo([shop.lat, shop.lng], 15, { animate: true, duration: 1 });
       });
 
       marker.addTo(group);
     });
-
-    // Re-center map smoothly to active selected shop
-    if (activeShop) {
-      map.flyTo([activeShop.lat, activeShop.lng], 14, { animate: true, duration: 1 });
-    }
   };
 
   useEffect(() => {
-    if (activeShop && leafletInstanceRef.current) {
+    if (leafletInstanceRef.current) {
       renderLeafletMarkers();
     }
-  }, [selectedShopId, activeShop]);
+  }, [selectedShopId, activeShop, radiusMiles, searchQuery]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-xl animate-fade-in">
@@ -612,23 +746,41 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
           <div className="lg:col-span-7 relative bg-[#070605] flex flex-col min-h-[420px]">
             
             {/* Map Canvas Header Bar */}
-            <div className="p-3 bg-black/80 backdrop-blur-md border-b border-white/15 text-xs flex items-center justify-between relative z-20">
+            <div className="p-3 bg-black/85 backdrop-blur-md border-b border-white/15 text-xs flex flex-wrap items-center justify-between gap-2 relative z-20">
               <div className="flex items-center space-x-2">
                 <MapIcon className="w-4 h-4 text-amber-gold" />
-                <span className="font-mono font-bold text-cream-light truncate max-w-[280px]">
-                  Real Street Map View • <strong className="text-amber-gold">{activeShop?.name || 'Selected Shop'}</strong>
+                <span className="font-mono font-bold text-cream-light truncate max-w-[220px]">
+                  Map View • <strong className="text-amber-gold">{activeShop?.name || 'Selected Shop'}</strong>
                 </span>
               </div>
 
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeShop?.name + ' ' + activeShop?.address)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-amber-gold/20 text-amber-gold hover:bg-amber-gold/30 border border-amber-gold/40 flex items-center gap-1 font-bold"
-              >
-                <span>Google Maps View 🗺️</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handleCenterGPS}
+                  title="Center map on your GPS coordinates"
+                  className="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 hover:bg-sky-500/30 border border-sky-400/40 flex items-center gap-1 font-bold transition-all active:scale-95"
+                >
+                  <span>🎯 My GPS</span>
+                </button>
+
+                <button
+                  onClick={handleFitAllShops}
+                  title="Fit all coffee locations and your GPS on the map"
+                  className="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-400/40 flex items-center gap-1 font-bold transition-all active:scale-95"
+                >
+                  <span>🗺️ View All ({filteredShops.length})</span>
+                </button>
+
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((activeShop?.name || '') + ' ' + (activeShop?.address || ''))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-amber-gold/20 text-amber-gold hover:bg-amber-gold/30 border border-amber-gold/40 flex items-center gap-1 font-bold transition-all"
+                >
+                  <span>Google Maps</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
             </div>
 
             {/* REAL ROADS MAP CONTAINER DIV */}
