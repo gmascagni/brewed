@@ -1,4 +1,4 @@
-﻿// World Coffee & Tea News Dispatch
+// World Coffee & Tea News Dispatch
 // Real, authenticated news briefs, market analyses, harvest reports, and championship updates
 // Sourced from Daily Coffee News (Roast Magazine), Sprudge, Tea & Coffee Trade Journal, and World Tea News.
 
@@ -158,9 +158,9 @@ export const WORLD_BREW_NEWS = [
 ];
 
 export const NEWS_CATEGORIES = [
-  { id: 'all', label: 'All Global News' },
-  { id: 'coffee', label: 'Coffee Industry' },
-  { id: 'tea', label: 'Fine Tea Dispatch' },
+  { id: 'all', label: 'All News' },
+  { id: 'coffee', label: 'Coffee' },
+  { id: 'tea', label: 'Tea' },
   { id: 'origin', label: 'Farm & Origin' },
-  { id: 'competition', label: 'Championships & Events' }
+  { id: 'competition', label: 'Competitions' }
 ];

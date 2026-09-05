@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Newspaper, 
   Search, 
@@ -111,16 +111,16 @@ export default function WorldNewsSection({ trackMode }) {
       </div>
 
       {/* Control Bar: Category Filters & Search Input */}
-      <div className="mt-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="mt-8 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Category Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
+        <div className="flex flex-wrap items-center gap-2">
           {NEWS_CATEGORIES.map((cat) => {
             const isSelected = selectedCategory === cat.id;
             return (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-2xl text-xs font-mono font-bold uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 flex items-center gap-1.5 ${
+                className={`px-3.5 py-2 rounded-2xl text-xs font-mono font-bold uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 flex items-center gap-1.5 ${
                   isSelected
                     ? 'btn-tactile-amber text-espresso-950 shadow-lg shadow-amber-gold/20 scale-105'
                     : 'bg-white/[0.06] text-cream-soft/80 hover:bg-white/[0.12] hover:text-cream-light border border-white/10'
@@ -136,21 +136,22 @@ export default function WorldNewsSection({ trackMode }) {
         </div>
 
         {/* Search Field */}
-        <div className="relative w-full md:w-72 flex-shrink-0">
+        <div className="relative w-full lg:w-80 flex-shrink-0">
           <Search className="w-4 h-4 text-cream-soft/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search news briefs, origins..."
-            className="w-full pl-9 pr-4 py-2 rounded-2xl bg-black/40 border border-white/15 text-xs text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold transition-all"
+            placeholder="Search news briefs, origins, topics..."
+            className="w-full pl-9 pr-8 py-2.5 rounded-2xl bg-black/40 border border-white/15 text-xs text-cream-light placeholder-cream-soft/50 focus:outline-none focus:border-amber-gold transition-all shadow-inner"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-cream-soft/50 hover:text-cream-light"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-cream-soft/50 hover:text-cream-light px-1.5 py-0.5 rounded bg-white/10"
+              title="Clear search"
             >
-              Clear
+              ✕
             </button>
           )}
         </div>
