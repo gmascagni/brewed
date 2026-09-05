@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Star, Sparkles, Plus, Trash2, X, Filter, Heart, Coffee, Leaf, Scale, Gauge, Thermometer, Calendar, Award, Download } from 'lucide-react';
+import { BookOpen, Star, Sparkles, Plus, Trash2, X, Filter, Heart, Coffee, Leaf, Scale, Gauge, Thermometer, Calendar, Award, Download, Upload } from 'lucide-react';
 
 const LOCAL_STORAGE_KEY = 'the_brew_app_journal_v1';
 
@@ -125,6 +125,31 @@ export default function BrewJournal({
     downloadAnchor.remove();
   };
 
+  // Import / Restore logs from JSON
+  const handleImportLogs = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const imported = JSON.parse(event.target.result);
+        if (Array.isArray(imported)) {
+          const existingIds = new Set(logs.map(l => l.id));
+          const newEntries = imported.filter(item => item && item.id && !existingIds.has(item.id));
+          const merged = [...newEntries, ...logs];
+          saveLogsToStorage(merged);
+          alert(`Successfully imported ${newEntries.length} brew log(s) into your journal!`);
+        } else {
+          alert('Invalid file format. Please upload a valid JSON journal backup array.');
+        }
+      } catch (err) {
+        alert('Failed to parse JSON file. Please ensure the backup file is valid.');
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  };
+
   // Filtered Logs
   const filteredLogs = logs.filter(log => {
     if (activeFilter === 'favorites') return log.isFavorite;
@@ -156,9 +181,9 @@ export default function BrewJournal({
               <BookOpen className="w-6 h-6" />
             </div>
             <div>
-              <div className="inline-flex items-center space-x-2 text-[10px] font-mono uppercase tracking-[0.2em] text-amber-gold font-extrabold mb-0.5">
+              <div className="inline-flex items-center space-x-2 text-[10px] font-mono uppercase tracking-[0.15em] text-amber-gold font-extrabold mb-0.5">
                 <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                <span>Personal Tasting Journal & Golden Cup Log</span>
+                <span>On-Device Private Journal • 100% Offline • Zero Tracking</span>
               </div>
               <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light">
                 The Brew App Journal
@@ -166,14 +191,31 @@ export default function BrewJournal({
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2.5">
+            {/* Import / Restore Journal Backup */}
+            <label
+              className="p-2.5 rounded-2xl bg-white/[0.08] text-stone-300 hover:text-cream-light hover:bg-white/[0.15] transition-all border border-white/[0.12] cursor-pointer flex items-center gap-1.5 text-xs font-mono"
+              title="Import & Restore Journal from JSON backup"
+            >
+              <Upload className="w-4 h-4 text-amber-gold" />
+              <span className="hidden sm:inline">Import Backup</span>
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImportLogs}
+                className="hidden"
+              />
+            </label>
+
+            {/* Export Journal Backup */}
             {logs.length > 0 && (
               <button
                 onClick={handleExportLogs}
-                className="p-2.5 rounded-2xl bg-white/[0.08] text-stone-300 hover:text-cream-light hover:bg-white/[0.15] transition-all border border-white/[0.12]"
-                title="Export Journal to JSON"
+                className="p-2.5 rounded-2xl bg-white/[0.08] text-stone-300 hover:text-cream-light hover:bg-white/[0.15] transition-all border border-white/[0.12] flex items-center gap-1.5 text-xs font-mono"
+                title="Export Journal to JSON backup"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4 text-amber-gold" />
+                <span className="hidden sm:inline">Export</span>
               </button>
             )}
 

@@ -50,12 +50,12 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
                   <span>{profile.displayName}</span>
                   <Shield className="w-4 h-4 text-amber-gold fill-current" />
                 </h3>
-                <span className="text-xs font-mono text-amber-gold font-bold">{profile.username} • {profile.email || 'Verified Account'}</span>
+                <span className="text-xs font-mono text-amber-gold font-bold">{profile.username} • On-Device Profile</span>
               </div>
 
               <div className="flex items-center justify-center gap-2">
                 <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-gold border border-amber-400/40 text-xs font-mono font-bold">
-                  {isOwnProfile ? 'Your Active Account' : 'Public Profile (Read-Only)'}
+                  Active Profile
                 </span>
                 {isOwnProfile && onOpenAuth && (
                   <button

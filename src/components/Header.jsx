@@ -154,10 +154,10 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
                   ? 'btn-tactile-coffee text-[#140C08]'
                   : 'btn-tactile-tea text-white'
               }`}
-              title="Sign In or Create Account"
+              title="Barista Profile & Backup"
             >
               <User className="w-3.5 h-3.5" />
-              <span>Sign In</span>
+              <span>Profile</span>
             </button>
           )}
 

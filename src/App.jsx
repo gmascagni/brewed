@@ -414,6 +414,7 @@ export default function App() {
             trackMode={trackMode}
             currentUser={currentUser}
             onOpenAuth={() => setIsAuthModalOpen(true)}
+            onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
             onSelectRecipe={(recipe) => {
               const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
               const match = allMethods.find(m => m.id === recipe.methodId);
@@ -421,6 +422,7 @@ export default function App() {
                 handleSelectMethodFromGrid(match);
               }
               if (recipe.ratio) setCustomRatio(recipe.ratio);
+              setIsCommunityOpen(false);
             }}
           />
 

@@ -2,19 +2,20 @@ import React, { useState } from 'react';
 import { X, Sparkles, Plus, Trash2, Coffee, Leaf, Scale, Thermometer, Clock } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 
-export default function RecipeBuilderModal({ isOpen, onClose, trackMode }) {
+export default function RecipeBuilderModal({ isOpen, onClose, trackMode, onRecipeSaved }) {
   if (!isOpen) return null;
 
   const isCoffee = trackMode === 'coffee';
 
   const [title, setTitle] = useState('');
-  const [methodId, setMethodId] = useState('pour_over');
+  const [methodId, setMethodId] = useState(isCoffee ? 'pour_over' : 'oolong_tea');
   const [beanName, setBeanName] = useState('');
-  const [ratio, setRatio] = useState(16.0);
-  const [dryDoseGrams, setDryDoseGrams] = useState(15.0);
-  const [waterTempC, setWaterTempC] = useState(96);
+  const [ratio, setRatio] = useState(isCoffee ? 16.0 : 20.0);
+  const [dryDoseGrams, setDryDoseGrams] = useState(isCoffee ? 15.0 : 7.5);
+  const [waterTempC, setWaterTempC] = useState(isCoffee ? 96 : 92);
   const [grindSetting, setGrindSetting] = useState('');
   const [description, setDescription] = useState('');
+  const [savedSuccess, setSavedSuccess] = useState(false);
   const [steps, setSteps] = useState([
     { order: 1, durationSec: 45, waterMl: 50, action: 'Bloom Pour & Swirl' },
     { order: 2, durationSec: 60, waterMl: 150, action: 'Concentric Spiral Pour' }
@@ -31,11 +32,72 @@ export default function RecipeBuilderModal({ isOpen, onClose, trackMode }) {
     setSteps(steps.filter((_, i) => i !== index));
   };
 
+  const methodNames = {
+    classic_pour_over: 'Flat-Bottom Pour Over (Kalita)',
+    pour_over: 'Hario V60 Dripper',
+    chemex: 'Chemex Glass Brewer',
+    french_press: 'French Press',
+    espresso: 'Espresso (9-Bar)',
+    moka_pot: 'Bialetti Moka Pot',
+    aeropress: 'AeroPress',
+    drip_brewer: 'Batch Precision Brewer',
+    oolong_tea: 'Gongfu Oolong Gaiwan',
+    matcha_tea: 'Japanese Matcha Whisk',
+    green_tea: 'Sencha Green Tea Kyusu',
+    english_breakfast: 'Royal English Breakfast',
+    darjeeling_tea: 'Darjeeling First Flush',
+    chai_masala: 'Masala Spiced Chai',
+    ceylon_tea: 'Ceylon Orange Pekoe',
+    white_tea: 'Silver Needle White Tea',
+    turmeric_tea: 'Turmeric Botanical Tonic'
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    trackEvent('publish_custom_recipe', { title, method_id: methodId, ratio });
-    alert(`Recipe "${title}" published successfully to the Community Recipe Explorer!`);
-    onClose();
+    if (!title.trim()) return;
+
+    const newRecipe = {
+      id: `custom_rec_${Date.now()}`,
+      title: title.trim(),
+      technique: 'Custom Personal Recipe',
+      badge: 'Personal Recipe',
+      methodId,
+      methodName: methodNames[methodId] || (isCoffee ? 'Pour Over' : 'Loose Leaf Tea'),
+      trackMode,
+      beanName: beanName.trim() || (isCoffee ? 'Custom Coffee' : 'Custom Tea'),
+      roasterName: 'Personal Roaster / Selection',
+      ratio: parseFloat(ratio) || 16.0,
+      dryDoseGrams: parseFloat(dryDoseGrams) || 15.0,
+      waterAmountMl: Math.round((parseFloat(dryDoseGrams) || 15.0) * (parseFloat(ratio) || 16.0)),
+      waterTempC: parseInt(waterTempC, 10) || 96,
+      grindSetting: grindSetting.trim() || 'Custom Setting',
+      totalTimeSec: steps.reduce((acc, s) => acc + (parseInt(s.durationSec, 10) || 0), 0) || 180,
+      description: description.trim() || 'Custom extraction recipe saved in your personal Recipe Box.',
+      createdAt: new Date().toLocaleDateString(),
+      isCustom: true,
+      steps: steps.map((s, idx) => ({
+        order: idx + 1,
+        durationSec: parseInt(s.durationSec, 10) || 30,
+        waterMl: parseInt(s.waterMl, 10) || 200,
+        action: s.action || 'Extraction Step'
+      }))
+    };
+
+    try {
+      const existingRaw = localStorage.getItem('the_brew_app_custom_recipes');
+      const existing = existingRaw ? JSON.parse(existingRaw) : [];
+      const updated = [newRecipe, ...existing];
+      localStorage.setItem('the_brew_app_custom_recipes', JSON.stringify(updated));
+      if (onRecipeSaved) onRecipeSaved(newRecipe);
+      trackEvent('save_custom_recipe', { title: newRecipe.title, method_id: methodId });
+      setSavedSuccess(true);
+      setTimeout(() => {
+        setSavedSuccess(false);
+        onClose();
+      }, 1200);
+    } catch (err) {
+      console.error('Failed to save custom recipe to localStorage:', err);
+    }
   };
 
   return (
@@ -53,12 +115,18 @@ export default function RecipeBuilderModal({ isOpen, onClose, trackMode }) {
         {/* Modal Header */}
         <div className="flex items-center space-x-2 text-xs font-mono font-extrabold uppercase tracking-widest text-amber-gold mb-2">
           <Sparkles className="w-4 h-4 animate-pulse" />
-          <span>Recipe Studio • Publish Public Recipe</span>
+          <span>Recipe Studio • Personal Recipe Box</span>
         </div>
 
         <h3 className="font-serif text-2xl font-bold text-cream-light mb-6">
-          Create & Publish Brew Recipe
+          Create & Save Custom Recipe
         </h3>
+
+        {savedSuccess && (
+          <div className="p-3.5 mb-4 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-mono font-bold flex items-center gap-2">
+            <span>✓ Recipe saved successfully to your personal Recipe Box!</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5 text-xs">
           
@@ -82,13 +150,30 @@ export default function RecipeBuilderModal({ isOpen, onClose, trackMode }) {
                 onChange={(e) => setMethodId(e.target.value)}
                 className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
               >
-                <option value="classic_pour_over">Flat-Bottom Pour Over (Kalita)</option>
-                <option value="pour_over">Hario V60 Dripper</option>
-                <option value="chemex">Chemex Glass Brewer</option>
-                <option value="french_press">French Press</option>
-                <option value="espresso">Espresso</option>
-                <option value="moka_pot">Moka Pot</option>
-                <option value="aeropress">AeroPress</option>
+                {isCoffee ? (
+                  <>
+                    <option value="pour_over">Hario V60 Dripper</option>
+                    <option value="classic_pour_over">Flat-Bottom Pour Over (Kalita)</option>
+                    <option value="chemex">Chemex Glass Brewer</option>
+                    <option value="french_press">French Press</option>
+                    <option value="aeropress">AeroPress</option>
+                    <option value="espresso">Espresso (9-Bar)</option>
+                    <option value="moka_pot">Bialetti Moka Pot</option>
+                    <option value="drip_brewer">Batch Precision Brewer</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="oolong_tea">Gongfu Oolong Gaiwan</option>
+                    <option value="matcha_tea">Japanese Matcha Whisk</option>
+                    <option value="green_tea">Sencha Green Tea Kyusu</option>
+                    <option value="english_breakfast">Royal English Breakfast</option>
+                    <option value="darjeeling_tea">Darjeeling First Flush</option>
+                    <option value="chai_masala">Masala Spiced Chai</option>
+                    <option value="ceylon_tea">Ceylon Orange Pekoe</option>
+                    <option value="white_tea">Silver Needle White Tea</option>
+                    <option value="turmeric_tea">Turmeric Botanical Tonic</option>
+                  </>
+                )}
               </select>
             </div>
 
@@ -151,9 +236,10 @@ export default function RecipeBuilderModal({ isOpen, onClose, trackMode }) {
 
           <button
             type="submit"
-            className="w-full py-4 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider shadow-xl active:scale-95 transition-all"
+            className="w-full py-4 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
           >
-            Publish Recipe to Community
+            <Plus className="w-4 h-4" />
+            <span>Save Recipe to Recipe Box</span>
           </button>
 
         </form>
