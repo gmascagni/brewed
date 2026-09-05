@@ -138,7 +138,7 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
               title="Open Barista Profile Dashboard"
             >
               <img
-                src={currentUser.avatar || './avatar_cartoon_female_barista.jpg'}
+                src={currentUser.avatar || '/'}
                 alt={currentUser.displayName}
                 className="w-6 h-6 rounded-full object-cover border border-amber-gold"
               />

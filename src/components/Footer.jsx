@@ -11,8 +11,8 @@ export default function Footer({ trackMode = 'coffee' }) {
   };
 
   return (
-    <footer className={`mt-14 py-6 px-4 sm:px-6 lg:px-8 border-t bg-[#0B0908]/90 backdrop-blur-xl text-stone-400 transition-colors duration-500 ${
-      isCoffee ? 'border-[#A66E38]/25' : 'border-sage-500/25'
+    <footer className={`mt-14 py-6 px-4 sm:px-6 lg:px-8 border-t backdrop-blur-xl text-stone-400 transition-colors duration-500 ${
+      isCoffee ? 'bg-[#0E0906]/90 border-[#A66E38]/25' : 'bg-[#07130B]/90 border-sage-500/25'
     }`}>
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono">
         

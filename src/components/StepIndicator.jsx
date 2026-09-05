@@ -59,7 +59,7 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
                 {/* Step Metadata & Title */}
                 <div className="text-left min-w-0">
                   <div className="text-[9px] sm:text-[10px] uppercase font-mono tracking-wider font-extrabold truncate opacity-90">
-                    0{step.id} • <span className="hidden xs:inline">{step.title}</span><span className="xs:hidden">{step.title.split(' ')[0]}</span>
+                    0{step.id} • <span className="hidden sm:inline">{step.title}</span><span className="sm:hidden">{step.title.split(' ')[0]}</span>
                   </div>
                 </div>
               </button>

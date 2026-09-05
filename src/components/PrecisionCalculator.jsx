@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CupSoda, Scale, Sliders, CheckCircle2, Sparkles, Thermometer, Clock, ChevronRight, ChevronLeft, Volume2, VolumeX, Lightbulb, Gauge } from 'lucide-react';
+import { CupSoda, Scale, Sliders, CheckCircle2, Sparkles, Thermometer, Clock, ChevronRight, ChevronLeft, Volume2, VolumeX, Lightbulb, Gauge, RotateCcw } from 'lucide-react';
 import V60ProTipModal from './V60ProTipModal';
 
 export default function PrecisionCalculator({
@@ -55,6 +55,23 @@ export default function PrecisionCalculator({
   const handleCupMlChange = (ml) => {
     setCupMl(ml);
     if (customWaterMl !== null) setCustomWaterMl(null);
+  };
+
+  const handleAdjustWater = (deltaMl) => {
+    const current = customWaterMl !== null ? customWaterMl : (cupCount * cupMl);
+    const updated = Math.max(50, Math.min(3000, current + deltaMl));
+    setCustomWaterMl(updated);
+  };
+
+  const handleWaterInputChange = (valStr) => {
+    const num = parseFloat(valStr);
+    if (!isNaN(num) && num > 0) {
+      if (isMetric) {
+        setCustomWaterMl(Math.round(num));
+      } else {
+        setCustomWaterMl(Math.round(num * 29.5735));
+      }
+    }
   };
 
   return (
@@ -369,19 +386,106 @@ export default function PrecisionCalculator({
                 <CupSoda className="w-4 h-4" />
                 <span>Total Hot Water</span>
               </span>
-              <span className="text-[10px] font-mono opacity-80">Target Liquid</span>
+              <div className="flex items-center gap-2">
+                {customWaterMl !== null && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomWaterMl(null)}
+                    className="flex items-center gap-1 text-[10px] font-mono text-amber-400 hover:text-amber-300 transition-colors"
+                    title="Reset to cup calculations"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>Reset to Cups</span>
+                  </button>
+                )}
+                <span className="text-[10px] font-mono opacity-80">Target Liquid</span>
+              </div>
             </div>
 
-            <div className="text-4xl lg:text-5xl font-extrabold font-mono text-cream-light drop-shadow-md my-2">
-              {waterDisplay}
+            <div className="flex items-baseline justify-between gap-3 my-2">
+              <div className="text-4xl lg:text-5xl font-extrabold font-mono text-cream-light drop-shadow-md">
+                {waterDisplay}
+              </div>
+              {customWaterMl !== null && (
+                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                  isCoffee ? 'bg-[#A66E38]/20 text-[#D2A06E] border-[#A66E38]/30' : 'bg-sage-500/20 text-sage-300 border-sage-500/30'
+                }`}>
+                  Custom Volume
+                </span>
+              )}
             </div>
           </div>
 
-          <div className="mt-5 pt-4 border-t border-white/[0.08] text-xs font-mono text-stone-300">
-            <span className={`font-bold ${isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`}>
-              Recommended Water Temp: 
-            </span>
-            <span> {isMetric ? `${activeMethod?.tempC || 93}°C` : `${activeMethod?.tempF || 200}°F`}</span>
+          {/* Water Fine-Tuning Controls */}
+          <div className="mt-5 pt-4 border-t border-white/[0.08]">
+            <div className="flex items-center justify-between text-[11px] text-stone-300 font-medium mb-2.5">
+              <span className="flex items-center gap-1.5 font-bold">
+                <Sliders className={`w-3.5 h-3.5 ${isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
+                <span>Fine-Tune Volume:</span>
+              </span>
+              <span className="text-[10px] font-mono text-stone-400">
+                {isMetric ? '±10 / ±50 mL' : '±0.5 / ±2 fl oz'}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5 mb-3">
+              <button
+                type="button"
+                onClick={() => handleAdjustWater(isMetric ? -50 : -59)}
+                className="py-1 px-2 rounded-lg bg-black/50 hover:bg-white/10 text-stone-300 border border-white/10 text-[10px] font-mono font-bold transition-all active:scale-95"
+                title={isMetric ? "Decrease 50 mL" : "Decrease ~2 fl oz"}
+              >
+                {isMetric ? '-50' : '-2oz'}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAdjustWater(isMetric ? -10 : -15)}
+                className="py-1 px-2 rounded-lg bg-black/50 hover:bg-white/10 text-stone-300 border border-white/10 text-[10px] font-mono font-bold transition-all active:scale-95"
+                title={isMetric ? "Decrease 10 mL" : "Decrease ~0.5 fl oz"}
+              >
+                {isMetric ? '-10' : '-0.5oz'}
+              </button>
+
+              <div className="flex-1 flex items-center bg-black/70 border border-white/15 rounded-lg px-2 py-1 focus-within:border-amber-gold/50">
+                <input
+                  type="number"
+                  min="50"
+                  max="3000"
+                  step={isMetric ? "5" : "0.5"}
+                  value={isMetric ? totalWaterMl : totalWaterOz}
+                  onChange={(e) => handleWaterInputChange(e.target.value)}
+                  className="w-full bg-transparent text-cream-light font-mono font-bold text-xs text-center focus:outline-none"
+                  title="Directly enter target water volume"
+                />
+                <span className="text-[10px] font-mono text-stone-400 ml-1">
+                  {isMetric ? 'mL' : 'oz'}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleAdjustWater(isMetric ? 10 : 15)}
+                className="py-1 px-2 rounded-lg bg-black/50 hover:bg-white/10 text-stone-300 border border-white/10 text-[10px] font-mono font-bold transition-all active:scale-95"
+                title={isMetric ? "Increase 10 mL" : "Increase ~0.5 fl oz"}
+              >
+                {isMetric ? '+10' : '+0.5oz'}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAdjustWater(isMetric ? 50 : 59)}
+                className="py-1 px-2 rounded-lg bg-black/50 hover:bg-white/10 text-stone-300 border border-white/10 text-[10px] font-mono font-bold transition-all active:scale-95"
+                title={isMetric ? "Increase 50 mL" : "Increase ~2 fl oz"}
+              >
+                {isMetric ? '+50' : '+2oz'}
+              </button>
+            </div>
+
+            <div className="pt-2 border-t border-white/[0.06] text-xs font-mono text-stone-300 flex items-center justify-between">
+              <span className={`font-bold ${isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`}>
+                Recommended Water Temp: 
+              </span>
+              <span> {isMetric ? `${activeMethod?.tempC || 93}°C` : `${activeMethod?.tempF || 200}°F`}</span>
+            </div>
           </div>
         </div>
 

@@ -62,7 +62,7 @@ export function playCompletionChime(isMuted = false) {
   stopCompletionChime();
 
   try {
-    const audio = new Audio('./tada_original.wav');
+    const audio = new Audio('/tada_original.wav');
     audio.loop = false;
     audio.volume = 0.85;
 

@@ -29,7 +29,7 @@ const DEFAULT_LOCAL_PROFILES = [
     username: '@barista_pro',
     displayName: 'Alex Rivers',
     email: 'alex@specialtybrew.org',
-    avatar: './avatar_cartoon_female_barista.jpg',
+    avatar: '/',
     bio: 'Specialty Coffee Association Certified Barista • Obsessed with high-altitude washed Ethiopians & 1:16 pour-overs.',
     role: 'user',
     streakDays: 14,
@@ -220,7 +220,7 @@ export default function App() {
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30 md:opacity-40 transition-all duration-1000">
         <img
           key={currentActiveMethod?.heroImage || trackMode}
-          src={currentActiveMethod?.heroImage || (isCoffee ? './pour_over_hero.jpg' : './tea_ceremony.jpg')}
+          src={currentActiveMethod?.heroImage || (isCoffee ? '/' : '/')}
           alt={currentActiveMethod?.name || 'Extraction Background'}
           className="w-full h-full object-cover object-center filter blur-[2px] scale-105 transform transition-transform duration-1000 brightness-90 contrast-110"
         />
@@ -342,7 +342,9 @@ export default function App() {
 
                 <button
                   onClick={() => setCurrentStep(4)}
-                  className="py-3.5 px-8 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all"
+                  className={`py-3.5 px-8 rounded-2xl font-extrabold text-xs flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all ${
+                    isCoffee ? 'btn-tactile-coffee text-[#140C08]' : 'btn-tactile-tea text-white'
+                  }`}
                 >
                   <span>Step 04: Guided Brew Timer</span>
                   <ChevronRight className="w-4 h-4" />

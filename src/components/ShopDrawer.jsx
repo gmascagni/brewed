@@ -11,7 +11,9 @@ export default function ShopDrawer({ trackMode = 'coffee', activeMethod }) {
   return (
     <div className="mt-14 border-t border-white/[0.08] pt-10">
       {/* Equipment & Gear Store Drawer Toggle Bar */}
-      <div className="p-7 md:p-9 rounded-3xl bg-[#14110E]/90 border border-white/[0.12] shadow-2xl backdrop-blur-2xl flex flex-col sm:flex-row items-center justify-between gap-5">
+      <div className={`p-7 md:p-9 rounded-3xl border shadow-2xl backdrop-blur-2xl flex flex-col sm:flex-row items-center justify-between gap-5 transition-colors duration-500 ${
+        isCoffee ? 'bg-[#14110E]/90 border-[#A66E38]/30' : 'bg-[#0B150F]/90 border-sage-500/30'
+      }`}>
         <div className="flex items-center space-x-4">
           <div className={`p-4 rounded-2xl ${
             isCoffee

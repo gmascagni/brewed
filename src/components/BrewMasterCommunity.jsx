@@ -109,7 +109,7 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
     const newCommentObj = {
       id: `comm_${Date.now()}`,
       author: currentUser.username,
-      authorAvatar: currentUser.avatar || './avatar_cartoon_female_barista.jpg',
+      authorAvatar: currentUser.avatar || '/',
       text: commentInput.trim(),
       timeAgo: 'Just now'
     };
@@ -146,7 +146,7 @@ export default function BrewMasterCommunity({ currentUser, onOpenAuth }) {
       categoryLabel: newCategory === 'gear' ? 'Gear & Instruments' : newCategory === 'beans' ? 'Beans & Roasters' : newCategory === 'teas' ? 'Tea Varietals' : 'Experiences & Tips',
       title: newTitle,
       author: currentUser.username,
-      authorAvatar: currentUser.avatar || './avatar_cartoon_female_barista.jpg',
+      authorAvatar: currentUser.avatar || '/',
       timeAgo: 'Just now',
       content: newContent,
       upvotes: 1,

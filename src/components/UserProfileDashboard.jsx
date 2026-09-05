@@ -12,7 +12,7 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
   const profile = currentUser || {
     username: '@barista_master',
     displayName: 'Specialty Brew Master',
-    avatar: './avatar_cartoon_female_barista.jpg',
+    avatar: '/',
     bio: 'Specialty Coffee & Fine Tea Enthusiast',
     location: 'Global Atelier',
     streakDays: 7,
@@ -39,7 +39,7 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
         {/* User Header Profile Card */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 mb-8 pb-6 border-b border-white/10">
           <img
-            src={profile.avatar || './avatar_cartoon_female_barista.jpg'}
+            src={profile.avatar || '/'}
             alt={profile.displayName}
             className="w-20 h-20 rounded-full object-cover border-2 border-amber-gold shadow-xl"
           />
