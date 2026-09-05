@@ -18,11 +18,11 @@ export default function TroubleshootingHub({ trackMode }) {
   const selectedGuide = guides.find((g) => g.id === selectedSymptomId) || guides[0];
 
   const GRIND_MATRIX = [
-    { level: 'Extra Fine', range: '200 - 300 µm', idealFor: 'Espresso / Turkish Coffee', visual: 'Powder / Flour-like texture', image: '/', burrTip: 'Baratza Encore #1-3, Fellow Ode Gen 2 with SSP burrs' },
-    { level: 'Fine / Medium-Fine', range: '350 - 500 µm', idealFor: 'Moka Pot / Hario V60 Dripper', visual: 'Table salt texture', image: '/', burrTip: 'Baratza Encore #4-8, Fellow Ode #2-4' },
-    { level: 'Medium', range: '600 - 750 µm', idealFor: 'Automatic Drip Maker / Siphon', visual: 'Regular beach sand texture', image: '/', burrTip: 'Baratza Encore #15-20, Fellow Ode #5-7' },
-    { level: 'Medium-Coarse', range: '750 - 900 µm', idealFor: 'Chemex / Clever Dripper', visual: 'Rough sand / Kosher salt', image: '/', burrTip: 'Baratza Encore #21-26, Fellow Ode #8-9' },
-    { level: 'Coarse', range: '900 - 1100 µm', idealFor: 'French Press / Cold Brew', visual: 'Coarse sea salt / Breadcrumb', image: '/', burrTip: 'Baratza Encore #27-35, Fellow Ode #10-11' }
+    { level: 'Extra Fine', range: '200 - 300 µm', idealFor: 'Espresso / Turkish Coffee', visual: 'Powder / Flour-like texture', image: '/extra_fine_grind.jpg', burrTip: 'Baratza Encore #1-3, Fellow Ode Gen 2 with SSP burrs' },
+    { level: 'Fine / Medium-Fine', range: '350 - 500 µm', idealFor: 'Moka Pot / Hario V60 Dripper', visual: 'Table salt texture', image: '/fine_grind.jpg', burrTip: 'Baratza Encore #4-8, Fellow Ode #2-4' },
+    { level: 'Medium', range: '600 - 750 µm', idealFor: 'Automatic Drip Maker / Siphon', visual: 'Regular beach sand texture', image: '/medium_grind.jpg', burrTip: 'Baratza Encore #15-20, Fellow Ode #5-7' },
+    { level: 'Medium-Coarse', range: '750 - 900 µm', idealFor: 'Chemex / Clever Dripper', visual: 'Rough sand / Kosher salt', image: '/medium_coarse_grind.jpg', burrTip: 'Baratza Encore #21-26, Fellow Ode #8-9' },
+    { level: 'Coarse', range: '900 - 1100 µm', idealFor: 'French Press / Cold Brew', visual: 'Coarse sea salt / Breadcrumb', image: '/coarse_grind.jpg', burrTip: 'Baratza Encore #27-35, Fellow Ode #10-11' }
   ];
 
   const TEA_LEAF_MATRIX = [

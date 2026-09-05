@@ -24,7 +24,7 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
         <div className="absolute inset-0 z-0 opacity-35 pointer-events-none">
           <img
             key={activeMethod?.heroImage || trackMode}
-            src={activeMethod?.heroImage || (isCoffee ? '/' : '/')}
+            src={(activeMethod?.heroImage && activeMethod.heroImage !== '/') ? activeMethod.heroImage : (isCoffee ? '/pour_over_hero.jpg' : '/tea_ceremony.jpg')}
             alt="Extraction Background"
             className="w-full h-full object-cover object-center transform scale-105 filter contrast-125 brightness-90"
           />

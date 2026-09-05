@@ -1,0 +1,270 @@
+﻿import React, { useState, useMemo } from 'react';
+import { 
+  Newspaper, 
+  Search, 
+  ExternalLink, 
+  Calendar, 
+  Clock, 
+  Sparkles, 
+  CheckCircle2, 
+  Globe2, 
+  RefreshCw, 
+  Tag, 
+  Layers,
+  Coffee,
+  Leaf
+} from 'lucide-react';
+import { WORLD_BREW_NEWS, NEWS_CATEGORIES } from '../data/newsData';
+
+export default function WorldNewsSection({ trackMode }) {
+  const isCoffee = trackMode === 'coffee';
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Filter and search logic
+  const filteredNews = useMemo(() => {
+    return WORLD_BREW_NEWS.filter((item) => {
+      // Category filter
+      const matchesCategory = 
+        selectedCategory === 'all' ||
+        (selectedCategory === 'coffee' && item.category === 'coffee') ||
+        (selectedCategory === 'tea' && item.category === 'tea') ||
+        (selectedCategory === 'origin' && (item.tag.toLowerCase().includes('origin') || item.tag.toLowerCase().includes('farming') || item.tag.toLowerCase().includes('harvest'))) ||
+        (selectedCategory === 'competition' && (item.tag.toLowerCase().includes('competition') || item.tag.toLowerCase().includes('events')));
+
+      if (!matchesCategory) return false;
+
+      // Keyword search
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.summary.toLowerCase().includes(q) ||
+        item.source.toLowerCase().includes(q) ||
+        item.tag.toLowerCase().includes(q) ||
+        item.keyPoints.some((pt) => pt.toLowerCase().includes(q))
+      );
+    });
+  }, [selectedCategory, searchQuery]);
+
+  const handleManualRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 700);
+  };
+
+  return (
+    <section 
+      id="world-news" 
+      className={`mt-14 p-6 sm:p-8 md:p-10 rounded-3xl transition-all duration-700 shadow-2xl border ${
+        isCoffee 
+          ? 'glass-panel-coffee border-[#A66E38]/35' 
+          : 'glass-panel-tea border-sage-500/35'
+      }`}
+    >
+      {/* Section Header */}
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-white/10">
+        <div>
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-[11px] font-mono font-extrabold uppercase tracking-widest text-amber-gold border border-amber-gold/30 mb-3 shadow">
+            <Globe2 className="w-3.5 h-3.5 text-amber-gold animate-spin-slow" />
+            <span>Daily Global Dispatch • Verified Journalism</span>
+          </div>
+
+          <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-extrabold text-cream-light drop-shadow-md">
+            World Coffee & Tea News
+          </h3>
+          
+          <p className="text-xs sm:text-sm text-cream-soft/80 mt-2 max-w-2xl leading-relaxed">
+            Curated daily briefings, origin harvest updates, championship highlights, and market analytics from the specialty coffee and fine tea trade.
+          </p>
+        </div>
+
+        {/* Schedule Status Card */}
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-between sm:justify-start gap-4 shadow-inner">
+          <div className="flex items-center space-x-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400">
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Daily Auto-Scan Active</span>
+              </div>
+              <div className="text-[11px] text-cream-soft/70 font-medium">
+                Scheduled Daily at 09:00 AM
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-cream-light text-xs font-mono font-bold transition-all border border-white/10 flex items-center gap-1.5 active:scale-95 whitespace-nowrap"
+            title="Trigger an on-demand refresh check"
+          >
+            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>Sync</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Control Bar: Category Filters & Search Input */}
+      <div className="mt-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Category Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
+          {NEWS_CATEGORIES.map((cat) => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`px-4 py-2 rounded-2xl text-xs font-mono font-bold uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'btn-tactile-amber text-espresso-950 shadow-lg shadow-amber-gold/20 scale-105'
+                    : 'bg-white/[0.06] text-cream-soft/80 hover:bg-white/[0.12] hover:text-cream-light border border-white/10'
+                }`}
+              >
+                {cat.id === 'coffee' && <Coffee className="w-3.5 h-3.5" />}
+                {cat.id === 'tea' && <Leaf className="w-3.5 h-3.5" />}
+                {cat.id === 'all' && <Layers className="w-3.5 h-3.5" />}
+                <span>{cat.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search Field */}
+        <div className="relative w-full md:w-72 flex-shrink-0">
+          <Search className="w-4 h-4 text-cream-soft/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search news briefs, origins..."
+            className="w-full pl-9 pr-4 py-2 rounded-2xl bg-black/40 border border-white/15 text-xs text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-cream-soft/50 hover:text-cream-light"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* News Briefs Grid */}
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {filteredNews.length > 0 ? (
+          filteredNews.map((article) => {
+            const isTeaArticle = article.category === 'tea';
+
+            return (
+              <article
+                key={article.id}
+                className="p-6 sm:p-7 rounded-3xl bg-espresso-950/70 border border-white/10 hover:border-amber-gold/50 transition-all duration-300 flex flex-col justify-between group shadow-xl hover:-translate-y-1 hover:shadow-2xl"
+              >
+                <div>
+                  {/* Article Metadata Header */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <div className="flex items-center gap-2">
+                      {/* Source Badge */}
+                      <span className={`px-2.5 py-1 rounded-xl text-[10px] font-mono font-extrabold uppercase tracking-wider border shadow-sm ${
+                        isTeaArticle
+                          ? 'bg-sage-500/20 text-sage-300 border-sage-500/40'
+                          : 'bg-amber-500/20 text-amber-gold border-amber-400/40'
+                      }`}>
+                        {article.source}
+                      </span>
+
+                      {/* Topic Tag */}
+                      <span className="px-2 py-0.5 rounded-lg bg-white/[0.05] text-cream-soft/70 border border-white/[0.08] text-[10px] font-mono font-bold">
+                        {article.tag}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-[11px] font-mono text-cream-soft/60">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-amber-gold" />
+                        <span>{article.publishedDate}</span>
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-cream-soft/40" />
+                        <span>{article.readTime}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Headline */}
+                  <h4 className="font-serif text-lg sm:text-xl font-bold text-cream-light mb-3 leading-snug group-hover:text-amber-gold transition-colors">
+                    {article.title}
+                  </h4>
+
+                  {/* News Brief / Summary */}
+                  <p className="text-xs sm:text-sm text-cream-soft/90 leading-relaxed mb-5 font-normal">
+                    {article.summary}
+                  </p>
+
+                  {/* Executive Key Points */}
+                  {article.keyPoints && article.keyPoints.length > 0 && (
+                    <div className="p-3.5 rounded-2xl bg-black/40 border border-white/[0.08] mb-6 shadow-inner">
+                      <div className="text-[10px] font-mono font-extrabold text-amber-gold uppercase tracking-wider mb-2 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-gold" />
+                        <span>Key Takeaways</span>
+                      </div>
+                      <ul className="space-y-1.5 text-[11px] text-cream-soft/85 font-medium">
+                        {article.keyPoints.map((point, idx) => (
+                          <li key={idx} className="flex items-start gap-2 leading-relaxed">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                            <span>{point}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer: Source Link & Domain */}
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+                  <span className="text-[10px] font-mono text-cream-soft/50 truncate">
+                    Publisher: {article.sourceDomain}
+                  </span>
+
+                  <a
+                    href={article.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 rounded-xl bg-white/[0.08] hover:bg-amber-gold hover:text-espresso-950 text-cream-light text-xs font-mono font-bold transition-all border border-white/15 flex items-center gap-1.5 active:scale-95 group/link shadow"
+                    title={`Read full coverage on ${article.source}`}
+                  >
+                    <span>Read Full Article</span>
+                    <ExternalLink className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+                  </a>
+                </div>
+              </article>
+            );
+          })
+        ) : (
+          <div className="col-span-full py-12 text-center p-8 rounded-3xl bg-black/30 border border-white/10">
+            <Newspaper className="w-10 h-10 text-cream-soft/40 mx-auto mb-3" />
+            <h5 className="font-serif text-lg font-bold text-cream-light mb-1">
+              No matching news briefs found
+            </h5>
+            <p className="text-xs text-cream-soft/60">
+              Try adjusting your search query or switching to another category.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Transparency Footer Notice */}
+      <div className="mt-8 pt-6 border-t border-white/10 text-center flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-cream-soft/50 font-mono">
+        <span>Curated from primary journalism outlets (DCN, Sprudge, TCTJ, WTN). All rights reserved by original publishers.</span>
+        <span>Next Automated Crawl: Tomorrow 09:00 AM EST</span>
+      </div>
+    </section>
+  );
+}

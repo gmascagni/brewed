@@ -7,7 +7,9 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
   const isPourOver = activeMethod?.id === 'pour_over' || activeMethod?.id === 'chemex' || activeMethod?.id === 'classic_pour_over';
   const [isProTipOpen, setIsProTipOpen] = useState(false);
 
-  const heroImage = activeMethod?.heroImage || (isCoffee ? '/' : '/');
+  const heroImage = (activeMethod?.heroImage && activeMethod.heroImage !== '/') 
+    ? activeMethod.heroImage 
+    : (isCoffee ? '/pour_over_hero.jpg' : '/tea_ceremony.jpg');
 
   const isMetric = unitSystem === 'metric';
   const tempDisplay = isMetric 

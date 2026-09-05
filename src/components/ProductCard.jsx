@@ -25,12 +25,22 @@ export default function ProductCard({ product, activeMethod }) {
       
       <div>
         {/* Card Thumbnail Image & Badges Overlay */}
-        <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden border border-white/[0.08] mb-5 relative group/img bg-black/40">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700 filter brightness-95"
-          />
+        <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden border border-white/[0.08] mb-5 relative group/img bg-black/40 flex items-center justify-center">
+          {product.image && product.image !== '/' ? (
+            <img
+              src={product.image}
+              alt={product.name}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+              className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700 filter brightness-95"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-espresso-950/60 text-amber-gold/60">
+              <ShoppingBag className="w-8 h-8 mb-2" />
+              <span className="text-[10px] font-mono uppercase tracking-wider">Specialty Gear</span>
+            </div>
+          )}
 
           {/* Badge Top Left */}
           {product.badge && (
@@ -47,7 +57,7 @@ export default function ProductCard({ product, activeMethod }) {
             </div>
           ) : isTopRated ? (
             <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-gold border border-amber-400/40 text-[10px] font-mono font-extrabold uppercase tracking-wider flex items-center gap-1 shadow-md backdrop-blur-md">
-              <Star className="w-3-3 fill-current text-amber-gold" />
+              <Star className="w-3.5 h-3.5 fill-current text-amber-gold" />
               <span>Top Rated 4.9+</span>
             </div>
           ) : null}
@@ -58,7 +68,7 @@ export default function ProductCard({ product, activeMethod }) {
           <div className="flex items-center space-x-1 text-amber-gold font-mono font-bold">
             <Star className="w-3.5 h-3.5 fill-current text-amber-gold" />
             <span>{product.rating}</span>
-            <span className="text-stone-500 font-normal">({product.reviewsCount.toLocaleString()})</span>
+            <span className="text-stone-400 font-normal text-[10px]">({product.reviewsCount.toLocaleString()} Amazon ratings)</span>
           </div>
 
           <span className="font-mono font-bold text-cream-light text-xs bg-white/[0.06] px-2.5 py-0.5 rounded-md border border-white/[0.1]">

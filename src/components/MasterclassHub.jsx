@@ -184,8 +184,11 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
                   {/* Thumbnail Container */}
                   <div className="relative aspect-video w-full overflow-hidden bg-slate-950">
                     <img
-                      src={item.thumbnail}
+                      src={item.thumbnail && item.thumbnail !== '/' ? item.thumbnail : `https://img.youtube.com/vi/${item.embedId}/hqdefault.jpg`}
                       alt={item.title}
+                      onError={(e) => {
+                        e.currentTarget.src = `https://img.youtube.com/vi/${item.embedId}/hqdefault.jpg`;
+                      }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />

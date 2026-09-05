@@ -1,5 +1,5 @@
 import React from 'react';
-import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin } from 'lucide-react';
+import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin, Newspaper } from 'lucide-react';
 
 export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenLocalCoffee, onOpenAuth, currentUser }) {
   const isCoffee = trackMode === 'coffee';
@@ -98,7 +98,7 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
             </button>
           )}
 
-          {/* Community Hub Trigger */}
+          {/* Master Recipe Vault Trigger */}
           {onOpenCommunity && (
             <button
               onClick={onOpenCommunity}
@@ -107,13 +107,31 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
                   ? 'bg-[#2A1C12]/50 border-[#A66E38]/40 text-[#D2A06E] hover:bg-[#38261A]/60'
                   : 'bg-emerald-950/50 border-sage-500/40 text-sage-300 hover:bg-emerald-900/60'
               }`}
-              title="Open Community Hub (Recipes & Forums)"
+              title="Open Master Recipe Vault & Custom Studio"
             >
-              <Users className="w-4 h-4" />
-              <span className="hidden md:inline">Community</span>
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden md:inline">Recipe Vault</span>
             </button>
           )}
+
+          {/* World News Dispatch Trigger */}
+          <button
+            onClick={() => {
+              const el = document.getElementById('world-news');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
+              isCoffee
+                ? 'bg-[#2A1C12]/50 border-[#A66E38]/40 text-[#D2A06E] hover:bg-[#38261A]/60'
+                : 'bg-emerald-950/50 border-sage-500/40 text-sage-300 hover:bg-emerald-900/60'
+            }`}
+            title="Jump to World Coffee & Tea News"
+          >
+            <Newspaper className="w-4 h-4" />
+            <span className="hidden md:inline">World News</span>
+          </button>
 
           {/* Brew Journal Trigger */}
           {onOpenJournal && (
@@ -137,11 +155,17 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
               className="flex items-center space-x-2 p-1 pl-1.5 pr-2.5 rounded-xl bg-white/[0.08] border border-white/[0.12] hover:border-amber-gold/50 transition-all shadow-md group"
               title="Open Barista Profile Dashboard"
             >
-              <img
-                src={currentUser.avatar || '/'}
-                alt={currentUser.displayName}
-                className="w-6 h-6 rounded-full object-cover border border-amber-gold"
-              />
+              {currentUser.avatar && currentUser.avatar !== '/' ? (
+                <img
+                  src={currentUser.avatar}
+                  alt={currentUser.displayName}
+                  className="w-6 h-6 rounded-full object-cover border border-amber-gold"
+                />
+              ) : (
+                <div className="w-6 h-6 rounded-full bg-amber-500/20 border border-amber-gold flex items-center justify-center">
+                  <User className="w-3.5 h-3.5 text-amber-gold" />
+                </div>
+              )}
               <span className="font-mono text-[11px] font-bold text-cream-light group-hover:text-amber-gold transition-colors hidden lg:inline max-w-[90px] truncate">
                 {currentUser.displayName}
               </span>

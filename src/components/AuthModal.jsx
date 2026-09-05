@@ -11,7 +11,7 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
   const [username, setUsername] = useState(currentUser?.username || '');
   const [displayName, setDisplayName] = useState(currentUser?.displayName || '');
   const [bio, setBio] = useState(currentUser?.bio || '');
-  const [avatar, setAvatar] = useState(currentUser?.avatar || AVATAR_PRESETS[0].url);
+  const [avatar, setAvatar] = useState((currentUser?.avatar && currentUser.avatar !== '/') ? currentUser.avatar : AVATAR_PRESETS[0].url);
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleExportFullBackup = () => {

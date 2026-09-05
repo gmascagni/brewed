@@ -5,7 +5,7 @@ export const BREW_METHODS = {
       name: 'Flat-Bottom Pour Over (Kalita)',
       category: 'coffee',
       featured: true,
-      heroImage: '/',
+      heroImage: '/pour_over_hero.jpg',
       ratio: 16, // 1:16 ratio (1g coffee to 16ml water)
       defaultCupMl: 240,
       tempC: 93,
@@ -26,7 +26,7 @@ export const BREW_METHODS = {
       name: 'Hario V60 Dripper',
       category: 'coffee',
       featured: false,
-      heroImage: '/',
+      heroImage: '/pour_over_hero.jpg',
       ratio: 16, // 1:16 Golden Ratio (1g coffee to 16ml water)
       defaultCupMl: 240,
       tempC: 94,
@@ -46,7 +46,7 @@ export const BREW_METHODS = {
       name: 'Chemex Glass Brewer',
       category: 'coffee',
       featured: false,
-      heroImage: '/',
+      heroImage: '/chemex_hero.jpg',
       ratio: 16, // 1:16 ratio
       defaultCupMl: 250,
       tempC: 94,
@@ -66,7 +66,7 @@ export const BREW_METHODS = {
       name: 'French Press (Immersion)',
       category: 'coffee',
       featured: false,
-      heroImage: '/',
+      heroImage: '/french_press.jpg',
       ratio: 13, // 1:13 ratio
       defaultCupMl: 250,
       tempC: 96,
@@ -86,7 +86,7 @@ export const BREW_METHODS = {
       name: 'Automatic Drip Coffee Maker',
       category: 'coffee',
       featured: false,
-      heroImage: '/',
+      heroImage: '/drip_brewer.jpg',
       ratio: 16, // 1:16 ratio
       defaultCupMl: 240,
       tempC: 93,
@@ -106,7 +106,7 @@ export const BREW_METHODS = {
       name: 'Moka Pot (Stovetop Espresso)',
       category: 'coffee',
       featured: false,
-      heroImage: '/',
+      heroImage: '/moka_pot_hero.jpg',
       ratio: 10, // 1:10 ratio
       defaultCupMl: 120,
       tempC: 95,
@@ -126,7 +126,7 @@ export const BREW_METHODS = {
       name: 'Espresso (Manual/Semi-Auto)',
       category: 'coffee',
       featured: false,
-      heroImage: '/',
+      heroImage: '/espresso_hero.jpg',
       ratio: 2, // 1:2 yield ratio (18g in -> 36g out)
       defaultCupMl: 36,
       tempC: 93,
@@ -145,7 +145,7 @@ export const BREW_METHODS = {
       name: 'AeroPress (Inverted Method)',
       category: 'coffee',
       featured: false,
-      heroImage: '/',
+      heroImage: '/aeropress_hero.jpg',
       ratio: 13,
       defaultCupMl: 220,
       tempC: 88,
@@ -167,7 +167,7 @@ export const BREW_METHODS = {
       name: 'Himalayan Darjeeling Tea (The Champagne of Teas)',
       category: 'tea',
       featured: true,
-      heroImage: '/',
+      heroImage: '/tea_ceremony.jpg',
       ratio: 50, // 1g per 50ml water
       defaultCupMl: 240,
       tempC: 88,
@@ -186,7 +186,7 @@ export const BREW_METHODS = {
       name: 'Masala Chai (Spiced Assam & Botanical Infusion)',
       category: 'tea',
       featured: true,
-      heroImage: '/',
+      heroImage: '/tea_kettle.jpg',
       ratio: 25, // 1g tea/spice per 25ml liquid
       defaultCupMl: 250,
       tempC: 98,
@@ -205,7 +205,7 @@ export const BREW_METHODS = {
       name: 'English Breakfast Tea (Malty Assam & Ceylon Blend)',
       category: 'tea',
       featured: true,
-      heroImage: '/',
+      heroImage: '/tea_kettle.jpg',
       ratio: 50, // 1g per 50ml water
       defaultCupMl: 250,
       tempC: 96,
@@ -224,7 +224,7 @@ export const BREW_METHODS = {
       name: 'Earl Grey Tea (Italian Bergamot Oil Infused)',
       category: 'tea',
       featured: true,
-      heroImage: '/',
+      heroImage: '/tea_ceremony.jpg',
       ratio: 50, // 1g per 50ml water
       defaultCupMl: 240,
       tempC: 95,
@@ -243,7 +243,7 @@ export const BREW_METHODS = {
       name: 'Specialty Green Tea (Dragonwell / Sencha)',
       category: 'tea',
       featured: false,
-      heroImage: '/',
+      heroImage: '/tea_ceremony.jpg',
       ratio: 50, // 1g per 50ml water
       defaultCupMl: 200,
       tempC: 78,
@@ -262,7 +262,7 @@ export const BREW_METHODS = {
       name: 'Japanese Ceremonial Matcha (Usucha Whisk)',
       category: 'tea',
       featured: true,
-      heroImage: '/',
+      heroImage: '/tea_ceremony.jpg',
       ratio: 35, // 2g matcha per 70ml water
       defaultCupMl: 100,
       tempC: 80,
@@ -281,7 +281,7 @@ export const BREW_METHODS = {
       name: 'Oolong Tea (Gongfu Hand-Rolled)',
       category: 'tea',
       featured: false,
-      heroImage: '/',
+      heroImage: '/tea_ceremony.jpg',
       ratio: 30, // 1g per 30ml water
       defaultCupMl: 150,
       tempC: 88,
@@ -300,7 +300,7 @@ export const BREW_METHODS = {
       name: 'Ceylon High-Grown Tea (Sri Lankan Black Tea)',
       category: 'tea',
       featured: false,
-      heroImage: '/',
+      heroImage: '/tea_kettle.jpg',
       ratio: 50, // 1g per 50ml water
       defaultCupMl: 240,
       tempC: 95,
@@ -319,7 +319,7 @@ export const BREW_METHODS = {
       name: 'White Tea (Silver Needle / White Peony)',
       category: 'tea',
       featured: false,
-      heroImage: '/',
+      heroImage: '/tea_ceremony.jpg',
       ratio: 60, // 1g per 60ml water
       defaultCupMl: 240,
       tempC: 83,
@@ -338,7 +338,7 @@ export const BREW_METHODS = {
       name: 'Golden Turmeric Botanical Tea (Herbal Infusion)',
       category: 'tea',
       featured: true,
-      heroImage: '/',
+      heroImage: '/tea_kettle.jpg',
       ratio: 40, // 1g botanicals per 40ml water
       defaultCupMl: 250,
       tempC: 98,
@@ -360,7 +360,7 @@ export const GRIND_VISUAL_GUIDE = [
     id: 'extra_fine',
     name: 'Extra Fine',
     micron: '200 - 300 µm',
-    image: '/',
+    image: '/extra_fine_grind.jpg',
     textureComparison: 'Powdered Sugar / Flour',
     visualDensity: 'Ultra-Dense Fine Dust',
     suitableMethods: ['Espresso (9-Bar)', 'Turkish Ibrik'],
@@ -371,7 +371,7 @@ export const GRIND_VISUAL_GUIDE = [
     id: 'fine',
     name: 'Fine',
     micron: '350 - 500 µm',
-    image: '/',
+    image: '/fine_grind.jpg',
     textureComparison: 'Table Salt',
     visualDensity: 'Granular Table Salt Grains',
     suitableMethods: ['Moka Pot (Stovetop)', 'AeroPress Short Brew'],
@@ -382,7 +382,7 @@ export const GRIND_VISUAL_GUIDE = [
     id: 'medium_fine',
     name: 'Medium-Fine',
     micron: '400 - 600 µm',
-    image: '/',
+    image: '/medium_fine_grind.jpg',
     textureComparison: 'Fine Beach Sand / Kosher Salt',
     visualDensity: 'Gritty Fine Sand Grains',
     suitableMethods: ['Pour-Over (V60)', 'Chemex Paper Filter', 'AeroPress Standard'],
@@ -393,7 +393,7 @@ export const GRIND_VISUAL_GUIDE = [
     id: 'medium',
     name: 'Medium',
     micron: '600 - 750 µm',
-    image: '/',
+    image: '/medium_grind.jpg',
     textureComparison: 'Coarse Sand / Ground Black Pepper',
     visualDensity: 'Distinct Uniform Sand Grains',
     suitableMethods: ['Automatic Drip Maker', 'Siphon Brewer'],
@@ -404,7 +404,7 @@ export const GRIND_VISUAL_GUIDE = [
     id: 'medium_coarse',
     name: 'Medium-Coarse',
     micron: '750 - 900 µm',
-    image: '/',
+    image: '/medium_coarse_grind.jpg',
     textureComparison: 'Coarse Sea Salt',
     visualDensity: 'Visible Coarse Rock Grains',
     suitableMethods: ['Chemex Thick Filter', 'Clever Coffee Dripper'],
@@ -415,7 +415,7 @@ export const GRIND_VISUAL_GUIDE = [
     id: 'coarse',
     name: 'Coarse',
     micron: '800 - 1000 µm',
-    image: '/',
+    image: '/coarse_grind.jpg',
     textureComparison: 'Cracked Black Pepper / Potting Soil',
     visualDensity: 'Large Chunks & Flakes',
     suitableMethods: ['French Press Immersion', 'Cold Brew Steep (16-24h)'],
@@ -871,7 +871,7 @@ export const MASTERCLASSES = [
     method: 'Classic Pour Over',
     title: 'James Hoffmann: The Ultimate Pour Over Technique',
     duration: '13:42',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/AI4ynXzkSQo/hqdefault.jpg',
     embedId: 'AI4ynXzkSQo',
     description: 'The world-famous standard pour-over technique by James Hoffmann for clean, sweet, and repeatable cup extraction.',
     keyTakeaways: [
@@ -887,7 +887,7 @@ export const MASTERCLASSES = [
     method: 'Classic Pour Over',
     title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/O9YnLFrM7Fs/hqdefault.jpg',
     embedId: 'O9YnLFrM7Fs',
     description: 'James Hoffmann breaks down coffee bean labels, roast profiles, terroir origins, and freshness dates.',
     keyTakeaways: [
@@ -903,7 +903,7 @@ export const MASTERCLASSES = [
     method: 'Hario V60 Dripper',
     title: 'James Hoffmann: A Better 1-Cup V60 Technique',
     duration: '9:18',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/1oB1oDrDkHM/hqdefault.jpg',
     embedId: '1oB1oDrDkHM',
     description: 'James Hoffmann demonstrates his refined single-cup V60 technique using a 5-pour structure to maximize sweetness and clarity.',
     keyTakeaways: [
@@ -919,7 +919,7 @@ export const MASTERCLASSES = [
     method: 'Hario V60 Dripper',
     title: 'James Hoffmann: The Ultimate V60 Technique (SCA 1:16 Ratio)',
     duration: '13:42',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/AI4ynXzkSQo/hqdefault.jpg',
     embedId: 'AI4ynXzkSQo',
     description: 'The benchmark 2-cup V60 technique by James Hoffmann, targeting 18%-22% extraction yield.',
     keyTakeaways: [
@@ -935,7 +935,7 @@ export const MASTERCLASSES = [
     method: 'Hario V60 Dripper',
     title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/O9YnLFrM7Fs/hqdefault.jpg',
     embedId: 'O9YnLFrM7Fs',
     description: 'Choosing single origins, understanding roast levels, and picking the right coffees for conical paper filtration.',
     keyTakeaways: [
@@ -951,7 +951,7 @@ export const MASTERCLASSES = [
     method: 'Chemex Glass Brewer',
     title: 'James Hoffmann: The Chemex',
     duration: '10:45',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/ikt-X5x7yoc/hqdefault.jpg',
     embedId: 'ikt-X5x7yoc',
     description: 'James Hoffmann explores the Chemex hourglass brewer, specialized bonded paper filters, and how grind size dictates drawdown time.',
     keyTakeaways: [
@@ -967,7 +967,7 @@ export const MASTERCLASSES = [
     method: 'Chemex Glass Brewer',
     title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/O9YnLFrM7Fs/hqdefault.jpg',
     embedId: 'O9YnLFrM7Fs',
     description: 'Selecting beans with delicate aromatic florals and bright fruit notes that shine through heavy Chemex filtration.',
     keyTakeaways: [
@@ -983,7 +983,7 @@ export const MASTERCLASSES = [
     method: 'French Press',
     title: 'James Hoffmann: The Ultimate French Press Technique',
     duration: '5:30',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/st571DYYTR8/hqdefault.jpg',
     embedId: 'st571DYYTR8',
     description: 'Master the James Hoffmann immersion technique: 4-minute steep, gently breaking the crust, and skimming foam for a crystal-clean body.',
     keyTakeaways: [
@@ -999,7 +999,7 @@ export const MASTERCLASSES = [
     method: 'French Press',
     title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/O9YnLFrM7Fs/hqdefault.jpg',
     embedId: 'O9YnLFrM7Fs',
     description: 'Learn why heavy-bodied Sumatran, Brazilian, and medium-dark roasts shine best in immersion brewing.',
     keyTakeaways: [
@@ -1015,7 +1015,7 @@ export const MASTERCLASSES = [
     method: 'Moka Pot',
     title: 'James Hoffmann: The Ultimate Moka Pot Technique',
     duration: '10:30',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/BfDLoIvb0w4/hqdefault.jpg',
     embedId: 'BfDLoIvb0w4',
     description: 'Master the stovetop Moka Pot with pre-heated water, low heat, and cooling the base to eliminate bitter metallic taste.',
     keyTakeaways: [
@@ -1031,7 +1031,7 @@ export const MASTERCLASSES = [
     method: 'Moka Pot',
     title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/O9YnLFrM7Fs/hqdefault.jpg',
     embedId: 'O9YnLFrM7Fs',
     description: 'Choosing roast profiles and processing methods that deliver rich chocolate and caramel notes in stovetop extraction.',
     keyTakeaways: [
@@ -1047,7 +1047,7 @@ export const MASTERCLASSES = [
     method: 'AeroPress',
     title: 'James Hoffmann: The Ultimate AeroPress Technique',
     duration: '13:15',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/j6VlT_jUVPc/hqdefault.jpg',
     embedId: 'j6VlT_jUVPc',
     description: 'The standard technique by James Hoffmann for clean, sweet, and highly reproducible AeroPress extraction.',
     keyTakeaways: [
@@ -1063,7 +1063,7 @@ export const MASTERCLASSES = [
     method: 'AeroPress',
     title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/O9YnLFrM7Fs/hqdefault.jpg',
     embedId: 'O9YnLFrM7Fs',
     description: 'Choosing the right coffee beans and roast profiles for rapid immersion-pressure brewing.',
     keyTakeaways: [
@@ -1079,7 +1079,7 @@ export const MASTERCLASSES = [
     method: 'Espresso',
     title: 'James Hoffmann: How I Dial-In Espresso',
     duration: '12:10',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/lFwJF-_SUr0/hqdefault.jpg',
     embedId: 'lFwJF-_SUr0',
     description: 'Master dose, grind adjustments, puck distribution, and dialing-in 1:2 extraction yields.',
     keyTakeaways: [
@@ -1095,7 +1095,7 @@ export const MASTERCLASSES = [
     method: 'Espresso',
     title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/O9YnLFrM7Fs/hqdefault.jpg',
     embedId: 'O9YnLFrM7Fs',
     description: 'Choosing espresso blends and single origins that produce thick syrupy crema without harsh sourness.',
     keyTakeaways: [
@@ -1111,7 +1111,7 @@ export const MASTERCLASSES = [
     method: 'Cold Brew',
     title: 'James Hoffmann: Everything I Learned About Cold Brew Coffee',
     duration: '14:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/AB0QLjroFss/hqdefault.jpg',
     embedId: 'AB0QLjroFss',
     description: 'Everything you need to know about cold water extraction, brewing variables, and taste comparisons.',
     keyTakeaways: [
@@ -1127,7 +1127,7 @@ export const MASTERCLASSES = [
     method: 'Cold Brew',
     title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/O9YnLFrM7Fs/hqdefault.jpg',
     embedId: 'O9YnLFrM7Fs',
     description: 'Choosing origins and roast levels that produce ultra-smooth, low-acidity cold brew concentrate.',
     keyTakeaways: [
@@ -1143,7 +1143,7 @@ export const MASTERCLASSES = [
     method: 'Siphon Coffee Maker',
     title: 'James Hoffmann: The Coffee Siphon (Vacuum Pot)',
     duration: '11:50',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/mvmRtPGR4C4/hqdefault.jpg',
     embedId: 'mvmRtPGR4C4',
     description: 'Vapor pressure dynamics, temperature stability, and cloth filter filtration in vacuum coffee makers.',
     keyTakeaways: [
@@ -1159,7 +1159,7 @@ export const MASTERCLASSES = [
     method: 'Siphon Coffee Maker',
     title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/O9YnLFrM7Fs/hqdefault.jpg',
     embedId: 'O9YnLFrM7Fs',
     description: 'Selecting delicate floral single origins that benefit from high extraction temperatures and cloth filtration.',
     keyTakeaways: [
@@ -1175,7 +1175,7 @@ export const MASTERCLASSES = [
     method: 'Automatic Drip',
     title: 'James Hoffmann: How To Avoid A Bad Brew',
     duration: '11:45',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/mMwscUNKbPk/hqdefault.jpg',
     embedId: 'mMwscUNKbPk',
     description: 'Mastering extraction balance, avoiding channeling, and getting cafe-quality batch brew from standard home electric coffee makers.',
     keyTakeaways: [
@@ -1191,7 +1191,7 @@ export const MASTERCLASSES = [
     method: 'Automatic Drip',
     title: "A Beginner's Guide To Buying Coffee Beans",
     duration: '11:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/O9YnLFrM7Fs/hqdefault.jpg',
     embedId: 'O9YnLFrM7Fs',
     description: 'Choosing crowd-pleasing medium roasts and single origins for smooth morning batch brewing.',
     keyTakeaways: [
@@ -1209,7 +1209,7 @@ export const MASTERCLASSES = [
     method: 'Oolong Tea',
     title: 'The 14 Steps of Gong Fu Tea (Walkthrough Guide)',
     duration: '12:30',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/vxYWCijfZn0/hqdefault.jpg',
     embedId: 'vxYWCijfZn0',
     description: 'A step-by-step walkthrough guide by Mei Leaf on gaiwan handling, leaf awakening, and multi-steep oolong infusions.',
     keyTakeaways: [
@@ -1225,7 +1225,7 @@ export const MASTERCLASSES = [
     method: 'Oolong Tea',
     title: 'Gong Fu Tea Teaware 101',
     duration: '14:15',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/Ia4oup1v4tU/hqdefault.jpg',
     embedId: 'Ia4oup1v4tU',
     description: 'Mei Leaf breaks down essential teaware from simple gaiwans to Yixing clay pots and fairness cups.',
     keyTakeaways: [
@@ -1241,7 +1241,7 @@ export const MASTERCLASSES = [
     method: 'Green Tea',
     title: 'Chinese Green Tea Explained: 11 Famous Teas',
     duration: '18:40',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/nOUSfwF5Z3U/hqdefault.jpg',
     embedId: 'nOUSfwF5Z3U',
     description: 'Mei Leaf compares 11 legendary green teas, explaining harvest timing, pan-firing, and temperature control.',
     keyTakeaways: [
@@ -1257,7 +1257,7 @@ export const MASTERCLASSES = [
     method: 'Green Tea',
     title: "China's Famous Steamed Green Tea Tasting",
     duration: '15:10',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/1S8PRIvqV60/hqdefault.jpg',
     embedId: '1S8PRIvqV60',
     description: 'Exploring steamed green tea processing, leaf chlorophyll preservation, and marine sweetness.',
     keyTakeaways: [
@@ -1273,7 +1273,7 @@ export const MASTERCLASSES = [
     method: 'White Tea',
     title: 'Silver Needle White Tea Masterclass',
     duration: '6:15',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/74kotpiKUo0/hqdefault.jpg',
     embedId: '74kotpiKUo0',
     description: 'Red Blossom Tea Company explores premium single-bud Silver Needle (Bai Hao Yin Zhen) harvesting and gentle steeping.',
     keyTakeaways: [
@@ -1289,7 +1289,7 @@ export const MASTERCLASSES = [
     method: 'White Tea',
     title: 'Bai Mu Dan (White Peony) Steeping Guide',
     duration: '5:45',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/6cHTJcTnaHo/hqdefault.jpg',
     embedId: '6cHTJcTnaHo',
     description: 'Steeping two-leaves-and-a-bud White Peony for melon sweetness and soft floral bouquet.',
     keyTakeaways: [
@@ -1305,7 +1305,7 @@ export const MASTERCLASSES = [
     method: 'Masala Chai',
     title: 'Authentic Indian Masala Chai & Spices',
     duration: '8:50',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/ptrblJdZT6I/hqdefault.jpg',
     embedId: 'ptrblJdZT6I',
     description: 'Chef Ranveer Brar shares the authentic Indian Masala Chai decoction technique, whole spice roasting, and milk simmering.',
     keyTakeaways: [
@@ -1321,7 +1321,7 @@ export const MASTERCLASSES = [
     method: 'Masala Chai',
     title: 'Botanical Spiced Chai Decoction',
     duration: '5:10',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/U-UI9iqANMc/hqdefault.jpg',
     embedId: 'U-UI9iqANMc',
     description: 'Red Blossom Tea Company demonstrates whole spice decoctions with cinnamon, cardamom, and clove.',
     keyTakeaways: [
@@ -1337,7 +1337,7 @@ export const MASTERCLASSES = [
     method: 'English Breakfast',
     title: 'Formosa Red Assam & Full-Bodied Black Tea',
     duration: '6:30',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/9FaPoLb4iSs/hqdefault.jpg',
     embedId: '9FaPoLb4iSs',
     description: 'Steeping robust Assam black tea at 95°C for rich malty depth, cocoa notes, and honey sweetness.',
     keyTakeaways: [
@@ -1353,7 +1353,7 @@ export const MASTERCLASSES = [
     method: 'English Breakfast',
     title: 'Yunnan Dianhong Black Tea Masterclass',
     duration: '16:20',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/tV7lANeLAeE/hqdefault.jpg',
     embedId: 'tV7lANeLAeE',
     description: 'Mei Leaf explores Yunnan Dianhong black teas, golden buds, and complex sweet potato and cocoa notes.',
     keyTakeaways: [
@@ -1369,7 +1369,7 @@ export const MASTERCLASSES = [
     method: 'Himalayan Darjeeling',
     title: 'How High Elevation Impacts First & Second Flush Teas',
     duration: '7:45',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/KfobDIwdhio/hqdefault.jpg',
     embedId: 'KfobDIwdhio',
     description: 'Red Blossom Tea Company explains how high Himalayan elevation and diurnal temperature swings produce muscatel grape clarity.',
     keyTakeaways: [
@@ -1385,7 +1385,7 @@ export const MASTERCLASSES = [
     method: 'Ceylon Tea',
     title: 'High-Grown Red Leaf & Oxidation Dynamics',
     duration: '6:15',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/PHpq2tc-VKk/hqdefault.jpg',
     embedId: 'PHpq2tc-VKk',
     description: 'Understanding high-grown black tea oxidation, citrus clementine brightness, and brisk copper liquor.',
     keyTakeaways: [
@@ -1401,7 +1401,7 @@ export const MASTERCLASSES = [
     method: 'Earl Grey',
     title: 'Scented Black Teas & Essential Bergamot Oils',
     duration: '7:10',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/IWQJLn5ABRk/hqdefault.jpg',
     embedId: 'IWQJLn5ABRk',
     description: 'Red Blossom Tea Company explores traditional scented black teas and natural essential oil infusing.',
     keyTakeaways: [
@@ -1417,7 +1417,7 @@ export const MASTERCLASSES = [
     method: 'Ceremonial Matcha',
     title: 'Matcha Whisking, Latte Prep & Frothing Guide',
     duration: '9:40',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/MWzqidSeEy0/hqdefault.jpg',
     embedId: 'MWzqidSeEy0',
     description: 'European Coffee Trip explores authentic ceremonial matcha powder whisking, frothing, and milk integration.',
     keyTakeaways: [
@@ -1433,7 +1433,7 @@ export const MASTERCLASSES = [
     method: 'Ceremonial Matcha',
     title: 'Genmai Matcha Ceremonial Whisking Guide',
     duration: '5:30',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/DqtigeEKI2Y/hqdefault.jpg',
     embedId: 'DqtigeEKI2Y',
     description: 'Red Blossom Tea Company demonstrates traditional matcha whisking mechanics and roasted rice tea infusions.',
     keyTakeaways: [
@@ -1449,7 +1449,7 @@ export const MASTERCLASSES = [
     method: 'Golden Turmeric',
     title: 'Botanical Herbal Tisane & Wellness Decoction Guide',
     duration: '6:50',
-    thumbnail: '/',
+    thumbnail: 'https://img.youtube.com/vi/RiBKUy_rEVQ/hqdefault.jpg',
     embedId: 'RiBKUy_rEVQ',
     description: 'Red Blossom Tea Company demonstrates brewing botanical herbal tisanes, ginger root, and turmeric infusions.',
     keyTakeaways: [

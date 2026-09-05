@@ -18,24 +18,14 @@ import AuthModal from './components/AuthModal';
 import CommunityHubModal from './components/CommunityHubModal';
 import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
 import ShopDrawer from './components/ShopDrawer';
+import WorldNewsSection from './components/WorldNewsSection';
 import Footer from './components/Footer';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { getMethodJsonLd, updatePageSeo } from './utils/seo';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 
-const DEFAULT_LOCAL_PROFILES = [
-  {
-    username: '@barista_pro',
-    displayName: 'Alex Rivers',
-    email: 'alex@specialtybrew.org',
-    avatar: '/',
-    bio: 'Specialty Coffee Association Certified Barista • Obsessed with high-altitude washed Ethiopians & 1:16 pour-overs.',
-    role: 'user',
-    streakDays: 14,
-    totalBrewsLogged: 142
-  }
-];
+const DEFAULT_LOCAL_PROFILES = [];
 
 export default function App() {
   const location = useLocation();
@@ -51,9 +41,11 @@ export default function App() {
   const [usersList, setUsersList] = useState(() => {
     try {
       const saved = localStorage.getItem('the_brew_app_local_users');
-      return saved ? JSON.parse(saved) : DEFAULT_LOCAL_PROFILES;
+      const list = saved ? JSON.parse(saved) : [];
+      // Clean up any historical fake personas
+      return list.filter((u) => u && u.username !== '@barista_pro' && u.email !== 'alex@specialtybrew.org');
     } catch {
-      return DEFAULT_LOCAL_PROFILES;
+      return [];
     }
   });
 
@@ -61,7 +53,12 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem('the_brew_app_active_user');
-      return saved ? JSON.parse(saved) : null;
+      const user = saved ? JSON.parse(saved) : null;
+      if (user && (user.username === '@barista_pro' || user.email === 'alex@specialtybrew.org')) {
+        localStorage.removeItem('the_brew_app_active_user');
+        return null;
+      }
+      return user;
     } catch {
       return null;
     }
@@ -220,7 +217,7 @@ export default function App() {
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30 md:opacity-40 transition-all duration-1000">
         <img
           key={currentActiveMethod?.heroImage || trackMode}
-          src={currentActiveMethod?.heroImage || (isCoffee ? '/' : '/')}
+          src={currentActiveMethod?.heroImage || (isCoffee ? '/pour_over_hero.jpg' : '/tea_ceremony.jpg')}
           alt={currentActiveMethod?.name || 'Extraction Background'}
           className="w-full h-full object-cover object-center filter blur-[2px] scale-105 transform transition-transform duration-1000 brightness-90 contrast-110"
         />
@@ -385,6 +382,9 @@ export default function App() {
 
           {/* Collapsible Equipment & Gear Store Drawer */}
           <ShopDrawer trackMode={trackMode} activeMethod={currentActiveMethod} />
+
+          {/* World Coffee & Tea News Dispatch Section */}
+          <WorldNewsSection trackMode={trackMode} />
 
           {/* Tasting Journal Modal */}
           <BrewJournal

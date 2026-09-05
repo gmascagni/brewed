@@ -75,7 +75,7 @@ export const BADGES_DATA = [
     id: 'recipe_creator',
     slug: 'recipe_creator',
     name: 'Master Alchemist',
-    description: 'Created and published a public community brew recipe.',
+    description: 'Designed and saved a custom recipe in your Personal Recipe Studio.',
     category: 'creator',
     icon: '📜',
     criteriaType: 'recipe_count',
