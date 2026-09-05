@@ -14,7 +14,7 @@ import {
   Coffee,
   Leaf
 } from 'lucide-react';
-import { WORLD_BREW_NEWS, NEWS_CATEGORIES } from '../data/newsData';
+import { WORLD_BREW_NEWS, NEWS_CATEGORIES, LAST_UPDATED } from '../data/newsData';
 
 export default function WorldNewsSection({ trackMode }) {
   const isCoffee = trackMode === 'coffee';
@@ -68,8 +68,8 @@ export default function WorldNewsSection({ trackMode }) {
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-white/10">
         <div>
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-[11px] font-mono font-extrabold uppercase tracking-widest text-amber-gold border border-amber-gold/30 mb-3 shadow">
-            <Globe2 className="w-3.5 h-3.5 text-amber-gold animate-spin-slow" />
-            <span>Daily Global Dispatch • Verified Journalism</span>
+            <Globe2 className="w-3.5 h-3.5 text-amber-gold" />
+            <span>Coffee & Tea News Roundup • Curated RSS Feeds</span>
           </div>
 
           <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-extrabold text-cream-light drop-shadow-md">
@@ -77,36 +77,26 @@ export default function WorldNewsSection({ trackMode }) {
           </h3>
           
           <p className="text-xs sm:text-sm text-cream-soft/80 mt-2 max-w-2xl leading-relaxed">
-            Curated daily briefings, origin harvest updates, championship highlights, and market analytics from the specialty coffee and fine tea trade.
+            Curated briefings, harvest dispatches, competition highlights, and market analytics pulled directly from Daily Coffee News, World Tea Press, and trade publications.
           </p>
         </div>
 
-        {/* Schedule Status Card */}
+        {/* Status & Last Synced Card */}
         <div className="p-3.5 sm:p-4 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-between sm:justify-start gap-4 shadow-inner">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400">
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-gold">
+              <Newspaper className="w-4 h-4" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Daily Auto-Scan Active</span>
+              <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-gold">
+                <span className="w-2 h-2 rounded-full bg-amber-gold" />
+                <span>Curated via RSS</span>
               </div>
-              <div className="text-[11px] text-cream-soft/70 font-medium">
-                Scheduled Daily at 09:00 AM
+              <div className="text-[11px] text-cream-soft/70 font-mono">
+                {LAST_UPDATED ? `Last Synced: ${LAST_UPDATED}` : 'Updated periodically'}
               </div>
             </div>
           </div>
-
-          <button
-            onClick={handleManualRefresh}
-            disabled={isRefreshing}
-            className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-cream-light text-xs font-mono font-bold transition-all border border-white/10 flex items-center gap-1.5 active:scale-95 whitespace-nowrap"
-            title="Trigger an on-demand refresh check"
-          >
-            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span>Sync</span>
-          </button>
         </div>
       </div>
 
@@ -241,7 +231,7 @@ export default function WorldNewsSection({ trackMode }) {
                     className="px-4 py-2 rounded-xl bg-white/[0.08] hover:bg-amber-gold hover:text-espresso-950 text-cream-light text-xs font-mono font-bold transition-all border border-white/15 flex items-center gap-1.5 active:scale-95 group/link shadow"
                     title={`Read full coverage on ${article.source}`}
                   >
-                    <span>Read Full Article</span>
+                    <span>Read on {article.source}</span>
                     <ExternalLink className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
                   </a>
                 </div>
@@ -263,8 +253,8 @@ export default function WorldNewsSection({ trackMode }) {
 
       {/* Transparency Footer Notice */}
       <div className="mt-8 pt-6 border-t border-white/10 text-center flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-cream-soft/50 font-mono">
-        <span>Curated from primary journalism outlets (DCN, Sprudge, TCTJ, WTN). All rights reserved by original publishers.</span>
-        <span>Next Automated Crawl: Tomorrow 09:00 AM EST</span>
+        <span>Syndicated from primary industry publications via RSS. Direct article permalinks open original reporting on publisher sites.</span>
+        <span>Curated with direct publisher attribution</span>
       </div>
     </section>
   );

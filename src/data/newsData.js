@@ -1,158 +1,188 @@
 // World Coffee & Tea News Dispatch
-// Real, authenticated news briefs, market analyses, harvest reports, and championship updates
-// Sourced from Daily Coffee News (Roast Magazine), Sprudge, Tea & Coffee Trade Journal, and World Tea News.
+// Automatically synced from live RSS feeds: Daily Coffee News, World Tea Press, Specialty Coffee Press.
+// Last Synced: Sep 5, 2026, 5:31 PM
+
+export const LAST_UPDATED = "Sep 5, 2026, 5:31 PM";
 
 export const WORLD_BREW_NEWS = [
   {
-    id: 'dcn_2026_barometer',
-    title: '2026 Coffee Barometer: Structural Fragility Meets Global Price Corrections',
-    source: 'Daily Coffee News',
-    sourceDomain: 'dailycoffeenews.com',
-    url: 'https://dailycoffeenews.com',
-    publishedDate: 'September 2026',
-    dateIso: '2026-09-02',
-    category: 'coffee',
-    tag: 'Market & Economics',
-    readTime: '4 min read',
-    featured: true,
-    summary: 'The landmark 2026 Coffee Barometer report reveals a stark industry paradox: while global green coffee benchmark prices corrected sharply following historic highs, structural vulnerabilities across smallholder farming communities persist. The report calls for greater transparency and verifiable accountability in sustainability claims across the international green trade.',
-    keyPoints: [
-      'Green coffee prices experienced sharp downward corrections after unprecedented multi-year peaks',
-      'Smallholder producer margins remain under immense pressure from rising fertilizer and transport costs',
-      'Report urges roasters and traders to tie sustainability premiums directly to farmer living incomes'
+    "id": "news_20964593288",
+    "title": "Pittsburgh's La Prima Espresso Gets Second Wind in Expanded Roastery",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/09/04/pittsburghs-la-prima-espresso-gets-second-wind-in-expanded-roastery/",
+    "publishedDate": "Sep 4, 2026",
+    "dateIso": "2026-09-04",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": true,
+    "summary": "Pittsburgh-based La Prima Espresso Company is approaching its 38th anniversary with an expanded roastery, new retail packaging and a refined selection of seasonal and limited-release coffees. The expanded 6,000-square-foot \"Torrefazione...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Sep 4, 2026",
+      "Direct coverage covering industry & news"
     ]
   },
   {
-    id: 'sprudge_usbc_2026',
-    title: 'Jak Michael Ryan of Proud Mary Crowned 2026 US Barista Champion',
-    source: 'Sprudge',
-    sourceDomain: 'sprudge.com',
-    url: 'https://sprudge.com',
-    publishedDate: 'August 2026',
-    dateIso: '2026-08-22',
-    category: 'coffee',
-    tag: 'Competition',
-    readTime: '3 min read',
-    featured: true,
-    summary: 'Jak Michael Ryan of Proud Mary Coffee (Austin, Texas) has taken top honors at the 2026 United States Barista Championship. Featuring an exquisitely processed anaerobic Gesha and a boundary-pushing signature drink exploring temperature profiling and milk fat fractioning, Ryan will represent the United States at the World Barista Championship.',
-    keyPoints: [
-      'Winning routine showcased precision temperature stages and innovative freeze-distilled milk chemistry',
-      'Highlighted direct collaboration with single-estate micro-lot producers in Central and South America',
-      'Jak Michael Ryan advances to represent the United States on the global stage'
+    "id": "news_4415713241",
+    "title": "Coffee People Zine Back in Print, Plans Minneapolis Party",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/09/04/coffee-people-zine-back-in-print-plans-minneapolis-party/",
+    "publishedDate": "Sep 4, 2026",
+    "dateIso": "2026-09-04",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "After a hiatus of more than a year, the independent journal Coffee People Zine is back in print, with a launch party planned for Sunday, Sept. 20, in Minneapolis.&#160; The...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Sep 4, 2026",
+      "Direct coverage covering industry & news"
     ]
   },
   {
-    id: 'tctj_global_tea_report_2026',
-    title: '2026 Global Tea Report: Record Production, Shifting Consumption & Smallholder Dynamics',
-    source: 'Tea & Coffee Trade Journal',
-    sourceDomain: 'teaandcoffee.net',
-    url: 'https://www.teaandcoffee.net',
-    publishedDate: 'September 2026',
-    dateIso: '2026-09-01',
-    category: 'tea',
-    tag: 'Harvest & Trade',
-    readTime: '5 min read',
-    featured: true,
-    summary: 'Global tea production reached a historic 7.27 million metric tons, driven by production expansions in China, India, Kenya, and Sri Lanka. However, oversupply pressures have led to modest global price declines, accelerating a major structural transition: more than 72% of total production is now retained within domestic producing markets rather than exported.',
-    keyPoints: [
-      'Top five producer nations represent 87.5% of total world tea output',
-      'Domestic tea retention in producer nations rose to 72%, reflecting booming local cafe cultures',
-      'Organic whole-leaf and functional botanical teas continue double-digit growth despite commodity dips'
+    "id": "news_2597700710",
+    "title": "Weekly Coffee News: Colombia Earthquake Support + Brewing for Equity",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/09/04/weekly-coffee-news-colombia-earthquake-support-brewing-for-equity/",
+    "publishedDate": "Sep 4, 2026",
+    "dateIso": "2026-09-04",
+    "category": "coffee",
+    "tag": "Farm & Origin",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Welcome to DCN’s Weekly Coffee News! Subscribe here for all the latest coffee industry news. Also, check out the latest career opportunities at CoffeeIndustryJobs.com. Reysol Coffee Raises Relief Funds for...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Sep 4, 2026",
+      "Direct coverage covering farm & origin"
     ]
   },
   {
-    id: 'dcn_aeropress_championship_2026',
-    title: 'World AeroPress Championship Moves to Mexico City for Historic 2026 Edition',
-    source: 'Daily Coffee News',
-    sourceDomain: 'dailycoffeenews.com',
-    url: 'https://dailycoffeenews.com',
-    publishedDate: 'August 2026',
-    dateIso: '2026-08-18',
-    category: 'coffee',
-    tag: 'Events & Gear',
-    readTime: '3 min read',
-    featured: false,
-    summary: 'For the first time in its 18-season history, the World AeroPress Championship (WAC) will take place in Mexico City on December 6, 2026. Bringing together national champions from over 60 countries, the event will celebrate Mexico’s rich specialty coffee culture and the worldwide community of AeroPress competitors.',
-    keyPoints: [
-      'Marks the first time the WAC world finals are hosted in Mexico, honoring a premier origin country',
-      'National competition circuits across 60+ countries culminate at the historic Mexico City venue',
-      'Focuses on experimental bypass ratios, quick inverted plunge methods, and custom water profiles'
+    "id": "news_11691739140",
+    "title": "Ecuador’s Deforestation-Free Coffee Model Moves Beyond the Pilot Stage",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/09/03/ecuadors-deforestation-free-coffee-model-moves-beyond-the-pilot-stage/",
+    "publishedDate": "Sep 3, 2026",
+    "dateIso": "2026-09-03",
+    "category": "coffee",
+    "tag": "Farm & Origin",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Since 2019, nearly 400 coffee producers in the Ecuadorian Amazon have adopted a deforestation-free production model that combines traceability, geospatial monitoring, and certification. In 2025 alone, the initiative exported as...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Sep 3, 2026",
+      "Direct coverage covering farm & origin"
     ]
   },
   {
-    id: 'wtn_matcha_surge_2026',
-    title: 'Matcha Mania: Ceremonial Grade Tencha Demand Accelerates Global Uji Exports',
-    source: 'World Tea News',
-    sourceDomain: 'worldteanews.com',
-    url: 'https://worldteanews.com',
-    publishedDate: 'August 2026',
-    dateIso: '2026-08-25',
-    category: 'tea',
-    tag: 'Origin & Culture',
-    readTime: '4 min read',
-    featured: false,
-    summary: 'International consumer appreciation for traditional Japanese stone-ground matcha has surged to all-time highs. Producers in Kyoto’s historic Uji and Kagoshima prefectures report record demand for first-harvest ceremonial tencha, sparking investments in sustainable shading techniques and modernized granite stone milling infrastructure.',
-    keyPoints: [
-      'Ceremonial grade single-cultivar matcha exports from Japan saw double-digit year-over-year gains',
-      'Consumers increasingly prioritize traditional bamboo chasen preparation and rich umami cultivars',
-      'Producers emphasize regenerative soil management and solar shading canopies'
+    "id": "news_15131124246",
+    "title": "Design Details: The Day to Night Gradient at Six Coffee + Wine in Kazakhstan",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/09/03/design-details-the-day-to-night-gradient-at-six-coffee-wine-in-kazakhstan/",
+    "publishedDate": "Sep 3, 2026",
+    "dateIso": "2026-09-03",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Welcome to Design Details, an ongoing editorial feature in Daily Coffee News focused on individual examples of coffee shop architecture, interior design, packaging design or branding. If you are a...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Sep 3, 2026",
+      "Direct coverage covering industry & news"
     ]
   },
   {
-    id: 'sprudge_kau_relief_2026',
-    title: 'Coffee Community Rallies Relief Efforts for Kaʻu Producers in Hawaiʻi',
-    source: 'Sprudge',
-    sourceDomain: 'sprudge.com',
-    url: 'https://sprudge.com',
-    publishedDate: 'Late August 2026',
-    dateIso: '2026-08-29',
-    category: 'coffee',
-    tag: 'Farming & Relief',
-    readTime: '3 min read',
-    featured: false,
-    summary: 'Following severe weather disruptions in southern Hawaiʻi Island, roasters, cuppers, and green buyers across the United States have launched cooperative relief funds to rebuild shade structures and processing wet mills for multi-generational family farms in the renowned Kaʻu coffee district.',
-    keyPoints: [
-      'Relief initiatives directly fund infrastructure repairs for family-owned coffee mills in Kaʻu',
-      'Collaborative green buyer fundraisers pledge matching contributions for parchment purchases',
-      'Underscores the specialty industry’s collective responsibility to safeguard origin resilience'
+    "id": "news_6695472711",
+    "title": "Report Traces Global Coffee Exports and Imports by Company",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/09/02/report-traces-global-coffee-exports-and-imports-by-company/",
+    "publishedDate": "Sep 2, 2026",
+    "dateIso": "2026-09-02",
+    "category": "coffee",
+    "tag": "Market & Trade",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "A new global coffee supply chain analysis from the nonprofit Trase gives fresh numerical weight to the fact that a relatively small group of companies accounts for a large share...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Sep 2, 2026",
+      "Direct coverage covering market & trade"
     ]
   },
   {
-    id: 'dcn_ace_cup_of_excellence_2026',
-    title: 'Alliance for Coffee Excellence Announces 2026 Cup of Excellence Schedule',
-    source: 'Daily Coffee News',
-    sourceDomain: 'dailycoffeenews.com',
-    url: 'https://dailycoffeenews.com',
-    publishedDate: 'July 2026',
-    dateIso: '2026-07-28',
-    category: 'coffee',
-    tag: 'Auctions & Quality',
-    readTime: '3 min read',
-    featured: false,
-    summary: 'The Alliance for Coffee Excellence (ACE) has released the 2026 international competition calendar spanning 11 coffee-producing nations. The Cup of Excellence program remains the gold standard for discovering exceptional micro-lots, rewarding innovative farmers with record-breaking international auction premiums.',
-    keyPoints: [
-      'Competitions scheduled across Ethiopia, Colombia, Guatemala, Costa Rica, and Indonesia',
-      'Incorporates updated sensory assessment forms aligning with the latest SCA evaluation standards',
-      'Direct-to-farmer auction model channels historic price premiums directly back to producers'
+    "id": "news_21987593513",
+    "title": "Specialty Tea Market Size, Share, Industry Growth, 2034 - fortunebusinessinsights.com",
+    "source": "fortunebusinessinsights.com",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBzMnNBUXUtQk9kaXotbHFhbWtaaHNVNWxUTjR0U29YM01rdmVjZHEtSlJDVWxtRTFSeEh4bGNySjRFcU5YRVRScjNCdUNuTnhxaGVzOVltWEd2ZnpqNmhJSVlxeU9kN1A0d0lReFdtUlkzMWFaQWc?oc=5",
+    "publishedDate": "Aug 10, 2026",
+    "dateIso": "2026-08-10",
+    "category": "tea",
+    "tag": "Fine Tea Dispatch",
+    "readTime": "2 min read",
+    "featured": true,
+    "summary": "Specialty Tea Market Size, Share, Industry Growth, 2034&nbsp;&nbsp;fortunebusinessinsights.com",
+    "keyPoints": [
+      "Published by fortunebusinessinsights.com on Aug 10, 2026",
+      "Direct coverage covering fine tea dispatch"
     ]
   },
   {
-    id: 'wtn_world_tea_expo_innovations',
-    title: 'World Tea Expo Spotlights Ancient Tree Teas and Precision Brewing Hardware',
-    source: 'World Tea News',
-    sourceDomain: 'worldteanews.com',
-    url: 'https://worldteanews.com',
-    publishedDate: 'March 2026',
-    dateIso: '2026-03-26',
-    category: 'tea',
-    tag: 'Tech & Innovation',
-    readTime: '4 min read',
-    featured: false,
-    summary: 'The annual World Tea Expo highlighted exciting crossovers between ancient artisanal tea traditions and contemporary precision technology. Key exhibits showcased wild ancient tree pu-erh teas from Yunnan alongside smart temperature-variable infusers designed to unlock nuanced multi-steep Gongfu flavor profiles.',
-    keyPoints: [
-      'Spotlight on single-mountain ancient tree teas (Gushu) from Yunnan and Wuyi rock oolongs',
-      'Intelligent induction kettles and digital water quality meters tailored specifically for tea leaves',
-      'Growing emphasis on plastic-free, 100% biodegradable whole-leaf pyramid tea packaging'
+    "id": "news_26879627794",
+    "title": "Is Brazil’s Specialty Coffee Sector on the Rise? - STiR Coffee and Tea Magazine",
+    "source": "STiR Coffee and Tea Magazine",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNeGR4UElqTzl2dTBYZ01TRk1tdWdEZkVselFxUkdnbzZzYmpidHJOZHlEODhqMWllTmxPWi1qSlBKVlRqR1FEZlFhUjdVcnQyYjN2emVTbjFxWFZNOW4xNjlCRW5UeDM3eFJGczlZV1pOX09zQW43S2F6dm9YRUVSM1hyb0tVSkxOWldwa1E1VFZVRVA1XzlPdnhQTnZJUUU2ZFE?oc=5",
+    "publishedDate": "Apr 19, 2026",
+    "dateIso": "2026-04-19",
+    "category": "tea",
+    "tag": "Fine Tea Dispatch",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Is Brazil’s Specialty Coffee Sector on the Rise?&nbsp;&nbsp;STiR Coffee and Tea Magazine",
+    "keyPoints": [
+      "Published by STiR Coffee and Tea Magazine on Apr 19, 2026",
+      "Direct coverage covering fine tea dispatch"
+    ]
+  },
+  {
+    "id": "news_10521141577",
+    "title": "China’s Tea Industry Shifts from Volume to Value - WorldTeaNews",
+    "source": "WorldTeaNews",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxONWlpcFlpS2paR1BBY1lUQ2VxLUYyTjJRWW9zd2oxazBzeVFaRjZJa2g4TWRYTTNmTEtHbXMwMld2bGhuQ1o4a1VYRkRFOXB0T1BoVFExUkkwWGFEdEhPM19IT1dLTjNYaTZ5dW9za1VEamVzd2EwYmx5U0xaTEpnMWpPRUVSWEFv?oc=5",
+    "publishedDate": "Mar 11, 2026",
+    "dateIso": "2026-03-11",
+    "category": "tea",
+    "tag": "Fine Tea Dispatch",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "China’s Tea Industry Shifts from Volume to Value&nbsp;&nbsp;WorldTeaNews",
+    "keyPoints": [
+      "Published by WorldTeaNews on Mar 11, 2026",
+      "Direct coverage covering fine tea dispatch"
+    ]
+  },
+  {
+    "id": "news_16872986195",
+    "title": "The Future of Specialty Coffee - Tea & Coffee Trade Journal",
+    "source": "Tea & Coffee Trade Journal",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9kdGlwSG9GTEdUUzRQN1k0TG42MDVmQ0NmSVVyOWt6dkpva2hfdGJOMWxzQ0pPb2FKWVdCeExNZS1YSEVTQm5ZcUpPQVdnWkJMbFY4UlA0U2JtbWpkVmlSdFF5NFFjNzFnSVpoZ1BJanR2a1pPZFNnZDZIZ1hSRUk?oc=5",
+    "publishedDate": "Jan 29, 2026",
+    "dateIso": "2026-01-29",
+    "category": "tea",
+    "tag": "Fine Tea Dispatch",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "The Future of Specialty Coffee&nbsp;&nbsp;Tea & Coffee Trade Journal",
+    "keyPoints": [
+      "Published by Tea & Coffee Trade Journal on Jan 29, 2026",
+      "Direct coverage covering fine tea dispatch"
     ]
   }
 ];
