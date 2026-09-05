@@ -17,14 +17,6 @@ export const PRODUCT_CATEGORIES = {
     { id: 'water_kettles', label: 'Kettles & Water' },
     { id: 'beans_tea', label: 'Imperial Loose Leaf Teas' },
     { id: 'top_rated', label: 'Top Rated ⭐ 4.9+' }
-  ],
-  beer: [
-    { id: 'all', label: 'All Beer Gear' },
-    { id: 'method_kit', label: 'Homebrew Kits' },
-    { id: 'grinders_scales', label: 'Grain Mills & Scalers' },
-    { id: 'fermenters_kettles', label: 'Kettles & Fermenters' },
-    { id: 'glassware', label: 'Craft Beer Glassware' },
-    { id: 'top_rated', label: 'Top Rated ⭐ 4.9+' }
   ]
 };
 
@@ -329,72 +321,6 @@ export const PRODUCTS_DATA = [
     amazonUrl: `https://www.amazon.com/s?k=Yunnan+Sourcing+Aged+Shou+Ripe+Pu-erh+Tea+Cake&tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/',
     description: 'Post-fermented tea cake from Menghai with deep camphor wood, damp earth sweetness, and velvet chocolate body.'
-  },
-
-  // ========================================
-  // 3. BEER STORE PRODUCTS (track: 'beer')
-  // ========================================
-  {
-    id: 'northern_brewer_starter_kit',
-    name: 'Northern Brewer Deluxe Homebrew Starter Kit (5 Gallon Carboy & Kettle)',
-    track: 'beer',
-    category: 'method_kit',
-    methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner', 'saison', 'sour_gose', 'hefeweizen', 'amber_ale', 'porter', 'tripel'],
-    badge: 'Homebrew Gold Standard',
-    rating: 4.9,
-    reviewsCount: 4120,
-    priceRange: '$139 - $169',
-    topRated: true,
-    asin: 'B01798AW8M',
-    amazonUrl: `https://www.amazon.com/s?k=Northern+Brewer+Deluxe+Homebrew+Starter+Kit&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/',
-    description: 'Complete 5-gallon brew kettle, glass fermenter carboy, auto-siphon tubing, sanitizer, and hydrometer for craft brewing.'
-  },
-  {
-    id: 'heavy_duty_barley_mill',
-    name: 'Heavy Duty 2-Roller Grain Mill Barley Crusher with Metal Base',
-    track: 'beer',
-    category: 'grinders_scales',
-    methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner', 'saison', 'sour_gose', 'hefeweizen', 'amber_ale', 'porter', 'tripel'],
-    badge: 'Roller Gap 0.038"',
-    rating: 4.8,
-    reviewsCount: 1890,
-    priceRange: '$79 - $95',
-    topRated: true,
-    asin: 'B07Q5W48JL',
-    amazonUrl: `https://www.amazon.com/s?k=2+Roller+Grain+Mill+Barley+Crusher&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/',
-    description: 'Adjustable dual stainless steel knurled rollers designed to crush malt husks cleanly for 85%+ mash conversion efficiency.'
-  },
-  {
-    id: 'craft_beer_glassware_set',
-    name: 'Spiegelau Craft Beer Glasses Tasting Kit (Tulip, IPA & Stout Glasses)',
-    track: 'beer',
-    category: 'glassware',
-    methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner', 'saison', 'sour_gose', 'hefeweizen', 'amber_ale', 'porter', 'tripel'],
-    badge: 'Sommelier Choice',
-    rating: 4.9,
-    reviewsCount: 3450,
-    priceRange: '$38 - $48',
-    topRated: true,
-    asin: 'B00BTPUT3S',
-    amazonUrl: `https://www.amazon.com/s?k=Spiegelau+Craft+Beer+Glasses+Tasting+Kit&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/',
-    description: 'German lead-free crystal glassware specifically shaped to enhance hop aromatics, foam retention, and head stability.'
-  },
-  {
-    id: 'triple_scale_hydrometer',
-    name: 'Brewing Triple Scale Hydrometer & Test Jar for Original Gravity & ABV',
-    track: 'beer',
-    category: 'method_kit',
-    methodIds: ['hazy_ipa', 'imperial_stout', 'west_coast_ipa', 'german_pilsner'],
-    badge: 'Gravity & ABV Tool',
-    rating: 4.8,
-    reviewsCount: 6120,
-    priceRange: '$16 - $21',
-    asin: 'B075R0G4M5',
-    amazonUrl: `https://www.amazon.com/s?k=Brewing+Triple+Scale+Hydrometer+Test+Jar&tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/',
-    description: 'Glass hydrometer reading specific gravity (0.990 - 1.160), Brix, and potential alcohol % for mash attenuation tracking.'
   }
 ];
+
