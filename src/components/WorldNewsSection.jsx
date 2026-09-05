@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Newspaper, 
   Search, 
@@ -12,15 +12,27 @@ import {
   Tag, 
   Layers,
   Coffee,
-  Leaf
+  Leaf,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { WORLD_BREW_NEWS, NEWS_CATEGORIES, LAST_UPDATED } from '../data/newsData';
 
 export default function WorldNewsSection({ trackMode }) {
   const isCoffee = trackMode === 'coffee';
+  const [isExpanded, setIsExpanded] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Listen for navigation event from Header
+  useEffect(() => {
+    const handleOpenWorldNews = () => {
+      setIsExpanded(true);
+    };
+    window.addEventListener('open-world-news', handleOpenWorldNews);
+    return () => window.removeEventListener('open-world-news', handleOpenWorldNews);
+  }, []);
 
   // Filter and search logic
   const filteredNews = useMemo(() => {
@@ -65,15 +77,20 @@ export default function WorldNewsSection({ trackMode }) {
       }`}
     >
       {/* Section Header */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-white/10">
+      <div className={`flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all ${
+        isExpanded ? 'pb-6 border-b border-white/10' : ''
+      }`}>
         <div>
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-[11px] font-mono font-extrabold uppercase tracking-widest text-amber-gold border border-amber-gold/30 mb-3 shadow">
             <Globe2 className="w-3.5 h-3.5 text-amber-gold" />
             <span>Coffee & Tea News Roundup • Curated RSS Feeds</span>
           </div>
 
-          <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-extrabold text-cream-light drop-shadow-md">
-            World Coffee & Tea News
+          <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-extrabold text-cream-light drop-shadow-md flex items-center gap-3">
+            <span>World Coffee & Tea News</span>
+            <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-cream-soft/80 border border-white/15">
+              {WORLD_BREW_NEWS.length} Stories
+            </span>
           </h3>
           
           <p className="text-xs sm:text-sm text-cream-soft/80 mt-2 max-w-2xl leading-relaxed">
@@ -81,10 +98,10 @@ export default function WorldNewsSection({ trackMode }) {
           </p>
         </div>
 
-        {/* Status & Last Synced Card */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-between sm:justify-start gap-4 shadow-inner">
-          <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-gold">
+        {/* Status Card & Expand/Collapse Controls */}
+        <div className="flex flex-wrap items-center gap-3 self-start lg:self-center">
+          <div className="p-3 sm:p-3.5 rounded-2xl bg-black/40 border border-white/10 flex items-center gap-3 shadow-inner">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-gold">
               <Newspaper className="w-4 h-4" />
             </div>
             <div>
@@ -92,13 +109,34 @@ export default function WorldNewsSection({ trackMode }) {
                 <span className="w-2 h-2 rounded-full bg-amber-gold" />
                 <span>Curated via RSS</span>
               </div>
-              <div className="text-[11px] text-cream-soft/70 font-mono">
-                {LAST_UPDATED ? `Last Synced: ${LAST_UPDATED}` : 'Updated periodically'}
+              <div className="text-[10px] text-cream-soft/70 font-mono">
+                {LAST_UPDATED ? `Synced: ${LAST_UPDATED}` : 'Updated periodically'}
               </div>
             </div>
           </div>
+
+          {/* Expand / Collapse Button */}
+          <button
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className={`px-5 sm:px-6 py-3.5 rounded-2xl text-xs font-mono font-extrabold uppercase tracking-wider flex items-center gap-2 shadow-xl transition-all active:scale-95 whitespace-nowrap ${
+              isExpanded
+                ? isCoffee 
+                  ? 'btn-tactile-coffee text-[#140C08]' 
+                  : 'btn-tactile-tea text-white'
+                : 'bg-white/[0.08] text-cream-light hover:bg-white/[0.15] border border-white/[0.12]'
+            }`}
+            title={isExpanded ? 'Collapse World News section' : 'Expand World News section'}
+            aria-expanded={isExpanded}
+          >
+            <span>{isExpanded ? 'Collapse News' : 'Expand World News'}</span>
+            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
         </div>
       </div>
+
+      {/* Collapsible Body Content */}
+      {isExpanded && (
+        <div className="mt-8 space-y-8 animate-fade-in">
 
       {/* Control Bar: Category Filters & Search Input */}
       <div className="mt-8 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -256,6 +294,8 @@ export default function WorldNewsSection({ trackMode }) {
         <span>Syndicated from primary industry publications via RSS. Direct article permalinks open original reporting on publisher sites.</span>
         <span>Curated with direct publisher attribution</span>
       </div>
+        </div>
+      )}
     </section>
   );
 }

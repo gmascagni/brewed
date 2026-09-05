@@ -117,10 +117,13 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
           {/* World News Dispatch Trigger */}
           <button
             onClick={() => {
-              const el = document.getElementById('world-news');
-              if (el) {
-                el.scrollIntoView({ behavior: 'smooth' });
-              }
+              window.dispatchEvent(new CustomEvent('open-world-news'));
+              setTimeout(() => {
+                const el = document.getElementById('world-news');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                }
+              }, 50);
             }}
             className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
               isCoffee
