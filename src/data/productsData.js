@@ -36,7 +36,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$24 - $28',
     topRated: true,
     asin: 'B002VUSWGQ',
-    amazonUrl: `https://www.amazon.com/s?k=Hario+V60+Ceramic+Coffee+Dripper+Starter+Set&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B002VUSWGQ/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/pour_over_hero.jpg',
     description: 'The iconic 60-degree spiral ribbed ceramic pour-over cone for maximum flow rate control and pristine citric clarity.'
   },
@@ -51,7 +51,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 8900,
     priceRange: '$9 - $12',
     asin: 'B001U7EOYA',
-    amazonUrl: `https://www.amazon.com/s?k=Hario+V60+Paper+Filters+Size+02+100+Count&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B001U7EOYA/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/pour_over_hero.jpg',
     description: 'High-density Japanese oxygen-bleached tabbed paper filters that trap sediment and oils for a tea-like body.'
   },
@@ -66,7 +66,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 5120,
     priceRange: '$48 - $54',
     asin: 'B0000CF2UT',
-    amazonUrl: `https://www.amazon.com/s?k=Chemex+Classic+8+Cup+Glass+Pour+Over+Coffeemaker&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B0000CF2UT/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/chemex_hero.jpg',
     description: 'Non-porous Borosilicate glass carafe with polished wood collar and leather tie. Uses heavy Chemex bond filters.'
   },
@@ -81,7 +81,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 12450,
     priceRange: '$35 - $42',
     asin: 'B00005LM76',
-    amazonUrl: `https://www.amazon.com/s?k=Bodum+Chambord+French+Press+Coffee+Maker+34+oz&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B00005LM76/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/french_press.jpg',
     description: 'Heat-resistant borosilicate glass with stainless steel frame and 3-part mesh plunger for heavy chocolate body.'
   },
@@ -96,7 +96,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 21500,
     priceRange: '$38 - $45',
     asin: 'B0000CF3Q6',
-    amazonUrl: `https://www.amazon.com/s?k=Bialetti+Moka+Express+Stovetop+Espresso+Maker+6+Cup&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B0000CF3Q6/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/french_press.jpg',
     description: 'Octagonal food-grade aluminum body made in Italy. Generates 1.5 bar steam pressure for syrupy crema-rich coffee.'
   },
@@ -112,7 +112,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$39 - $44',
     topRated: true,
     asin: 'B0047BIWSK',
-    amazonUrl: `https://www.amazon.com/s?k=AeroPress+Original+Coffee+and+Espresso+Maker&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B0047BIWSK/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/moka_pot_hero.jpg',
     description: 'Patented air-pressure immersion technology brewing zero-bitterness coffee in 60 seconds.'
   },
@@ -127,7 +127,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 9400,
     priceRange: '$149 - $169',
     asin: 'B007F18CHC',
-    amazonUrl: `https://www.amazon.com/s?k=Baratza+Encore+Conical+Burr+Coffee+Grinder&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B007F18CHC/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/aeropress_hero.jpg',
     description: '40 individual coarseness settings from 250 to 1200 microns. 40mm alloy steel burrs engineered in Europe.'
   },
@@ -142,7 +142,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 3100,
     priceRange: '$52 - $59',
     asin: 'B0836F76D8',
-    amazonUrl: `https://www.amazon.com/s?k=Timemore+Black+Mirror+Basic+Digital+Coffee+Scale&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B0836F76D8/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/medium_grind.jpg',
     description: 'Ultra-fast 0.1g precision sensor with auto-starting brew timer, hidden LED display, and USB-C rechargeable battery.'
   },
@@ -157,7 +157,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 7800,
     priceRange: '$165 - $195',
     asin: 'B077JBQZPX',
-    amazonUrl: `https://www.amazon.com/s?k=Fellow+Stagg+EKG+Electric+Gooseneck+Kettle&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B077JBQZPX/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/coffee_setup.jpg',
     description: 'PID degree-by-degree temperature control (135°F - 212°F) with precision counterbalanced gooseneck pour spout.'
   },
@@ -172,7 +172,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 1650,
     priceRange: '$15 - $18',
     asin: 'B077J399B6',
-    amazonUrl: `https://www.amazon.com/s?k=Third+Wave+Water+Coffee+Mineral+Packets&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B077J399B6/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/tea_kettle.jpg',
     description: 'Remineralizes distilled or RO water with exact magnesium, calcium, and sodium ratios to eliminate papery sourness.'
   },
@@ -188,7 +188,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$22 - $26',
     topRated: true,
     asin: 'B08F9G2X9C',
-    amazonUrl: `https://www.amazon.com/s?k=Onyx+Coffee+Lab+Tropical+Weather+Ethiopian+Whole+Bean&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B08F9G2X9C/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/coffee_setup.jpg',
     description: 'Washed and natural processed Ethiopian heirloom blend featuring wild blueberry jam, peach nectar, and floral bergamot.'
   },
@@ -204,7 +204,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$19 - $23',
     topRated: true,
     asin: 'B01M333V4H',
-    amazonUrl: `https://www.amazon.com/s?k=Blue+Bottle+Coffee+Three+Africas+Organic+Whole+Bean&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B01M333V4H/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/avatar_roast_beans.jpg',
     description: 'Blend of two Ethiopian single-origins and a Ugandan bean featuring golden raisin, dried blueberry, and dark chocolate.'
   },
@@ -223,7 +223,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 840,
     priceRange: '$32 - $39',
     asin: 'B08F2B1QZP',
-    amazonUrl: `https://www.amazon.com/s?k=Gongfu+Ceramic+Gaiwan+Teapot+Tea+Set&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B08F2B1QZP/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/avatar_roast_beans.jpg',
     description: 'Traditional 150mL porcelain lidded Gaiwan set for precision multi-steep Gongfu tea infusions.'
   },
@@ -239,7 +239,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$18 - $24',
     topRated: true,
     asin: 'B07MZD72TY',
-    amazonUrl: `https://www.amazon.com/s?k=Japanese+Bamboo+Chasen+Matcha+Whisk+Set&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B07MZD72TY/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/tea_ceremony.jpg',
     description: 'Hand-split 100-prong golden bamboo Chasen whisk designed to create creamy micro-foam froth for ceremonial Matcha.'
   },
@@ -255,7 +255,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$65 - $79',
     topRated: true,
     asin: 'B08BG4578S',
-    amazonUrl: `https://www.amazon.com/s?k=Electric+Gooseneck+Kettle+with+Timer+and+Variable+Temperature&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B08BG4578S/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/tea_ceremony.jpg',
     description: 'Precision temperature presets for Green Tea (180°F), White Tea (185°F), Oolong (190°F), and Black Tea (205°F).'
   },
@@ -271,7 +271,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$38 - $44',
     topRated: true,
     asin: 'B015C3YXYO',
-    amazonUrl: `https://www.amazon.com/s?k=Ippodo+Tea+Ummon-no-mukai+Ceremonial+Grade+Matcha&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B015C3YXYO/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/tea_kettle.jpg',
     description: 'First-harvest shade-grown green tea leaves stone-ground in Kyoto, Japan. Deep emerald foam with intense savory umami.'
   },
@@ -287,7 +287,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$12 - $16',
     topRated: true,
     asin: 'B000RHXMYC',
-    amazonUrl: `https://www.amazon.com/s?k=Harney+and+Sons+Supreme+Dragon+Pearl+Jasmine+Green+Tea&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B000RHXMYC/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/tea_ceremony.jpg',
     description: 'Hand-rolled Fujian tea pearls infused multiple times with fresh night-blooming jasmine flowers for a sweet fragrant cup.'
   },
@@ -302,7 +302,7 @@ export const PRODUCTS_DATA = [
     reviewsCount: 7800,
     priceRange: '$14 - $17',
     asin: 'B07B5N5Z2K',
-    amazonUrl: `https://www.amazon.com/s?k=Vahdam+Imperial+English+Breakfast+Loose+Leaf+Black+Tea&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B07B5N5Z2K/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/tea_ceremony.jpg',
     description: 'Robust blend of Assam second-flush orthodox black tea leaves delivering rich maltiness, amber cup, and bold body.'
   },
@@ -318,7 +318,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$24 - $29',
     topRated: true,
     asin: 'B07M9P22X7',
-    amazonUrl: `https://www.amazon.com/s?k=Yunnan+Sourcing+Aged+Shou+Ripe+Pu-erh+Tea+Cake&tag=${AMAZON_AFFILIATE_TAG}`,
+    amazonUrl: `https://www.amazon.com/dp/B07M9P22X7/?tag=${AMAZON_AFFILIATE_TAG}`,
     image: '/tea_kettle.jpg',
     description: 'Post-fermented tea cake from Menghai with deep camphor wood, damp earth sweetness, and velvet chocolate body.'
   }
