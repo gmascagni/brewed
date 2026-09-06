@@ -339,8 +339,50 @@ const waterGuideContent = `
       </div>
     </section>
 
+    <section style="margin-bottom: 32px;">
+      <h2 style="font-family: serif; font-size: 22px; font-weight: bold; color: #F8F5F1; margin-bottom: 12px;">
+        4. Off-The-Shelf Bottled Waters Evaluated Against SCA Standards
+      </h2>
+      <p style="font-size: 14px; color: #D4D4D8; margin-bottom: 16px;">
+        If you prefer buying ready-to-brew water from the grocery store without mixing mineral drops, these commercial bottled waters have been laboratory-tested and evaluated against the SCA target window:
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <strong style="color: #6EE7B7; font-size: 15px;">Crystal Geyser Alpine Spring Water (Mt. Shasta, CA)</strong>
+            <span style="font-family: monospace; font-size: 11px; background: rgba(16, 185, 129, 0.2); color: #6EE7B7; padding: 2px 8px; border-radius: 6px;">Specialty Gold Standard</span>
+          </div>
+          <p style="font-size: 12px; color: #D4D4D8; margin: 0 0 6px 0;">115 PPM TDS • 50 GH • 52 KH • pH 7.2. The #1 recommended grocery store water in US specialty coffee. Ready to pour straight into your kettle with zero remineralization.</p>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <strong style="color: #6EE7B7; font-size: 15px;">Volvic Natural Spring Water (Puy de Dôme, France)</strong>
+            <span style="font-family: monospace; font-size: 11px; background: rgba(16, 185, 129, 0.2); color: #6EE7B7; padding: 2px 8px; border-radius: 6px;">European Barista Benchmark</span>
+          </div>
+          <p style="font-size: 12px; color: #D4D4D8; margin: 0 0 6px 0;">130 PPM TDS • 62 GH • 58 KH • pH 7.0. Filtered through volcanic rock with 31.7 mg/L natural silica for velvety mouthfeel and sparkling cup clarity.</p>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <strong style="color: #FCD34D; font-size: 15px;">Evian Natural Spring Water (Évian-les-Bains, France)</strong>
+            <span style="font-family: monospace; font-size: 11px; background: rgba(245, 158, 11, 0.2); color: #FCD34D; padding: 2px 8px; border-radius: 6px;">Requires 50/50 Dilution</span>
+          </div>
+          <p style="font-size: 12px; color: #D4D4D8; margin: 0 0 6px 0;">357 PPM TDS undiluted (too hard). Mix 50/50 with steam-distilled water to yield an exceptional 178 PPM brew water at low cost.</p>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.03); padding: 14px; border-radius: 12px; border: 1px solid rgba(96, 165, 250, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <strong style="color: #93C5FD; font-size: 15px;">Poland Spring 100% Natural Spring Water (Maine, USA)</strong>
+            <span style="font-family: monospace; font-size: 11px; background: rgba(96, 165, 250, 0.2); color: #93C5FD; padding: 2px 8px; border-radius: 6px;">Soft / Nordic Light</span>
+          </div>
+          <p style="font-size: 12px; color: #D4D4D8; margin: 0 0 6px 0;">50 PPM TDS • 26 GH • 20 KH • pH 6.8. Naturally very soft water that allows intense floral and berry acidity to shine through without bicarbonate neutralization.</p>
+        </div>
+      </div>
+    </section>
+
     <footer style="font-size: 12px; color: #A1A1AA; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; text-align: center;">
-      Use the interactive <strong>Water Lab</strong> inside <a href="https://thebrew.app" style="color: #D48C46; text-decoration: underline;">The Brew App</a> to calculate exact drop counts and DIY mineral grams for any container size.
+      Use the interactive <strong>Water Lab</strong> inside <a href="https://thebrew.app" style="color: #D48C46; text-decoration: underline;">The Brew App</a> to view full laboratory ion breakdowns, search bottled water brands, or calculate exact mineral drop formulas.
     </footer>
   </div>
 `;

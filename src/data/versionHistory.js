@@ -2,6 +2,38 @@
 
 export const VERSION_HISTORY = [
   {
+    version: "1.4.4",
+    releaseDate: "2026-09-06",
+    title: "Laboratory-Verified Commercial Bottled Water Guide & SCA Classification",
+    summary: "Integrated an authentic, laboratory-verified commercial bottled water database into the Coffee Water Chemistry Lab. Includes real mineral ion analyses (TDS, Ca²⁺, Mg²⁺, Na⁺, K⁺, HCO₃⁻, SiO₂, GH, KH, pH) from certified water reports, real-time grocery brand search, SCA compliance ratings, and dilution/remineralization guides.",
+    highlights: [
+      {
+        type: "feature",
+        badge: "Verified Lab Data",
+        title: "Authentic Bottled Water Mineral Database",
+        description: "Incorporated laboratory-tested mineral reports for globally available bottled waters (Crystal Geyser Weed CA, Volvic Puy de Dôme, Evian French Alps, Acqua Panna Tuscany, Fiji Natural Artesian, Poland Spring Maine, Tesco Ashbeck UK, Third Wave Water, and Smartwater) with zero fabricated numbers."
+      },
+      {
+        type: "feature",
+        badge: "SCA Standards",
+        title: "SCA Suitability Badging & Practical Barista Tips",
+        description: "Each bottled water is evaluated against SCA brewing standards: Specialty Gold Standards (Crystal Geyser, Volvic, Ashbeck), Soft / Nordic Light styles (Poland Spring, Fiji), Requires 50/50 Dilution (Evian), RO Blank Canvas (Smartwater), and Palate Cleanser Only (San Pellegrino)."
+      },
+      {
+        type: "enhancement",
+        badge: "Dual-Tab Lab",
+        title: "Tabbed Water Chemistry Lab & Filter Chips",
+        description: "Upgraded the Water Chemistry Lab modal with seamless tab switching between '💧 Bottled Water Guide' and '🔬 Mineral Recipes & Scaler', featuring brand/country search, category filtering chips, and expandable chemical ion cards."
+      },
+      {
+        type: "enhancement",
+        badge: "SEO Guide",
+        title: "Prerendered Comprehensive Water Chemistry Article",
+        description: "Updated the prerendered guide at /guides/coffee-water-chemistry with a dedicated commercial bottled water evaluation section detailing hardness vs alkalinity tradeoffs."
+      }
+    ]
+  },
+  {
     version: "1.4.3",
     releaseDate: "2026-09-06",
     title: "Active Extraction Instruction Voice Guidance & On-Demand Audio",
