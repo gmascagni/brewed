@@ -1,11 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft, BookOpen, Thermometer } from 'lucide-react';
-import { playTimerStartChime, announcePhase, stopSpeechAnnouncement, playPhaseChime, playCompletionChime, stopCompletionChime } from '../utils/audioSynth';
+import { playTimerStartChime, announcePhase, stopSpeechAnnouncement, playPhaseChime, playCompletionChime, stopCompletionChime, unlockAudio } from '../utils/audioSynth';
 import V60ProTipModal from './V60ProTipModal';
 
 export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, unitSystem = 'imperial', isMuted, setIsMuted, onPrevStep, onOpenJournal }) {
   const isCoffee = trackMode === 'coffee';
-  const phases = activeMethod?.phases || [];
+
+  // Default fallback phases if method phases are not loaded
+  const defaultPhases = [
+    { name: 'Bloom Phase', durationSec: 45, waterMultiplier: 3, instruction: 'Saturate grounds evenly in gentle circular motions. Allow bed to expand and de-gas.' },
+    { name: 'Main Concentric Pour', durationSec: 60, waterMultiplier: 0.6, instruction: 'Pour in steady spirals from center outward. Maintain consistent slurry level.' },
+    { name: 'Final Drawdown', durationSec: 60, waterMultiplier: 1.0, instruction: 'Gently top up remaining water in center. Allow full even drawdown.' }
+  ];
+
+  const rawPhases = activeMethod?.phases && activeMethod.phases.length > 0 ? activeMethod.phases : defaultPhases;
+  const phases = rawPhases;
 
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(phases[0]?.durationSec || 60);
@@ -17,6 +26,20 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   // Local muted state synced with prop
   const [localMuted, setLocalMuted] = useState(isMuted ?? false);
 
+  // High-precision timing refs to prevent drift and guarantee mobile background wake resilience
+  const endTimeRef = useRef(null);
+  const remainingAtPauseRef = useRef(null);
+  const currentPhaseIndexRef = useRef(0);
+  const phasesRef = useRef(phases);
+
+  useEffect(() => {
+    currentPhaseIndexRef.current = currentPhaseIndex;
+  }, [currentPhaseIndex]);
+
+  useEffect(() => {
+    phasesRef.current = phases;
+  }, [phases]);
+
   useEffect(() => {
     if (isMuted !== undefined) {
       setLocalMuted(isMuted);
@@ -24,6 +47,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   }, [isMuted]);
 
   const toggleMute = () => {
+    unlockAudio();
     const next = !localMuted;
     setLocalMuted(next);
     if (setIsMuted) {
@@ -38,11 +62,18 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   // Preload speech synthesis voices
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.getVoices();
+      try {
+        window.speechSynthesis.getVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+          window.speechSynthesis.onvoiceschanged = () => {
+            try { window.speechSynthesis.getVoices(); } catch (e) {}
+          };
+        }
+      } catch (e) {}
     }
   }, []);
 
-  const activePhase = phases[currentPhaseIndex] || phases[0] || { name: 'Brew Extraction', durationSec: 60, waterMultiplier: 1.0, instruction: 'Begin brewing.' };
+  const activePhase = phases[currentPhaseIndex] || phases[0] || defaultPhases[0];
   const totalPhaseTime = activePhase?.durationSec || 60;
 
   // Reset timer when method or track mode changes
@@ -50,73 +81,122 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     stopCompletionChime();
     stopSpeechAnnouncement();
     setCurrentPhaseIndex(0);
-    setTimeLeft(phases[0]?.durationSec || 60);
+    currentPhaseIndexRef.current = 0;
+    const initialTime = phases[0]?.durationSec || 60;
+    setTimeLeft(initialTime);
+    endTimeRef.current = null;
+    remainingAtPauseRef.current = null;
     setIsRunning(false);
     setIsAnnouncing(false);
     setIsCompleted(false);
-  }, [activeMethod, trackMode]);
+  }, [activeMethod?.id, trackMode]);
 
-  // Main Timer Countdown Loop
-  useEffect(() => {
-    let interval = null;
-    if (isRunning && !isAnnouncing && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-    } else if (isRunning && !isAnnouncing && timeLeft === 0) {
-      // Phase finish handler
-      if (currentPhaseIndex < phases.length - 1) {
-        // Move to next phase safely
-        const nextIdx = currentPhaseIndex + 1;
-        const nextPhase = phases[nextIdx];
-        if (nextPhase) {
-          setCurrentPhaseIndex(nextIdx);
-          setTimeLeft(nextPhase.durationSec || 60);
-          playTimerStartChime(localMuted);
+  // Advance to next phase safely or complete extraction
+  const handlePhaseAdvance = useCallback(() => {
+    const currentIdx = currentPhaseIndexRef.current;
+    const activePhases = phasesRef.current;
 
-          if (!localMuted) {
-            setIsAnnouncing(true);
-            setAnnouncementText(`${nextPhase.name}, ${nextPhase.durationSec}s`);
-            announcePhase(nextPhase.name, nextPhase.durationSec, localMuted, () => {
-              setIsAnnouncing(false);
-            });
-          }
-        } else {
-          playCompletionChime(localMuted);
-          setIsRunning(false);
-          setIsCompleted(true);
-        }
-      } else {
-        // All phases complete!
-        playCompletionChime(localMuted);
-        setIsRunning(false);
-        setIsCompleted(true);
+    if (currentIdx < activePhases.length - 1) {
+      const nextIdx = currentIdx + 1;
+      const nextPhase = activePhases[nextIdx];
+      const nextDuration = nextPhase?.durationSec || 60;
+
+      setCurrentPhaseIndex(nextIdx);
+      currentPhaseIndexRef.current = nextIdx;
+      setTimeLeft(nextDuration);
+      endTimeRef.current = Date.now() + nextDuration * 1000;
+      remainingAtPauseRef.current = null;
+
+      // Bell chime for phase transition
+      playTimerStartChime(localMuted);
+
+      if (!localMuted) {
+        setIsAnnouncing(true);
+        const nameToSay = nextPhase?.name || `Phase ${nextIdx + 1}`;
+        setAnnouncementText(`${nameToSay}, ${nextDuration}s`);
+        announcePhase(nameToSay, nextDuration, localMuted, () => {
+          setIsAnnouncing(false);
+        });
       }
+    } else {
+      // All phases complete!
+      setIsRunning(false);
+      setIsAnnouncing(false);
+      setIsCompleted(true);
+      endTimeRef.current = null;
+      remainingAtPauseRef.current = null;
+      playCompletionChime(localMuted);
     }
-    return () => clearInterval(interval);
-  }, [isRunning, isAnnouncing, timeLeft, currentPhaseIndex, phases, localMuted]);
+  }, [localMuted]);
 
-  // Toggle Timer Handler (Start / Announce / Pause / Resume)
+  // Main High-Precision Countdown Loop (Wall-clock accurate, immune to background mobile sleep)
+  useEffect(() => {
+    if (!isRunning) return;
+
+    const tick = () => {
+      if (!endTimeRef.current) return;
+      const now = Date.now();
+      const diffSec = Math.max(0, Math.ceil((endTimeRef.current - now) / 1000));
+
+      setTimeLeft(diffSec);
+
+      if (diffSec <= 0) {
+        handlePhaseAdvance();
+      }
+    };
+
+    tick();
+    const intervalId = setInterval(tick, 250);
+
+    return () => clearInterval(intervalId);
+  }, [isRunning, handlePhaseAdvance]);
+
+  // Toggle Timer Handler (Start / Resume / Pause)
   const handleToggleTimer = () => {
-    if (isRunning || isAnnouncing) {
-      // Pause
+    unlockAudio();
+
+    if (isRunning) {
+      // Pause action
       setIsRunning(false);
       setIsAnnouncing(false);
       stopSpeechAnnouncement();
+
+      if (endTimeRef.current) {
+        const remaining = Math.max(0, Math.ceil((endTimeRef.current - Date.now()) / 1000));
+        remainingAtPauseRef.current = remaining;
+        setTimeLeft(remaining);
+      }
     } else {
-      // Start or Resume
+      // Start or Resume action
+      let secondsToRun = timeLeft;
+
       if (isCompleted) {
         setIsCompleted(false);
         setCurrentPhaseIndex(0);
-        setTimeLeft(phases[0]?.durationSec || 60);
+        currentPhaseIndexRef.current = 0;
+        secondsToRun = phases[0]?.durationSec || 60;
+        setTimeLeft(secondsToRun);
+        remainingAtPauseRef.current = null;
+      } else if (remainingAtPauseRef.current !== null && remainingAtPauseRef.current > 0) {
+        secondsToRun = remainingAtPauseRef.current;
+      } else if (timeLeft <= 0) {
+        secondsToRun = activePhase?.durationSec || 60;
+        setTimeLeft(secondsToRun);
       }
 
-      // 1. Play real mechanical timer bell chime
+      // 1. Play authentic barista bell chime immediately
       playTimerStartChime(localMuted);
 
-      // 2. Announce phase name and seconds (e.g. "Bloom Phase, 45 seconds") before counting down
+      // 2. Set wall-clock target timestamp
+      endTimeRef.current = Date.now() + secondsToRun * 1000;
+      remainingAtPauseRef.current = null;
+
+      // 3. Mark running immediately - NEVER BLOCK COUNTDOWN
+      setIsRunning(true);
+
+      // 4. Asynchronous Spoken Voice Guidance ("Bloom Phase, 45 seconds")
       const phaseDuration = activePhase?.durationSec || 60;
-      const isFreshPhase = timeLeft === phaseDuration;
+      const isFreshPhase = secondsToRun === phaseDuration;
 
       if (!localMuted && isFreshPhase) {
         setIsAnnouncing(true);
@@ -125,62 +205,74 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
         announcePhase(nameToSay, phaseDuration, localMuted, () => {
           setIsAnnouncing(false);
-          setIsRunning(true);
         });
       } else {
         setIsAnnouncing(false);
-        setIsRunning(true);
       }
     }
   };
 
   // Skip Phase handler
   const handleSkipPhase = () => {
+    unlockAudio();
     stopSpeechAnnouncement();
     setIsAnnouncing(false);
-    if (currentPhaseIndex < phases.length - 1) {
-      const nextIdx = currentPhaseIndex + 1;
-      const nextPhase = phases[nextIdx];
-      if (nextPhase) {
-        setCurrentPhaseIndex(nextIdx);
-        setTimeLeft(nextPhase.durationSec || 60);
-        playTimerStartChime(localMuted);
 
-        if (!localMuted) {
-          setIsAnnouncing(true);
-          setAnnouncementText(`${nextPhase.name}, ${nextPhase.durationSec}s`);
-          announcePhase(nextPhase.name, nextPhase.durationSec, localMuted, () => {
-            setIsAnnouncing(false);
-            setIsRunning(true);
-          });
-        } else {
-          setIsRunning(true);
-        }
+    const currentIdx = currentPhaseIndex;
+    if (currentIdx < phases.length - 1) {
+      const nextIdx = currentIdx + 1;
+      const nextPhase = phases[nextIdx];
+      const nextDuration = nextPhase?.durationSec || 60;
+
+      setCurrentPhaseIndex(nextIdx);
+      currentPhaseIndexRef.current = nextIdx;
+      setTimeLeft(nextDuration);
+      playTimerStartChime(localMuted);
+
+      if (isRunning) {
+        endTimeRef.current = Date.now() + nextDuration * 1000;
+        remainingAtPauseRef.current = null;
       } else {
-        setIsRunning(false);
-        setIsCompleted(true);
+        remainingAtPauseRef.current = nextDuration;
+      }
+
+      if (!localMuted) {
+        setIsAnnouncing(true);
+        const nameToSay = nextPhase?.name || `Phase ${nextIdx + 1}`;
+        setAnnouncementText(`${nameToSay}, ${nextDuration}s`);
+        announcePhase(nameToSay, nextDuration, localMuted, () => {
+          setIsAnnouncing(false);
+        });
       }
     } else {
       setIsRunning(false);
       setIsCompleted(true);
+      endTimeRef.current = null;
+      remainingAtPauseRef.current = null;
+      playCompletionChime(localMuted);
     }
   };
 
   // Reset Timer handler
   const handleReset = () => {
+    unlockAudio();
     stopCompletionChime();
     stopSpeechAnnouncement();
     setIsAnnouncing(false);
     setIsRunning(false);
     setIsCompleted(false);
+    endTimeRef.current = null;
+    remainingAtPauseRef.current = null;
     setCurrentPhaseIndex(0);
+    currentPhaseIndexRef.current = 0;
     setTimeLeft(phases[0]?.durationSec || 60);
   };
 
   // Format MM:SS display
   const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const s = Math.max(0, seconds);
+    const mins = Math.floor(s / 60);
+    const secs = s % 60;
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
@@ -191,20 +283,20 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     return `${m}m ${s > 0 ? `${s}s` : ''}`;
   };
 
-  const strokeDashoffset = totalPhaseTime > 0 
-    ? ((totalPhaseTime - timeLeft) / totalPhaseTime) * (2 * Math.PI * 80)
-    : 0;
-
   const radius = 80;
   const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = totalPhaseTime > 0 
+    ? ((totalPhaseTime - timeLeft) / totalPhaseTime) * circumference
+    : 0;
 
-  const targetPhaseWaterMl = activePhase?.waterMultiplier ? Math.round(dryDoseGrams * activePhase.waterMultiplier) : null;
+  const targetPhaseWaterMl = (dryDoseGrams > 0 && activePhase?.waterMultiplier) 
+    ? Math.round(dryDoseGrams * activePhase.waterMultiplier) 
+    : null;
 
-  const isPourOver = activeMethod?.id === 'pour_over' || activeMethod?.id === 'chemex' || activeMethod?.id === 'classic_pour_over';
   const [isProTipOpen, setIsProTipOpen] = useState(false);
 
   return (
-    <div className={`p-8 md:p-10 lg:p-12 rounded-3xl ${
+    <div className={`p-5 sm:p-8 md:p-10 lg:p-12 rounded-3xl ${
       isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
     } shadow-2xl transition-all duration-500 relative overflow-hidden`}>
       
@@ -214,7 +306,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       }`} />
 
       {/* Header Info */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10 relative z-10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10 relative z-10">
         <div>
           <div className={`inline-flex items-center space-x-2 text-xs font-mono font-extrabold uppercase tracking-[0.2em] mb-1.5 ${
             isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
@@ -232,7 +324,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
         </div>
 
         {/* Status Badge & Speaker / Mute Toggle Column */}
-        <div className="flex flex-col items-end gap-2.5">
+        <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2.5">
           {/* Status Badge */}
           <div>
             {isCompleted ? (
@@ -240,15 +332,15 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Extraction Complete! ☕</span>
               </span>
-            ) : isAnnouncing ? (
-              <span className="px-4 py-2 rounded-2xl bg-indigo-500/25 text-indigo-300 border border-indigo-500/50 font-mono font-bold text-xs flex items-center gap-2 shadow-lg animate-pulse">
-                <Volume2 className="w-4 h-4 text-indigo-400 animate-bounce" />
-                <span>Announcing: {announcementText || activePhase?.name}</span>
-              </span>
             ) : isRunning ? (
               <span className="px-4 py-2 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold text-xs flex items-center gap-1.5 shadow-lg animate-pulse">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
                 <span>Pouring in Progress</span>
+              </span>
+            ) : (!isRunning && remainingAtPauseRef.current !== null && timeLeft < totalPhaseTime) ? (
+              <span className="px-4 py-2 rounded-2xl bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono font-bold text-xs flex items-center gap-1.5 shadow-md">
+                <Pause className="w-3.5 h-3.5 text-amber-400" />
+                <span>Timer Paused</span>
               </span>
             ) : (
               <span className="px-4 py-2 rounded-2xl bg-white/10 text-stone-300 border border-white/15 font-mono font-bold text-xs flex items-center gap-2">
@@ -260,7 +352,9 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
           {/* Speaker / Mute Button Under Timer Ready Box */}
           <button
+            type="button"
             onClick={toggleMute}
+            style={{ touchAction: 'manipulation' }}
             className={`px-3.5 py-1.5 rounded-xl border text-xs font-mono font-semibold flex items-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer ${
               localMuted
                 ? 'bg-rose-500/15 border-rose-500/35 text-rose-300 hover:bg-rose-500/25 shadow-rose-900/20'
@@ -284,15 +378,25 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       </div>
 
       {/* Main Timer Display */}
-      <div className="flex flex-col lg:flex-row items-center justify-center gap-10 my-6 relative z-10">
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 my-6 relative z-10">
         
         {/* Circular Countdown Ring - Clickable to Start / Chime / Pause */}
         <div 
           onClick={handleToggleTimer}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+              e.preventDefault();
+              handleToggleTimer();
+            }
+          }}
+          style={{ touchAction: 'manipulation' }}
           className="relative w-56 h-56 flex items-center justify-center flex-shrink-0 cursor-pointer group select-none transition-transform active:scale-95"
-          title={isRunning || isAnnouncing ? "Click to Pause Timer" : "Click to Chime & Start Countdown"}
+          title={isRunning ? "Click to Pause Timer" : "Click to Chime & Start Countdown"}
+          aria-label={isRunning ? "Pause extraction timer" : "Start extraction timer"}
         >
-          <svg className="w-full h-full transform -rotate-90 group-hover:scale-102 transition-transform duration-300" viewBox="0 0 200 200">
+          <svg className="w-full h-full transform -rotate-90 pointer-events-none group-hover:scale-102 transition-transform duration-300" viewBox="0 0 200 200">
             {/* Background Track */}
             <circle
               cx="100"
@@ -308,7 +412,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
               cx="100"
               cy="100"
               r={radius}
-              className={`transition-all duration-500 ${
+              className={`transition-all duration-300 ${
                 isCoffee ? 'text-[#D2A06E]' : 'text-sage-400'
               } drop-shadow-[0_0_12px_rgba(210,160,110,0.3)]`}
               strokeWidth="12"
@@ -321,19 +425,24 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
           </svg>
 
           {/* Center Digital Clock */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="font-mono text-5xl font-black text-cream-light tracking-tight drop-shadow-lg group-hover:text-amber-300 transition-colors">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+            <span className={`font-mono text-5xl font-black tracking-tight drop-shadow-lg transition-colors ${
+              isRunning ? 'text-amber-300' : 'text-cream-light group-hover:text-amber-300'
+            }`}>
               {formatTime(timeLeft)}
             </span>
-            <span className="text-[11px] font-mono uppercase tracking-widest text-stone-400 mt-1 font-semibold">
+            <span className="text-[11px] font-mono uppercase tracking-widest text-stone-400 mt-1 font-semibold px-2 truncate max-w-[180px]">
               {isAnnouncing ? (
-                <span className="text-amber-300 animate-pulse">Announcing...</span>
+                <span className="text-amber-300 animate-pulse flex items-center justify-center gap-1">
+                  <Volume2 className="w-3 h-3" />
+                  <span>{activePhase?.name}</span>
+                </span>
               ) : (
                 activePhase?.name
               )}
             </span>
-            <span className="text-[9px] font-mono uppercase tracking-wider text-stone-500 mt-1 opacity-60 group-hover:opacity-100 transition-opacity">
-              {isRunning || isAnnouncing ? 'Click to Pause' : 'Click to Chime & Start'}
+            <span className="text-[9px] font-mono uppercase tracking-wider text-stone-500 mt-1 opacity-70 group-hover:opacity-100 transition-opacity">
+              {isRunning ? 'Tap to Pause' : 'Tap to Chime & Start'}
             </span>
           </div>
         </div>
@@ -349,21 +458,31 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
             <p className="text-sm md:text-base text-cream-light font-medium leading-relaxed">
               {activePhase?.instruction || 'Follow standard extraction pulse pouring technique.'}
             </p>
+
+            {/* Subtle Voice Announcement Notice */}
+            {isAnnouncing && announcementText && (
+              <div className="pt-2 flex items-center justify-center lg:justify-start gap-2 text-xs font-mono text-amber-300/90 animate-pulse">
+                <Volume2 className="w-3.5 h-3.5 flex-shrink-0" />
+                <span>Voice Guidance: "{announcementText}"</span>
+              </div>
+            )}
           </div>
 
           {/* Target Water Pour & Water Temp Indicator */}
-          {targetPhaseWaterMl && (
+          {(targetPhaseWaterMl || activeMethod?.tempC || activeMethod?.tempF) && (
             <div className="space-y-2">
-              <div className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-mono font-bold shadow-md ${
-                isCoffee
-                  ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
-                  : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
-              }`}>
-                <span>Target Pour Water:</span>
-                <span className="text-cream-light text-sm font-black">
-                  ~{targetPhaseWaterMl} mL ({Math.round(targetPhaseWaterMl / 29.5735 * 10) / 10} fl oz)
-                </span>
-              </div>
+              {targetPhaseWaterMl && (
+                <div className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-mono font-bold shadow-md ${
+                  isCoffee
+                    ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
+                    : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
+                }`}>
+                  <span>Target Pour Water:</span>
+                  <span className="text-cream-light text-sm font-black">
+                    ~{targetPhaseWaterMl} mL ({Math.round(targetPhaseWaterMl / 29.5735 * 10) / 10} fl oz)
+                  </span>
+                </div>
+              )}
 
               {/* Water Temperature Indicator */}
               {(activeMethod?.tempC || activeMethod?.tempF) && (
@@ -390,34 +509,42 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       </div>
 
       {/* Timer Controls Row with Tactile 3D Buttons */}
-      <div className="flex items-center justify-center space-x-5 mt-8">
+      <div className="flex items-center justify-center space-x-3 sm:space-x-5 mt-8">
         
         <button
+          type="button"
           onClick={handleReset}
+          style={{ touchAction: 'manipulation' }}
           className="p-4 rounded-2xl bg-white/10 text-stone-300 hover:text-cream-light hover:bg-white/20 transition-all border border-white/15 shadow-xl active:scale-95 cursor-pointer"
           title="Reset Timer"
+          aria-label="Reset Timer"
         >
           <RotateCcw className="w-5 h-5" />
         </button>
 
         <button
+          type="button"
           onClick={handleToggleTimer}
-          className={`px-10 py-4.5 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-3 shadow-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer ${
-            isRunning || isAnnouncing
+          style={{ touchAction: 'manipulation' }}
+          className={`px-8 sm:px-10 py-4 sm:py-4.5 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-3 shadow-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+            isRunning
               ? 'bg-amber-600 text-cream-light border border-amber-500 shadow-amber-600/30'
               : isCoffee
               ? 'btn-tactile-coffee text-[#140C08]'
               : 'btn-tactile-tea text-white'
           }`}
         >
-          {isRunning || isAnnouncing ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
-          <span>{isAnnouncing ? 'Announcing...' : isRunning ? 'Pause Timer' : 'Start Extraction'}</span>
+          {isRunning ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
+          <span>{isRunning ? 'Pause Timer' : (!isRunning && remainingAtPauseRef.current !== null && timeLeft < totalPhaseTime) ? 'Resume Timer' : 'Start Extraction'}</span>
         </button>
 
         <button
+          type="button"
           onClick={handleSkipPhase}
+          style={{ touchAction: 'manipulation' }}
           className="p-4 rounded-2xl bg-white/10 text-stone-300 hover:text-cream-light hover:bg-white/20 transition-all border border-white/15 shadow-xl active:scale-95 cursor-pointer"
           title="Skip to Next Phase"
+          aria-label="Skip to Next Phase"
         >
           <FastForward className="w-5 h-5" />
         </button>
@@ -503,7 +630,9 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 mt-8 border-t border-white/[0.08]">
         {onPrevStep && (
           <button
+            type="button"
             onClick={onPrevStep}
+            style={{ touchAction: 'manipulation' }}
             className="w-full sm:w-auto py-4 px-8 rounded-2xl bg-white/[0.08] text-cream-light font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 hover:bg-white/[0.15] transition-all border border-white/[0.12]"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -513,7 +642,9 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
         {onOpenJournal && (
           <button
+            type="button"
             onClick={onOpenJournal}
+            style={{ touchAction: 'manipulation' }}
             className={`w-full sm:w-auto py-4 px-9 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all ${
               isCoffee ? 'btn-tactile-coffee text-[#140C08]' : 'btn-tactile-tea text-white'
             }`}
@@ -533,3 +664,4 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     </div>
   );
 }
+

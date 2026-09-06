@@ -1,8 +1,41 @@
-// Audio Chime & Windows Fanfare Player for The Brew App
+// Audio Chime & Barista Audio Synthesizer for The Brew App
 
+let sharedAudioCtx = null;
 let activeAudioElement = null;
 let currentCompletionTimeout = null;
 let activeSpeechUtterance = null;
+
+/**
+ * Get or lazily create a shared Web Audio AudioContext singleton.
+ * Automatically handles mobile browser suspension and unlocks on user gesture.
+ */
+export function getAudioContext() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') {
+      sharedAudioCtx = new AudioContextClass();
+    }
+    if (sharedAudioCtx.state === 'suspended') {
+      sharedAudioCtx.resume().catch(() => {});
+    }
+    return sharedAudioCtx;
+  } catch (e) {
+    console.warn('AudioContext initialization failed:', e);
+    return null;
+  }
+}
+
+/**
+ * Proactively unlock Web Audio on touch / click (critical for iOS Safari & Android Chrome)
+ */
+export function unlockAudio() {
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+}
 
 /**
  * Play a rich, authentic mechanical barista / kitchen timer bell chime.
@@ -11,12 +44,8 @@ let activeSpeechUtterance = null;
 export function playTimerStartChime(isMuted = false) {
   if (isMuted) return;
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
-    if (ctx.state === 'suspended') {
-      ctx.resume();
-    }
+    const ctx = getAudioContext();
+    if (!ctx) return;
     const now = ctx.currentTime;
 
     // Master output bus
@@ -76,7 +105,7 @@ export function playTimerStartChime(isMuted = false) {
 }
 
 /**
- * Stop any active speech announcement
+ * Stop any active speech announcement cleanly
  */
 export function stopSpeechAnnouncement() {
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -90,7 +119,8 @@ export function stopSpeechAnnouncement() {
 }
 
 /**
- * Announce phase name and duration via Web Speech API before countdown begins
+ * Announce phase name and duration via Web Speech API asynchronously.
+ * NEVER blocks timer countdown or UI execution.
  * Example: "Bloom Phase, 45 seconds."
  */
 export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMuted = false, onComplete) {
@@ -100,9 +130,6 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
   }
 
   try {
-    stopSpeechAnnouncement();
-
-    // Standardize phrase so it cleanly says "Bloom Phase" or "[Name] Phase"
     let cleanName = (phaseName || '').trim();
     if (cleanName.toLowerCase() === 'bloom') {
       cleanName = 'Bloom Phase';
@@ -119,41 +146,55 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
     const textToSpeak = `${cleanName}, ${secondsText}.`;
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    activeSpeechUtterance = utterance;
-    utterance.rate = 1.0;
+    utterance.lang = 'en-US';
+    utterance.rate = 1.05;
     utterance.pitch = 1.0;
 
     // Pick best natural English voice (prefer high-clarity British or US female voice)
     const voices = window.speechSynthesis.getVoices() || [];
-    const chosenVoice = voices.find(v => v.lang.startsWith('en') && (
+    const chosenVoice = voices.find(v => v.lang && v.lang.startsWith('en') && (
       v.name.includes('Natural') || 
       v.name.includes('Sonia') || 
       v.name.includes('Female') || 
       v.name.includes('Samantha') || 
       v.name.includes('Google UK English Female') || 
       v.name.includes('Victoria')
-    )) || voices.find(v => v.lang.startsWith('en')) || null;
+    )) || voices.find(v => v.lang && v.lang.startsWith('en')) || null;
 
     if (chosenVoice) {
       utterance.voice = chosenVoice;
     }
 
-    let completed = false;
-    const handleFinish = () => {
-      if (!completed) {
-        completed = true;
+    let finished = false;
+    const safeFinish = () => {
+      if (!finished) {
+        finished = true;
         activeSpeechUtterance = null;
         if (onComplete) onComplete();
       }
     };
 
-    utterance.onend = handleFinish;
-    utterance.onerror = handleFinish;
+    utterance.onend = safeFinish;
+    utterance.onerror = safeFinish;
 
-    // Safety fallback timeout in case browser speech engine stalls
-    setTimeout(handleFinish, 2200);
+    // Safety fallback timeout: ensures callback always triggers rapidly
+    setTimeout(safeFinish, 2000);
 
-    window.speechSynthesis.speak(utterance);
+    activeSpeechUtterance = utterance;
+
+    // If speech synthesis is currently active, cancel gently then speak
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      setTimeout(() => {
+        try {
+          window.speechSynthesis.speak(utterance);
+        } catch {
+          safeFinish();
+        }
+      }, 50);
+    } else {
+      window.speechSynthesis.speak(utterance);
+    }
   } catch (err) {
     console.warn('Speech announcement failed:', err);
     if (onComplete) onComplete();
@@ -166,9 +207,8 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
 export function playPhaseChime(isMuted = false) {
   if (isMuted) return;
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
+    const ctx = getAudioContext();
+    if (!ctx) return;
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -210,7 +250,8 @@ export function stopCompletionChime() {
 }
 
 /**
- * Play user's tada_original.wav file, repeating exactly 3 times
+ * Play extraction celebration sound.
+ * Uses Web Audio API synthesization (guaranteed on mobile iOS/Android) alongside tada_original.wav.
  */
 export function playCompletionChime(isMuted = false) {
   if (isMuted) return;
@@ -218,6 +259,40 @@ export function playCompletionChime(isMuted = false) {
   // Stop any previous playing audio
   stopCompletionChime();
 
+  // 1. Synthesize resonant triumphant chord via Web Audio API (Guaranteed on mobile devices)
+  try {
+    const ctx = getAudioContext();
+    if (ctx) {
+      const now = ctx.currentTime;
+      const notes = [
+        { freq: 523.25, time: 0.0, dur: 1.2 },  // C5
+        { freq: 659.25, time: 0.12, dur: 1.2 }, // E5
+        { freq: 783.99, time: 0.24, dur: 1.4 }, // G5
+        { freq: 1046.50, time: 0.36, dur: 2.5 } // C6 (High ringing chime)
+      ];
+
+      notes.forEach(({ freq, time, dur }) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + time);
+
+        g.gain.setValueAtTime(0.0001, now + time);
+        g.gain.exponentialRampToValueAtTime(0.25, now + time + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + time + dur);
+
+        osc.connect(g);
+        g.connect(ctx.destination);
+
+        osc.start(now + time);
+        osc.stop(now + time + dur + 0.05);
+      });
+    }
+  } catch (e) {
+    console.warn('Web Audio completion fanfare error:', e);
+  }
+
+  // 2. Play HTML5 Audio file tada_original.wav with repeat logic
   try {
     const audio = new Audio('/tada_original.wav');
     audio.loop = false;
@@ -232,9 +307,7 @@ export function playCompletionChime(isMuted = false) {
       playCount += 1;
       if (playCount < MAX_REPEATS) {
         audio.currentTime = 0;
-        audio.play().catch((err) => {
-          console.warn('Repeat audio play failed:', err);
-        });
+        audio.play().catch(() => {});
       } else {
         stopCompletionChime();
       }
@@ -242,12 +315,11 @@ export function playCompletionChime(isMuted = false) {
 
     const playPromise = audio.play();
     if (playPromise !== undefined) {
-      playPromise.catch((err) => {
-        console.warn('Audio element play failed:', err);
+      playPromise.catch(() => {
+        // Expected on iOS mobile if backgrounded without immediate gesture
       });
     }
-
   } catch (e) {
-    console.error('Failed to play tada_original.wav:', e);
+    // Handled by Web Audio synthesis
   }
 }

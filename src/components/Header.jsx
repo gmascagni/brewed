@@ -46,7 +46,7 @@ export default function Header({
                   className="whitespace-nowrap text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition cursor-pointer flex items-center gap-1 shadow-sm"
                   title="View Release Notes & Build History"
                 >
-                  <span>v1.4.0</span>
+                  <span>v1.4.1</span>
                 </button>
               )}
             </h1>

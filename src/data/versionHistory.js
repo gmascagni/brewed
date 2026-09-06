@@ -2,6 +2,38 @@
 
 export const VERSION_HISTORY = [
   {
+    version: "1.4.1",
+    releaseDate: "2026-09-06",
+    title: "Mobile Audio Unlock & Precision Wall-Clock Timer Overhaul",
+    summary: "Resolved mobile browser timer freezing and speech synthesis delays with persistent AudioContext singleton, asynchronous voice guidance, touch gesture unlocking, and drift-free wall-clock timestamp tracking.",
+    highlights: [
+      {
+        type: "fix",
+        badge: "Timer Precision",
+        title: "Instant Countdown Start & Zero Freezing",
+        description: "Starting the timer immediately initiates the active countdown without waiting for browser speech engines, preventing the 2.2-second pause and mobile cancellation lockouts."
+      },
+      {
+        type: "fix",
+        badge: "Mobile Audio",
+        title: "Web Audio Singleton & Touch Gesture Unlock",
+        description: "Replaced per-chime context instantiation with a shared AudioContext singleton unlocked on first touch/tap, eliminating iOS Safari / Android Chrome 6-context limits and autoplay blocks."
+      },
+      {
+        type: "fix",
+        badge: "Sleep Resilience",
+        title: "Wall-Clock Target Tracking & Wake-up Recovery",
+        description: "Replaced naive setInterval ticks with absolute Date.now() timestamp difference calculations, guaranteeing exact remaining seconds even after phone screen dimming or tab switching."
+      },
+      {
+        type: "enhancement",
+        badge: "Mobile UX",
+        title: "Smooth Mobile Step Navigation",
+        description: "Added automatic smooth scroll-to-top on step transitions to keep the guided extraction view squarely in focus on all mobile viewports."
+      }
+    ]
+  },
+  {
     version: "1.4.0",
     releaseDate: "2026-09-06",
     title: "Acoustic Mechanical Bell Chime & Voice-Guided Timer",

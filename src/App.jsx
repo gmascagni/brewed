@@ -253,6 +253,13 @@ export default function App() {
   useEffect(() => {
     document.body.className = `theme-${trackMode}`;
   }, [trackMode]);
+
+  // Scroll to top smoothly when changing steps so mobile screens always show the active step container
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentStep]);
   
   // Guarantee active method belongs to current track
   const currentActiveMethod = (activeMethod && methods.some(m => m.id === activeMethod.id))
