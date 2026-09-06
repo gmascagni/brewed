@@ -1,5 +1,5 @@
 import React from 'react';
-import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin, Newspaper, ScanLine, FlaskConical, Volume2, VolumeX } from 'lucide-react';
+import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin, Newspaper, ScanLine, FlaskConical, Volume2, VolumeX, Store } from 'lucide-react';
 
 export default function Header({ 
   trackMode, 
@@ -12,7 +12,9 @@ export default function Header({
   onOpenAuth, 
   onOpenScanner,
   onOpenWaterLab,
-  onOpenVersionHistory,
+  onOpenRoasterPortal,
+  onOpenRoasterInfo,
+  onOpenRoasterShowcase,
   isMuted = false,
   onToggleMute,
   currentUser 
@@ -42,15 +44,6 @@ export default function Header({
               }`}>
                 Master
               </span>
-              {onOpenVersionHistory && (
-                <button
-                  onClick={onOpenVersionHistory}
-                  className="whitespace-nowrap text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition cursor-pointer flex items-center gap-1 shadow-sm"
-                  title="View Release Notes & Build History"
-                >
-                  <span>v1.4.2</span>
-                </button>
-              )}
             </h1>
             <p className="text-[10px] text-stone-400 font-mono">Precision Coffee & Tea Guide</p>
           </div>
@@ -197,7 +190,38 @@ export default function Header({
             </button>
           )}
 
-          {/* World News Dispatch Trigger */}
+          {/* Specialty Roaster Showcase Trigger */}
+          {onOpenRoasterShowcase && (
+            <button
+              onClick={onOpenRoasterShowcase}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
+                isCoffee
+                  ? 'bg-[#2A1C12]/50 border-amber-gold/40 text-amber-gold hover:bg-[#38261A]/60'
+                  : 'bg-emerald-950/50 border-sage-500/40 text-sage-300 hover:bg-emerald-900/60'
+              }`}
+              title="View Roaster Showcase & Dial-In Profiles (Methodical, Onyx, Black & White)"
+            >
+              <Store className="w-4 h-4 text-amber-gold" />
+              <span className="hidden xl:inline">Roasters</span>
+            </button>
+          )}
+
+          {/* Specialty Roaster Partner Portal Trigger */}
+          {(onOpenRoasterInfo || onOpenRoasterPortal) && (
+            <button
+              onClick={onOpenRoasterInfo || onOpenRoasterPortal}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
+                isCoffee
+                  ? 'bg-[#2A1C12]/50 border-orange-500/40 text-orange-300 hover:bg-[#38261A]/60'
+                  : 'bg-emerald-950/50 border-sage-500/40 text-sage-300 hover:bg-emerald-900/60'
+              }`}
+              title="Add Your Roastery Labels & Smart Bag Packaging Codes"
+            >
+              <span className="hidden xl:inline">Partner Ingestion</span>
+            </button>
+          )}
+
+          {/* Brew News Dispatch Trigger */}
           <button
             onClick={() => {
               window.dispatchEvent(new CustomEvent('open-world-news'));
@@ -213,10 +237,10 @@ export default function Header({
                 ? 'bg-[#2A1C12]/50 border-[#A66E38]/40 text-[#D2A06E] hover:bg-[#38261A]/60'
                 : 'bg-emerald-950/50 border-sage-500/40 text-sage-300 hover:bg-emerald-900/60'
             }`}
-            title="Jump to World Coffee & Tea News"
+            title="Jump to Brew News"
           >
             <Newspaper className="w-4 h-4" />
-            <span className="hidden md:inline">World News</span>
+            <span className="hidden md:inline">Brew News</span>
           </button>
 
           {/* Brew Journal Trigger */}

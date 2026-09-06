@@ -106,11 +106,11 @@ export default function WorldNewsSection({ trackMode }) {
         <div>
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-[11px] font-mono font-extrabold uppercase tracking-widest text-amber-gold border border-amber-gold/30 mb-3 shadow">
             <Globe2 className="w-3.5 h-3.5 text-amber-gold" />
-            <span>Coffee & Tea News Roundup • Curated RSS Feeds</span>
+            <span>Brew News Roundup • Curated RSS Feeds</span>
           </div>
 
           <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-extrabold text-cream-light drop-shadow-md flex items-center gap-3">
-            <span>World Coffee & Tea News</span>
+            <span>Brew News</span>
             <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-cream-soft/80 border border-white/15">
               {WORLD_BREW_NEWS.length} Stories
             </span>
@@ -148,10 +148,10 @@ export default function WorldNewsSection({ trackMode }) {
                   : 'btn-tactile-tea text-white'
                 : 'bg-white/[0.08] text-cream-light hover:bg-white/[0.15] border border-white/[0.12]'
             }`}
-            title={isExpanded ? 'Collapse World News section' : 'Expand World News section'}
+            title={isExpanded ? 'Collapse Brew News section' : 'Expand Brew News section'}
             aria-expanded={isExpanded}
           >
-            <span>{isExpanded ? 'Collapse News' : 'Expand World News'}</span>
+            <span>{isExpanded ? 'Collapse News' : 'Expand Brew News'}</span>
             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         </div>

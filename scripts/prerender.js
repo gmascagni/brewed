@@ -407,3 +407,136 @@ fs.writeFileSync(path.join(guideRootDir, 'index.html'), waterHtml);
 
 console.log('✓ Successfully prerendered /guides/coffee-water-chemistry with Article, HowTo, and FAQPage schemas!');
 
+// ==========================================
+// PRERENDER: /roasters (Roaster Partner Program & Label Ingestion)
+// ==========================================
+console.log('Prerendering /roasters partner information page...');
+
+const roasterDistDir = path.join(distDir, 'roasters');
+fs.mkdirSync(roasterDistDir, { recursive: true });
+
+const roasterRootDir = path.join(rootDir, 'roasters');
+fs.mkdirSync(roasterRootDir, { recursive: true });
+
+const roasterTitle = "Specialty Coffee Roaster Partner Program | The Brew App";
+const roasterDesc = "Learn how specialty coffee roasters can add their roastery, retail coffee labels, and bag barcodes to The Brew App global verified database. Free Smart Bag technology for artisan roasters.";
+const roasterUrl = "https://thebrew.app/roasters";
+
+const roasterJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "Specialty Coffee Roaster Partner Program: Add Your Labels & Barcodes",
+      "description": roasterDesc,
+      "url": roasterUrl,
+      "author": {
+        "@type": "Organization",
+        "name": "The Brew App HQ"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "The Brew App",
+        "url": "https://thebrew.app",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://thebrew.app/favicon.svg"
+        }
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I add my roastery and coffee labels to The Brew App?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Specialty roasters can contact HQ at gmascagni@gmail.com with their roastery details, coffee varieties, and retail UPC/EAN barcodes, or use the interactive Roaster Portal inside the app."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there any cost for roasters to join?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The Brew App Smart Bag Partner Program is 100% free for independent specialty coffee roasters."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does barcode scanning work for customers?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "When a customer scans your retail coffee bag barcode with their phone camera, The Brew App instantly loads your exact recommended brew method, golden ratio, water temperature, grind setting, and multi-phase timer."
+          }
+        }
+      ]
+    }
+  ]
+};
+
+const roasterContent = `
+  <div style="max-width: 960px; margin: 0 auto; padding: 40px 20px; font-family: system-ui, -apple-system, sans-serif; color: #F4E8DC; line-height: 1.6; background-color: #0E0906;">
+    <header style="margin-bottom: 32px; border-bottom: 1px solid rgba(166, 110, 56, 0.3); padding-bottom: 24px;">
+      <span style="font-family: monospace; font-size: 12px; color: #D48C46; text-transform: uppercase; letter-spacing: 2px;">B2B Specialty Roaster Program</span>
+      <h1 style="font-family: Georgia, serif; font-size: 32px; color: #FFF; margin: 8px 0 12px 0;">Add Your Roastery & Coffee Labels to The Brew App</h1>
+      <p style="font-size: 16px; color: #C5A894; max-width: 780px;">Turn every retail coffee bag into an interactive dial-in masterclass. Free barcode and Smart Bag QR technology for specialty roasters.</p>
+    </header>
+
+    <section style="margin-bottom: 32px;">
+      <h2 style="font-family: Georgia, serif; font-size: 22px; color: #D48C46; margin-bottom: 12px;">Why Partner With The Brew App?</h2>
+      <p style="font-size: 14px; color: #E4D5C7;">Specialty coffee roasters spend weeks sourcing and roasting exceptional lots, but home baristas often underextract or overextract the beans using generic ratios. When your labels are registered in our global verified database, scanning your retail bag barcode instantly configures your dialed-in recipe, water temperature, and voice-guided timer.</p>
+    </section>
+
+    <section style="margin-bottom: 32px;">
+      <h2 style="font-family: Georgia, serif; font-size: 22px; color: #D48C46; margin-bottom: 16px;">How It Works: 3 Simple Steps</h2>
+      <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
+        <div style="background: rgba(255,255,255,0.03); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+          <strong style="color: #D48C46;">1. Submit Roastery & Bag Labels:</strong>
+          <p style="font-size: 13px; color: #C5A894; margin: 6px 0 0 0;">Provide your roastery name, bean origins, harvest processing, and existing retail bag UPC/EAN barcodes.</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+          <strong style="color: #D48C46;">2. Set Dial-In Extraction Parameters:</strong>
+          <p style="font-size: 13px; color: #C5A894; margin: 6px 0 0 0;">Specify your recommended brew method (V60, Kalita, Chemex, AeroPress, Espresso), golden ratio, water temperature, and grind size.</p>
+        </div>
+        <div style="background: rgba(255,255,255,0.03); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+          <strong style="color: #D48C46;">3. Instant Barcode Recognition:</strong>
+          <p style="font-size: 13px; color: #C5A894; margin: 6px 0 0 0;">Once approved by HQ, your coffee is live in the verified catalog. Customers scanning your bag instantly brew with your certified recipe.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="background: rgba(212, 140, 70, 0.08); border: 1px solid rgba(212, 140, 70, 0.3); border-radius: 16px; padding: 24px; margin-bottom: 32px;">
+      <h2 style="font-family: Georgia, serif; font-size: 20px; color: #D48C46; margin-top: 0;">Contact HQ to Add Your Labels</h2>
+      <p style="font-size: 14px; color: #E4D5C7;">To request inclusion in our verified specialty coffee database, please contact our roaster partnerships team directly:</p>
+      <p style="font-family: monospace; font-size: 15px; color: #FFF;">Email: <a href="mailto:gmascagni@gmail.com?subject=Roastery%20Label%20Ingestion" style="color: #D48C46; text-decoration: underline;">gmascagni@gmail.com</a></p>
+      <p style="font-size: 12px; color: #C5A894;">Or open <a href="https://thebrew.app" style="color: #D48C46; text-decoration: underline;">The Brew App</a> and click <strong>For Roasters</strong> in the header navigation.</p>
+    </section>
+
+    <footer style="font-size: 12px; color: #A1A1AA; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; text-align: center;">
+      © The Brew App HQ • Precision Extraction & Smart Bag Technology
+    </footer>
+  </div>
+`;
+
+let roasterHtml = templateHtml;
+roasterHtml = roasterHtml.replace(/<title>.*?<\/title>/i, `<title>${roasterTitle}</title>`);
+roasterHtml = roasterHtml.replace(/<meta name="description" content=".*?" \/>/i, `<meta name="description" content="${roasterDesc}" />`);
+roasterHtml = roasterHtml.replace(/<link rel="canonical" href=".*?" \/>/i, `<link rel="canonical" href="${roasterUrl}" />`);
+roasterHtml = roasterHtml.replace(/<meta property="og:title" content=".*?" \/>/i, `<meta property="og:title" content="${roasterTitle}" />`);
+roasterHtml = roasterHtml.replace(/<meta property="og:description" content=".*?" \/>/i, `<meta property="og:description" content="${roasterDesc}" />`);
+roasterHtml = roasterHtml.replace(/<meta property="og:url" content=".*?" \/>/i, `<meta property="og:url" content="${roasterUrl}" />`);
+roasterHtml = roasterHtml.replace(/<meta name="twitter:title" content=".*?" \/>/i, `<meta name="twitter:title" content="${roasterTitle}" />`);
+roasterHtml = roasterHtml.replace(/<meta name="twitter:description" content=".*?" \/>/i, `<meta name="twitter:description" content="${roasterDesc}" />`);
+roasterHtml = roasterHtml.replace(/<meta name="twitter:url" content=".*?" \/>/i, `<meta name="twitter:url" content="${roasterUrl}" />`);
+
+const roasterJsonLdTag = `<script id="json-ld-structured-data" type="application/ld+json">${JSON.stringify(roasterJsonLd)}</script>`;
+roasterHtml = roasterHtml.replace('</head>', `  ${roasterJsonLdTag}\n  </head>`);
+roasterHtml = roasterHtml.replace('<div id="root"></div>', `<div id="root">${roasterContent}</div>`);
+
+fs.writeFileSync(path.join(roasterDistDir, 'index.html'), roasterHtml);
+fs.writeFileSync(path.join(roasterRootDir, 'index.html'), roasterHtml);
+
+console.log('✓ Successfully prerendered /roasters with Article and FAQPage schemas!');
+

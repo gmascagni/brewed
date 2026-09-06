@@ -15,8 +15,12 @@ import {
   ArrowRight,
   RefreshCw,
   Sliders,
-  BookmarkPlus
+  BookmarkPlus,
+  Store,
+  Loader2,
+  Mail
 } from 'lucide-react';
+import { getRegisteredCoffees } from '../data/roasterRegistry';
 
 // Verified catalog of real specialty coffee roasters, beans, and extraction parameters
 export const VERIFIED_BEAN_CATALOG = [
@@ -134,7 +138,9 @@ export default function BarcodeScannerModal({
   isOpen,
   onClose,
   onApplyRecipe,
-  onSaveToJournal
+  onSaveToJournal,
+  onOpenRoasterPortal,
+  onOpenRoasterInfo
 }) {
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState(null);
@@ -142,6 +148,8 @@ export default function BarcodeScannerModal({
   const [matchedBean, setMatchedBean] = useState(null);
   const [manualCode, setManualCode] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  const [isLookingUp, setIsLookingUp] = useState(false);
+  const [uncatalogedResult, setUncatalogedResult] = useState(null);
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -155,41 +163,36 @@ export default function BarcodeScannerModal({
       stopCamera();
       setScannedResult(null);
       setMatchedBean(null);
-      setCameraError(null);
+      setUncatalogedResult(null);
+      setManualCode('');
     }
-
-    return () => {
-      stopCamera();
-    };
+    return () => stopCamera();
   }, [isOpen]);
 
   const startCamera = async () => {
     setCameraError(null);
-    setCameraActive(false);
-
     try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera access not supported in this browser. You can still enter or upload codes.');
-      }
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { 
+      // Prefer rear environment-facing camera on mobile devices
+      const constraints = {
+        video: {
           facingMode: { ideal: 'environment' },
           width: { ideal: 1280 },
           height: { ideal: 720 }
         }
-      });
+      };
 
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        videoRef.current.play();
         setCameraActive(true);
         startScanLoop();
       }
     } catch (err) {
-      console.warn('Camera initialization note:', err.message);
-      setCameraError(err.message || 'Unable to access camera.');
+      console.warn('Camera access error:', err);
+      setCameraError('Camera access denied or unavailable. You can upload a photo or enter a barcode manually below.');
+      setCameraActive(false);
     }
   };
 
@@ -199,11 +202,8 @@ export default function BarcodeScannerModal({
       scanIntervalRef.current = null;
     }
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
     }
     setCameraActive(false);
   };
@@ -233,42 +233,113 @@ export default function BarcodeScannerModal({
     }, 450);
   };
 
-  const handleCodeDetected = (rawValue, format = 'code') => {
+  const handleCodeDetected = async (rawValue, format = 'code') => {
     if (!rawValue || rawValue === scannedResult) return;
     setIsScanning(true);
     setScannedResult(rawValue);
+    setUncatalogedResult(null);
 
-    // Look up in verified catalog
     const cleanVal = rawValue.trim();
-    const matched = VERIFIED_BEAN_CATALOG.find((bean) => {
+
+    // 1. Search in local and built-in verified Roaster Registry
+    const allRegistered = getRegisteredCoffees(VERIFIED_BEAN_CATALOG);
+    const matched = allRegistered.find((bean) => {
       if (bean.upc === cleanVal) return true;
       if (bean.qrPatterns && bean.qrPatterns.some(p => cleanVal.toLowerCase().includes(p.toLowerCase()))) return true;
+      if (cleanVal.includes('thebrew.app') && cleanVal.includes('bean=')) {
+        try {
+          const urlObj = new URL(cleanVal.startsWith('http') ? cleanVal : `https://${cleanVal}`);
+          const beanName = urlObj.searchParams.get('bean');
+          if (beanName && bean.beanName && bean.beanName.toLowerCase() === beanName.toLowerCase()) return true;
+        } catch {}
+      }
       return false;
     });
 
     if (matched) {
       setMatchedBean(matched);
-    } else {
-      // Uncataloged SKU fallback: create custom bean profile
-      setMatchedBean({
-        id: `custom_${cleanVal}`,
-        upc: cleanVal,
-        roaster: "Artisan Coffee Roaster",
-        beanName: `Single-Origin Lot #${cleanVal.slice(-4) || '77'}`,
-        origin: "Specialty Lot",
-        process: "Washed / Natural",
-        elevation: "1,800 MASL",
-        roastLevel: "Light-Medium",
-        tastingNotes: ["Stone Fruit", "Honey", "Citrus", "Clean Finish"],
-        recommendedRatio: 16,
-        recommendedGrind: "Medium-Fine",
-        tempC: 93,
-        tempF: 200,
-        brewMethod: "pour_over",
-        notes: `Bag barcode scanned (${cleanVal}). Parameters calibrated for balanced extraction.`
-      });
+      setIsScanning(false);
+      return;
     }
 
+    // 2. Check if the scanned code is a direct The Brew App Smart Bag URL
+    if (cleanVal.includes('thebrew.app') && cleanVal.includes('bean=')) {
+      try {
+        const urlObj = new URL(cleanVal.startsWith('http') ? cleanVal : `https://${cleanVal}`);
+        const parsedBean = {
+          id: `smart_bag_${Date.now()}`,
+          upc: urlObj.searchParams.get('upc') || cleanVal,
+          roaster: urlObj.searchParams.get('roaster') || 'Specialty Roaster',
+          beanName: urlObj.searchParams.get('bean') || 'Smart Bag Lot',
+          origin: urlObj.searchParams.get('origin') || 'Specialty Lot',
+          process: 'Specialty Process',
+          elevation: '1,800+ MASL',
+          roastLevel: 'Light-Medium',
+          tastingNotes: ['Artisan Selected', 'Balanced Profile'],
+          recommendedRatio: parseFloat(urlObj.searchParams.get('ratio')) || 16.5,
+          recommendedGrind: urlObj.searchParams.get('grind') || 'Medium-Fine',
+          tempF: parseInt(urlObj.searchParams.get('tempF')) || 202,
+          tempC: Math.round(((parseInt(urlObj.searchParams.get('tempF') || '202') - 32) * 5) / 9),
+          brewMethod: urlObj.searchParams.get('method') || 'pour_over',
+          notes: `Smart Bag packaging QR scanned. Dialed in by ${urlObj.searchParams.get('roaster') || 'the Roaster'}.`
+        };
+        setMatchedBean(parsedBean);
+        setIsScanning(false);
+        return;
+      } catch (err) {
+        console.warn('Error parsing Smart Bag URL:', err);
+      }
+    }
+
+    // 3. Genuine real-time lookup against Open Food Facts API
+    setIsLookingUp(true);
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3500);
+      const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(cleanVal)}.json`, {
+        signal: controller.signal,
+        headers: { 'User-Agent': 'TheBrewApp/1.4.4 (contact@thebrew.app)' }
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const offData = await res.json();
+        if (offData.status === 1 && offData.product) {
+          const p = offData.product;
+          setMatchedBean({
+            id: `off_${cleanVal}`,
+            upc: cleanVal,
+            roaster: p.brands || p.brand_owner || 'Retail Coffee Roaster',
+            beanName: p.product_name || p.generic_name || 'Retail Whole Bean Coffee',
+            origin: p.origins || p.countries || 'Commercial Origin',
+            process: 'Commercial / Specialty',
+            elevation: 'Unspecified',
+            roastLevel: 'Medium',
+            tastingNotes: ['Retail Roasted', 'Balanced Body'],
+            recommendedRatio: 16,
+            recommendedGrind: 'Medium',
+            tempC: 93,
+            tempF: 200,
+            brewMethod: 'pour_over',
+            isOffMatch: true,
+            notes: `Verified retail product found on Open Food Facts (${p.product_name || 'Coffee'}). Note: Retail packaging barcodes do not specify barista extraction ratios or water temperatures. Set custom dial-in below.`
+          });
+          setIsLookingUp(false);
+          setIsScanning(false);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('Open Food Facts lookup failed or timed out:', err);
+    }
+
+    // 4. Truly uncataloged: Absolutely NO fake data generated (Rule [user_global])
+    setIsLookingUp(false);
+    setMatchedBean(null);
+    setUncatalogedResult({
+      code: cleanVal,
+      format
+    });
     setIsScanning(false);
   };
 
@@ -450,6 +521,105 @@ export default function BarcodeScannerModal({
             </div>
           </div>
 
+          {/* Real-time Open Product Lookup Spinner */}
+          {isLookingUp && (
+            <div className="p-4 rounded-2xl bg-black/50 border border-amber-gold/30 flex items-center justify-center gap-3 text-cream-light font-mono text-xs animate-pulse">
+              <Loader2 className="w-4 h-4 text-amber-gold animate-spin" />
+              <span>Querying verified roasters & Open Food Facts product database...</span>
+            </div>
+          )}
+
+          {/* Uncataloged / Transparent Barcode Result */}
+          {uncatalogedResult && !matchedBean && !isLookingUp && (
+            <div className="p-5 sm:p-6 rounded-2xl bg-amber-500/[0.07] border-2 border-amber-500/40 shadow-2xl space-y-4 animate-fade-in">
+              <div className="flex items-center gap-3 text-amber-gold">
+                <AlertCircle className="w-6 h-6 shrink-0" />
+                <div>
+                  <span className="text-[10px] font-mono uppercase font-bold text-amber-gold/80 block">
+                    Transparent Barcode Result
+                  </span>
+                  <h3 className="font-serif text-lg sm:text-xl font-bold text-cream-light">
+                    Unregistered Coffee Bag Barcode
+                  </h3>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs text-cream-soft/90 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-cream-soft/60">Scanned Barcode:</span>
+                  <span className="text-amber-gold font-bold px-2 py-0.5 rounded bg-white/[0.06]">{uncatalogedResult.code}</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-cream-soft/80">
+                  Standard supermarket and retail barcodes identify products for inventory and checkout, but do <strong>not</strong> specify barista brew recipes, water ratios, or extraction temperatures unless registered by the roaster. In accordance with our zero-theater standards, no synthetic recipe was generated.
+                </p>
+                <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-200/90 text-[11px] flex items-start gap-2">
+                  <Mail className="w-4 h-4 text-amber-gold shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Roaster or Retail Partner?</strong> Please contact HQ if you would like to add your roaster, coffees, and bag barcodes to our global database.
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-2">
+                {onOpenRoasterInfo && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpenRoasterInfo();
+                      onClose();
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-amber-gold text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow hover:scale-105 active:scale-95 transition"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>Contact HQ to Add Label</span>
+                  </button>
+                )}
+
+                {onOpenRoasterPortal && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpenRoasterPortal(uncatalogedResult.code);
+                      onClose();
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold flex items-center justify-center gap-2 border border-white/15"
+                  >
+                    <Store className="w-4 h-4 text-amber-gold" />
+                    <span>Self-Service Onboard</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMatchedBean({
+                      id: `custom_${uncatalogedResult.code}`,
+                      upc: uncatalogedResult.code,
+                      roaster: "My Coffee Roastery",
+                      beanName: "Custom Coffee Lot",
+                      origin: "Specialty Origin",
+                      process: "Washed / Natural",
+                      elevation: "Specialty Lot",
+                      roastLevel: "Medium",
+                      tastingNotes: ["Balanced", "Sweet", "Clean"],
+                      recommendedRatio: 16,
+                      recommendedGrind: "Medium",
+                      tempC: 93,
+                      tempF: 200,
+                      brewMethod: "pour_over",
+                      notes: `Custom recipe saved for retail barcode (${uncatalogedResult.code}).`
+                    });
+                    setUncatalogedResult(null);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold flex items-center justify-center gap-2 border border-white/15 transition active:scale-95"
+                >
+                  <Coffee className="w-4 h-4 text-amber-gold" />
+                  <span>Home Barista Recipe</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Scanned Bean Result Card */}
           {matchedBean && (
             <div className="p-5 sm:p-6 rounded-2xl bg-black/60 border-2 border-amber-gold/50 shadow-2xl space-y-4 animate-fade-in">
@@ -551,6 +721,42 @@ export default function BarcodeScannerModal({
               Verify Code
             </button>
           </form>
+
+          {/* Roaster Partner Banner */}
+          <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-cream-soft/80 font-mono text-[11px]">
+              <Store className="w-4 h-4 text-amber-gold shrink-0" />
+              <span>Are you a specialty coffee roaster? Add your labels & bag barcodes to our global database.</span>
+            </div>
+            <div className="flex items-center gap-3">
+              {onOpenRoasterInfo && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenRoasterInfo();
+                    onClose();
+                  }}
+                  className="text-amber-gold hover:underline font-mono font-bold text-[11px] flex items-center gap-1"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  <span>How to Add Your Label</span>
+                </button>
+              )}
+              {onOpenRoasterPortal && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenRoasterPortal('');
+                    onClose();
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono font-bold text-[11px] flex items-center gap-1 border border-white/10"
+                >
+                  <span>Roaster Studio</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          </div>
 
         </div>
       </div>

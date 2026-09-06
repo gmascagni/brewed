@@ -21,7 +21,9 @@ import ShopDrawer from './components/ShopDrawer';
 import WorldNewsSection from './components/WorldNewsSection';
 import BarcodeScannerModal from './components/BarcodeScannerModal';
 import WaterChemistryModal from './components/WaterChemistryModal';
-import VersionHistoryModal from './components/VersionHistoryModal';
+import RoasterPortalModal from './components/RoasterPortalModal';
+import RoasterInfoPage from './components/RoasterInfoPage';
+import RoasterProfilePage from './components/RoasterProfilePage';
 import Footer from './components/Footer';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
@@ -98,7 +100,12 @@ export default function App() {
   const [isLocalCoffeeOpen, setIsLocalCoffeeOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isWaterLabOpen, setIsWaterLabOpen] = useState(false);
-  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+  const [isRoasterPortalOpen, setIsRoasterPortalOpen] = useState(false);
+  const [isRoasterInfoOpen, setIsRoasterInfoOpen] = useState(false);
+  const [roasterPrefillBarcode, setRoasterPrefillBarcode] = useState('');
+  const [roasterPrefillBean, setRoasterPrefillBean] = useState(null);
+  const [isRoasterShowcaseView, setIsRoasterShowcaseView] = useState(false);
+  const [selectedRoasterSlug, setSelectedRoasterSlug] = useState('methodical');
 
   // Handlers for Scanned Bean Actions
   const handleApplyScannedRecipe = (scannedBean) => {
@@ -169,6 +176,7 @@ export default function App() {
     const path = location.pathname;
 
     if (path.startsWith('/methods/')) {
+      setIsRoasterShowcaseView(false);
       const methodId = path.replace('/methods/', '').replace(/\/$/, '');
       const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
       const found = allMethods.find(m => m.id === methodId);
@@ -203,14 +211,46 @@ export default function App() {
         }
       }
     } else if (path.startsWith('/guides/coffee-water-chemistry')) {
+      setIsRoasterShowcaseView(false);
       setIsWaterLabOpen(true);
       updatePageSeo(
         'Coffee Water Chemistry & Extraction Yield Guide',
         'Master coffee water chemistry: SCA water specs, Lotus drop recipes, DIY mineral recipes (GH & KH), and extraction yield optimization for specialty coffee.',
         'https://thebrew.app/guides/coffee-water-chemistry'
       );
+    } else if (path.startsWith('/roasters') || path.startsWith('/roaster')) {
+      if (path === '/roasters/partner' || path === '/roasters/info') {
+        setIsRoasterInfoOpen(true);
+      } else {
+        setIsRoasterShowcaseView(true);
+        const parts = path.split('/').filter(Boolean);
+        if (parts.length > 1 && parts[1] !== 'showcase' && parts[1] !== 'partner' && parts[1] !== 'info') {
+          setSelectedRoasterSlug(parts[1]);
+        }
+      }
+      updatePageSeo(
+        'Specialty Coffee Roaster Showcase & Dial-In Lab | The Brew App',
+        'Explore verified specialty coffee roasters, authentic origin stories, and certified dial-in recipes with golden ratios, grind sizes, and water chemistry.',
+        'https://thebrew.app/roasters'
+      );
     } else if (path === '/' || path === '') {
-      setCurrentStep(1);
+      setIsRoasterShowcaseView(false);
+      // Check for Smart Bag deep link query parameters: ?roaster=...&bean=...&method=...&ratio=...
+      const searchParams = new URLSearchParams(location.search);
+      const roasterParam = searchParams.get('roaster');
+      const beanParam = searchParams.get('bean');
+      if (roasterParam || beanParam) {
+        const methodParam = searchParams.get('method');
+        const ratioParam = parseFloat(searchParams.get('ratio'));
+        const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+        const found = allMethods.find(m => m.id === methodParam) || allMethods[0];
+        setActiveMethod(found);
+        if (ratioParam) setCustomRatio(ratioParam);
+        setTrackMode('coffee');
+        setCurrentStep(2);
+      } else {
+        setCurrentStep(1);
+      }
       updatePageSeo(
         'The Art of Extraction',
         'Precision specialty coffee & fine tea extraction ratio scaler, multi-phase countdown timer, burr grinder macro texture guide, and troubleshooting compendium.',
@@ -223,7 +263,7 @@ export default function App() {
         existingScript.remove();
       }
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   // Sync active method when track mode switches
   const handleTrackSwitch = (newTrack) => {
@@ -310,25 +350,32 @@ export default function App() {
           onOpenAuth={() => setIsAuthModalOpen(true)}
           onOpenScanner={() => setIsScannerOpen(true)}
           onOpenWaterLab={() => setIsWaterLabOpen(true)}
-          onOpenVersionHistory={() => setIsVersionModalOpen(true)}
+          onOpenRoasterPortal={() => { setRoasterPrefillBarcode(''); setRoasterPrefillBean(null); setIsRoasterPortalOpen(true); }}
+          onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
+          onOpenRoasterShowcase={() => {
+            setIsRoasterShowcaseView(true);
+            navigate('/roasters');
+          }}
           isMuted={isMuted}
           onToggleMute={() => setIsMuted(!isMuted)}
           currentUser={currentUser}
         />
         
-        {/* Step Progress Bar Pinned Inside Sticky Top Bar */}
-        <StepIndicator
-          currentStep={currentStep}
-          setCurrentStep={(stepNum) => {
-            setCurrentStep(stepNum);
-            if (stepNum === 1) {
-              navigate('/');
-            } else if (currentActiveMethod) {
-              navigate(`/methods/${currentActiveMethod.id}`);
-            }
-          }}
-          trackMode={trackMode}
-        />
+        {/* Step Progress Bar Pinned Inside Sticky Top Bar (hidden in Roaster Showcase) */}
+        {!isRoasterShowcaseView && (
+          <StepIndicator
+            currentStep={currentStep}
+            setCurrentStep={(stepNum) => {
+              setCurrentStep(stepNum);
+              if (stepNum === 1) {
+                navigate('/');
+              } else if (currentActiveMethod) {
+                navigate(`/methods/${currentActiveMethod.id}`);
+              }
+            }}
+            trackMode={trackMode}
+          />
+        )}
       </header>
 
       {/* Main Workspace Container */}
@@ -336,8 +383,32 @@ export default function App() {
 
         <main className="mt-4 space-y-10">
 
-          {/* STEP 01: METHOD SELECTOR */}
-          {currentStep === 1 && (
+          {isRoasterShowcaseView ? (
+            <RoasterProfilePage
+              initialRoasterId={selectedRoasterSlug}
+              onBackToApp={() => {
+                setIsRoasterShowcaseView(false);
+                navigate('/');
+              }}
+              onBrewCoffee={(coffee) => {
+                setIsRoasterShowcaseView(false);
+                handleApplyScannedRecipe(coffee);
+              }}
+              onOpenWaterLabWithProfile={(waterProfile) => {
+                setIsWaterLabOpen(true);
+              }}
+              onOpenRoasterPortalWithBean={(bean) => {
+                setRoasterPrefillBean(bean);
+                setIsRoasterPortalOpen(true);
+              }}
+              onOpenRoasterInfo={() => {
+                setIsRoasterInfoOpen(true);
+              }}
+            />
+          ) : (
+            <>
+              {/* STEP 01: METHOD SELECTOR */}
+              {currentStep === 1 && (
             <MethodSelectorGrid
               trackMode={trackMode}
               setTrackMode={setTrackMode}
@@ -454,8 +525,10 @@ export default function App() {
           {/* Collapsible Equipment & Gear Store Drawer */}
           <ShopDrawer trackMode={trackMode} activeMethod={currentActiveMethod} />
 
-          {/* World Coffee & Tea News Dispatch Section */}
+          {/* Brew News Dispatch Section */}
           <WorldNewsSection trackMode={trackMode} />
+        </>
+      )}
 
           {/* Tasting Journal Modal */}
           <BrewJournal
@@ -541,6 +614,34 @@ export default function App() {
             onClose={() => setIsScannerOpen(false)}
             onApplyRecipe={handleApplyScannedRecipe}
             onSaveToJournal={handleSaveScannedToJournal}
+            onOpenRoasterPortal={(code) => {
+              setRoasterPrefillBarcode(code || '');
+              setIsRoasterPortalOpen(true);
+            }}
+            onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
+          />
+
+          {/* Specialty Roaster Partner Information & Contact HQ Page */}
+          <RoasterInfoPage
+            isOpen={isRoasterInfoOpen}
+            onClose={() => setIsRoasterInfoOpen(false)}
+            onOpenStudio={() => {
+              setIsRoasterInfoOpen(false);
+              setIsRoasterPortalOpen(true);
+            }}
+          />
+
+          {/* Specialty Roaster Partner Portal & Smart Bag Packaging Generator Modal */}
+          <RoasterPortalModal
+            isOpen={isRoasterPortalOpen}
+            onClose={() => {
+              setIsRoasterPortalOpen(false);
+              setRoasterPrefillBarcode('');
+              setRoasterPrefillBean(null);
+            }}
+            prefilledBarcode={roasterPrefillBarcode}
+            prefilledBean={roasterPrefillBean}
+            onSelectBeanToBrew={handleApplyScannedRecipe}
           />
 
           {/* Coffee Water Chemistry Lab Modal */}
@@ -549,16 +650,17 @@ export default function App() {
             onClose={() => setIsWaterLabOpen(false)}
           />
 
-          {/* Version Control & Release Notes History Modal */}
-          <VersionHistoryModal
-            isOpen={isVersionModalOpen}
-            onClose={() => setIsVersionModalOpen(false)}
-          />
-
         </main>
 
         {/* Contact HQ Email & App Footer */}
-        <Footer trackMode={trackMode} />
+        <Footer
+          trackMode={trackMode}
+          onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
+          onOpenRoasterShowcase={() => {
+            setIsRoasterShowcaseView(true);
+            navigate('/roasters');
+          }}
+        />
 
       </div>
 

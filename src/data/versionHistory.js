@@ -2,6 +2,38 @@
 
 export const VERSION_HISTORY = [
   {
+    version: "1.5.0",
+    releaseDate: "2026-09-06",
+    title: "Specialty Roaster Verification Ecosystem, Smart Bag Studio & War Room CRM Bridge",
+    summary: "Complete artisan coffee roastery onboarding suite. Includes verified roaster showcase profiles (Methodical, Onyx, Black & White), real-time QR code generator studio for retail bag packaging, interactive video onboarding walkthrough, automated backend War Room CRM lead capture, Brew News syndication, and Digital Trail Labs LLC parent company attribution.",
+    highlights: [
+      {
+        type: "feature",
+        badge: "Roaster Showcase",
+        title: "Dedicated Artisan Roaster Profiles",
+        description: "Full profiles with roastery origin stories, roasting philosophy (Loring/Diedrich), certified coffee lineups, barista dial-in parameters, Water Lab mineral pairings, and physical cafe locations."
+      },
+      {
+        type: "feature",
+        badge: "Smart Bag Studio",
+        title: "Real-Time QR & Barcode Generator",
+        description: "Enables roasters to generate packaging stickers that smartphone cameras scan to instantly launch multi-phase extraction recipes."
+      },
+      {
+        type: "feature",
+        badge: "CRM Bridge",
+        title: "War Room Lead Capture & Alerting",
+        description: "Roaster onboarding form posts directly to the War Room CRM backend with automatic executive notes and applicant confirmation emails."
+      },
+      {
+        type: "enhancement",
+        badge: "Brand & UX",
+        title: "Brew News & Digital Trail Labs LLC Attribution",
+        description: "Syndicated coffee & tea news renamed to Brew News; updated parent company attribution to Digital Trail Labs LLC; moved release notes to War Room admin portal."
+      }
+    ]
+  },
+  {
     version: "1.4.4",
     releaseDate: "2026-09-06",
     title: "Laboratory-Verified Commercial Bottled Water Guide & SCA Classification",
