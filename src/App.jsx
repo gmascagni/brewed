@@ -311,6 +311,8 @@ export default function App() {
           onOpenScanner={() => setIsScannerOpen(true)}
           onOpenWaterLab={() => setIsWaterLabOpen(true)}
           onOpenVersionHistory={() => setIsVersionModalOpen(true)}
+          isMuted={isMuted}
+          onToggleMute={() => setIsMuted(!isMuted)}
           currentUser={currentUser}
         />
         

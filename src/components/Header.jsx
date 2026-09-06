@@ -1,5 +1,5 @@
 import React from 'react';
-import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin, Newspaper, ScanLine, FlaskConical } from 'lucide-react';
+import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin, Newspaper, ScanLine, FlaskConical, Volume2, VolumeX } from 'lucide-react';
 
 export default function Header({ 
   trackMode, 
@@ -13,6 +13,8 @@ export default function Header({
   onOpenScanner,
   onOpenWaterLab,
   onOpenVersionHistory,
+  isMuted = false,
+  onToggleMute,
   currentUser 
 }) {
   const isCoffee = trackMode === 'coffee';
@@ -46,7 +48,7 @@ export default function Header({
                   className="whitespace-nowrap text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition cursor-pointer flex items-center gap-1 shadow-sm"
                   title="View Release Notes & Build History"
                 >
-                  <span>v1.4.1</span>
+                  <span>v1.4.2</span>
                 </button>
               )}
             </h1>
@@ -102,6 +104,33 @@ export default function Header({
                 {isCoffee ? 'Shop Local Coffee' : 'Shop Local Tea'}
               </span>
               <span className="text-[10px] bg-black/40 text-current px-1.5 py-0.5 rounded-full font-mono font-bold">📍</span>
+            </button>
+          )}
+
+          {/* Global Audible / Mute Sound Toggle Button */}
+          {onToggleMute && (
+            <button
+              type="button"
+              onClick={onToggleMute}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl font-mono font-bold transition-all active:scale-95 shadow-md cursor-pointer border ${
+                isMuted
+                  ? 'bg-rose-500/20 border-rose-500/50 text-rose-300 hover:bg-rose-500/30'
+                  : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25'
+              }`}
+              title={isMuted ? "Audible Sound: MUTED (Click to Turn Sound ON)" : "Audible Sound: ON (Click to Mute)"}
+              aria-label="Toggle Audible Sound"
+            >
+              {isMuted ? (
+                <>
+                  <VolumeX className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+                  <span className="font-mono text-xs">Audible: OFF</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 animate-pulse" />
+                  <span className="font-mono text-xs">Audible: ON</span>
+                </>
+              )}
             </button>
           )}
 

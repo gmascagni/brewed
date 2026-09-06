@@ -55,16 +55,25 @@ export async function ensureAudioContextRunning() {
 
 /**
  * Play an authentic tactile mechanical micro-switch click on button / dial interactions.
- * Simulates physical click-wheel and spring switch feedback.
+ * Dual-engine: plays direct WAV sample + Web Audio synthesization for guaranteed sound.
  */
 export function playMechanicalClick(isMuted = false) {
   if (isMuted) return;
+  
+  // 1. Direct HTML5 audio playback (immune to AudioContext suspension)
+  try {
+    const audio = new Audio('/audio/timer/mechanical_click.wav');
+    audio.volume = 0.9;
+    const p = audio.play();
+    if (p !== undefined) p.catch(() => {});
+  } catch (e) {}
+
+  // 2. Web Audio micro-switch synthesis fallback
   try {
     const ctx = getAudioContext();
-    if (!ctx) return;
+    if (!ctx || ctx.state !== 'running') return;
     const now = ctx.currentTime;
 
-    // High transient snap (plastic/metal switch contact)
     const snapOsc = ctx.createOscillator();
     const snapGain = ctx.createGain();
     snapOsc.type = 'triangle';
@@ -79,44 +88,33 @@ export function playMechanicalClick(isMuted = false) {
 
     snapOsc.start(now);
     snapOsc.stop(now + 0.012);
-
-    // Subtle switch body thud
-    const bodyOsc = ctx.createOscillator();
-    const bodyGain = ctx.createGain();
-    bodyOsc.type = 'sine';
-    bodyOsc.frequency.setValueAtTime(480, now);
-    bodyOsc.frequency.exponentialRampToValueAtTime(90, now + 0.015);
-
-    bodyGain.gain.setValueAtTime(0.20, now);
-    bodyGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.015);
-
-    bodyOsc.connect(bodyGain);
-    bodyGain.connect(ctx.destination);
-
-    bodyOsc.start(now);
-    bodyOsc.stop(now + 0.02);
-  } catch (e) {
-    // Non-blocking
-  }
+  } catch (e) {}
 }
 
 /**
  * Play authentic clockwork ticking sound for every second of countdown.
- * Simulates the mechanical escapement wheel of a high-end physical kitchen/barista timer.
- * Alternates frequency slightly (tick-tock) for realistic clockwork rhythm.
+ * Dual-engine: plays direct WAV sample + Web Audio escapement pulse.
  */
 export function playClockTick(isMuted = false, tickNumber = 0) {
   if (isMuted) return;
+
+  // 1. Direct HTML5 audio tick playback
+  try {
+    const audio = new Audio('/audio/timer/clock_tick.wav');
+    audio.volume = 0.85;
+    const p = audio.play();
+    if (p !== undefined) p.catch(() => {});
+  } catch (e) {}
+
+  // 2. Web Audio escapement pulse
   try {
     const ctx = getAudioContext();
-    if (!ctx) return;
+    if (!ctx || ctx.state !== 'running') return;
     const now = ctx.currentTime;
 
     const isEven = (tickNumber % 2) === 0;
     const clickFreq = isEven ? 2600 : 1950;
-    const bodyFreq = isEven ? 360 : 300;
 
-    // Escapement pallet click
     const clickOsc = ctx.createOscillator();
     const clickGain = ctx.createGain();
     clickOsc.type = 'triangle';
@@ -131,92 +129,68 @@ export function playClockTick(isMuted = false, tickNumber = 0) {
 
     clickOsc.start(now);
     clickOsc.stop(now + 0.01);
-
-    // Mechanical escapement body resonance
-    const thudOsc = ctx.createOscillator();
-    const thudGain = ctx.createGain();
-    thudOsc.type = 'sine';
-    thudOsc.frequency.setValueAtTime(bodyFreq, now);
-    thudOsc.frequency.exponentialRampToValueAtTime(70, now + 0.018);
-
-    thudGain.gain.setValueAtTime(0.18, now);
-    thudGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
-
-    thudOsc.connect(thudGain);
-    thudGain.connect(ctx.destination);
-
-    thudOsc.start(now);
-    thudOsc.stop(now + 0.022);
-  } catch (e) {
-    // Non-blocking
-  }
+  } catch (e) {}
 }
 
 /**
  * Play a rich, authentic mechanical barista / kitchen timer bell chime.
- * Features a sharp physical striker impact click + resonant C6 harmonic bell decay.
+ * Dual-engine: plays high-definition timer_chime.wav + Web Audio C6 harmonic bell.
  */
 export function playTimerStartChime(isMuted = false) {
   if (isMuted) return;
+
+  // 1. Direct HTML5 audio playback (Guaranteed on mobile phone & computer speakers)
+  try {
+    const audio = new Audio('/audio/timer/timer_chime.wav');
+    audio.volume = 1.0;
+    const p = audio.play();
+    if (p !== undefined) p.catch(() => {});
+  } catch (e) {}
+
+  // 2. Web Audio brass bell strike synthesis
   try {
     const ctx = getAudioContext();
     if (!ctx) return;
-    const now = ctx.currentTime;
+    
+    const playBell = () => {
+      try {
+        const now = ctx.currentTime;
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(0.85, now);
+        masterGain.connect(ctx.destination);
 
-    // Master output bus
-    const masterGain = ctx.createGain();
-    masterGain.gain.setValueAtTime(0.85, now);
-    masterGain.connect(ctx.destination);
+        const bellPartials = [
+          { freq: 1046.5, gain: 0.40, decay: 1.6, type: 'sine' },
+          { freq: 1051.0, gain: 0.30, decay: 1.4, type: 'sine' },
+          { freq: 1318.5, gain: 0.22, decay: 1.1, type: 'sine' },
+          { freq: 1568.0, gain: 0.18, decay: 0.9, type: 'sine' },
+          { freq: 2093.0, gain: 0.15, decay: 0.7, type: 'sine' },
+          { freq: 2793.8, gain: 0.10, decay: 0.45, type: 'sine' },
+          { freq: 4186.0, gain: 0.05, decay: 0.25, type: 'triangle' }
+        ];
 
-    // Harmonic bell partials (C6 fundamental ~1046.5 Hz with authentic inharmonic metal overtones)
-    const bellPartials = [
-      { freq: 1046.5, gain: 0.40, decay: 1.6, type: 'sine' },      // Fundamental strike (C6)
-      { freq: 1051.0, gain: 0.30, decay: 1.4, type: 'sine' },      // Acoustic beating shimmer
-      { freq: 1318.5, gain: 0.22, decay: 1.1, type: 'sine' },      // Tierce / Major third (E6)
-      { freq: 1568.0, gain: 0.18, decay: 0.9, type: 'sine' },      // Quint / Perfect fifth (G6)
-      { freq: 2093.0, gain: 0.15, decay: 0.7, type: 'sine' },      // Nominal / Octave (C7)
-      { freq: 2793.8, gain: 0.10, decay: 0.45, type: 'sine' },     // High overtone (F7)
-      { freq: 4186.0, gain: 0.05, decay: 0.25, type: 'triangle' }  // Top chime sparkle (C8)
-    ];
+        bellPartials.forEach(({ freq, gain, decay, type }) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now);
+          g.gain.setValueAtTime(0.0001, now);
+          g.gain.exponentialRampToValueAtTime(gain, now + 0.004);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+          osc.connect(g);
+          g.connect(masterGain);
+          osc.start(now);
+          osc.stop(now + decay + 0.05);
+        });
+      } catch (err) {}
+    };
 
-    bellPartials.forEach(({ freq, gain, decay, type }) => {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, now);
-
-      // Rapid attack, realistic exponential metal ring-out
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(gain, now + 0.004);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + decay);
-
-      osc.connect(g);
-      g.connect(masterGain);
-
-      osc.start(now);
-      osc.stop(now + decay + 0.05);
-    });
-
-    // Mechanical hammer striker click (simulates the physical spring striker hitting brass)
-    const clickOsc = ctx.createOscillator();
-    const clickGain = ctx.createGain();
-    clickOsc.type = 'triangle';
-    clickOsc.frequency.setValueAtTime(3400, now);
-    clickOsc.frequency.exponentialRampToValueAtTime(250, now + 0.025);
-
-    clickGain.gain.setValueAtTime(0.35, now);
-    clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
-
-    clickOsc.connect(clickGain);
-    clickGain.connect(masterGain);
-
-    clickOsc.start(now);
-    clickOsc.stop(now + 0.03);
-
-  } catch (e) {
-    console.warn('Real timer chime error:', e);
-  }
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(playBell).catch(() => {});
+    } else {
+      playBell();
+    }
+  } catch (e) {}
 }
 
 /**
@@ -227,17 +201,13 @@ export function stopSpeechAnnouncement() {
     try {
       activeAudioElement.pause();
       activeAudioElement.currentTime = 0;
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
     activeAudioElement = null;
   }
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     try {
       window.speechSynthesis.cancel();
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
   }
   activeSpeechUtterance = null;
 }
@@ -245,7 +215,7 @@ export function stopSpeechAnnouncement() {
 /**
  * Announce phase name and duration clearly.
  * Prioritizes pre-rendered studio British female voice MP3s (/audio/timer/<slug>.mp3)
- * with robust, resilient fallback to Web Speech API (with Chromium resume() fix).
+ * with exact slug resolution and resilient Web Speech fallback.
  * NEVER blocks timer countdown or UI execution.
  * Example: "Bloom Phase, 45 seconds."
  */
@@ -258,23 +228,9 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
   // Clean up any ongoing announcement
   stopSpeechAnnouncement();
 
-  let cleanName = (phaseName || '').trim();
-  if (cleanName.toLowerCase() === 'bloom') {
-    cleanName = 'Bloom Phase';
-  } else if (
-    !cleanName.toLowerCase().includes('phase') && 
-    !cleanName.toLowerCase().includes('infusion') && 
-    !cleanName.toLowerCase().includes('pour') && 
-    !cleanName.toLowerCase().includes('steep') &&
-    !cleanName.toLowerCase().includes('rest') &&
-    !cleanName.toLowerCase().includes('simmer') &&
-    !cleanName.toLowerCase().includes('preheat') &&
-    !cleanName.toLowerCase().includes('complete')
-  ) {
-    cleanName = `${cleanName} Phase`;
-  }
-
-  const slug = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  const rawName = (phaseName || '').trim();
+  // Exact slug matching our 47 pre-rendered audio files
+  const slug = rawName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 
   let finished = false;
   const safeFinish = () => {
@@ -294,18 +250,16 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
     }
 
     try {
-      // Unstick Chrome speech synthesis queue if paused
       try { window.speechSynthesis.resume(); } catch (e) {}
 
       const secondsText = `${durationSec} second${durationSec === 1 ? '' : 's'}`;
-      const textToSpeak = `${cleanName}, ${secondsText}.`;
+      const textToSpeak = `${rawName}, ${secondsText}.`;
 
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
       utterance.lang = 'en-US';
       utterance.rate = 1.05;
       utterance.pitch = 1.0;
 
-      // Select best voice (prefer British or US female voice)
       const voices = window.speechSynthesis.getVoices() || [];
       const chosenVoice = voices.find(v => v.lang && v.lang.startsWith('en') && (
         v.name.includes('Natural') || 
@@ -322,8 +276,6 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
 
       utterance.onend = safeFinish;
       utterance.onerror = safeFinish;
-
-      // Safety timeout: ensure callback always fires even if engine hangs
       setTimeout(safeFinish, 2800);
 
       activeSpeechUtterance = utterance;
@@ -331,11 +283,7 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
       if (window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
         setTimeout(() => {
-          try {
-            window.speechSynthesis.speak(utterance);
-          } catch {
-            safeFinish();
-          }
+          try { window.speechSynthesis.speak(utterance); } catch { safeFinish(); }
         }, 50);
       } else {
         window.speechSynthesis.speak(utterance);
@@ -354,21 +302,12 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
 
     audio.onended = safeFinish;
     audio.onerror = () => {
-      // If MP3 fails to load, gracefully fall back to speech synthesis
       fallbackToSpeech();
     };
 
-    // Failsafe timeout in case audio takes too long
-    setTimeout(() => {
-      if (!finished && audio && audio.paused) {
-        fallbackToSpeech();
-      }
-    }, 1200);
-
     const playPromise = audio.play();
     if (playPromise !== undefined) {
-      playPromise.catch((e) => {
-        // Autoplay policy or format error -> fall back to speech
+      playPromise.catch(() => {
         fallbackToSpeech();
       });
     }
