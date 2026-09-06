@@ -1,7 +1,20 @@
 import React from 'react';
-import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin, Newspaper } from 'lucide-react';
+import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin, Newspaper, ScanLine, FlaskConical } from 'lucide-react';
 
-export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenSearch, onOpenProfile, onOpenCommunity, onOpenLocalCoffee, onOpenAuth, currentUser }) {
+export default function Header({ 
+  trackMode, 
+  setTrackMode, 
+  onOpenJournal, 
+  onOpenSearch, 
+  onOpenProfile, 
+  onOpenCommunity, 
+  onOpenLocalCoffee, 
+  onOpenAuth, 
+  onOpenScanner,
+  onOpenWaterLab,
+  onOpenVersionHistory,
+  currentUser 
+}) {
   const isCoffee = trackMode === 'coffee';
 
   return (
@@ -27,6 +40,15 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
               }`}>
                 Master
               </span>
+              {onOpenVersionHistory && (
+                <button
+                  onClick={onOpenVersionHistory}
+                  className="whitespace-nowrap text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition cursor-pointer flex items-center gap-1 shadow-sm"
+                  title="View Release Notes & Build History"
+                >
+                  <span>v1.4.0</span>
+                </button>
+              )}
             </h1>
             <p className="text-[10px] text-stone-400 font-mono">Precision Coffee & Tea Guide</p>
           </div>
@@ -111,6 +133,38 @@ export default function Header({ trackMode, setTrackMode, onOpenJournal, onOpenS
             >
               <BookOpen className="w-4 h-4" />
               <span className="hidden md:inline">Recipe Vault</span>
+            </button>
+          )}
+
+          {/* Native Camera Barcode & QR Scanner Trigger */}
+          {onOpenScanner && (
+            <button
+              onClick={onOpenScanner}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
+                isCoffee
+                  ? 'bg-[#2A1C12]/50 border-amber-gold/40 text-amber-gold hover:bg-[#38261A]/60'
+                  : 'bg-emerald-950/50 border-sage-500/40 text-sage-300 hover:bg-emerald-900/60'
+              }`}
+              title="Scan Bean Bag Barcode or QR Code with Device Camera"
+            >
+              <ScanLine className="w-4 h-4 text-amber-gold" />
+              <span className="hidden lg:inline">Scan Bag</span>
+            </button>
+          )}
+
+          {/* Water Chemistry Lab Trigger */}
+          {onOpenWaterLab && (
+            <button
+              onClick={onOpenWaterLab}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
+                isCoffee
+                  ? 'bg-[#2A1C12]/50 border-cyan-500/40 text-cyan-300 hover:bg-[#38261A]/60'
+                  : 'bg-emerald-950/50 border-cyan-500/40 text-cyan-300 hover:bg-emerald-900/60'
+              }`}
+              title="Open Coffee Water Chemistry Lab & Mineral Recipes"
+            >
+              <FlaskConical className="w-4 h-4 text-cyan-400" />
+              <span className="hidden lg:inline">Water Lab</span>
             </button>
           )}
 

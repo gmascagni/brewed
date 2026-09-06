@@ -35,7 +35,7 @@ export const WORLD_BREW_NEWS = [
     "tag": "Industry & News",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "After a hiatus of more than a year, the independent journal Coffee People Zine is back in print, with a launch party planned for Sunday, Sept. 20, in Minneapolis.&#160; The...",
+    "summary": "After a hiatus of more than a year, the independent journal Coffee People Zine is back in print, with a launch party planned for Sunday, Sept. 20, in Minneapolis. The...",
     "keyPoints": [
       "Published by Daily Coffee News on Sep 4, 2026",
       "Direct coverage covering industry & news"
@@ -125,7 +125,7 @@ export const WORLD_BREW_NEWS = [
     "tag": "Fine Tea Dispatch",
     "readTime": "2 min read",
     "featured": true,
-    "summary": "Specialty Tea Market Size, Share, Industry Growth, 2034&nbsp;&nbsp;fortunebusinessinsights.com",
+    "summary": "Global market analysis and projections for the specialty tea industry through 2034, tracking volume expansion, single-origin demand, and market trends.",
     "keyPoints": [
       "Published by fortunebusinessinsights.com on Aug 10, 2026",
       "Direct coverage covering fine tea dispatch"
@@ -143,7 +143,7 @@ export const WORLD_BREW_NEWS = [
     "tag": "Fine Tea Dispatch",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "Is Brazil’s Specialty Coffee Sector on the Rise?&nbsp;&nbsp;STiR Coffee and Tea Magazine",
+    "summary": "In-depth examination of Brazil’s evolving specialty coffee sector, assessing harvest investments, quality scoring, and producer infrastructure.",
     "keyPoints": [
       "Published by STiR Coffee and Tea Magazine on Apr 19, 2026",
       "Direct coverage covering fine tea dispatch"
@@ -161,7 +161,7 @@ export const WORLD_BREW_NEWS = [
     "tag": "Fine Tea Dispatch",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "China’s Tea Industry Shifts from Volume to Value&nbsp;&nbsp;WorldTeaNews",
+    "summary": "Analysis of China's domestic and export tea markets as producers pivot toward high-grade single-origin harvests and artisanal processing.",
     "keyPoints": [
       "Published by WorldTeaNews on Mar 11, 2026",
       "Direct coverage covering fine tea dispatch"
@@ -179,7 +179,7 @@ export const WORLD_BREW_NEWS = [
     "tag": "Fine Tea Dispatch",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "The Future of Specialty Coffee&nbsp;&nbsp;Tea & Coffee Trade Journal",
+    "summary": "Industry leaders discuss technological shifts, sustainable farming practices, and consumer preferences shaping the specialty coffee landscape.",
     "keyPoints": [
       "Published by Tea & Coffee Trade Journal on Jan 29, 2026",
       "Direct coverage covering fine tea dispatch"

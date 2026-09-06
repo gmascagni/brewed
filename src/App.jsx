@@ -19,6 +19,9 @@ import CommunityHubModal from './components/CommunityHubModal';
 import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
 import ShopDrawer from './components/ShopDrawer';
 import WorldNewsSection from './components/WorldNewsSection';
+import BarcodeScannerModal from './components/BarcodeScannerModal';
+import WaterChemistryModal from './components/WaterChemistryModal';
+import VersionHistoryModal from './components/VersionHistoryModal';
 import Footer from './components/Footer';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
@@ -93,6 +96,54 @@ export default function App() {
   const [isRecipeBuilderOpen, setIsRecipeBuilderOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isLocalCoffeeOpen, setIsLocalCoffeeOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isWaterLabOpen, setIsWaterLabOpen] = useState(false);
+  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+
+  // Handlers for Scanned Bean Actions
+  const handleApplyScannedRecipe = (scannedBean) => {
+    if (!scannedBean) return;
+    if (scannedBean.recommendedRatio) {
+      setCustomRatio(scannedBean.recommendedRatio);
+    }
+    const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+    const targetMethod = allMethods.find(m => m.id === scannedBean.brewMethod) || allMethods[0];
+    setActiveMethod(targetMethod);
+    setTrackMode('coffee');
+    setCurrentStep(2);
+    setTimeout(() => {
+      const el = document.getElementById('step-2');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handleSaveScannedToJournal = (scannedBean) => {
+    if (!scannedBean) return;
+    try {
+      const existing = JSON.parse(localStorage.getItem('the_brew_app_journal_v1') || '[]');
+      const newEntry = {
+        id: Date.now().toString(),
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        trackMode: 'coffee',
+        methodName: scannedBean.brewMethod ? scannedBean.brewMethod.replace(/_/g, ' ') : 'Pour Over',
+        beanName: scannedBean.beanName,
+        roaster: scannedBean.roaster,
+        doseStr: '18.0 g',
+        waterStr: `${18 * (scannedBean.recommendedRatio || 16)} mL`,
+        ratioStr: `1 : ${scannedBean.recommendedRatio || 16}`,
+        grindStr: scannedBean.recommendedGrind || 'Medium-Fine',
+        tempStr: `${scannedBean.tempF || 200}°F`,
+        rating: 5,
+        isFavorite: true,
+        tastingNotes: scannedBean.tastingNotes || [],
+        notes: `${scannedBean.notes} (Origin: ${scannedBean.origin}, Altitude: ${scannedBean.elevation})`
+      };
+      localStorage.setItem('the_brew_app_journal_v1', JSON.stringify([newEntry, ...existing]));
+      setIsJournalOpen(true);
+    } catch (err) {
+      console.error('Error saving scanned bean to journal', err);
+    }
+  };
 
   // Active Method & Scaling State
   const methods = BREW_METHODS[trackMode] || BREW_METHODS.coffee;
@@ -151,6 +202,13 @@ export default function App() {
           script.textContent = JSON.stringify(jsonLdData);
         }
       }
+    } else if (path.startsWith('/guides/coffee-water-chemistry')) {
+      setIsWaterLabOpen(true);
+      updatePageSeo(
+        'Coffee Water Chemistry & Extraction Yield Guide',
+        'Master coffee water chemistry: SCA water specs, Lotus drop recipes, DIY mineral recipes (GH & KH), and extraction yield optimization for specialty coffee.',
+        'https://thebrew.app/guides/coffee-water-chemistry'
+      );
     } else if (path === '/' || path === '') {
       setCurrentStep(1);
       updatePageSeo(
@@ -243,6 +301,9 @@ export default function App() {
           onOpenCommunity={() => setIsCommunityOpen(true)}
           onOpenLocalCoffee={() => setIsLocalCoffeeOpen(true)}
           onOpenAuth={() => setIsAuthModalOpen(true)}
+          onOpenScanner={() => setIsScannerOpen(true)}
+          onOpenWaterLab={() => setIsWaterLabOpen(true)}
+          onOpenVersionHistory={() => setIsVersionModalOpen(true)}
           currentUser={currentUser}
         />
         
@@ -360,6 +421,7 @@ export default function App() {
                 dryDoseGrams={dryDoseGrams}
                 unitSystem={unitSystem}
                 isMuted={isMuted}
+                setIsMuted={setIsMuted}
                 onPrevStep={() => setCurrentStep(3)}
                 onOpenJournal={() => setIsJournalOpen(true)}
               />
@@ -396,6 +458,7 @@ export default function App() {
             cupMl={cupMl}
             customRatio={customRatio}
             unitSystem={unitSystem}
+            onOpenScanner={() => setIsScannerOpen(true)}
           />
 
           {/* Multi-Index Global Search Modal */}
@@ -461,6 +524,26 @@ export default function App() {
             isOpen={isLocalCoffeeOpen}
             onClose={() => setIsLocalCoffeeOpen(false)}
             trackMode={trackMode}
+          />
+
+          {/* Native Camera Barcode & QR Scanner Modal */}
+          <BarcodeScannerModal
+            isOpen={isScannerOpen}
+            onClose={() => setIsScannerOpen(false)}
+            onApplyRecipe={handleApplyScannedRecipe}
+            onSaveToJournal={handleSaveScannedToJournal}
+          />
+
+          {/* Coffee Water Chemistry Lab Modal */}
+          <WaterChemistryModal
+            isOpen={isWaterLabOpen}
+            onClose={() => setIsWaterLabOpen(false)}
+          />
+
+          {/* Version Control & Release Notes History Modal */}
+          <VersionHistoryModal
+            isOpen={isVersionModalOpen}
+            onClose={() => setIsVersionModalOpen(false)}
           />
 
         </main>

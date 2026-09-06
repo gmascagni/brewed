@@ -18,6 +18,29 @@ import {
 } from 'lucide-react';
 import { WORLD_BREW_NEWS, NEWS_CATEGORIES, LAST_UPDATED } from '../data/newsData';
 
+function sanitizeNewsText(str) {
+  if (!str) return '';
+  return str
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&#160;/g, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&ndash;/gi, '–')
+    .replace(/&mdash;/gi, '—')
+    .replace(/&#8211;/g, '–')
+    .replace(/&#8212;/g, '—')
+    .replace(/&#8216;/g, "'")
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8220;/g, '"')
+    .replace(/&#8221;/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export default function WorldNewsSection({ trackMode }) {
   const isCoffee = trackMode === 'coffee';
   const [isExpanded, setIsExpanded] = useState(false);
@@ -229,12 +252,12 @@ export default function WorldNewsSection({ trackMode }) {
 
                   {/* Headline */}
                   <h4 className="font-serif text-lg sm:text-xl font-bold text-cream-light mb-3 leading-snug group-hover:text-amber-gold transition-colors">
-                    {article.title}
+                    {sanitizeNewsText(article.title)}
                   </h4>
 
                   {/* News Brief / Summary */}
                   <p className="text-xs sm:text-sm text-cream-soft/90 leading-relaxed mb-5 font-normal">
-                    {article.summary}
+                    {sanitizeNewsText(article.summary)}
                   </p>
 
                   {/* Executive Key Points */}
@@ -248,7 +271,7 @@ export default function WorldNewsSection({ trackMode }) {
                         {article.keyPoints.map((point, idx) => (
                           <li key={idx} className="flex items-start gap-2 leading-relaxed">
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                            <span>{point}</span>
+                            <span>{sanitizeNewsText(point)}</span>
                           </li>
                         ))}
                       </ul>

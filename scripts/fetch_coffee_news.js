@@ -1,4 +1,4 @@
-﻿/**
+/**
  * scripts/fetch_coffee_news.js
  * Real-time Automated RSS Crawler for World Coffee & Tea News.
  * Fetches real articles, real publication dates, and real direct article permalinks
@@ -17,12 +17,23 @@ function decodeEntities(str) {
   if (!str) return '';
   return str
     .replace(/<!\[CDATA\[(.*?)\]\]>/gs, '$1')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&#160;/g, ' ')
+    .replace(/&bull;/gi, '•')
     .replace(/&#8217;/g, "'")
     .replace(/&#8216;/g, "'")
+    .replace(/&lsquo;/gi, "'")
+    .replace(/&rsquo;/gi, "'")
     .replace(/&#8220;/g, '"')
     .replace(/&#8221;/g, '"')
+    .replace(/&ldquo;/gi, '"')
+    .replace(/&rdquo;/gi, '"')
     .replace(/&#8211;/g, '–')
+    .replace(/&ndash;/gi, '–')
     .replace(/&#8212;/g, '—')
+    .replace(/&mdash;/gi, '—')
+    .replace(/&#8230;/g, '...')
+    .replace(/&hellip;/gi, '...')
     .replace(/&#038;/g, '&')
     .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
@@ -32,6 +43,7 @@ function decodeEntities(str) {
     .replace(/&gt;/g, '>')
     .replace(/<[^>]+>/g, '')
     .replace(/\[\.\.\.\]/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
@@ -86,8 +98,11 @@ function parseRssXml(xml, defaultSource, defaultCategory) {
 
     // Clean summary
     let summary = rawDesc;
-    if (!summary || summary.length < 30) {
-      summary = `${rawTitle}. Full coverage available from ${sourceName}.`;
+    if (sourceName && summary.toLowerCase().includes(sourceName.toLowerCase())) {
+      summary = summary.replace(new RegExp(`\\s*[-–—|•]?\\s*${sourceName}\\s*$`, 'i'), '').trim();
+    }
+    if (!summary || summary.length < 30 || summary.toLowerCase() === rawTitle.toLowerCase()) {
+      summary = `${rawTitle}. Read complete reporting and industry insights on ${sourceName}.`;
     } else if (summary.length > 280) {
       summary = summary.substring(0, 277) + '...';
     }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Star, Sparkles, Plus, Trash2, X, Filter, Heart, Coffee, Leaf, Scale, Gauge, Thermometer, Calendar, Award, Download, Upload } from 'lucide-react';
+import { BookOpen, Star, Sparkles, Plus, Trash2, X, Filter, Heart, Coffee, Leaf, Scale, Gauge, Thermometer, Calendar, Award, Download, Upload, ScanLine } from 'lucide-react';
 
 const LOCAL_STORAGE_KEY = 'the_brew_app_journal_v1';
 
@@ -11,7 +11,8 @@ export default function BrewJournal({
   cupCount,
   cupMl,
   customRatio,
-  unitSystem
+  unitSystem,
+  onOpenScanner
 }) {
   const isCoffee = trackMode === 'coffee';
   const isMetric = unitSystem === 'metric';
@@ -324,9 +325,22 @@ export default function BrewJournal({
                 <Sparkles className="w-4 h-4 text-amber-gold" />
                 <span>Log Recipe: {activeMethod?.name}</span>
               </h3>
-              <span className="text-xs font-mono font-bold text-amber-gold bg-amber-400/15 px-3 py-1 rounded-full border border-amber-400/30">
-                {defaultDoseStr} • {defaultWaterStr}
-              </span>
+              <div className="flex items-center gap-2">
+                {onOpenScanner && (
+                  <button
+                    type="button"
+                    onClick={onOpenScanner}
+                    className="px-3 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-gold border border-amber-500/40 text-xs font-mono font-bold flex items-center gap-1.5 transition active:scale-95 shadow"
+                    title="Scan bag barcode or QR code to auto-fill"
+                  >
+                    <ScanLine className="w-3.5 h-3.5" />
+                    <span>Scan Bag Barcode</span>
+                  </button>
+                )}
+                <span className="text-xs font-mono font-bold text-amber-gold bg-amber-400/15 px-3 py-1 rounded-full border border-amber-400/30">
+                  {defaultDoseStr} • {defaultWaterStr}
+                </span>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
