@@ -3,6 +3,7 @@ import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, Volum
 import { 
   playTimerStartChime, 
   announcePhase, 
+  speakActiveInstruction,
   stopSpeechAnnouncement, 
   playPhaseChime, 
   playCompletionChime, 
@@ -126,10 +127,19 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       if (!localMuted) {
         setIsAnnouncing(true);
         const nameToSay = nextPhase?.name || `Phase ${nextIdx + 1}`;
-        setAnnouncementText(`${nameToSay}, ${nextDuration}s`);
-        announcePhase(nameToSay, nextDuration, localMuted, () => {
-          setIsAnnouncing(false);
-        });
+        const instructionToSay = nextPhase?.instruction || '';
+        setAnnouncementText(instructionToSay || nameToSay);
+        announcePhase(
+          nameToSay, 
+          nextDuration, 
+          localMuted, 
+          () => {
+            setIsAnnouncing(false);
+          },
+          instructionToSay,
+          activeMethod?.id,
+          nextIdx
+        );
       }
     } else {
       // All phases complete!
@@ -224,11 +234,20 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       if (!localMuted && isFreshPhase) {
         setIsAnnouncing(true);
         const nameToSay = activePhase?.name || 'Bloom Phase';
-        setAnnouncementText(`${nameToSay}, ${phaseDuration}s`);
+        const instructionToSay = activePhase?.instruction || '';
+        setAnnouncementText(instructionToSay || nameToSay);
 
-        announcePhase(nameToSay, phaseDuration, localMuted, () => {
-          setIsAnnouncing(false);
-        });
+        announcePhase(
+          nameToSay, 
+          phaseDuration, 
+          localMuted, 
+          () => {
+            setIsAnnouncing(false);
+          },
+          instructionToSay,
+          activeMethod?.id,
+          currentPhaseIndex
+        );
       } else {
         setIsAnnouncing(false);
       }
@@ -264,10 +283,19 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       if (!localMuted) {
         setIsAnnouncing(true);
         const nameToSay = nextPhase?.name || `Phase ${nextIdx + 1}`;
-        setAnnouncementText(`${nameToSay}, ${nextDuration}s`);
-        announcePhase(nameToSay, nextDuration, localMuted, () => {
-          setIsAnnouncing(false);
-        });
+        const instructionToSay = nextPhase?.instruction || '';
+        setAnnouncementText(instructionToSay || nameToSay);
+        announcePhase(
+          nameToSay, 
+          nextDuration, 
+          localMuted, 
+          () => {
+            setIsAnnouncing(false);
+          },
+          instructionToSay,
+          activeMethod?.id,
+          nextIdx
+        );
       }
     } else {
       setIsRunning(false);
@@ -293,6 +321,29 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     setCurrentPhaseIndex(0);
     currentPhaseIndexRef.current = 0;
     setTimeLeft(phases[0]?.durationSec || 60);
+  };
+
+  // Replay Active Extraction Instruction out loud on demand
+  const handleReplayInstruction = () => {
+    unlockAudio();
+    playMechanicalClick(localMuted);
+    setIsAnnouncing(true);
+    const nameToSay = activePhase?.name || 'Active Phase';
+    const instructionToSay = activePhase?.instruction || '';
+    const phaseDuration = activePhase?.durationSec || 60;
+    setAnnouncementText(instructionToSay || nameToSay);
+
+    announcePhase(
+      nameToSay,
+      phaseDuration,
+      false, // Force audio playback on explicit user request
+      () => {
+        setIsAnnouncing(false);
+      },
+      instructionToSay,
+      activeMethod?.id,
+      currentPhaseIndex
+    );
   };
 
   // Format MM:SS display
@@ -477,21 +528,43 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
         {/* Phase Instruction & Active Target Pour Box */}
         <div className="max-w-md w-full space-y-4 text-center lg:text-left">
-          <div className="p-6 rounded-3xl bg-black/40 border border-white/10 shadow-inner space-y-3">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-stone-400 font-extrabold flex items-center justify-center lg:justify-start gap-1.5">
-              <Sparkles className={`w-3.5 h-3.5 ${isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
-              <span>Active Extraction Instruction</span>
+          <div className={`p-6 rounded-3xl bg-black/40 border shadow-inner space-y-3 transition-all duration-300 ${
+            isAnnouncing
+              ? 'border-amber-400/50 shadow-[0_0_20px_rgba(251,191,36,0.15)] ring-1 ring-amber-400/30'
+              : 'border-white/10'
+          }`}>
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-stone-400 font-extrabold flex items-center gap-1.5">
+                <Sparkles className={`w-3.5 h-3.5 ${isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
+                <span>Active Extraction Instruction</span>
+              </div>
+
+              {/* Dedicated Listen / Replay Instruction Button */}
+              <button
+                type="button"
+                onClick={handleReplayInstruction}
+                className={`px-3 py-1.5 rounded-xl border text-[11px] font-mono font-bold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-sm ${
+                  isAnnouncing
+                    ? 'bg-amber-500/25 border-amber-400/60 text-amber-200 animate-pulse ring-1 ring-amber-400/40'
+                    : 'bg-white/10 hover:bg-white/20 border-white/15 text-stone-200 hover:text-white'
+                }`}
+                title="Tap to hear Active Extraction Instruction spoken aloud"
+                aria-label="Hear Active Extraction Instruction"
+              >
+                <Volume2 className={`w-3.5 h-3.5 ${isAnnouncing ? 'text-amber-300 animate-bounce' : 'text-stone-300'}`} />
+                <span>{isAnnouncing ? 'Speaking...' : '🔊 Listen'}</span>
+              </button>
             </div>
             
             <p className="text-sm md:text-base text-cream-light font-medium leading-relaxed">
               {activePhase?.instruction || 'Follow standard extraction pulse pouring technique.'}
             </p>
 
-            {/* Subtle Voice Announcement Notice */}
-            {isAnnouncing && announcementText && (
-              <div className="pt-2 flex items-center justify-center lg:justify-start gap-2 text-xs font-mono text-amber-300/90 animate-pulse">
-                <Volume2 className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>Voice Guidance: "{announcementText}"</span>
+            {/* Active Voice Guidance Banner */}
+            {isAnnouncing && (
+              <div className="pt-2 flex items-center gap-2 text-xs font-mono text-amber-300 animate-pulse border-t border-white/10">
+                <Volume2 className="w-4 h-4 flex-shrink-0 animate-spin" />
+                <span className="font-semibold">Speaking Active Instruction: "{announcementText || activePhase?.instruction}"</span>
               </div>
             )}
           </div>

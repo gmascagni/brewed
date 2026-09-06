@@ -2,6 +2,38 @@
 
 export const VERSION_HISTORY = [
   {
+    version: "1.4.3",
+    releaseDate: "2026-09-06",
+    title: "Active Extraction Instruction Voice Guidance & On-Demand Audio",
+    summary: "As the mechanical clock ticks, the timer now speaks the full Active Extraction Instruction aloud. Includes 54 pre-rendered neural studio voice recordings and a dedicated Listen button on the instruction card.",
+    highlights: [
+      {
+        type: "feature",
+        badge: "Spoken Instructions",
+        title: "Active Extraction Instruction Spoken As Timer Ticks",
+        description: "Countdown now announces the phase name, time, and complete Active Extraction Instruction (e.g. 'Bloom Phase, 45 seconds. Saturate grounds evenly with 3x coffee weight in circular motion. Let coffee bloom and de-gas.') while the mechanical clock continues clicking in rhythm."
+      },
+      {
+        type: "feature",
+        badge: "54 Studio Tracks",
+        title: "54 Neural British Voice Clips for Every Method",
+        description: "Synthesized 54 studio audio files using Microsoft Edge Neural Voice (en-GB-SoniaNeural) covering all 18 coffee and tea methods with exact extraction instructions and fallback Web Speech API synthesis."
+      },
+      {
+        type: "enhancement",
+        badge: "Listen On-Demand",
+        title: "Dedicated Listen Button on Instruction Card",
+        description: "Added a tactile '[ 🔊 Listen ]' button directly inside the Active Extraction Instruction box so users can replay or hear the instruction at any time during extraction."
+      },
+      {
+        type: "enhancement",
+        badge: "Audio Memory",
+        title: "Escapement Tick Audio Instance Optimization",
+        description: "Optimized HTML5 clockwork tick sound instances with a singleton audio element to prevent memory churn during long steep and immersion countdowns."
+      }
+    ]
+  },
+  {
     version: "1.4.2",
     releaseDate: "2026-09-06",
     title: "Mechanical Clockwork Ticking, Studio Audio Voice & Dual Mute Controls",

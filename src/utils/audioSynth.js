@@ -91,18 +91,24 @@ export function playMechanicalClick(isMuted = false) {
   } catch (e) {}
 }
 
+let tickAudioInstance = null;
+
 /**
  * Play authentic clockwork ticking sound for every second of countdown.
  * Dual-engine: plays direct WAV sample + Web Audio escapement pulse.
+ * As the time is clicking, speech audio plays smoothly over speakers concurrently.
  */
 export function playClockTick(isMuted = false, tickNumber = 0) {
   if (isMuted) return;
 
-  // 1. Direct HTML5 audio tick playback
+  // 1. Direct HTML5 audio tick playback (reusable element to prevent memory pressure)
   try {
-    const audio = new Audio('/audio/timer/clock_tick.wav');
-    audio.volume = 0.85;
-    const p = audio.play();
+    if (!tickAudioInstance) {
+      tickAudioInstance = new Audio('/audio/timer/clock_tick.wav');
+    }
+    tickAudioInstance.currentTime = 0;
+    tickAudioInstance.volume = 0.85;
+    const p = tickAudioInstance.play();
     if (p !== undefined) p.catch(() => {});
   } catch (e) {}
 
@@ -213,13 +219,21 @@ export function stopSpeechAnnouncement() {
 }
 
 /**
- * Announce phase name and duration clearly.
- * Prioritizes pre-rendered studio British female voice MP3s (/audio/timer/<slug>.mp3)
- * with exact slug resolution and resilient Web Speech fallback.
+ * Announce phase name, duration, and the Active Extraction Instruction clearly.
+ * Prioritizes pre-rendered studio British female voice MP3s (/audio/timer/instructions/<method>_phase_<idx>.mp3)
+ * with robust, resilient fallback to Web Speech API.
  * NEVER blocks timer countdown or UI execution.
- * Example: "Bloom Phase, 45 seconds."
+ * Example: "Bloom Phase, 45 seconds. Saturate grounds evenly with 3x coffee weight in circular motion. Let coffee bloom and de-gas."
  */
-export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMuted = false, onComplete) {
+export function announcePhase(
+  phaseName = 'Bloom Phase', 
+  durationSec = 45, 
+  isMuted = false, 
+  onComplete,
+  instruction = '',
+  methodId = '',
+  phaseIdx = 0
+) {
   if (isMuted || typeof window === 'undefined') {
     if (onComplete) onComplete();
     return;
@@ -229,7 +243,7 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
   stopSpeechAnnouncement();
 
   const rawName = (phaseName || '').trim();
-  // Exact slug matching our 47 pre-rendered audio files
+  const rawInstruction = (instruction || '').trim();
   const slug = rawName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 
   let finished = false;
@@ -242,6 +256,20 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
     }
   };
 
+  // Format duration text
+  let durText;
+  if (durationSec >= 60 && durationSec % 60 === 0) {
+    const mins = Math.floor(durationSec / 60);
+    durText = mins === 1 ? '1 minute' : `${mins} minutes`;
+  } else {
+    durText = `${durationSec} second${durationSec === 1 ? '' : 's'}`;
+  }
+
+  // Full spoken phrase with Active Extraction Instruction
+  const textToSpeak = rawInstruction
+    ? `${rawName}, ${durText}. ${rawInstruction}`
+    : `${rawName}, ${durText}.`;
+
   // Fallback Web Speech Synthesizer implementation
   const fallbackToSpeech = () => {
     if (!('speechSynthesis' in window)) {
@@ -252,12 +280,9 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
     try {
       try { window.speechSynthesis.resume(); } catch (e) {}
 
-      const secondsText = `${durationSec} second${durationSec === 1 ? '' : 's'}`;
-      const textToSpeak = `${rawName}, ${secondsText}.`;
-
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
       utterance.lang = 'en-US';
-      utterance.rate = 1.05;
+      utterance.rate = 1.02;
       utterance.pitch = 1.0;
 
       const voices = window.speechSynthesis.getVoices() || [];
@@ -276,7 +301,10 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
 
       utterance.onend = safeFinish;
       utterance.onerror = safeFinish;
-      setTimeout(safeFinish, 2800);
+
+      // Timeout scaled by length of spoken text (allows long instructions to finish)
+      const maxMs = Math.max(5000, textToSpeak.length * 85);
+      setTimeout(safeFinish, maxMs);
 
       activeSpeechUtterance = utterance;
 
@@ -293,26 +321,90 @@ export function announcePhase(phaseName = 'Bloom Phase', durationSec = 45, isMut
     }
   };
 
-  // 1. First attempt: Load and play pre-rendered studio voice MP3
-  try {
-    const mp3Path = `/audio/timer/${slug}.mp3`;
-    const audio = new Audio(mp3Path);
-    audio.volume = 1.0;
-    activeAudioElement = audio;
+  // Candidate audio URLs: method-specific instruction MP3 -> slug instruction MP3 -> phase name MP3
+  const candidates = [];
+  if (methodId && phaseIdx !== undefined && phaseIdx !== null) {
+    candidates.push(`/audio/timer/instructions/${methodId}_phase_${phaseIdx}.mp3`);
+  }
+  candidates.push(`/audio/timer/instructions/${slug}.mp3`);
+  candidates.push(`/audio/timer/${slug}.mp3`);
 
-    audio.onended = safeFinish;
-    audio.onerror = () => {
+  const tryPlayIndex = (idx) => {
+    if (idx >= candidates.length) {
       fallbackToSpeech();
+      return;
+    }
+
+    try {
+      const audio = new Audio(candidates[idx]);
+      audio.volume = 1.0;
+      activeAudioElement = audio;
+
+      audio.onended = safeFinish;
+      audio.onerror = () => {
+        tryPlayIndex(idx + 1);
+      };
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          tryPlayIndex(idx + 1);
+        });
+      }
+    } catch (err) {
+      tryPlayIndex(idx + 1);
+    }
+  };
+
+  tryPlayIndex(0);
+}
+
+/**
+ * Replay or speak the Active Extraction Instruction on demand.
+ */
+export function speakActiveInstruction(instruction, phaseName = '', isMuted = false, onComplete) {
+  if (isMuted || !instruction || typeof window === 'undefined') {
+    if (onComplete) onComplete();
+    return;
+  }
+  stopSpeechAnnouncement();
+
+  const textToSpeak = phaseName ? `${phaseName}. ${instruction}` : instruction;
+  if (!('speechSynthesis' in window)) {
+    if (onComplete) onComplete();
+    return;
+  }
+
+  try {
+    try { window.speechSynthesis.resume(); } catch (e) {}
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = 'en-US';
+    utterance.rate = 1.02;
+    utterance.pitch = 1.0;
+
+    const voices = window.speechSynthesis.getVoices() || [];
+    const chosenVoice = voices.find(v => v.lang && v.lang.startsWith('en') && (
+      v.name.includes('Natural') || 
+      v.name.includes('Sonia') || 
+      v.name.includes('Female')
+    )) || null;
+
+    if (chosenVoice) utterance.voice = chosenVoice;
+
+    utterance.onend = () => {
+      activeSpeechUtterance = null;
+      if (onComplete) onComplete();
+    };
+    utterance.onerror = () => {
+      activeSpeechUtterance = null;
+      if (onComplete) onComplete();
     };
 
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        fallbackToSpeech();
-      });
-    }
-  } catch (err) {
-    fallbackToSpeech();
+    activeSpeechUtterance = utterance;
+    window.speechSynthesis.speak(utterance);
+  } catch (e) {
+    if (onComplete) onComplete();
   }
 }
 

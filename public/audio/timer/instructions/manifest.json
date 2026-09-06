@@ -1,0 +1,434 @@
+{
+  "classic_pour_over_0": {
+    "filename": "classic_pour_over_phase_0.mp3",
+    "url": "/audio/timer/instructions/classic_pour_over_phase_0.mp3",
+    "phrase": "Bloom Phase, 45 seconds. Saturate grounds evenly with 3x coffee weight in circular motion. Let coffee bloom and de-gas.",
+    "name": "Bloom Phase",
+    "durationSec": 45,
+    "instruction": "Saturate grounds evenly with 3x coffee weight in circular motion. Let coffee bloom and de-gas."
+  },
+  "classic_pour_over_1": {
+    "filename": "classic_pour_over_phase_1.mp3",
+    "url": "/audio/timer/instructions/classic_pour_over_phase_1.mp3",
+    "phrase": "First Pulse Pour, 45 seconds. Pour in gentle spirals from center outward to raise the slurry level evenly.",
+    "name": "First Pulse Pour",
+    "durationSec": 45,
+    "instruction": "Pour in gentle spirals from center outward to raise the slurry level evenly."
+  },
+  "classic_pour_over_2": {
+    "filename": "classic_pour_over_phase_2.mp3",
+    "url": "/audio/timer/instructions/classic_pour_over_phase_2.mp3",
+    "phrase": "Second Pulse Pour, 45 seconds. Pour second pulse in steady circles, maintaining consistent slurry temperature.",
+    "name": "Second Pulse Pour",
+    "durationSec": 45,
+    "instruction": "Pour second pulse in steady circles, maintaining consistent slurry temperature."
+  },
+  "classic_pour_over_3": {
+    "filename": "classic_pour_over_phase_3.mp3",
+    "url": "/audio/timer/instructions/classic_pour_over_phase_3.mp3",
+    "phrase": "Final Drawdown, 1 minute. Top up final water in center. Allow even flat-bed drawdown.",
+    "name": "Final Drawdown",
+    "durationSec": 60,
+    "instruction": "Top up final water in center. Allow even flat-bed drawdown."
+  },
+  "pour_over_0": {
+    "filename": "pour_over_phase_0.mp3",
+    "url": "/audio/timer/instructions/pour_over_phase_0.mp3",
+    "phrase": "Bloom Phase, 45 seconds. Pour 3x coffee weight in circular motion. Let coffee expand and off-gas CO2.",
+    "name": "Bloom Phase",
+    "durationSec": 45,
+    "instruction": "Pour 3x coffee weight in circular motion. Let coffee expand and off-gas CO2."
+  },
+  "pour_over_1": {
+    "filename": "pour_over_phase_1.mp3",
+    "url": "/audio/timer/instructions/pour_over_phase_1.mp3",
+    "phrase": "Main Concentric Pour, 1 minute. Slow concentric pour from center outward. Keep water level steady.",
+    "name": "Main Concentric Pour",
+    "durationSec": 60,
+    "instruction": "Slow concentric pour from center outward. Keep water level steady."
+  },
+  "pour_over_2": {
+    "filename": "pour_over_phase_2.mp3",
+    "url": "/audio/timer/instructions/pour_over_phase_2.mp3",
+    "phrase": "Final Center Pour & Drawdown, 75 seconds. Gently top up remaining water in center. Allow full bed drawdown.",
+    "name": "Final Center Pour & Drawdown",
+    "durationSec": 75,
+    "instruction": "Gently top up remaining water in center. Allow full bed drawdown."
+  },
+  "chemex_0": {
+    "filename": "chemex_phase_0.mp3",
+    "url": "/audio/timer/instructions/chemex_phase_0.mp3",
+    "phrase": "Bloom Phase, 45 seconds. Saturate grounds with 3x coffee weight. Allow heavy bloom for 45 seconds.",
+    "name": "Bloom Phase",
+    "durationSec": 45,
+    "instruction": "Saturate grounds with 3x coffee weight. Allow heavy bloom for 45 seconds."
+  },
+  "chemex_1": {
+    "filename": "chemex_phase_1.mp3",
+    "url": "/audio/timer/instructions/chemex_phase_1.mp3",
+    "phrase": "Slow Spiral Pulse Pour, 90 seconds. Pour in slow steady spirals avoiding the outer glass filter rim.",
+    "name": "Slow Spiral Pulse Pour",
+    "durationSec": 90,
+    "instruction": "Pour in slow steady spirals avoiding the outer glass filter rim."
+  },
+  "chemex_2": {
+    "filename": "chemex_phase_2.mp3",
+    "url": "/audio/timer/instructions/chemex_phase_2.mp3",
+    "phrase": "Final Drawdown & Filter Lift, 105 seconds. Allow complete drawdown through thick paper filter. Lift filter and discard.",
+    "name": "Final Drawdown & Filter Lift",
+    "durationSec": 105,
+    "instruction": "Allow complete drawdown through thick paper filter. Lift filter and discard."
+  },
+  "french_press_0": {
+    "filename": "french_press_phase_0.mp3",
+    "url": "/audio/timer/instructions/french_press_phase_0.mp3",
+    "phrase": "Full Immersion Steep, 4 minutes. Pour all water aggressively over grounds. Place lid on top to retain heat.",
+    "name": "Full Immersion Steep",
+    "durationSec": 240,
+    "instruction": "Pour all water aggressively over grounds. Place lid on top to retain heat."
+  },
+  "french_press_1": {
+    "filename": "french_press_phase_1.mp3",
+    "url": "/audio/timer/instructions/french_press_phase_1.mp3",
+    "phrase": "Stir & Crust Skim, 30 seconds. Gently stir crust. Skim top foam and floating bits with two spoons.",
+    "name": "Stir & Crust Skim",
+    "durationSec": 30,
+    "instruction": "Gently stir crust. Skim top foam and floating bits with two spoons."
+  },
+  "french_press_2": {
+    "filename": "french_press_phase_2.mp3",
+    "url": "/audio/timer/instructions/french_press_phase_2.mp3",
+    "phrase": "Sediment Settle Rest, 5 minutes. Insert plunger without pressing down. Rest 5 mins to let fine silt settle.",
+    "name": "Sediment Settle Rest",
+    "durationSec": 300,
+    "instruction": "Insert plunger without pressing down. Rest 5 mins to let fine silt settle."
+  },
+  "drip_brewer_0": {
+    "filename": "drip_brewer_phase_0.mp3",
+    "url": "/audio/timer/instructions/drip_brewer_phase_0.mp3",
+    "phrase": "Filter Rinse & Reservoir Fill, 30 seconds. Pre-rinse paper filter with hot water. Fill reservoir with cold filtered water.",
+    "name": "Filter Rinse & Reservoir Fill",
+    "durationSec": 30,
+    "instruction": "Pre-rinse paper filter with hot water. Fill reservoir with cold filtered water."
+  },
+  "drip_brewer_1": {
+    "filename": "drip_brewer_phase_1.mp3",
+    "url": "/audio/timer/instructions/drip_brewer_phase_1.mp3",
+    "phrase": "Showerhead Brew Cycle, 3 minutes. Start brew cycle. Ensure grounds bed is evenly saturated by showerhead.",
+    "name": "Showerhead Brew Cycle",
+    "durationSec": 180,
+    "instruction": "Start brew cycle. Ensure grounds bed is evenly saturated by showerhead."
+  },
+  "drip_brewer_2": {
+    "filename": "drip_brewer_phase_2.mp3",
+    "url": "/audio/timer/instructions/drip_brewer_phase_2.mp3",
+    "phrase": "Thermal Carafe Hold, 1 minute. Brew complete. Remove carafe immediately to prevent hotplate scorching.",
+    "name": "Thermal Carafe Hold",
+    "durationSec": 60,
+    "instruction": "Brew complete. Remove carafe immediately to prevent hotplate scorching."
+  },
+  "moka_pot_0": {
+    "filename": "moka_pot_phase_0.mp3",
+    "url": "/audio/timer/instructions/moka_pot_phase_0.mp3",
+    "phrase": "Water Reservoir Fill & Basket Prep, 30 seconds. Fill lower chamber with boiling water to safety valve. Level grounds in funnel without packing tightly.",
+    "name": "Water Reservoir Fill & Basket Prep",
+    "durationSec": 30,
+    "instruction": "Fill lower chamber with boiling water to safety valve. Level grounds in funnel without packing tightly."
+  },
+  "moka_pot_1": {
+    "filename": "moka_pot_phase_1.mp3",
+    "url": "/audio/timer/instructions/moka_pot_phase_1.mp3",
+    "phrase": "Stovetop Low Heat Heating, 3 minutes. Place on medium-low heat with lid open. Steam pressure forces water upward through basket.",
+    "name": "Stovetop Low Heat Heating",
+    "durationSec": 180,
+    "instruction": "Place on medium-low heat with lid open. Steam pressure forces water upward through basket."
+  },
+  "moka_pot_2": {
+    "filename": "moka_pot_phase_2.mp3",
+    "url": "/audio/timer/instructions/moka_pot_phase_2.mp3",
+    "phrase": "Crema Sputter & Cold Towel Stop, 45 seconds. When honey-gold stream turns pale and begins sputtering, remove from burner immediately and wrap base in cold wet towel.",
+    "name": "Crema Sputter & Cold Towel Stop",
+    "durationSec": 45,
+    "instruction": "When honey-gold stream turns pale and begins sputtering, remove from burner immediately and wrap base in cold wet towel."
+  },
+  "espresso_0": {
+    "filename": "espresso_phase_0.mp3",
+    "url": "/audio/timer/instructions/espresso_phase_0.mp3",
+    "phrase": "Pre-Infusion, 8 seconds. Gentle low pressure saturation to prevent puck channeling.",
+    "name": "Pre-Infusion",
+    "durationSec": 8,
+    "instruction": "Gentle low pressure saturation to prevent puck channeling."
+  },
+  "espresso_1": {
+    "filename": "espresso_phase_1.mp3",
+    "url": "/audio/timer/instructions/espresso_phase_1.mp3",
+    "phrase": "Main Pressure Extraction, 25 seconds. Full 9-bar pressure extraction aiming for 1:2 yield ratio.",
+    "name": "Main Pressure Extraction",
+    "durationSec": 25,
+    "instruction": "Full 9-bar pressure extraction aiming for 1:2 yield ratio."
+  },
+  "aeropress_0": {
+    "filename": "aeropress_phase_0.mp3",
+    "url": "/audio/timer/instructions/aeropress_phase_0.mp3",
+    "phrase": "Steep & Agitate, 1 minute. Pour hot water, stir vigorously 10 times, let steep inverted.",
+    "name": "Steep & Agitate",
+    "durationSec": 60,
+    "instruction": "Pour hot water, stir vigorously 10 times, let steep inverted."
+  },
+  "aeropress_1": {
+    "filename": "aeropress_phase_1.mp3",
+    "url": "/audio/timer/instructions/aeropress_phase_1.mp3",
+    "phrase": "Cap & Flip Rest, 30 seconds. Attach filter cap, carefully flip onto sturdy mug.",
+    "name": "Cap & Flip Rest",
+    "durationSec": 30,
+    "instruction": "Attach filter cap, carefully flip onto sturdy mug."
+  },
+  "aeropress_2": {
+    "filename": "aeropress_phase_2.mp3",
+    "url": "/audio/timer/instructions/aeropress_phase_2.mp3",
+    "phrase": "Gentle Plunge, 30 seconds. Apply steady downward pressure until subtle hiss sound.",
+    "name": "Gentle Plunge",
+    "durationSec": 30,
+    "instruction": "Apply steady downward pressure until subtle hiss sound."
+  },
+  "darjeeling_tea_0": {
+    "filename": "darjeeling_tea_phase_0.mp3",
+    "url": "/audio/timer/instructions/darjeeling_tea_phase_0.mp3",
+    "phrase": "Vessel Preheat, 15 seconds. Rinse porcelain or glass teapot with warm water to maintain steep temperature.",
+    "name": "Vessel Preheat",
+    "durationSec": 15,
+    "instruction": "Rinse porcelain or glass teapot with warm water to maintain steep temperature."
+  },
+  "darjeeling_tea_1": {
+    "filename": "darjeeling_tea_phase_1.mp3",
+    "url": "/audio/timer/instructions/darjeeling_tea_phase_1.mp3",
+    "phrase": "Aromatic Himalayan Steep, 3 minutes. Pour 88\u00b0C water over leaves. Steep 3 minutes for peak muscatel grape bouquet.",
+    "name": "Aromatic Himalayan Steep",
+    "durationSec": 180,
+    "instruction": "Pour 88\u00b0C water over leaves. Steep 3 minutes for peak muscatel grape bouquet."
+  },
+  "darjeeling_tea_2": {
+    "filename": "darjeeling_tea_phase_2.mp3",
+    "url": "/audio/timer/instructions/darjeeling_tea_phase_2.mp3",
+    "phrase": "Decant & Serve, 30 seconds. Strain completely into teacup to stop extraction.",
+    "name": "Decant & Serve",
+    "durationSec": 30,
+    "instruction": "Strain completely into teacup to stop extraction."
+  },
+  "chai_masala_0": {
+    "filename": "chai_masala_phase_0.mp3",
+    "url": "/audio/timer/instructions/chai_masala_phase_0.mp3",
+    "phrase": "Spice & Leaf Decoction Simmer, 4 minutes. Boil crushed spices and tea leaves in water for 4 minutes to extract essential oils.",
+    "name": "Spice & Leaf Decoction Simmer",
+    "durationSec": 240,
+    "instruction": "Boil crushed spices and tea leaves in water for 4 minutes to extract essential oils."
+  },
+  "chai_masala_1": {
+    "filename": "chai_masala_phase_1.mp3",
+    "url": "/audio/timer/instructions/chai_masala_phase_1.mp3",
+    "phrase": "Milk & Sweetener Rest, 2 minutes. Add milk and unrefined cane sugar (Panela/Jaggery); bring to gentle froth.",
+    "name": "Milk & Sweetener Rest",
+    "durationSec": 120,
+    "instruction": "Add milk and unrefined cane sugar (Panela/Jaggery); bring to gentle froth."
+  },
+  "chai_masala_2": {
+    "filename": "chai_masala_phase_2.mp3",
+    "url": "/audio/timer/instructions/chai_masala_phase_2.mp3",
+    "phrase": "Fine Mesh Strain, 30 seconds. Pour through fine sieve into mug.",
+    "name": "Fine Mesh Strain",
+    "durationSec": 30,
+    "instruction": "Pour through fine sieve into mug."
+  },
+  "english_breakfast_0": {
+    "filename": "english_breakfast_phase_0.mp3",
+    "url": "/audio/timer/instructions/english_breakfast_phase_0.mp3",
+    "phrase": "Teapot Warm, 15 seconds. Rinse teapot with near-boiling water.",
+    "name": "Teapot Warm",
+    "durationSec": 15,
+    "instruction": "Rinse teapot with near-boiling water."
+  },
+  "english_breakfast_1": {
+    "filename": "english_breakfast_phase_1.mp3",
+    "url": "/audio/timer/instructions/english_breakfast_phase_1.mp3",
+    "phrase": "Full Extraction Steep, 4 minutes. Steep at 96\u00b0C for 4 minutes for robust body without harshness.",
+    "name": "Full Extraction Steep",
+    "durationSec": 240,
+    "instruction": "Steep at 96\u00b0C for 4 minutes for robust body without harshness."
+  },
+  "english_breakfast_2": {
+    "filename": "english_breakfast_phase_2.mp3",
+    "url": "/audio/timer/instructions/english_breakfast_phase_2.mp3",
+    "phrase": "Serve & Rest, 30 seconds. Remove infuser basket completely.",
+    "name": "Serve & Rest",
+    "durationSec": 30,
+    "instruction": "Remove infuser basket completely."
+  },
+  "earl_grey_0": {
+    "filename": "earl_grey_phase_0.mp3",
+    "url": "/audio/timer/instructions/earl_grey_phase_0.mp3",
+    "phrase": "Vessel Warm, 15 seconds. Rinse ceramic teapot with hot water.",
+    "name": "Vessel Warm",
+    "durationSec": 15,
+    "instruction": "Rinse ceramic teapot with hot water."
+  },
+  "earl_grey_1": {
+    "filename": "earl_grey_phase_1.mp3",
+    "url": "/audio/timer/instructions/earl_grey_phase_1.mp3",
+    "phrase": "Aromatic Citrus Steep, 210 seconds. Steep untouched at 95\u00b0C for 3.5 minutes to release citrus aromatics.",
+    "name": "Aromatic Citrus Steep",
+    "durationSec": 210,
+    "instruction": "Steep untouched at 95\u00b0C for 3.5 minutes to release citrus aromatics."
+  },
+  "earl_grey_2": {
+    "filename": "earl_grey_phase_2.mp3",
+    "url": "/audio/timer/instructions/earl_grey_phase_2.mp3",
+    "phrase": "Decant, 30 seconds. Separate tea leaves from liqueur.",
+    "name": "Decant",
+    "durationSec": 30,
+    "instruction": "Separate tea leaves from liqueur."
+  },
+  "green_tea_0": {
+    "filename": "green_tea_phase_0.mp3",
+    "url": "/audio/timer/instructions/green_tea_phase_0.mp3",
+    "phrase": "Vessel Preheat, 15 seconds. Warm teapot or glass with warm water, then discard water.",
+    "name": "Vessel Preheat",
+    "durationSec": 15,
+    "instruction": "Warm teapot or glass with warm water, then discard water."
+  },
+  "green_tea_1": {
+    "filename": "green_tea_phase_1.mp3",
+    "url": "/audio/timer/instructions/green_tea_phase_1.mp3",
+    "phrase": "1st Steeping Infusion, 2 minutes. Pour 78\u00b0C water gently over leaves. Do not agitate.",
+    "name": "1st Steeping Infusion",
+    "durationSec": 120,
+    "instruction": "Pour 78\u00b0C water gently over leaves. Do not agitate."
+  },
+  "green_tea_2": {
+    "filename": "green_tea_phase_2.mp3",
+    "url": "/audio/timer/instructions/green_tea_phase_2.mp3",
+    "phrase": "Decant & 2nd Infusion Prep, 90 seconds. Pour completely into server. Leaves ready for 2nd steep.",
+    "name": "Decant & 2nd Infusion Prep",
+    "durationSec": 90,
+    "instruction": "Pour completely into server. Leaves ready for 2nd steep."
+  },
+  "matcha_tea_0": {
+    "filename": "matcha_tea_phase_0.mp3",
+    "url": "/audio/timer/instructions/matcha_tea_phase_0.mp3",
+    "phrase": "Sift & Warm Bowl, 20 seconds. Sift 2g matcha powder through fine mesh into warm Chawan bowl.",
+    "name": "Sift & Warm Bowl",
+    "durationSec": 20,
+    "instruction": "Sift 2g matcha powder through fine mesh into warm Chawan bowl."
+  },
+  "matcha_tea_1": {
+    "filename": "matcha_tea_phase_1.mp3",
+    "url": "/audio/timer/instructions/matcha_tea_phase_1.mp3",
+    "phrase": "Water Add & Bloom, 15 seconds. Pour 70mL of 80\u00b0C water gently down side of bowl.",
+    "name": "Water Add & Bloom",
+    "durationSec": 15,
+    "instruction": "Pour 70mL of 80\u00b0C water gently down side of bowl."
+  },
+  "matcha_tea_2": {
+    "filename": "matcha_tea_phase_2.mp3",
+    "url": "/audio/timer/instructions/matcha_tea_phase_2.mp3",
+    "phrase": "Chasen Bamboo Whisk, 45 seconds. Whisk rapidly in a zig-zag \"W\" motion using bamboo Chasen until rich froth forms.",
+    "name": "Chasen Bamboo Whisk",
+    "durationSec": 45,
+    "instruction": "Whisk rapidly in a zig-zag \"W\" motion using bamboo Chasen until rich froth forms."
+  },
+  "oolong_tea_0": {
+    "filename": "oolong_tea_phase_0.mp3",
+    "url": "/audio/timer/instructions/oolong_tea_phase_0.mp3",
+    "phrase": "Leaf Wash Rinse, 10 seconds. Quick 10-second flash pour to wake rolled leaves; discard liquid.",
+    "name": "Leaf Wash Rinse",
+    "durationSec": 10,
+    "instruction": "Quick 10-second flash pour to wake rolled leaves; discard liquid."
+  },
+  "oolong_tea_1": {
+    "filename": "oolong_tea_phase_1.mp3",
+    "url": "/audio/timer/instructions/oolong_tea_phase_1.mp3",
+    "phrase": "1st Infusion, 45 seconds. Steep 45 seconds at 88\u00b0C for rich aroma peak.",
+    "name": "1st Infusion",
+    "durationSec": 45,
+    "instruction": "Steep 45 seconds at 88\u00b0C for rich aroma peak."
+  },
+  "oolong_tea_2": {
+    "filename": "oolong_tea_phase_2.mp3",
+    "url": "/audio/timer/instructions/oolong_tea_phase_2.mp3",
+    "phrase": "2nd Infusion, 1 minute. Add 15s to steep time. Full floral body unfolding.",
+    "name": "2nd Infusion",
+    "durationSec": 60,
+    "instruction": "Add 15s to steep time. Full floral body unfolding."
+  },
+  "ceylon_tea_0": {
+    "filename": "ceylon_tea_phase_0.mp3",
+    "url": "/audio/timer/instructions/ceylon_tea_phase_0.mp3",
+    "phrase": "Vessel Warm, 15 seconds. Rinse teapot with hot water.",
+    "name": "Vessel Warm",
+    "durationSec": 15,
+    "instruction": "Rinse teapot with hot water."
+  },
+  "ceylon_tea_1": {
+    "filename": "ceylon_tea_phase_1.mp3",
+    "url": "/audio/timer/instructions/ceylon_tea_phase_1.mp3",
+    "phrase": "Brisk Mountain Steep, 210 seconds. Steep at 95\u00b0C for 3.5 minutes for bright citrus acidity.",
+    "name": "Brisk Mountain Steep",
+    "durationSec": 210,
+    "instruction": "Steep at 95\u00b0C for 3.5 minutes for bright citrus acidity."
+  },
+  "ceylon_tea_2": {
+    "filename": "ceylon_tea_phase_2.mp3",
+    "url": "/audio/timer/instructions/ceylon_tea_phase_2.mp3",
+    "phrase": "Decant & Serve, 30 seconds. Strain completely into cup.",
+    "name": "Decant & Serve",
+    "durationSec": 30,
+    "instruction": "Strain completely into cup."
+  },
+  "white_tea_0": {
+    "filename": "white_tea_phase_0.mp3",
+    "url": "/audio/timer/instructions/white_tea_phase_0.mp3",
+    "phrase": "Vessel Preheat, 15 seconds. Warm ceramic teapot with warm water.",
+    "name": "Vessel Preheat",
+    "durationSec": 15,
+    "instruction": "Warm ceramic teapot with warm water."
+  },
+  "white_tea_1": {
+    "filename": "white_tea_phase_1.mp3",
+    "url": "/audio/timer/instructions/white_tea_phase_1.mp3",
+    "phrase": "Long Floral Infusion, 3 minutes. Steep untouched at 83\u00b0C to unlock delicate essential oils.",
+    "name": "Long Floral Infusion",
+    "durationSec": 180,
+    "instruction": "Steep untouched at 83\u00b0C to unlock delicate essential oils."
+  },
+  "white_tea_2": {
+    "filename": "white_tea_phase_2.mp3",
+    "url": "/audio/timer/instructions/white_tea_phase_2.mp3",
+    "phrase": "Decant, 30 seconds. Strain fully to prevent over-steeping the leaves.",
+    "name": "Decant",
+    "durationSec": 30,
+    "instruction": "Strain fully to prevent over-steeping the leaves."
+  },
+  "turmeric_tea_0": {
+    "filename": "turmeric_tea_phase_0.mp3",
+    "url": "/audio/timer/instructions/turmeric_tea_phase_0.mp3",
+    "phrase": "Botanical Hydration, 15 seconds. Place crushed turmeric and botanicals into infuser.",
+    "name": "Botanical Hydration",
+    "durationSec": 15,
+    "instruction": "Place crushed turmeric and botanicals into infuser."
+  },
+  "turmeric_tea_1": {
+    "filename": "turmeric_tea_phase_1.mp3",
+    "url": "/audio/timer/instructions/turmeric_tea_phase_1.mp3",
+    "phrase": "Deep Botanical Steep, 5 minutes. Steep 5 minutes with boiling 98\u00b0C water for rich golden extraction.",
+    "name": "Deep Botanical Steep",
+    "durationSec": 300,
+    "instruction": "Steep 5 minutes with boiling 98\u00b0C water for rich golden extraction."
+  },
+  "turmeric_tea_2": {
+    "filename": "turmeric_tea_phase_2.mp3",
+    "url": "/audio/timer/instructions/turmeric_tea_phase_2.mp3",
+    "phrase": "Honey & Citrus Stir, 30 seconds. Stir in raw honey and squeeze of fresh lemon.",
+    "name": "Honey & Citrus Stir",
+    "durationSec": 30,
+    "instruction": "Stir in raw honey and squeeze of fresh lemon."
+  }
+}
