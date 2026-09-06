@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft, BookOpen, Thermometer } from 'lucide-react';
-import { playTimerStartChime, announcePhase, stopSpeechAnnouncement, playPhaseChime, playCompletionChime, stopCompletionChime, unlockAudio } from '../utils/audioSynth';
+import { 
+  playTimerStartChime, 
+  announcePhase, 
+  stopSpeechAnnouncement, 
+  playPhaseChime, 
+  playCompletionChime, 
+  stopCompletionChime, 
+  unlockAudio,
+  playClockTick,
+  playMechanicalClick
+} from '../utils/audioSynth';
 import V60ProTipModal from './V60ProTipModal';
 
 export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, unitSystem = 'imperial', isMuted, setIsMuted, onPrevStep, onOpenJournal }) {
@@ -31,6 +41,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   const remainingAtPauseRef = useRef(null);
   const currentPhaseIndexRef = useRef(0);
   const phasesRef = useRef(phases);
+  const lastTickedSecRef = useRef(null);
 
   useEffect(() => {
     currentPhaseIndexRef.current = currentPhaseIndex;
@@ -48,6 +59,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
   const toggleMute = () => {
     unlockAudio();
+    playMechanicalClick(false); // Tactile click feedback on mute/unmute
     const next = !localMuted;
     setLocalMuted(next);
     if (setIsMuted) {
@@ -93,6 +105,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
 
   // Advance to next phase safely or complete extraction
   const handlePhaseAdvance = useCallback(() => {
+    lastTickedSecRef.current = null;
     const currentIdx = currentPhaseIndexRef.current;
     const activePhases = phasesRef.current;
 
@@ -138,6 +151,14 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       const now = Date.now();
       const diffSec = Math.max(0, Math.ceil((endTimeRef.current - now) / 1000));
 
+      // Play authentic mechanical clockwork tick on every second of countdown
+      if (lastTickedSecRef.current !== diffSec) {
+        lastTickedSecRef.current = diffSec;
+        if (diffSec > 0) {
+          playClockTick(localMuted, diffSec);
+        }
+      }
+
       setTimeLeft(diffSec);
 
       if (diffSec <= 0) {
@@ -146,14 +167,15 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     };
 
     tick();
-    const intervalId = setInterval(tick, 250);
+    const intervalId = setInterval(tick, 200);
 
     return () => clearInterval(intervalId);
-  }, [isRunning, handlePhaseAdvance]);
+  }, [isRunning, handlePhaseAdvance, localMuted]);
 
   // Toggle Timer Handler (Start / Resume / Pause)
   const handleToggleTimer = () => {
     unlockAudio();
+    playMechanicalClick(localMuted);
 
     if (isRunning) {
       // Pause action
@@ -190,6 +212,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       // 2. Set wall-clock target timestamp
       endTimeRef.current = Date.now() + secondsToRun * 1000;
       remainingAtPauseRef.current = null;
+      lastTickedSecRef.current = secondsToRun;
 
       // 3. Mark running immediately - NEVER BLOCK COUNTDOWN
       setIsRunning(true);
@@ -215,8 +238,10 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   // Skip Phase handler
   const handleSkipPhase = () => {
     unlockAudio();
+    playMechanicalClick(localMuted);
     stopSpeechAnnouncement();
     setIsAnnouncing(false);
+    lastTickedSecRef.current = null;
 
     const currentIdx = currentPhaseIndex;
     if (currentIdx < phases.length - 1) {
@@ -256,6 +281,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   // Reset Timer handler
   const handleReset = () => {
     unlockAudio();
+    playMechanicalClick(localMuted);
     stopCompletionChime();
     stopSpeechAnnouncement();
     setIsAnnouncing(false);
@@ -263,6 +289,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     setIsCompleted(false);
     endTimeRef.current = null;
     remainingAtPauseRef.current = null;
+    lastTickedSecRef.current = null;
     setCurrentPhaseIndex(0);
     currentPhaseIndexRef.current = 0;
     setTimeLeft(phases[0]?.durationSec || 60);
@@ -324,53 +351,54 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
         </div>
 
         {/* Status Badge & Speaker / Mute Toggle Column */}
-        <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2.5">
+        <div className="flex flex-col items-start sm:items-end gap-2.5">
           {/* Status Badge */}
           <div>
             {isCompleted ? (
-              <span className="px-4 py-2 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold text-xs flex items-center gap-1.5 shadow-lg animate-bounce">
-                <CheckCircle2 className="w-4 h-4" />
+              <div className="px-4 py-2 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold text-xs flex items-center gap-2 shadow-lg animate-bounce">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <span>Extraction Complete! ☕</span>
-              </span>
+              </div>
             ) : isRunning ? (
-              <span className="px-4 py-2 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold text-xs flex items-center gap-1.5 shadow-lg animate-pulse">
+              <div className="px-4 py-2 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold text-xs flex items-center gap-2 shadow-lg animate-pulse">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
                 <span>Pouring in Progress</span>
-              </span>
+              </div>
             ) : (!isRunning && remainingAtPauseRef.current !== null && timeLeft < totalPhaseTime) ? (
-              <span className="px-4 py-2 rounded-2xl bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono font-bold text-xs flex items-center gap-1.5 shadow-md">
+              <div className="px-4 py-2 rounded-2xl bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono font-bold text-xs flex items-center gap-2 shadow-md">
                 <Pause className="w-3.5 h-3.5 text-amber-400" />
                 <span>Timer Paused</span>
-              </span>
+              </div>
             ) : (
-              <span className="px-4 py-2 rounded-2xl bg-white/10 text-stone-300 border border-white/15 font-mono font-bold text-xs flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="px-4 py-2 rounded-2xl bg-white/10 text-stone-200 border border-white/20 font-mono font-bold text-xs flex items-center gap-2 shadow-inner">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>Timer Ready</span>
-              </span>
+              </div>
             )}
           </div>
 
-          {/* Speaker / Mute Button Under Timer Ready Box */}
+          {/* Speaker / Mute Button Directly Under Timer Ready Box */}
           <button
             type="button"
             onClick={toggleMute}
             style={{ touchAction: 'manipulation' }}
-            className={`px-3.5 py-1.5 rounded-xl border text-xs font-mono font-semibold flex items-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer ${
+            className={`w-full sm:w-auto px-4 py-2 rounded-xl border text-xs font-mono font-bold flex items-center justify-center gap-2.5 transition-all shadow-md active:scale-95 cursor-pointer ${
               localMuted
-                ? 'bg-rose-500/15 border-rose-500/35 text-rose-300 hover:bg-rose-500/25 shadow-rose-900/20'
-                : 'bg-white/10 border-white/15 text-stone-300 hover:text-cream-light hover:bg-white/20'
+                ? 'bg-rose-500/20 border-rose-500/50 text-rose-300 hover:bg-rose-500/30 shadow-rose-900/30 ring-1 ring-rose-500/30'
+                : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25 shadow-emerald-900/20 ring-1 ring-emerald-500/30'
             }`}
-            title={localMuted ? "Unmute Timer Chime & Voice Guidance" : "Mute Timer Chime & Voice Guidance"}
+            title={localMuted ? "Click to Unmute Audio & Spoken Guidance" : "Click to Mute Audio"}
+            aria-label={localMuted ? "Unmute Timer Audio" : "Mute Timer Audio"}
           >
             {localMuted ? (
               <>
-                <VolumeX className="w-3.5 h-3.5 text-rose-400" />
-                <span>Audio: Muted</span>
+                <VolumeX className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                <span>Audio Muted (Click to Unmute)</span>
               </>
             ) : (
               <>
-                <Volume2 className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                <span>Audio: On</span>
+                <Volume2 className="w-4 h-4 text-emerald-400 flex-shrink-0 animate-pulse" />
+                <span>Audio & Voice: ON (Mute)</span>
               </>
             )}
           </button>
@@ -509,14 +537,14 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       </div>
 
       {/* Timer Controls Row with Tactile 3D Buttons */}
-      <div className="flex items-center justify-center space-x-3 sm:space-x-5 mt-8">
+      <div className="flex items-center justify-center space-x-3 sm:space-x-4 mt-8 flex-wrap gap-y-3">
         
         <button
           type="button"
           onClick={handleReset}
           style={{ touchAction: 'manipulation' }}
           className="p-4 rounded-2xl bg-white/10 text-stone-300 hover:text-cream-light hover:bg-white/20 transition-all border border-white/15 shadow-xl active:scale-95 cursor-pointer"
-          title="Reset Timer"
+          title="Reset Timer (R)"
           aria-label="Reset Timer"
         >
           <RotateCcw className="w-5 h-5" />
@@ -526,7 +554,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
           type="button"
           onClick={handleToggleTimer}
           style={{ touchAction: 'manipulation' }}
-          className={`px-8 sm:px-10 py-4 sm:py-4.5 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-3 shadow-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+          className={`px-7 sm:px-10 py-4 sm:py-4.5 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-3 shadow-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer ${
             isRunning
               ? 'bg-amber-600 text-cream-light border border-amber-500 shadow-amber-600/30'
               : isCoffee
@@ -547,6 +575,22 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
           aria-label="Skip to Next Phase"
         >
           <FastForward className="w-5 h-5" />
+        </button>
+
+        {/* Dedicated Speaker / Mute Toggle Button in Control Row */}
+        <button
+          type="button"
+          onClick={toggleMute}
+          style={{ touchAction: 'manipulation' }}
+          className={`p-4 rounded-2xl border transition-all shadow-xl active:scale-95 cursor-pointer flex items-center justify-center ${
+            localMuted
+              ? 'bg-rose-500/25 border-rose-500/50 text-rose-300 hover:bg-rose-500/35 ring-2 ring-rose-500/30'
+              : 'bg-white/10 border-white/15 text-stone-300 hover:text-cream-light hover:bg-white/20'
+          }`}
+          title={localMuted ? "Audio is Muted — Click to Unmute (Ticks, Chimes & Spoken Guidance)" : "Audio is ON — Click to Mute"}
+          aria-label={localMuted ? "Unmute Timer Audio" : "Mute Timer Audio"}
+        >
+          {localMuted ? <VolumeX className="w-5 h-5 text-rose-400" /> : <Volume2 className="w-5 h-5 text-amber-400" />}
         </button>
 
       </div>

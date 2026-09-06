@@ -2,6 +2,38 @@
 
 export const VERSION_HISTORY = [
   {
+    version: "1.4.2",
+    releaseDate: "2026-09-06",
+    title: "Mechanical Clockwork Ticking, Studio Audio Voice & Dual Mute Controls",
+    summary: "Introduced authentic mechanical clockwork escapement ticking every second, tactile switch clicks on all controls, studio British female voice guidance for all 48 coffee/tea extraction phases, and dual prominent mute buttons.",
+    highlights: [
+      {
+        type: "feature",
+        badge: "Clockwork Tick",
+        title: "Per-Second Mechanical Clock Ticking",
+        description: "Countdown now plays an authentic mechanical clockwork tick every second (alternating 2600Hz/1950Hz escapement pallet clicks with 360Hz/300Hz body resonance) for true physical barista timer sound."
+      },
+      {
+        type: "feature",
+        badge: "Studio Voice",
+        title: "Pre-Rendered British Female Voice Guidance",
+        description: "All 48 coffee and tea phases now feature pre-rendered studio voice guidance ('Bloom Phase, 45 seconds', 'First Pulse Pour, 45 seconds', etc.) ensuring loud, reliable audio on both desktop and mobile devices."
+      },
+      {
+        type: "enhancement",
+        badge: "Mute Controls",
+        title: "Dual Prominent Mute Buttons",
+        description: "Placed an eye-catching glowing Speaker/Mute toggle directly beneath the Timer Ready box, plus a 4th dedicated mute button in the main timer controls row for immediate one-tap muting."
+      },
+      {
+        type: "enhancement",
+        badge: "Tactile Feedback",
+        title: "Mechanical Switch Click Sounds",
+        description: "All button presses (Start, Pause, Resume, Skip, Reset, Mute) and dial clicks now trigger an authentic tactile micro-switch contact snap."
+      }
+    ]
+  },
+  {
     version: "1.4.1",
     releaseDate: "2026-09-06",
     title: "Mobile Audio Unlock & Precision Wall-Clock Timer Overhaul",
