@@ -483,10 +483,11 @@ export default function RoasterProfilePage({
                   <button
                     onClick={() => {
                       const payload = { ...scannedCoffee, roaster: roaster.name };
+                      if (onBrewCoffee) {
+                        onBrewCoffee(payload);
+                      }
                       if (orchestrator) {
                         orchestrator.brew(payload);
-                      } else if (onBrewCoffee) {
-                        onBrewCoffee(payload);
                       }
                     }}
                     className="px-5 py-3 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition"
@@ -631,10 +632,11 @@ export default function RoasterProfilePage({
                             ...coffee,
                             roaster: roaster.name
                           };
+                          if (onBrewCoffee) {
+                            onBrewCoffee(payload);
+                          }
                           if (orchestrator) {
                             orchestrator.brew(payload);
-                          } else if (onBrewCoffee) {
-                            onBrewCoffee(payload);
                           }
                         }}
                         className="w-full py-3 rounded-xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition hover:scale-[1.02] active:scale-[0.98]"

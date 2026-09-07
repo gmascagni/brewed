@@ -30,7 +30,7 @@ import { AppOrchestratorProvider } from './context/AppOrchestratorContext';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { getMethodJsonLd, updatePageSeo } from './utils/seo';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Sparkles, Coffee } from 'lucide-react';
 
 const DEFAULT_LOCAL_PROFILES = [];
 
@@ -110,6 +110,7 @@ export default function App() {
   const [selectedRoasterSlug, setSelectedRoasterSlug] = useState('methodical');
   const [isVideoAcademyOpen, setIsVideoAcademyOpen] = useState(false);
   const [selectedAcademyVideoId, setSelectedAcademyVideoId] = useState(null);
+  const [dialedInCoffee, setDialedInCoffee] = useState(null);
 
   // Handler for Brew Along With Video Action
   const handleBrewWithVideo = (video) => {
@@ -132,21 +133,48 @@ export default function App() {
     trackEvent('brew_with_video_applied', { video_id: video.id, method_id: targetMethod.id, ratio });
   };
 
-  // Handlers for Scanned Bean Actions
+  // Handlers for Scanned / Roaster Dial-In Actions
   const handleApplyScannedRecipe = (scannedBean) => {
     if (!scannedBean) return;
-    if (scannedBean.recommendedRatio) {
-      setCustomRatio(scannedBean.recommendedRatio);
-    }
+
+    // 1. Immediately exit Roaster Showcase or Scanner overlay
+    setIsRoasterShowcaseView(false);
+    setIsScannerOpen(false);
+
+    // 2. Extract ratio, dose, and water volume
+    const ratio = Number(scannedBean.recommendedRatio || scannedBean.extraction?.ratio || 16);
+    setCustomRatio(ratio);
+
+    const waterAmount = Number(scannedBean.waterGrams || (scannedBean.dryDoseGrams ? Math.round(scannedBean.dryDoseGrams * ratio) : 320));
+    setCustomWaterMl(waterAmount);
+    setCupCount(1);
+    setCupMl(waterAmount);
+
+    // 3. Resolve target brew method
+    const targetMethodId = scannedBean.brewMethod || scannedBean.extraction?.method || 'pour_over';
     const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
-    const targetMethod = allMethods.find(m => m.id === scannedBean.brewMethod) || allMethods[0];
+    const targetMethod = allMethods.find(m => m.id === targetMethodId || m.id.includes(targetMethodId) || targetMethodId.includes(m.id)) || allMethods[0];
+
     setActiveMethod(targetMethod);
     setTrackMode('coffee');
-    setCurrentStep(2);
+    setDialedInCoffee(scannedBean);
+
+    // 4. Advance straight to Step 4 (Guided Brew Timer) and navigate URL
+    setCurrentStep(4);
+    navigate(`/methods/${targetMethod.id}`);
+
+    // 5. Smooth scroll down to the timer
     setTimeout(() => {
-      const el = document.getElementById('step-2');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+      const timerEl = document.getElementById('step-4') || document.querySelector('main');
+      if (timerEl) timerEl.scrollIntoView({ behavior: 'smooth' });
+    }, 150);
+
+    trackEvent('dial_in_recipe_applied', {
+      roaster: scannedBean.roaster,
+      bean: scannedBean.beanName,
+      method: targetMethod.id,
+      ratio
+    });
   };
 
   const handleSaveScannedToJournal = (scannedBean) => {
@@ -557,7 +585,45 @@ export default function App() {
 
           {/* STEP 04: GUIDED BREW TIMER */}
           {currentStep === 4 && (
-            <div className="animate-fade-in space-y-8">
+            <div id="step-4" className="animate-fade-in space-y-6">
+              {dialedInCoffee && (
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 backdrop-blur-md shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                    <div>
+                      <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-amber-gold font-bold flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Roaster Certified Dial-In Active</span>
+                      </div>
+                      <div className="text-sm sm:text-base font-serif font-bold text-cream-light">
+                        {dialedInCoffee.roaster} • {dialedInCoffee.beanName}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-xs font-mono text-cream-soft bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 self-start sm:self-auto">
+                    <span>1:{effectiveRatio}</span>
+                    <span>•</span>
+                    <span>{dryDoseGrams}g : {calculatedTotalWaterMl}g</span>
+                    {(dialedInCoffee.tempF || dialedInCoffee.extraction?.tempF) && (
+                      <>
+                        <span>•</span>
+                        <span className="text-amber-gold font-bold">
+                          {dialedInCoffee.tempF || dialedInCoffee.extraction?.tempF}°F
+                        </span>
+                      </>
+                    )}
+                    {(dialedInCoffee.recommendedGrind || dialedInCoffee.extraction?.grind) && (
+                      <>
+                        <span>•</span>
+                        <span className="text-cream-light font-bold">
+                          {dialedInCoffee.recommendedGrind || dialedInCoffee.extraction?.grind}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <MultiPhaseTimer
                 trackMode={trackMode}
                 activeMethod={currentActiveMethod}
