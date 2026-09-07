@@ -23,7 +23,8 @@ import {
   Sliders,
   Share2,
   Compass,
-  Play
+  Play,
+  AlertCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import QRCode from 'qrcode';
@@ -78,20 +79,55 @@ export default function RoasterPortalModal({
   const [process, setProcess] = useState('Washed');
   const [elevation, setElevation] = useState('1,850 MASL');
 
+  const [formError, setFormError] = useState(null);
+  const [saveToast, setSaveToast] = useState(null);
+  const modalBodyRef = useRef(null);
+
   const handleLogoUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Logo image size must be under 5MB.');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Logo image size must be under 10MB.');
       return;
     }
 
     setLogoFileName(file.name);
     const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      setLogoImage(dataUrl);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const maxDim = 512;
+          let width = img.width;
+          let height = img.height;
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const optimizedDataUrl = canvas.toDataURL('image/png');
+          setLogoImage(optimizedDataUrl);
+        } catch (canvasErr) {
+          console.warn('Canvas optimization fallback:', canvasErr);
+          setLogoImage(event.target.result);
+        }
+      };
+      img.onerror = () => {
+        setLogoImage(event.target.result);
+      };
+      img.src = event.target.result;
     };
     reader.readAsDataURL(file);
   };
@@ -238,10 +274,33 @@ export default function RoasterPortalModal({
   };
 
   const handleSaveCoffee = (e) => {
-    e.preventDefault();
-    if (!roasterName.trim() || !beanName.trim()) {
-      alert('Please enter both the Roastery Name and the Coffee Bean Name.');
+    if (e && e.preventDefault) e.preventDefault();
+    setFormError(null);
+
+    const trimmedRoaster = roasterName.trim();
+    const trimmedBean = beanName.trim();
+
+    if (!trimmedRoaster) {
+      setFormError('Please enter your Roastery Brand name.');
+      if (modalBodyRef.current) modalBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       return;
+    }
+
+    if (!trimmedBean) {
+      setFormError('Please enter the Coffee / Lot name.');
+      if (modalBodyRef.current) modalBodyRef.current.scrollTo({ top: 250, behavior: 'smooth' });
+      return;
+    }
+
+    // Auto-normalize URLs so user isn't rejected for omitting https://
+    let normalizedWebsite = website.trim();
+    if (normalizedWebsite && !/^https?:\/\//i.test(normalizedWebsite)) {
+      normalizedWebsite = `https://${normalizedWebsite}`;
+    }
+
+    let normalizedCustomUrl = customUrl.trim();
+    if (normalizedCustomUrl && !/^https?:\/\//i.test(normalizedCustomUrl)) {
+      normalizedCustomUrl = `https://${normalizedCustomUrl}`;
     }
 
     const notesArray = tastingNotesInput
@@ -251,11 +310,11 @@ export default function RoasterPortalModal({
 
     const newCoffee = {
       id: `roaster_${Date.now()}`,
-      roaster: roasterName.trim(),
+      roaster: trimmedRoaster,
       location: location.trim(),
-      website: website.trim(),
+      website: normalizedWebsite,
       logoImage: logoImage || '',
-      beanName: beanName.trim(),
+      beanName: trimmedBean,
       origin: origin.trim() || 'Single Origin',
       varietal: varietal.trim(),
       process,
@@ -263,23 +322,23 @@ export default function RoasterPortalModal({
       roastLevel,
       tastingNotes: notesArray.length > 0 ? notesArray : ['Floral', 'Fruit', 'Balanced'],
       brewMethod,
-      recommendedRatio: Number(recommendedRatio),
-      tempF: Number(tempF),
-      tempC: Math.round(((Number(tempF) - 32) * 5) / 9),
-      recommendedGrind,
-      brewTime,
+      recommendedRatio: Number(recommendedRatio) || 16.5,
+      tempF: Number(tempF) || 202,
+      tempC: Math.round(((Number(tempF || 202) - 32) * 5) / 9),
+      recommendedGrind: recommendedGrind.trim() || 'Medium-Fine',
+      brewTime: brewTime.trim() || '3m 15s',
       upc: upc.trim() || `LOT-${Date.now().toString().slice(-6)}`,
-      customUrl: customUrl.trim(),
-      notes: roasterNotes.trim() || `Dialed-in recipe from ${roasterName}. Optimized for ${brewMethod.replace(/_/g, ' ')}.`
+      customUrl: normalizedCustomUrl,
+      notes: roasterNotes.trim() || `Dialed-in recipe from ${trimmedRoaster}. Optimized for ${brewMethod.replace(/_/g, ' ')}.`
     };
 
     saveRoasterCoffee(newCoffee);
 
     // Save custom roaster profile with uploaded logoImage for RoasterProfilePage background
     saveCustomRoasterProfile({
-      name: roasterName.trim(),
+      name: trimmedRoaster,
       location: location.trim(),
-      website: website.trim(),
+      website: normalizedWebsite,
       logoImage: logoImage || '',
       backgroundImage: logoImage || ''
     });
@@ -288,6 +347,13 @@ export default function RoasterPortalModal({
     setRegisteredCoffees(updated);
     setSelectedCoffeeForSticker(newCoffee);
     setActiveTab('sticker');
+
+    if (modalBodyRef.current) {
+      modalBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    setSaveToast(`Saved "${trimmedBean}" to your Roaster Registry! Smart Bag QR Studio ready.`);
+    setTimeout(() => setSaveToast(null), 4000);
   };
 
   const handleDelete = (id) => {
@@ -508,11 +574,27 @@ export default function RoasterPortalModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 sm:p-6 overflow-y-auto flex-1 custom-scrollbar space-y-6">
+        <div ref={modalBodyRef} className="p-5 sm:p-6 overflow-y-auto flex-1 custom-scrollbar space-y-6">
+
+          {/* Global Toast Notification inside Modal */}
+          {saveToast && (
+            <div className="p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 text-xs font-mono flex items-center gap-2.5 shadow-xl animate-fade-in">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+              <span className="font-bold">{saveToast}</span>
+            </div>
+          )}
 
           {/* TAB 1: ONBOARD FORM */}
           {activeTab === 'onboard' && (
-            <form onSubmit={handleSaveCoffee} className="space-y-6">
+            <form onSubmit={handleSaveCoffee} noValidate className="space-y-6">
+              
+              {/* Form Validation Warning */}
+              {formError && (
+                <div className="p-4 rounded-2xl bg-red-950/70 border border-red-500/50 text-red-200 text-xs font-mono flex items-center gap-2.5 shadow-xl animate-shake">
+                  <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+                  <span className="font-bold">{formError}</span>
+                </div>
+              )}
               
               {/* Roastery Information Card */}
               <div className="p-4 sm:p-5 rounded-2xl bg-black/30 border border-white/10 space-y-4">
@@ -877,6 +959,14 @@ export default function RoasterPortalModal({
                 </div>
               </div>
 
+              {/* Form Validation Warning at Bottom */}
+              {formError && (
+                <div className="p-4 rounded-2xl bg-red-950/70 border border-red-500/50 text-red-200 text-xs font-mono flex items-center gap-2.5 shadow-xl animate-shake">
+                  <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+                  <span className="font-bold">{formError}</span>
+                </div>
+              )}
+
               {/* Submit Action Bar */}
               <div className="flex items-center justify-end gap-3 pt-2">
                 <button
@@ -888,7 +978,8 @@ export default function RoasterPortalModal({
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-gold/20"
+                  onClick={handleSaveCoffee}
+                  className="px-6 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-gold/20 hover:scale-105 active:scale-95 transition"
                 >
                   <span>Save to Registry & Open QR Studio</span>
                   <ArrowRight className="w-4 h-4" />

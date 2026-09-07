@@ -52,7 +52,20 @@ export function saveRoasterCoffee(coffee) {
   const filtered = existing.filter((c) => c.id !== id);
   const updated = [record, ...filtered];
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  } catch (err) {
+    console.warn('Storage quota exceeded in saveRoasterCoffee; falling back to lightweight record without oversized image:', err);
+    try {
+      const lightweight = updated.map((c) => ({
+        ...c,
+        logoImage: c.logoImage && c.logoImage.length > 50000 ? '' : c.logoImage
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lightweight));
+    } catch (fallbackErr) {
+      console.error('Failed to save coffee to localStorage:', fallbackErr);
+    }
+  }
   return record;
 }
 
@@ -62,7 +75,11 @@ export function saveRoasterCoffee(coffee) {
 export function deleteRoasterCoffee(id) {
   const existing = getCustomRoasterCoffees();
   const filtered = existing.filter((c) => c.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  } catch (err) {
+    console.error('Failed to delete coffee from localStorage:', err);
+  }
   return filtered;
 }
 
@@ -99,7 +116,21 @@ export function saveCustomRoasterProfile(profile) {
   };
   const filtered = existing.filter((r) => r.id !== slug && r.slug !== slug);
   const updated = [record, ...filtered];
-  localStorage.setItem(ROASTER_PROFILES_KEY, JSON.stringify(updated));
+  try {
+    localStorage.setItem(ROASTER_PROFILES_KEY, JSON.stringify(updated));
+  } catch (err) {
+    console.warn('Storage quota exceeded in saveCustomRoasterProfile; falling back to lightweight record:', err);
+    try {
+      const lightweight = updated.map((r) => ({
+        ...r,
+        logoImage: r.logoImage && r.logoImage.length > 50000 ? '' : r.logoImage,
+        backgroundImage: r.backgroundImage && r.backgroundImage.length > 50000 ? '' : r.backgroundImage
+      }));
+      localStorage.setItem(ROASTER_PROFILES_KEY, JSON.stringify(lightweight));
+    } catch (fallbackErr) {
+      console.error('Failed to save roaster profile to localStorage:', fallbackErr);
+    }
+  }
   return record;
 }
 
