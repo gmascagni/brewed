@@ -348,43 +348,16 @@ export default function RoasterProfilePage({
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
 
-            {onOpenRoasterPortalWithBean && (
-              <button
-                onClick={() => {
-                  const defaultBean = roaster.coffees && roaster.coffees[0];
-                  const payload = {
-                    roaster: roaster.name,
-                    beanName: defaultBean?.beanName || '',
-                    brewMethod: defaultBean?.brewMethod || 'pour_over',
-                    recommendedRatio: defaultBean?.recommendedRatio || 16.5,
-                    tempF: defaultBean?.tempF || 202,
-                    recommendedGrind: defaultBean?.recommendedGrind || 'Medium-Fine',
-                    upc: defaultBean?.upc || '',
-                    customUrl: defaultBean?.directUrl || roaster.shopUrl
-                  };
-                  if (orchestrator) {
-                    orchestrator.package(payload);
-                  } else {
-                    onOpenRoasterPortalWithBean(payload);
-                  }
-                }}
-                className="px-5 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/15 flex items-center gap-2 transition"
-                title="Roaster Label & Smart Bag Packaging Studio"
-              >
-                <QrCode className="w-3.5 h-3.5 text-amber-gold" />
-                <span>Roaster Packaging Studio</span>
-              </button>
-            )}
-
-            {onOpenRoasterInfo && (
-              <button
-                onClick={onOpenRoasterInfo}
-                className="px-5 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/15 flex items-center gap-2 transition"
-              >
-                <Store className="w-3.5 h-3.5 text-amber-gold" />
-                <span>Onboard Your Roastery</span>
-              </button>
-            )}
+            <button
+              onClick={() => {
+                setActiveTab('coffees');
+                document.getElementById('roaster-tabs')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-5 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/15 flex items-center gap-2 transition"
+            >
+              <Coffee className="w-3.5 h-3.5 text-amber-gold" />
+              <span>Browse Coffees & Dial-In Recipes ({roaster.coffees?.length || 0})</span>
+            </button>
 
             <div className="text-xs font-mono text-cream-soft/60 hidden lg:block ml-2">
               Founders: <span className="text-cream-light font-bold">{roaster.founders?.length ? roaster.founders.join(', ') : `${roaster.city}${roaster.state ? ', ' + roaster.state : ''}`}</span>
@@ -396,7 +369,7 @@ export default function RoasterProfilePage({
         {/* ========================================================================= */}
         {/* 4. ROASTER SECTION TABS                                                  */}
         {/* ========================================================================= */}
-        <div className="border-b border-white/10 pt-4">
+        <div id="roaster-tabs" className="border-b border-white/10 pt-4">
           <div className="flex items-center gap-2 overflow-x-auto pb-3 text-xs font-mono">
             <button
               onClick={() => setActiveTab('coffees')}
@@ -872,6 +845,43 @@ export default function RoasterProfilePage({
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 5. ROASTERY PARTNER & PACKAGING TOOLING (DISCRETE OWNER FOOTER)           */}
+        {/* ========================================================================= */}
+        {onOpenRoasterPortalWithBean && (
+          <div className="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-cream-soft/60">
+            <div className="flex items-center gap-2">
+              <Store className="w-4 h-4 text-cream-soft/40" />
+              <span>Are you a team member or owner at {roaster.name}?</span>
+            </div>
+            <button
+              onClick={() => {
+                const defaultBean = roaster.coffees && roaster.coffees[0];
+                const payload = {
+                  roaster: roaster.name,
+                  beanName: defaultBean?.beanName || '',
+                  brewMethod: defaultBean?.brewMethod || 'pour_over',
+                  recommendedRatio: defaultBean?.recommendedRatio || 16.5,
+                  tempF: defaultBean?.tempF || 202,
+                  recommendedGrind: defaultBean?.recommendedGrind || 'Medium-Fine',
+                  upc: defaultBean?.upc || '',
+                  customUrl: defaultBean?.directUrl || roaster.shopUrl
+                };
+                if (orchestrator) {
+                  orchestrator.package(payload);
+                } else {
+                  onOpenRoasterPortalWithBean(payload);
+                }
+              }}
+              className="px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-cream-soft hover:text-cream-light border border-white/10 flex items-center gap-2 transition"
+              title="Open Smart Bag Packaging & Label Studio"
+            >
+              <QrCode className="w-3.5 h-3.5 text-amber-gold" />
+              <span>Roaster Packaging & Label Studio</span>
+            </button>
           </div>
         )}
 
