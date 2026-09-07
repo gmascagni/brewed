@@ -26,6 +26,7 @@ import RoasterInfoPage from './components/RoasterInfoPage';
 import RoasterProfilePage from './components/RoasterProfilePage';
 import CoffeeVideoAcademyModal from './components/CoffeeVideoAcademyModal';
 import Footer from './components/Footer';
+import { AppOrchestratorProvider } from './context/AppOrchestratorContext';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { getMethodJsonLd, updatePageSeo } from './utils/seo';
@@ -359,11 +360,25 @@ export default function App() {
   const dryDoseGrams = calculatedTotalWaterMl > 0 ? Math.round((calculatedTotalWaterMl / effectiveRatio) * 10) / 10 : 0;
 
   return (
-    <div className={`min-h-screen font-sans flex flex-col transition-colors duration-700 relative ${
-      isCoffee
-        ? 'bg-[#0E0906] text-[#F8F5F1] selection:bg-[#C48B56] selection:text-[#140C08]'
-        : 'bg-[#08110B] text-[#EBF7EE] selection:bg-sage-400 selection:text-[#07130B]'
-    }`}>
+    <AppOrchestratorProvider
+      onApplyRecipeToTimer={handleApplyScannedRecipe}
+      onSaveRecipeToJournal={handleSaveScannedToJournal}
+      onOpenScanner={() => setIsScannerOpen(true)}
+      onOpenPackagingStudio={(coffee) => {
+        if (coffee?.packaging?.upc) setRoasterPrefillBarcode(coffee.packaging.upc);
+        if (coffee) setRoasterPrefillBean(coffee);
+        setIsRoasterPortalOpen(true);
+      }}
+      onOpenWaterLab={() => setIsWaterLabOpen(true)}
+      onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
+      onOpenJournal={() => setIsJournalOpen(true)}
+      navigate={navigate}
+    >
+      <div className={`min-h-screen font-sans flex flex-col transition-colors duration-700 relative ${
+        isCoffee
+          ? 'bg-[#0E0906] text-[#F8F5F1] selection:bg-[#C48B56] selection:text-[#140C08]'
+          : 'bg-[#08110B] text-[#EBF7EE] selection:bg-sage-400 selection:text-[#07130B]'
+      }`}>
 
       {/* High-Definition Extraction Method Background Image Overlay */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30 md:opacity-40 transition-all duration-1000">
@@ -729,7 +744,7 @@ export default function App() {
         />
 
       </div>
-
     </div>
+    </AppOrchestratorProvider>
   );
 }

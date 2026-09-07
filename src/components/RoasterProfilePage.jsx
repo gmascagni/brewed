@@ -21,10 +21,12 @@ import {
   Layers,
   ArrowLeft,
   Share2,
-  Check
+  Check,
+  Download
 } from 'lucide-react';
 import { SHOWCASE_ROASTERS, getShowcaseRoaster } from '../data/roasterShowcaseData';
 import { trackEvent } from '../utils/analytics';
+import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 
 export default function RoasterProfilePage({
   initialRoasterId = 'methodical',
@@ -38,6 +40,11 @@ export default function RoasterProfilePage({
   const [activeTab, setActiveTab] = useState('coffees'); // 'coffees' | 'story' | 'water' | 'cafes'
   const [copiedLink, setCopiedLink] = useState(false);
   const [selectedCoffeeForQuickView, setSelectedCoffeeForQuickView] = useState(null);
+
+  let orchestrator = null;
+  try {
+    orchestrator = useAppOrchestrator();
+  } catch {}
 
   const roaster = getShowcaseRoaster(activeRoasterId);
 
@@ -435,11 +442,14 @@ export default function RoasterProfilePage({
                     {/* Primary Dial-In Button */}
                     <button
                       onClick={() => {
-                        if (onBrewCoffee) {
-                          onBrewCoffee({
-                            ...coffee,
-                            roaster: roaster.name
-                          });
+                        const payload = {
+                          ...coffee,
+                          roaster: roaster.name
+                        };
+                        if (orchestrator) {
+                          orchestrator.brew(payload);
+                        } else if (onBrewCoffee) {
+                          onBrewCoffee(payload);
                         }
                       }}
                       className="w-full py-3 rounded-xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition hover:scale-[1.02] active:scale-[0.98]"
@@ -448,28 +458,60 @@ export default function RoasterProfilePage({
                       <span>Dial-In & Brew ({coffee.dryDoseGrams}g : {coffee.waterGrams}g)</span>
                     </button>
 
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       {/* Smart Bag QR Studio Trigger */}
                       <button
                         onClick={() => {
-                          if (onOpenRoasterPortalWithBean) {
-                            onOpenRoasterPortalWithBean({
-                              roaster: roaster.name,
-                              beanName: coffee.beanName,
-                              brewMethod: coffee.brewMethod,
-                              recommendedRatio: coffee.recommendedRatio,
-                              tempF: coffee.tempF,
-                              recommendedGrind: coffee.recommendedGrind,
-                              upc: coffee.upc,
-                              customUrl: coffee.directUrl
-                            });
+                          const payload = {
+                            roaster: roaster.name,
+                            beanName: coffee.beanName,
+                            brewMethod: coffee.brewMethod,
+                            recommendedRatio: coffee.recommendedRatio,
+                            tempF: coffee.tempF,
+                            recommendedGrind: coffee.recommendedGrind,
+                            upc: coffee.upc,
+                            customUrl: coffee.directUrl
+                          };
+                          if (orchestrator) {
+                            orchestrator.package(payload);
+                          } else if (onOpenRoasterPortalWithBean) {
+                            onOpenRoasterPortalWithBean(payload);
                           }
                         }}
-                        className="py-2.5 px-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-mono text-cream-light flex items-center justify-center gap-1.5 transition"
-                        title="Download or print packaging QR sticker"
+                        className="py-2.5 px-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-[11px] font-mono text-cream-light flex items-center justify-center gap-1 transition"
+                        title="Open Roaster Studio to configure packaging QR"
                       >
-                        <QrCode className="w-3.5 h-3.5 text-amber-gold" />
-                        <span>Smart Bag QR</span>
+                        <QrCode className="w-3.5 h-3.5 text-amber-gold shrink-0" />
+                        <span className="truncate">Studio</span>
+                      </button>
+
+                      {/* Direct 300-DPI Sticker Download */}
+                      <button
+                        onClick={() => {
+                          const payload = {
+                            roaster: roaster.name,
+                            beanName: coffee.beanName,
+                            origin: coffee.origin,
+                            process: coffee.process,
+                            elevation: coffee.elevation,
+                            roastLevel: 'Light',
+                            tastingNotes: coffee.tastingNotes,
+                            brewMethod: coffee.brewMethod,
+                            recommendedRatio: coffee.recommendedRatio,
+                            tempF: coffee.tempF,
+                            recommendedGrind: coffee.recommendedGrind,
+                            upc: coffee.upc,
+                            customUrl: coffee.directUrl
+                          };
+                          if (orchestrator) {
+                            orchestrator.downloadSticker(payload);
+                          }
+                        }}
+                        className="py-2.5 px-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-[11px] font-mono text-cream-light flex items-center justify-center gap-1 transition"
+                        title="Download print-ready 300-DPI label sticker directly"
+                      >
+                        <Download className="w-3.5 h-3.5 text-amber-gold shrink-0" />
+                        <span className="truncate">Sticker</span>
                       </button>
 
                       {/* Buy Direct from Roaster */}
@@ -477,11 +519,11 @@ export default function RoasterProfilePage({
                         href={coffee.directUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="py-2.5 px-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-mono text-cream-light flex items-center justify-center gap-1.5 transition"
+                        className="py-2.5 px-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-[11px] font-mono text-cream-light flex items-center justify-center gap-1 transition"
                         title="Purchase directly on roaster's website"
                       >
-                        <span>Buy {coffee.price}</span>
-                        <ExternalLink className="w-3 h-3 text-cream-soft" />
+                        <span className="truncate">Buy {coffee.price}</span>
+                        <ExternalLink className="w-3 h-3 text-cream-soft shrink-0" />
                       </a>
                     </div>
 
@@ -585,17 +627,19 @@ export default function RoasterProfilePage({
                   </div>
                 </div>
 
-                {onOpenWaterLabWithProfile && (
-                  <button
-                    onClick={() => {
+                <button
+                  onClick={() => {
+                    if (orchestrator) {
+                      orchestrator.water(roaster.recommendedWater);
+                    } else if (onOpenWaterLabWithProfile) {
                       onOpenWaterLabWithProfile(roaster.recommendedWater);
-                    }}
-                    className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg transition"
-                  >
-                    <span>Open in Water Lab</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                )}
+                    }
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg transition"
+                >
+                  <span>Open in Water Lab</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
 
               <p className="text-sm text-cream-soft font-sans leading-relaxed">

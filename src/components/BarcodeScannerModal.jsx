@@ -25,6 +25,8 @@ import {
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import jsQR from 'jsqr';
 import { getRegisteredCoffees } from '../data/roasterRegistry';
+import { useAppOrchestrator } from '../context/AppOrchestratorContext';
+import { createCoffeeProfile } from '../models/coffeeProfile';
 
 // Verified catalog of real specialty coffee roasters, beans, and extraction parameters
 export const VERIFIED_BEAN_CATALOG = [
@@ -162,6 +164,11 @@ export default function BarcodeScannerModal({
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const scanIntervalRef = useRef(null);
+
+  let orchestrator = null;
+  try {
+    orchestrator = useAppOrchestrator();
+  } catch {}
 
   // Initialize camera when modal opens
   useEffect(() => {
@@ -568,7 +575,9 @@ export default function BarcodeScannerModal({
 
   const handleApplyToDialIn = () => {
     if (!matchedBean) return;
-    if (onApplyRecipe) {
+    if (orchestrator) {
+      orchestrator.brew(matchedBean);
+    } else if (onApplyRecipe) {
       onApplyRecipe(matchedBean);
     }
     onClose();
@@ -576,7 +585,9 @@ export default function BarcodeScannerModal({
 
   const handleSaveToCellar = () => {
     if (!matchedBean) return;
-    if (onSaveToJournal) {
+    if (orchestrator) {
+      orchestrator.cellar(matchedBean);
+    } else if (onSaveToJournal) {
       onSaveToJournal(matchedBean);
     }
     onClose();
@@ -1011,22 +1022,42 @@ export default function BarcodeScannerModal({
 
               {/* Action Buttons */}
               <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-end gap-3">
-                {onOpenRoasterPortal && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onOpenRoasterPortal(matchedBean.upc, matchedBean);
-                      onClose();
-                    }}
-                    className="px-4 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-gold border border-amber-500/40 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95"
-                    title="Open Roaster Studio to export packaging sticker with 'Scan Me for Recipe' or vector SVG for your printer"
-                  >
-                    <QrCode className="w-4 h-4 text-amber-gold" />
-                    <span>Export Sticker for Printer</span>
-                  </button>
-                )}
-
+                {/* 1. Direct 300-DPI Packaging Sticker Download */}
                 <button
+                  type="button"
+                  onClick={() => {
+                    if (orchestrator) {
+                      orchestrator.downloadSticker(matchedBean);
+                    }
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light border border-white/15 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95"
+                  title="Download 300-DPI packaging sticker (PNG) with 'Scan Me for Recipe' badge directly to your device"
+                >
+                  <Download className="w-4 h-4 text-amber-gold" />
+                  <span>Download Sticker (300 DPI)</span>
+                </button>
+
+                {/* 2. Roaster Studio Handoff */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (orchestrator) {
+                      orchestrator.package(matchedBean);
+                    } else if (onOpenRoasterPortal) {
+                      onOpenRoasterPortal(matchedBean.upc, matchedBean);
+                    }
+                    onClose();
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-gold border border-amber-500/40 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95"
+                  title="Open Roaster Studio to export vector SVG or thermal roll specs for your bag printer"
+                >
+                  <QrCode className="w-4 h-4 text-amber-gold" />
+                  <span>Roaster Studio</span>
+                </button>
+
+                {/* 3. Log to Brew Cellar */}
+                <button
+                  type="button"
                   onClick={handleSaveToCellar}
                   className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light text-xs font-mono font-bold flex items-center gap-2 border border-white/15 transition active:scale-95"
                 >
@@ -1034,7 +1065,9 @@ export default function BarcodeScannerModal({
                   <span>Log to Brew Cellar</span>
                 </button>
 
+                {/* 4. Load into Dial-In Station */}
                 <button
+                  type="button"
                   onClick={handleApplyToDialIn}
                   className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-gold/20 transition active:scale-95 hover:scale-105"
                 >

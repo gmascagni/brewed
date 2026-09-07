@@ -35,6 +35,12 @@ import {
 } from '../data/roasterRegistry';
 import { BREW_METHODS } from '../data/brewData';
 import RoasterVideoPlayer from './RoasterVideoPlayer';
+import { useAppOrchestrator } from '../context/AppOrchestratorContext';
+import { 
+  downloadCompleteStickerPng, 
+  downloadVectorQrSvg, 
+  downloadHighResQrPng 
+} from '../services/packagingAssetPipeline';
 
 export default function RoasterPortalModal({
   isOpen,
@@ -49,6 +55,11 @@ export default function RoasterPortalModal({
   const [qrEcc, setQrEcc] = useState('H'); // 'H' (30%) | 'Q' (25%) | 'M' (15%) | 'L' (7%)
   const [registeredCoffees, setRegisteredCoffees] = useState([]);
   const [copySuccess, setCopySuccess] = useState(false);
+
+  let orchestrator = null;
+  try {
+    orchestrator = useAppOrchestrator();
+  } catch {}
 
   // Form State for Onboarding
   const [roasterName, setRoasterName] = useState('');
@@ -267,207 +278,46 @@ export default function RoasterPortalModal({
       roastLevel: roastLevel || 'Light',
       tastingNotes: tastingNotesInput ? tastingNotesInput.split(',').map(s => s.trim()).filter(Boolean) : ['Peach', 'Jasmine', 'Honey'],
       brewMethod: brewMethod || 'pour_over',
-      recommendedRatio: recommendedRatio || 16.5,
-      tempF: tempF || 202,
+      recommendedRatio: Number(recommendedRatio) || 16.5,
+      tempF: Number(tempF) || 202,
       recommendedGrind: recommendedGrind || 'Medium-Fine',
-      upc: upc || 'LOT-2026-CERTIFIED'
+      upc: upc || 'LOT-2026-CERTIFIED',
+      customUrl: customUrl.trim()
     };
 
-    const targetUrl = customUrl.trim() || generateSmartBagUrl(coffee);
-
-    // Create high-res 300 DPI canvas (1200 x 1800 px for standard 2"x3" or 3"x4.5" commercial bag stickers)
-    const canvas = document.createElement('canvas');
-    canvas.width = 1200;
-    canvas.height = 1800;
-    const ctx = canvas.getContext('2d');
-
-    // Clean white label background
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, 1200, 1800);
-
-    // Outer printer bleed & border
-    ctx.strokeStyle = '#1C1917';
-    ctx.lineWidth = 10;
-    ctx.strokeRect(30, 30, 1140, 1740);
-
-    // Inner hairline frame
-    ctx.strokeStyle = '#E7E5E4';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(45, 45, 1110, 1710);
-
-    // Category Top Header
-    ctx.fillStyle = '#78716C';
-    ctx.font = 'bold 22px -apple-system, monospace, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('SPECIALTY COFFEE ROASTERY • SMART BAG CERTIFIED', 70, 105);
-
-    // Roast Level Pill Badge
-    const roastText = (coffee.roastLevel || 'LIGHT').toUpperCase();
-    ctx.font = 'bold 22px monospace, sans-serif';
-    const badgeW = ctx.measureText(roastText).width + 36;
-    ctx.fillStyle = '#1C1917';
-    ctx.fillRect(1200 - 70 - badgeW, 78, badgeW, 42);
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(roastText, 1200 - 70 - badgeW + 18, 107);
-
-    // Roaster Title
-    ctx.fillStyle = '#1C1917';
-    ctx.font = 'bold 52px Georgia, "Times New Roman", serif';
-    ctx.fillText(coffee.roaster, 70, 180);
-
-    // Roaster Location
-    ctx.fillStyle = '#57534E';
-    ctx.font = '28px -apple-system, sans-serif';
-    ctx.fillText(coffee.location || 'Artisan Small Batch', 70, 225);
-
-    // Dividing Rule
-    ctx.strokeStyle = '#1C1917';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(70, 255);
-    ctx.lineTo(1130, 255);
-    ctx.stroke();
-
-    // Coffee Lot Name
-    ctx.fillStyle = '#0C0A09';
-    ctx.font = 'bold 44px Georgia, serif';
-    ctx.fillText(coffee.beanName, 70, 315);
-
-    // Terroir Specs
-    ctx.fillStyle = '#44403C';
-    ctx.font = '500 26px -apple-system, sans-serif';
-    const originStr = `${coffee.origin || 'Single Origin'} • ${coffee.process || 'Washed'} • ${coffee.elevation || 'High Altitude'}`;
-    ctx.fillText(originStr, 70, 360);
-
-    // Tasting Notes
-    const notesStr = (coffee.tastingNotes || []).slice(0, 4).join(', ');
-    if (notesStr) {
-      ctx.fillStyle = '#92400E';
-      ctx.font = 'italic 26px Georgia, serif';
-      ctx.fillText(`Notes: ${notesStr}`, 70, 405);
-    }
-
-    // --- PROMINENT "SCAN ME FOR RECIPE" BANNER ---
-    const bannerY = 460;
-    const bannerH = 75;
-    ctx.fillStyle = '#1C1917';
-    if (ctx.roundRect) {
-      ctx.beginPath();
-      ctx.roundRect(140, bannerY, 920, bannerH, 37);
-      ctx.fill();
+    if (orchestrator) {
+      await orchestrator.downloadSticker(coffee);
     } else {
-      ctx.fillRect(140, bannerY, 920, bannerH);
+      await downloadCompleteStickerPng(coffee);
     }
-
-    ctx.fillStyle = '#F59E0B'; // Amber Gold
-    ctx.font = 'bold 32px -apple-system, monospace, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('✨  SCAN ME FOR RECIPE  ✨', 600, bannerY + 49);
-
-    // QR Code generation
-    const qrCanvas = document.createElement('canvas');
-    await QRCode.toCanvas(qrCanvas, targetUrl, {
-      width: 700,
-      margin: 1,
-      errorCorrectionLevel: 'H',
-      color: { dark: '#000000', light: '#FFFFFF' }
-    });
-
-    // Draw QR centered
-    ctx.drawImage(qrCanvas, 250, 560, 700, 700);
-
-    // Callout subtitle
-    ctx.fillStyle = '#78716C';
-    ctx.font = 'bold 22px monospace, sans-serif';
-    ctx.fillText('AIM PHONE CAMERA TO DIAL-IN & BREW', 600, 1315);
-
-    // Extraction Parameter Box
-    ctx.fillStyle = '#F5F5F4';
-    ctx.fillRect(70, 1360, 1060, 230);
-    ctx.strokeStyle = '#D6D3D1';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(70, 1360, 1060, 230);
-
-    ctx.fillStyle = '#78716C';
-    ctx.font = 'bold 20px monospace, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('BARISTA DIAL-IN SPECIFICATIONS', 100, 1400);
-
-    const colW = 1060 / 4;
-    const colY = 1455;
-
-    // Col 1: Ratio
-    ctx.fillStyle = '#78716C';
-    ctx.font = 'bold 18px monospace, sans-serif';
-    ctx.fillText('WATER RATIO', 100, colY);
-    ctx.fillStyle = '#92400E';
-    ctx.font = 'bold 36px monospace, sans-serif';
-    ctx.fillText(`1:${coffee.recommendedRatio}`, 100, colY + 45);
-
-    // Col 2: Water Temp
-    ctx.fillStyle = '#78716C';
-    ctx.font = 'bold 18px monospace, sans-serif';
-    ctx.fillText('WATER TEMP', 100 + colW, colY);
-    ctx.fillStyle = '#1C1917';
-    ctx.font = 'bold 36px monospace, sans-serif';
-    ctx.fillText(`${coffee.tempF}°F`, 100 + colW, colY + 45);
-
-    // Col 3: Method
-    ctx.fillStyle = '#78716C';
-    ctx.font = 'bold 18px monospace, sans-serif';
-    ctx.fillText('BREW METHOD', 100 + colW * 2, colY);
-    ctx.fillStyle = '#1C1917';
-    ctx.font = 'bold 28px -apple-system, sans-serif';
-    ctx.fillText((coffee.brewMethod || 'pour_over').replace(/_/g, ' '), 100 + colW * 2, colY + 42);
-
-    // Col 4: Grind
-    ctx.fillStyle = '#78716C';
-    ctx.font = 'bold 18px monospace, sans-serif';
-    ctx.fillText('GRIND SIZE', 100 + colW * 3, colY);
-    ctx.fillStyle = '#1C1917';
-    ctx.font = 'bold 26px -apple-system, sans-serif';
-    ctx.fillText((coffee.recommendedGrind || 'Medium-Fine').split('(')[0].trim(), 100 + colW * 3, colY + 42);
-
-    // Footer
-    ctx.fillStyle = '#A8A29E';
-    ctx.font = 'bold 22px monospace, sans-serif';
-    ctx.fillText('thebrew.app dial-in', 70, 1660);
-    ctx.textAlign = 'right';
-    ctx.fillText(`LOT: ${coffee.upc || 'CERTIFIED-LOT'}`, 1130, 1660);
-
-    // Trigger Download to user's device Downloads directory
-    const slug = (coffee.beanName || 'coffee').toLowerCase().replace(/[^a-z0-9]/g, '_');
-    const a = document.createElement('a');
-    a.href = canvas.toDataURL('image/png');
-    a.download = `smart_bag_sticker_${slug}_print_ready_300dpi.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
   };
 
-  const handleDownloadQrPng = () => {
-    if (!qrDataUrl) return;
-    const a = document.createElement('a');
-    a.href = qrDataUrl;
-    const slug = (selectedCoffeeForSticker?.beanName || beanName || 'coffee').toLowerCase().replace(/[^a-z0-9]/g, '_');
-    a.download = `smart_bag_qr_${slug}_1200px.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+  const handleDownloadQrPng = async () => {
+    const coffee = selectedCoffeeForSticker || {
+      roaster: roasterName || 'Specialty Roaster',
+      beanName: beanName || 'Single Origin Lot',
+      customUrl: customUrl.trim()
+    };
+
+    if (orchestrator) {
+      await orchestrator.downloadQr(coffee, 1200);
+    } else {
+      await downloadHighResQrPng(coffee, 1200);
+    }
   };
 
-  const handleDownloadQrSvg = () => {
-    if (!qrSvgString) return;
-    const blob = new Blob([qrSvgString], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const slug = (selectedCoffeeForSticker?.beanName || beanName || 'coffee').toLowerCase().replace(/[^a-z0-9]/g, '_');
-    a.download = `smart_bag_qr_${slug}_vector.svg`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+  const handleDownloadQrSvg = async () => {
+    const coffee = selectedCoffeeForSticker || {
+      roaster: roasterName || 'Specialty Roaster',
+      beanName: beanName || 'Single Origin Lot',
+      customUrl: customUrl.trim()
+    };
+
+    if (orchestrator) {
+      await orchestrator.downloadVector(coffee);
+    } else {
+      await downloadVectorQrSvg(coffee);
+    }
   };
 
   const handleOpenLinkInNewTab = () => {
@@ -1408,18 +1258,20 @@ export default function RoasterPortalModal({
                         </button>
 
                         <div className="flex items-center gap-1.5">
-                          {onSelectBeanToBrew && (
-                            <button
-                              onClick={() => {
+                          <button
+                            onClick={() => {
+                              if (orchestrator) {
+                                orchestrator.brew(c);
+                              } else if (onSelectBeanToBrew) {
                                 onSelectBeanToBrew(c);
-                                onClose();
-                              }}
-                              className="px-3 py-1.5 rounded-lg bg-amber-gold/20 hover:bg-amber-gold text-amber-gold hover:text-espresso-950 text-[11px] font-mono font-bold flex items-center gap-1 border border-amber-500/30 transition"
-                            >
-                              <span>Dial-In</span>
-                              <ArrowRight className="w-3 h-3" />
-                            </button>
-                          )}
+                              }
+                              onClose();
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-amber-gold/20 hover:bg-amber-gold text-amber-gold hover:text-espresso-950 text-[11px] font-mono font-bold flex items-center gap-1 border border-amber-500/30 transition"
+                          >
+                            <span>Dial-In</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
 
                           <button
                             onClick={() => handleDelete(c.id)}
