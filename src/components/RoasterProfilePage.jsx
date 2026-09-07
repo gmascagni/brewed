@@ -22,7 +22,8 @@ import {
   ArrowLeft,
   Share2,
   Check,
-  Download
+  Download,
+  Bookmark
 } from 'lucide-react';
 import { SHOWCASE_ROASTERS, getShowcaseRoaster, getAllShowcaseRoasters } from '../data/roasterShowcaseData';
 import { trackEvent } from '../utils/analytics';
@@ -39,7 +40,8 @@ export default function RoasterProfilePage({
   const [activeRoasterId, setActiveRoasterId] = useState(initialRoasterId);
   const [activeTab, setActiveTab] = useState('coffees'); // 'coffees' | 'story' | 'water' | 'cafes'
   const [copiedLink, setCopiedLink] = useState(false);
-  const [selectedCoffeeForQuickView, setSelectedCoffeeForQuickView] = useState(null);
+  const [scannedBeanName, setScannedBeanName] = useState('');
+  const [savedToJournalId, setSavedToJournalId] = useState(null);
 
   let orchestrator = null;
   try {
@@ -56,6 +58,16 @@ export default function RoasterProfilePage({
   }, [initialRoasterId]);
 
   useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const beanParam = params.get('bean');
+      if (beanParam) {
+        setScannedBeanName(beanParam);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     trackEvent('view_roaster_profile_page', {
       roaster_id: roaster.id,
@@ -70,6 +82,40 @@ export default function RoasterProfilePage({
       setTimeout(() => setCopiedLink(false), 2000);
     }
   };
+
+  const handleSaveToJournal = (coffee) => {
+    try {
+      const existing = JSON.parse(localStorage.getItem('the_brew_app_journal_v1') || '[]');
+      const newEntry = {
+        id: Date.now().toString(),
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        trackMode: 'coffee',
+        methodName: coffee.brewMethod ? coffee.brewMethod.replace(/_/g, ' ') : 'Pour Over',
+        beanName: coffee.beanName,
+        roaster: roaster.name,
+        doseStr: `${coffee.dryDoseGrams || 18} g`,
+        waterStr: `${coffee.waterGrams || 297} mL`,
+        ratioStr: `1 : ${coffee.recommendedRatio || 16.5}`,
+        grindStr: coffee.recommendedGrind || 'Medium-Fine',
+        tempStr: `${coffee.tempF || 202}°F`,
+        rating: 5,
+        isFavorite: true,
+        tastingNotes: coffee.tastingNotes || [],
+        notes: `${coffee.description || ''} (Origin: ${coffee.origin}, Elevation: ${coffee.elevation})`
+      };
+      localStorage.setItem('the_brew_app_journal_v1', JSON.stringify([newEntry, ...existing]));
+      setSavedToJournalId(coffee.id);
+      setTimeout(() => setSavedToJournalId(null), 2500);
+    } catch (err) {
+      console.error('Error saving to journal:', err);
+    }
+  };
+
+  const scannedCoffee = scannedBeanName && roaster.coffees ? roaster.coffees.find(
+    (c) => c.beanName.toLowerCase() === scannedBeanName.toLowerCase() ||
+           c.beanName.toLowerCase().includes(scannedBeanName.toLowerCase()) ||
+           scannedBeanName.toLowerCase().includes(c.beanName.toLowerCase())
+  ) : null;
 
   return (
     <div className="min-h-screen bg-[#0A0604] text-cream-light selection:bg-amber-gold selection:text-espresso-950 font-sans pb-24 relative overflow-hidden">
@@ -188,10 +234,17 @@ export default function RoasterProfilePage({
           
           {/* Brand Metadata Badges */}
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="px-3 py-1 rounded-full bg-amber-500/25 text-amber-300 font-mono text-xs font-extrabold border border-amber-500/50 flex items-center gap-1.5 shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-amber-gold" />
-              <span>Showcase Demonstration • Example Profile</span>
-            </span>
+            {roaster.isCustomRoaster ? (
+              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Verified Independent Roastery</span>
+              </span>
+            ) : (
+              <span className="px-3 py-1 rounded-full bg-amber-500/25 text-amber-300 font-mono text-xs font-extrabold border border-amber-500/50 flex items-center gap-1.5 shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-amber-gold" />
+                <span>Showcase Roaster Partner</span>
+              </span>
+            )}
 
             <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-gold font-mono text-xs font-bold border border-amber-500/30 flex items-center gap-1.5">
               <Store className="w-3.5 h-3.5" />
@@ -243,26 +296,28 @@ export default function RoasterProfilePage({
             </div>
           </div>
 
-          {/* Transparent Showcase Demonstration & Partner Example Notice */}
-          <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/40 text-xs font-mono text-cream-soft/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 backdrop-blur-md shadow-lg">
-            <div className="flex items-start sm:items-center gap-2.5">
-              <span className="px-2.5 py-1 rounded-md bg-amber-gold/20 text-amber-gold font-bold text-[10px] uppercase tracking-wider border border-amber-gold/40 shrink-0">
-                Demo / Example Only
-              </span>
-              <span className="leading-relaxed">
-                This profile represents an illustrative partner demonstration of The Brew App Smart Bag catalog. Coffee descriptions and trademarks belong to their respective roasteries.
-              </span>
+          {/* Transparent Showcase Demonstration & Partner Example Notice (shown only for showcase profiles) */}
+          {!roaster.isCustomRoaster && (
+            <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/40 text-xs font-mono text-cream-soft/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 backdrop-blur-md shadow-lg">
+              <div className="flex items-start sm:items-center gap-2.5">
+                <span className="px-2.5 py-1 rounded-md bg-amber-gold/20 text-amber-gold font-bold text-[10px] uppercase tracking-wider border border-amber-gold/40 shrink-0">
+                  Showcase Preview
+                </span>
+                <span className="leading-relaxed">
+                  Featured roaster showcase demonstrating The Brew App Smart Bag ecosystem. Coffee dial-in recipes are tuned to roaster specifications.
+                </span>
+              </div>
+              {onOpenRoasterInfo && (
+                <button
+                  onClick={onOpenRoasterInfo}
+                  className="text-amber-gold hover:underline font-bold text-xs flex items-center gap-1 whitespace-nowrap shrink-0 self-start sm:self-auto"
+                >
+                  <span>Are you a roaster? Onboard your labels</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
-            {onOpenRoasterInfo && (
-              <button
-                onClick={onOpenRoasterInfo}
-                className="text-amber-gold hover:underline font-bold text-xs flex items-center gap-1 whitespace-nowrap shrink-0 self-start sm:self-auto"
-              >
-                <span>Are you a roaster? Ingest official labels</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
+          )}
 
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
@@ -292,6 +347,34 @@ export default function RoasterProfilePage({
               <span>Visit Official Store</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
+
+            {onOpenRoasterPortalWithBean && (
+              <button
+                onClick={() => {
+                  const defaultBean = roaster.coffees && roaster.coffees[0];
+                  const payload = {
+                    roaster: roaster.name,
+                    beanName: defaultBean?.beanName || '',
+                    brewMethod: defaultBean?.brewMethod || 'pour_over',
+                    recommendedRatio: defaultBean?.recommendedRatio || 16.5,
+                    tempF: defaultBean?.tempF || 202,
+                    recommendedGrind: defaultBean?.recommendedGrind || 'Medium-Fine',
+                    upc: defaultBean?.upc || '',
+                    customUrl: defaultBean?.directUrl || roaster.shopUrl
+                  };
+                  if (orchestrator) {
+                    orchestrator.package(payload);
+                  } else {
+                    onOpenRoasterPortalWithBean(payload);
+                  }
+                }}
+                className="px-5 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/15 flex items-center gap-2 transition"
+                title="Roaster Label & Smart Bag Packaging Studio"
+              >
+                <QrCode className="w-3.5 h-3.5 text-amber-gold" />
+                <span>Roaster Packaging Studio</span>
+              </button>
+            )}
 
             {onOpenRoasterInfo && (
               <button
@@ -371,6 +454,57 @@ export default function RoasterProfilePage({
         {activeTab === 'coffees' && (
           <div className="space-y-8 animate-fade-in">
             
+            {/* Scanned Bag Notification Banner (rendered when arriving from a bag barcode scan) */}
+            {scannedCoffee && (
+              <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-950/60 via-black/80 to-amber-950/40 border-2 border-emerald-500/60 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                    <QrCode className="w-6 h-6 text-emerald-400 animate-pulse" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-500/30 text-emerald-300 font-mono text-[10px] font-bold uppercase tracking-wider border border-emerald-500/50">
+                        ✨ Smart Bag Scanned
+                      </span>
+                      <span className="text-xs font-mono text-cream-soft">
+                        Matched from your physical packaging
+                      </span>
+                    </div>
+                    <h4 className="font-serif text-lg sm:text-xl font-bold text-cream-light mt-0.5">
+                      {scannedCoffee.beanName}
+                    </h4>
+                    <p className="text-xs text-cream-soft font-sans">
+                      Roaster golden ratio 1:{scannedCoffee.recommendedRatio} • {scannedCoffee.tempF}°F • {scannedCoffee.recommendedGrind} grind
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <button
+                    onClick={() => {
+                      const payload = { ...scannedCoffee, roaster: roaster.name };
+                      if (orchestrator) {
+                        orchestrator.brew(payload);
+                      } else if (onBrewCoffee) {
+                        onBrewCoffee(payload);
+                      }
+                    }}
+                    className="px-5 py-3 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition"
+                  >
+                    <Coffee className="w-4 h-4" />
+                    <span>Start Brew Timer</span>
+                  </button>
+                  <button
+                    onClick={() => handleSaveToJournal(scannedCoffee)}
+                    className="p-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-cream-light transition"
+                    title="Save this bag to your personal coffee cellar"
+                  >
+                    <Bookmark className={`w-4 h-4 ${savedToJournalId === scannedCoffee.id ? 'text-amber-gold fill-amber-gold' : 'text-cream-soft'}`} />
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-black/40 to-transparent border border-amber-500/30">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -385,193 +519,164 @@ export default function RoasterProfilePage({
               </div>
 
               <span className="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-mono text-amber-300 font-bold shrink-0">
-                Showcase Sample Dial-Ins
+                Official Dial-In Recipes
               </span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {roaster.coffees.map((coffee) => (
-                <div
-                  key={coffee.id}
-                  className="rounded-3xl bg-black/40 border border-white/10 hover:border-amber-gold/50 p-6 flex flex-col justify-between gap-6 transition-all duration-300 shadow-xl group hover:shadow-2xl hover:shadow-amber-gold/5 relative overflow-hidden"
-                >
-                  {/* Top Badge */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-gold font-mono text-[10px] font-bold border border-amber-500/30">
-                        {coffee.badge} • Showcase Demo
-                      </span>
-                      <span className="font-mono text-[11px] text-emerald-400 font-bold flex items-center gap-1">
-                        <Award className="w-3.5 h-3.5" />
-                        <span>SCA {coffee.cuppingScore}</span>
-                      </span>
-                    </div>
-
-                    <div>
-                      <h4 className="font-serif text-xl font-bold text-cream-light group-hover:text-amber-gold transition leading-snug">
-                        {coffee.beanName}
-                      </h4>
-                      <p className="text-xs font-mono text-cream-soft/70 mt-1">
-                        {coffee.origin}
-                      </p>
-                    </div>
-
-                    <p className="text-xs text-cream-soft font-sans leading-relaxed">
-                      {coffee.description}
-                    </p>
-
-                    {/* Tasting Notes Chips */}
-                    <div className="flex flex-wrap gap-1.5">
-                      {coffee.tastingNotes.map((note, i) => (
-                        <span
-                          key={i}
-                          className="px-2.5 py-0.5 rounded-lg bg-white/[0.05] border border-white/10 text-[11px] font-mono text-cream-light"
-                        >
-                          {note}
+              {roaster.coffees.map((coffee) => {
+                const isThisCoffeeScanned = scannedCoffee && scannedCoffee.id === coffee.id;
+                return (
+                  <div
+                    key={coffee.id}
+                    className={`rounded-3xl bg-black/40 border p-6 flex flex-col justify-between gap-6 transition-all duration-300 shadow-xl group hover:shadow-2xl relative overflow-hidden ${
+                      isThisCoffeeScanned
+                        ? 'border-emerald-500/60 ring-2 ring-emerald-500/30 bg-emerald-950/10'
+                        : 'border-white/10 hover:border-amber-gold/50 hover:shadow-amber-gold/5'
+                    }`}
+                  >
+                    {/* Top Badge */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className={`px-2.5 py-1 rounded-full font-mono text-[10px] font-bold border ${
+                          isThisCoffeeScanned
+                            ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/50'
+                            : 'bg-amber-500/20 text-amber-gold border-amber-500/30'
+                        }`}>
+                          {isThisCoffeeScanned ? '✨ Scanned from Your Bag' : `${coffee.badge} • Roaster Spec`}
                         </span>
-                      ))}
+                        <span className="font-mono text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+                          <Award className="w-3.5 h-3.5" />
+                          <span>SCA {coffee.cuppingScore}</span>
+                        </span>
+                      </div>
+
+                      <div>
+                        <h4 className="font-serif text-xl font-bold text-cream-light group-hover:text-amber-gold transition leading-snug">
+                          {coffee.beanName}
+                        </h4>
+                        <p className="text-xs font-mono text-cream-soft/70 mt-1">
+                          {coffee.origin}
+                        </p>
+                      </div>
+
+                      <p className="text-xs text-cream-soft font-sans leading-relaxed">
+                        {coffee.description}
+                      </p>
+
+                      {/* Tasting Notes Chips */}
+                      <div className="flex flex-wrap gap-1.5">
+                        {coffee.tastingNotes.map((note, i) => (
+                          <span
+                            key={i}
+                            className="px-2.5 py-0.5 rounded-lg bg-white/[0.05] border border-white/10 text-[11px] font-mono text-cream-light"
+                          >
+                            {note}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Terroir & Processing Specs */}
+                      <div className="p-3.5 rounded-2xl bg-[#140C08] border border-white/5 space-y-1.5 text-xs font-mono">
+                        <div className="flex justify-between text-cream-soft">
+                          <span>Process:</span>
+                          <span className="text-cream-light font-bold">{coffee.process}</span>
+                        </div>
+                        <div className="flex justify-between text-cream-soft">
+                          <span>Varietal:</span>
+                          <span className="text-cream-light">{coffee.varietal}</span>
+                        </div>
+                        <div className="flex justify-between text-cream-soft">
+                          <span>Elevation:</span>
+                          <span className="text-amber-gold">{coffee.elevation}</span>
+                        </div>
+                      </div>
+
+                      {/* Dial-In Parameters Box */}
+                      <div className="p-4 rounded-2xl bg-amber-500/[0.08] border border-amber-500/25 space-y-2">
+                        <div className="flex items-center justify-between text-[11px] font-mono text-amber-gold font-bold uppercase tracking-wider">
+                          <span>Dial-In Parameters:</span>
+                          <span className="capitalize">{coffee.brewMethod.replace(/_/g, ' ')}</span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
+                          <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                            <span className="text-[10px] text-cream-soft/60 block">Ratio</span>
+                            <strong className="text-cream-light font-bold">1:{coffee.recommendedRatio}</strong>
+                          </div>
+                          <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                            <span className="text-[10px] text-cream-soft/60 block">Water Temp</span>
+                            <strong className="text-amber-gold font-bold">{coffee.tempF}°F</strong>
+                          </div>
+                          <div className="p-2 rounded-xl bg-black/40 border border-white/5">
+                            <span className="text-[10px] text-cream-soft/60 block">Time</span>
+                            <strong className="text-cream-light font-bold">{coffee.brewTime}</strong>
+                          </div>
+                        </div>
+
+                        <div className="text-[11px] font-mono text-cream-soft/80 flex items-center justify-between pt-1">
+                          <span>Grind Setting:</span>
+                          <span className="text-cream-light font-bold">{coffee.recommendedGrind}</span>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Terroir & Processing Specs */}
-                    <div className="p-3.5 rounded-2xl bg-[#140C08] border border-white/5 space-y-1.5 text-xs font-mono">
-                      <div className="flex justify-between text-cream-soft">
-                        <span>Process:</span>
-                        <span className="text-cream-light font-bold">{coffee.process}</span>
-                      </div>
-                      <div className="flex justify-between text-cream-soft">
-                        <span>Varietal:</span>
-                        <span className="text-cream-light">{coffee.varietal}</span>
-                      </div>
-                      <div className="flex justify-between text-cream-soft">
-                        <span>Elevation:</span>
-                        <span className="text-amber-gold">{coffee.elevation}</span>
-                      </div>
-                    </div>
-
-                    {/* Dial-In Parameters Box */}
-                    <div className="p-4 rounded-2xl bg-amber-500/[0.08] border border-amber-500/25 space-y-2">
-                      <div className="flex items-center justify-between text-[11px] font-mono text-amber-gold font-bold uppercase tracking-wider">
-                        <span>Dial-In Parameters:</span>
-                        <span className="capitalize">{coffee.brewMethod.replace(/_/g, ' ')}</span>
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
-                        <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                          <span className="text-[10px] text-cream-soft/60 block">Ratio</span>
-                          <strong className="text-cream-light font-bold">1:{coffee.recommendedRatio}</strong>
-                        </div>
-                        <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                          <span className="text-[10px] text-cream-soft/60 block">Water Temp</span>
-                          <strong className="text-amber-gold font-bold">{coffee.tempF}°F</strong>
-                        </div>
-                        <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                          <span className="text-[10px] text-cream-soft/60 block">Time</span>
-                          <strong className="text-cream-light font-bold">{coffee.brewTime}</strong>
-                        </div>
-                      </div>
-
-                      <div className="text-[11px] font-mono text-cream-soft/80 flex items-center justify-between pt-1">
-                        <span>Grind Setting:</span>
-                        <span className="text-cream-light font-bold">{coffee.recommendedGrind}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions Bar */}
-                  <div className="space-y-2.5 pt-4 border-t border-white/10">
-                    
-                    {/* Primary Dial-In Button */}
-                    <button
-                      onClick={() => {
-                        const payload = {
-                          ...coffee,
-                          roaster: roaster.name
-                        };
-                        if (orchestrator) {
-                          orchestrator.brew(payload);
-                        } else if (onBrewCoffee) {
-                          onBrewCoffee(payload);
-                        }
-                      }}
-                      className="w-full py-3 rounded-xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      <Coffee className="w-4 h-4" />
-                      <span>Dial-In & Brew ({coffee.dryDoseGrams}g : {coffee.waterGrams}g)</span>
-                    </button>
-
-                    <div className="grid grid-cols-3 gap-2">
-                      {/* Smart Bag QR Studio Trigger */}
+                    {/* Customer Actions Bar */}
+                    <div className="space-y-2.5 pt-4 border-t border-white/10">
+                      
+                      {/* Primary Customer Action: Dial-In & Brew */}
                       <button
                         onClick={() => {
                           const payload = {
-                            roaster: roaster.name,
-                            beanName: coffee.beanName,
-                            brewMethod: coffee.brewMethod,
-                            recommendedRatio: coffee.recommendedRatio,
-                            tempF: coffee.tempF,
-                            recommendedGrind: coffee.recommendedGrind,
-                            upc: coffee.upc,
-                            customUrl: coffee.directUrl
+                            ...coffee,
+                            roaster: roaster.name
                           };
                           if (orchestrator) {
-                            orchestrator.package(payload);
-                          } else if (onOpenRoasterPortalWithBean) {
-                            onOpenRoasterPortalWithBean(payload);
+                            orchestrator.brew(payload);
+                          } else if (onBrewCoffee) {
+                            onBrewCoffee(payload);
                           }
                         }}
-                        className="py-2.5 px-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-[11px] font-mono text-cream-light flex items-center justify-center gap-1 transition"
-                        title="Open Roaster Studio to configure packaging QR"
+                        className="w-full py-3 rounded-xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition hover:scale-[1.02] active:scale-[0.98]"
                       >
-                        <QrCode className="w-3.5 h-3.5 text-amber-gold shrink-0" />
-                        <span className="truncate">Studio</span>
+                        <Coffee className="w-4 h-4" />
+                        <span>Dial-In & Brew ({coffee.dryDoseGrams}g : {coffee.waterGrams}g)</span>
                       </button>
 
-                      {/* Direct 300-DPI Sticker Download */}
-                      <button
-                        onClick={() => {
-                          const payload = {
-                            roaster: roaster.name,
-                            beanName: coffee.beanName,
-                            origin: coffee.origin,
-                            process: coffee.process,
-                            elevation: coffee.elevation,
-                            roastLevel: 'Light',
-                            tastingNotes: coffee.tastingNotes,
-                            brewMethod: coffee.brewMethod,
-                            recommendedRatio: coffee.recommendedRatio,
-                            tempF: coffee.tempF,
-                            recommendedGrind: coffee.recommendedGrind,
-                            upc: coffee.upc,
-                            customUrl: coffee.directUrl
-                          };
-                          if (orchestrator) {
-                            orchestrator.downloadSticker(payload);
-                          }
-                        }}
-                        className="py-2.5 px-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-[11px] font-mono text-cream-light flex items-center justify-center gap-1 transition"
-                        title="Download print-ready 300-DPI label sticker directly"
-                      >
-                        <Download className="w-3.5 h-3.5 text-amber-gold shrink-0" />
-                        <span className="truncate">Sticker</span>
-                      </button>
+                      {/* Secondary Customer Actions: Reorder from Roaster & Save to Cellar */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {/* Buy Direct from Roaster */}
+                        <a
+                          href={coffee.directUrl || roaster.shopUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="py-2.5 px-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-mono text-cream-light flex items-center justify-center gap-1.5 transition font-bold"
+                          title="Purchase directly on roaster's website"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5 text-amber-gold shrink-0" />
+                          <span className="truncate">Buy Beans ({coffee.price || '$22.00'})</span>
+                        </a>
 
-                      {/* Buy Direct from Roaster */}
-                      <a
-                        href={coffee.directUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="py-2.5 px-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-[11px] font-mono text-cream-light flex items-center justify-center gap-1 transition"
-                        title="Purchase directly on roaster's website"
-                      >
-                        <span className="truncate">Buy {coffee.price}</span>
-                        <ExternalLink className="w-3 h-3 text-cream-soft shrink-0" />
-                      </a>
+                        {/* Save to Personal Cellar / Journal */}
+                        <button
+                          onClick={() => handleSaveToJournal(coffee)}
+                          className={`py-2.5 px-3 rounded-xl border text-xs font-mono flex items-center justify-center gap-1.5 transition font-bold ${
+                            savedToJournalId === coffee.id
+                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                              : 'bg-white/[0.06] hover:bg-white/[0.12] border-white/10 text-cream-light'
+                          }`}
+                          title="Save this lot to your personal coffee cellar"
+                        >
+                          <Bookmark className={`w-3.5 h-3.5 shrink-0 ${savedToJournalId === coffee.id ? 'text-emerald-400 fill-emerald-400' : 'text-amber-gold'}`} />
+                          <span className="truncate">{savedToJournalId === coffee.id ? 'Saved in Cellar!' : 'Save to Cellar'}</span>
+                        </button>
+                      </div>
+
                     </div>
 
                   </div>
-
-                </div>
-              ))}
+                );
+              })}
             </div>
 
           </div>
