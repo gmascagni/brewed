@@ -159,6 +159,11 @@ export default function RoasterProfilePage({
           
           {/* Brand Metadata Badges */}
           <div className="flex flex-wrap items-center gap-2.5">
+            <span className="px-3 py-1 rounded-full bg-amber-500/25 text-amber-300 font-mono text-xs font-extrabold border border-amber-500/50 flex items-center gap-1.5 shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-amber-gold" />
+              <span>Showcase Demonstration • Example Profile</span>
+            </span>
+
             <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-gold font-mono text-xs font-bold border border-amber-500/30 flex items-center gap-1.5">
               <Store className="w-3.5 h-3.5" />
               <span>Specialty Coffee Roastery</span>
@@ -176,7 +181,7 @@ export default function RoasterProfilePage({
 
             <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30 flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Smart Bag Verified</span>
+              <span>Smart Bag Verified Spec</span>
             </span>
           </div>
 
@@ -188,6 +193,27 @@ export default function RoasterProfilePage({
             <p className="font-serif italic text-lg sm:text-2xl text-amber-gold font-medium">
               "{roaster.tagline}"
             </p>
+          </div>
+
+          {/* Transparent Showcase Demonstration & Partner Example Notice */}
+          <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/40 text-xs font-mono text-cream-soft/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 backdrop-blur-md shadow-lg">
+            <div className="flex items-start sm:items-center gap-2.5">
+              <span className="px-2.5 py-1 rounded-md bg-amber-gold/20 text-amber-gold font-bold text-[10px] uppercase tracking-wider border border-amber-gold/40 shrink-0">
+                Demo / Example Only
+              </span>
+              <span className="leading-relaxed">
+                This profile represents an illustrative partner demonstration of The Brew App Smart Bag catalog. Coffee descriptions and trademarks belong to their respective roasteries.
+              </span>
+            </div>
+            {onOpenRoasterInfo && (
+              <button
+                onClick={onOpenRoasterInfo}
+                className="text-amber-gold hover:underline font-bold text-xs flex items-center gap-1 whitespace-nowrap shrink-0 self-start sm:self-auto"
+              >
+                <span>Are you a roaster? Ingest official labels</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           {/* Quick Stats Grid */}
@@ -310,8 +336,8 @@ export default function RoasterProfilePage({
                 </p>
               </div>
 
-              <span className="px-3 py-1.5 rounded-xl bg-black/60 border border-white/10 text-xs font-mono text-amber-gold shrink-0">
-                100% Barista Verified
+              <span className="px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-xs font-mono text-amber-300 font-bold shrink-0">
+                Showcase Sample Dial-Ins
               </span>
             </div>
 
@@ -325,7 +351,7 @@ export default function RoasterProfilePage({
                   <div className="space-y-4">
                     <div className="flex items-center justify-between gap-2">
                       <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-gold font-mono text-[10px] font-bold border border-amber-500/30">
-                        {coffee.badge}
+                        {coffee.badge} • Showcase Demo
                       </span>
                       <span className="font-mono text-[11px] text-emerald-400 font-bold flex items-center gap-1">
                         <Award className="w-3.5 h-3.5" />

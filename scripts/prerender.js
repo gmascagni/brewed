@@ -484,6 +484,10 @@ const roasterContent = `
       <p style="font-size: 16px; color: #C5A894; max-width: 780px;">Turn every retail coffee bag into an interactive dial-in masterclass. Free barcode and Smart Bag QR technology for specialty roasters.</p>
     </header>
 
+    <div style="background: rgba(212, 140, 70, 0.12); border: 1px solid rgba(212, 140, 70, 0.4); border-radius: 8px; padding: 12px 16px; margin-bottom: 24px; font-size: 13px; color: #D4A373;">
+      <strong>Showcase Demonstration Notice:</strong> Featured roaster profiles illustrate The Brew App Smart Bag & verified catalog integration. Independent roasters can onboard their official retail labels at zero cost.
+    </div>
+
     <section style="margin-bottom: 32px;">
       <h2 style="font-family: Georgia, serif; font-size: 22px; color: #D48C46; margin-bottom: 12px;">Why Partner With The Brew App?</h2>
       <p style="font-size: 14px; color: #E4D5C7;">Specialty coffee roasters spend weeks sourcing and roasting exceptional lots, but home baristas often underextract or overextract the beans using generic ratios. When your labels are registered in our global verified database, scanning your retail bag barcode instantly configures your dialed-in recipe, water temperature, and voice-guided timer.</p>
