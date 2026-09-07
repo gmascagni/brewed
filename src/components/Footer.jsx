@@ -1,8 +1,8 @@
 import React from 'react';
-import { Mail, ExternalLink, Store } from 'lucide-react';
+import { Mail, ExternalLink, Store, Tv } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 
-export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpenRoasterShowcase }) {
+export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpenRoasterShowcase, onOpenVideoAcademy }) {
   const isCoffee = trackMode === 'coffee';
   const emailAddress = 'clay@thebrew.app';
 
@@ -25,6 +25,16 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
 
         {/* Action Group */}
         <div className="flex flex-wrap items-center gap-3">
+          {onOpenVideoAcademy && (
+            <button
+              onClick={onOpenVideoAcademy}
+              className="py-2 px-3.5 rounded-xl bg-red-600/15 hover:bg-red-600/25 text-red-400 hover:text-red-300 border border-red-500/30 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow"
+            >
+              <Tv className="w-3.5 h-3.5" />
+              <span>Coffee Academy</span>
+            </button>
+          )}
+
           {onOpenRoasterShowcase && (
             <button
               onClick={onOpenRoasterShowcase}

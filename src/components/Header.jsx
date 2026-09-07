@@ -1,5 +1,5 @@
 import React from 'react';
-import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin, Newspaper, ScanLine, FlaskConical, Volume2, VolumeX, Store } from 'lucide-react';
+import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin, Newspaper, ScanLine, FlaskConical, Volume2, VolumeX, Store, Tv } from 'lucide-react';
 
 export default function Header({ 
   trackMode, 
@@ -15,6 +15,7 @@ export default function Header({
   onOpenRoasterPortal,
   onOpenRoasterInfo,
   onOpenRoasterShowcase,
+  onOpenVideoAcademy,
   isMuted = false,
   onToggleMute,
   currentUser 
@@ -187,6 +188,22 @@ export default function Header({
             >
               <FlaskConical className="w-4 h-4 text-cyan-400" />
               <span className="hidden lg:inline">Water Lab</span>
+            </button>
+          )}
+
+          {/* Coffee Academy & Video Hub Trigger */}
+          {onOpenVideoAcademy && (
+            <button
+              onClick={onOpenVideoAcademy}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
+                isCoffee
+                  ? 'bg-[#2A1C12]/50 border-red-500/40 text-red-300 hover:bg-[#38261A]/60'
+                  : 'bg-emerald-950/50 border-red-500/40 text-red-300 hover:bg-emerald-900/60'
+              }`}
+              title="Open Coffee Academy & Video Masterclasses"
+            >
+              <Tv className="w-4 h-4 text-red-400" />
+              <span className="hidden lg:inline">Academy</span>
             </button>
           )}
 

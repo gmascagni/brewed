@@ -24,6 +24,7 @@ import WaterChemistryModal from './components/WaterChemistryModal';
 import RoasterPortalModal from './components/RoasterPortalModal';
 import RoasterInfoPage from './components/RoasterInfoPage';
 import RoasterProfilePage from './components/RoasterProfilePage';
+import CoffeeVideoAcademyModal from './components/CoffeeVideoAcademyModal';
 import Footer from './components/Footer';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
@@ -106,6 +107,29 @@ export default function App() {
   const [roasterPrefillBean, setRoasterPrefillBean] = useState(null);
   const [isRoasterShowcaseView, setIsRoasterShowcaseView] = useState(false);
   const [selectedRoasterSlug, setSelectedRoasterSlug] = useState('methodical');
+  const [isVideoAcademyOpen, setIsVideoAcademyOpen] = useState(false);
+  const [selectedAcademyVideoId, setSelectedAcademyVideoId] = useState(null);
+
+  // Handler for Brew Along With Video Action
+  const handleBrewWithVideo = (video) => {
+    if (!video || !video.recipeSync) return;
+    const { methodId, ratio, waterTempF } = video.recipeSync;
+    const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+    const targetMethod = allMethods.find(m => m.id === methodId) || allMethods[0];
+    setActiveMethod(targetMethod);
+    if (ratio) {
+      setCustomRatio(ratio);
+    }
+    setTrackMode('coffee');
+    setIsVideoAcademyOpen(false);
+    setCurrentStep(4); // Advance straight to the active guided timer so user brews along
+    navigate(`/methods/${targetMethod.id}`);
+    setTimeout(() => {
+      const timerEl = document.getElementById('step-4') || document.querySelector('main');
+      if (timerEl) timerEl.scrollIntoView({ behavior: 'smooth' });
+    }, 150);
+    trackEvent('brew_with_video_applied', { video_id: video.id, method_id: targetMethod.id, ratio });
+  };
 
   // Handlers for Scanned Bean Actions
   const handleApplyScannedRecipe = (scannedBean) => {
@@ -233,10 +257,22 @@ export default function App() {
         'Explore verified specialty coffee roasters, authentic origin stories, and certified dial-in recipes with golden ratios, grind sizes, and water chemistry.',
         'https://thebrew.app/roasters'
       );
+    } else if (path.startsWith('/academy') || path.startsWith('/videos')) {
+      setIsVideoAcademyOpen(true);
+      updatePageSeo(
+        'Coffee Academy & Video Masterclasses | The Brew App',
+        'Watch curated 4K specialty coffee tutorials, roaster origins, water science, and dial-in masterclasses with synchronized brew timers.',
+        'https://thebrew.app/academy'
+      );
     } else if (path === '/' || path === '') {
       setIsRoasterShowcaseView(false);
-      // Check for Smart Bag deep link query parameters: ?roaster=...&bean=...&method=...&ratio=...
+      // Check for Smart Bag deep link query parameters or video parameter:
       const searchParams = new URLSearchParams(location.search);
+      const videoParam = searchParams.get('video');
+      if (videoParam) {
+        setSelectedAcademyVideoId(videoParam);
+        setIsVideoAcademyOpen(true);
+      }
       const roasterParam = searchParams.get('roaster');
       const beanParam = searchParams.get('bean');
       if (roasterParam || beanParam) {
@@ -356,6 +392,7 @@ export default function App() {
             setIsRoasterShowcaseView(true);
             navigate('/roasters');
           }}
+          onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
           isMuted={isMuted}
           onToggleMute={() => setIsMuted(!isMuted)}
           currentUser={currentUser}
@@ -650,6 +687,17 @@ export default function App() {
             onClose={() => setIsWaterLabOpen(false)}
           />
 
+          {/* YouTube-Powered Coffee Video Academy & Masterclass Hub */}
+          <CoffeeVideoAcademyModal
+            isOpen={isVideoAcademyOpen}
+            onClose={() => {
+              setIsVideoAcademyOpen(false);
+              setSelectedAcademyVideoId(null);
+            }}
+            onBrewWithVideo={handleBrewWithVideo}
+            initialVideoId={selectedAcademyVideoId}
+          />
+
         </main>
 
         {/* Contact HQ Email & App Footer */}
@@ -660,6 +708,7 @@ export default function App() {
             setIsRoasterShowcaseView(true);
             navigate('/roasters');
           }}
+          onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
         />
 
       </div>
