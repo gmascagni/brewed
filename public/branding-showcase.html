@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Brew App — Brand Logo Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Playfair+Display:wght@700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0B0D10;
+      --card: #13161C;
+      --card-border: rgba(212, 163, 115, 0.2);
+      --gold: #D4A373;
+      --gold-bright: #F7EBE1;
+      --text: #F1F5F9;
+      --text-muted: #94A3B8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(212, 163, 115, 0.1);
+      border: 1px solid rgba(212, 163, 115, 0.3);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 40px;
+      font-weight: 700;
+      color: #FFF;
+      margin-bottom: 12px;
+    }
+    p.subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 650px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+    }
+    .concept-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 32px -8px rgba(0,0,0,0.5);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .concept-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(212, 163, 115, 0.6);
+      box-shadow: 0 24px 48px -12px rgba(212, 163, 115, 0.2);
+    }
+    .image-container {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+    .image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .concept-card:hover .image-container img {
+      transform: scale(1.03);
+    }
+    .card-body {
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .concept-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .concept-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #FFF;
+      margin-bottom: 10px;
+    }
+    .concept-desc {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+    .concept-tag {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .preview-bar {
+      margin-top: 48px;
+      background: #14110E;
+      border: 1px solid rgba(212,163,115,0.3);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .back-btn {
+      background: var(--gold);
+      color: #0B0D10;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      display: inline-block;
+      transition: opacity 0.2s;
+    }
+    .back-btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">Brand Identity Exploration</div>
+      <h1>The Brew App Brand Logos</h1>
+      <p class="subtitle">Select your favorite direction for the official logo, app icon, header branding, and roaster packaging seals.</p>
+    </header>
+
+    <div class="grid">
+      <!-- Concept 1 -->
+      <div class="concept-card">
+        <div class="image-container">
+          <img src="/images/branding/logo_1_golden_ratio.jpg" alt="The Golden Ratio Dripper">
+        </div>
+        <div class="card-body">
+          <div class="concept-number">Concept 01</div>
+          <div class="concept-title">The Golden Ratio Dripper</div>
+          <div class="concept-desc">Conical pour-over dripper silhouette crowned with the concentric logarithmic spiral of the Golden Ratio. Represents extraction science, mathematical perfection, and third-wave barista craft.</div>
+          <div class="concept-tag">★ Sacred Geometry & Science</div>
+        </div>
+      </div>
+
+      <!-- Concept 2 -->
+      <div class="concept-card">
+        <div class="image-container">
+          <img src="/images/branding/logo_2_alchemy_harmony.jpg" alt="The Alchemy Harmony">
+        </div>
+        <div class="card-body">
+          <div class="concept-number">Concept 02</div>
+          <div class="concept-title">The Alchemy Harmony</div>
+          <div class="concept-desc">Circular yin-yang medallion with organic flow: amber coffee droplet uniting with a sage botanical tea leaf. Bridges The Brew App's dual-engine system (coffee extraction & tea gongfu ceremony).</div>
+          <div class="concept-tag">★ Dual Coffee + Tea Harmony</div>
+        </div>
+      </div>
+
+      <!-- Concept 3 -->
+      <div class="concept-card">
+        <div class="image-container">
+          <img src="/images/branding/logo_3_chrono_precision.jpg" alt="The Chrono-Precision Dial">
+        </div>
+        <div class="card-body">
+          <div class="concept-number">Concept 03</div>
+          <div class="concept-title">The Chrono-Precision Dial</div>
+          <div class="concept-desc">Chronograph stopwatch face with fine radial second tick marks, intersected by a gooseneck kettle spout and single extraction drop. Highlights the app's signature multi-phase timer.</div>
+          <div class="concept-tag">★ Multi-Phase Timer & Lab Station</div>
+        </div>
+      </div>
+
+      <!-- Concept 4 -->
+      <div class="concept-card">
+        <div class="image-container">
+          <img src="/images/branding/logo_4_signature_monogram.jpg" alt="The Signature 'B' Monogram">
+        </div>
+        <div class="card-body">
+          <div class="concept-number">Concept 04</div>
+          <div class="concept-title">The Signature 'B' Monogram</div>
+          <div class="concept-desc">Bold architectural letter "B" formed by a golden coffee bean, steam curves, and cup base. Supreme versatility for mobile app icons (iOS/Android), 16px favicons, and packaging stickers.</div>
+          <div class="concept-tag">★ App Icon & Favicon Winner</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-bar">
+      <div>
+        <h3 style="color: #FFF; font-size: 16px; margin-bottom: 4px;">Ready to select a direction?</h3>
+        <p style="color: var(--text-muted); font-size: 13px;">Tell Clay or the assistant which number you prefer, and we'll convert it into an SVG vector and push it live to the app header and favicon.</p>
+      </div>
+      <a href="/" class="back-btn">Open The Brew App →</a>
+    </div>
+  </div>
+</body>
+</html>

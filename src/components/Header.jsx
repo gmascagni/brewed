@@ -1,5 +1,6 @@
 import React from 'react';
 import { Coffee, Leaf, BookOpen, Search, User, Users, MapPin, Newspaper, ScanLine, FlaskConical, Volume2, VolumeX, Store, Tv } from 'lucide-react';
+import BrandLogo from './BrandLogo';
 
 export default function Header({ 
   trackMode, 
@@ -10,7 +11,7 @@ export default function Header({
   onOpenCommunity, 
   onOpenLocalCoffee, 
   onOpenAuth, 
-  onOpenScanner,
+  onOpenScanner, 
   onOpenWaterLab,
   onOpenRoasterPortal,
   onOpenRoasterInfo,
@@ -28,12 +29,12 @@ export default function Header({
         
         {/* Logo & Brand Title */}
         <div className="flex items-center space-x-3">
-          <div className={`p-2.5 rounded-2xl transition-all duration-500 ${
+          <div className={`p-1.5 rounded-2xl transition-all duration-500 flex items-center justify-center ${
             isCoffee 
-              ? 'bg-[#A66E38]/25 text-[#D2A06E] border border-[#A66E38]/40 shadow-[0_0_20px_rgba(166,110,56,0.3)]' 
-              : 'bg-sage-500/25 text-sage-300 border border-sage-500/40 shadow-[0_0_20px_rgba(94,150,106,0.3)]'
+              ? 'bg-[#A66E38]/20 border border-[#A66E38]/40 shadow-[0_0_20px_rgba(166,110,56,0.35)]' 
+              : 'bg-sage-500/20 border border-sage-500/40 shadow-[0_0_20px_rgba(94,150,106,0.35)]'
           }`}>
-            {isCoffee ? <Coffee className="w-5 h-5 animate-pulse" /> : <Leaf className="w-5 h-5 animate-pulse" />}
+            <BrandLogo size={36} />
           </div>
           <div>
             <h1 className="font-serif text-xl font-bold tracking-wider text-cream-light flex items-center gap-2">

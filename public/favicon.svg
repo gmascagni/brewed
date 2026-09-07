@@ -1,30 +1,106 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
   <defs>
-    <linearGradient id="cupGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#E6AB65" />
-      <stop offset="100%" stop-color="#D48C46" />
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1A1410" />
+      <stop offset="100%" stop-color="#0B0907" />
+    </radialGradient>
+
+    <!-- Rich Coffee Amber-Gold Gradient -->
+    <linearGradient id="coffeeGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5DCB7" />
+      <stop offset="35%" stop-color="#D4A373" />
+      <stop offset="100%" stop-color="#8F5422" />
     </linearGradient>
-    <linearGradient id="steamGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stop-color="#D48C46" stop-opacity="0.2" />
-      <stop offset="50%" stop-color="#F7EBE1" stop-opacity="0.9" />
-      <stop offset="100%" stop-color="#F7EBE1" stop-opacity="0" />
+
+    <!-- Fresh Sage / Botanical Green Gradient -->
+    <linearGradient id="teaSage" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C2E2CC" />
+      <stop offset="45%" stop-color="#7EA98E" />
+      <stop offset="100%" stop-color="#365C45" />
     </linearGradient>
+
+    <!-- Deep Roast Drop Interior Gradient -->
+    <linearGradient id="beanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D190D" />
+      <stop offset="100%" stop-color="#100703" />
+    </linearGradient>
+
+    <!-- Outer Gold Bezel Rim Gradient -->
+    <linearGradient id="goldBezel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCEFD8" />
+      <stop offset="50%" stop-color="#D4A373" />
+      <stop offset="100%" stop-color="#9A622A" />
+    </linearGradient>
+
+    <!-- Ambient Shadow Filter -->
+    <filter id="alchemyGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#D4A373" flood-opacity="0.35" />
+    </filter>
   </defs>
 
-  <!-- Background Icon Badge -->
-  <rect width="64" height="64" rx="16" fill="#120E0C" />
-  <rect width="60" height="60" x="2" y="2" rx="14" fill="none" stroke="#D48C46" stroke-width="1.5" stroke-opacity="0.4" />
+  <!-- Dark Obsidian Container Badge -->
+  <rect width="100" height="100" rx="24" fill="url(#bgGrad)" />
+  <rect width="94" height="94" x="3" y="3" rx="21" fill="none" stroke="url(#goldBezel)" stroke-width="1.2" stroke-opacity="0.35" />
 
-  <!-- Rising Steam Waves -->
-  <path d="M 22 24 C 20 18, 26 14, 24 8" fill="none" stroke="url(#steamGrad)" stroke-width="3" stroke-linecap="round" />
-  <path d="M 32 22 C 30 16, 36 12, 34 6" fill="none" stroke="url(#steamGrad)" stroke-width="3.5" stroke-linecap="round" />
-  <path d="M 42 24 C 40 18, 46 14, 44 8" fill="none" stroke="url(#steamGrad)" stroke-width="3" stroke-linecap="round" />
+  <!-- Yin-Yang Harmony Medallion -->
+  <g filter="url(#alchemyGlow)">
+    <!-- Base Circular Disk -->
+    <circle cx="50" cy="50" r="38" fill="#120E0A" stroke="url(#goldBezel)" stroke-width="1.5" />
 
-  <!-- Steaming Cup Body & Handle -->
-  <!-- Cup Handle -->
-  <path d="M 44 32 C 52 32, 52 44, 44 44" fill="none" stroke="url(#cupGrad)" stroke-width="4" stroke-linecap="round" />
-  <!-- Cup Base & Body -->
-  <path d="M 16 28 L 44 28 L 40 46 C 39 49, 36 51, 30 51 C 24 51, 21 49, 20 46 Z" fill="url(#cupGrad)" />
-  <!-- Saucer Base -->
-  <path d="M 12 55 L 48 55" fill="none" stroke="url(#cupGrad)" stroke-width="3.5" stroke-linecap="round" />
+    <!-- Coffee Half (Left Amber-Gold Hemisphere with S-Curve) -->
+    <path d="M 50,12 
+             A 38,38 0 0,0 50,88 
+             A 19,19 0 0,1 50,50 
+             A 19,19 0 0,0 50,12 Z" 
+          fill="url(#coffeeGold)" />
+
+    <!-- Tea Half (Right Sage-Green Hemisphere with S-Curve) -->
+    <path d="M 50,12 
+             A 38,38 0 0,1 50,88 
+             A 19,19 0 0,1 50,50 
+             A 19,19 0 0,0 50,12 Z" 
+          fill="url(#teaSage)" />
+
+    <!-- Coffee Droplet / Bean in Upper Half (Center: ~ 50, 31) -->
+    <path d="M 50 21
+             C 54.5 26.5, 57 31, 55.5 35
+             C 54 39, 46 39, 44.5 35
+             C 43 31, 45.5 26.5, 50 21 Z" 
+          fill="url(#beanGrad)" 
+          stroke="#D4A373" 
+          stroke-width="0.9" />
+    
+    <!-- Bean Center Crease / Golden Glint -->
+    <path d="M 50 25 Q 48 30.5, 51.5 35.5" 
+          fill="none" 
+          stroke="#F5DCB7" 
+          stroke-width="0.9" 
+          stroke-linecap="round" 
+          opacity="0.85" />
+
+    <!-- Botanical Tea Leaf Veins in Lower Sage Half (Center: ~ 50, 69) -->
+    <path d="M 50 57 L 50 80" 
+          stroke="#1E3826" 
+          stroke-width="1.8" 
+          stroke-linecap="round" />
+    <path d="M 50 63 Q 56.5 60.5, 59.5 58.5" 
+          stroke="#1E3826" 
+          stroke-width="1.4" 
+          stroke-linecap="round" 
+          fill="none" />
+    <path d="M 50 69 Q 43.5 66.5, 40.5 65.5" 
+          stroke="#1E3826" 
+          stroke-width="1.4" 
+          stroke-linecap="round" 
+          fill="none" />
+    <path d="M 50 74.5 Q 55.5 72.5, 58 71.5" 
+          stroke="#1E3826" 
+          stroke-width="1.2" 
+          stroke-linecap="round" 
+          fill="none" />
+
+    <!-- Outer Fine Gold Ring Accent -->
+    <circle cx="50" cy="50" r="38" fill="none" stroke="url(#goldBezel)" stroke-width="1.5" stroke-opacity="0.8" />
+  </g>
 </svg>
