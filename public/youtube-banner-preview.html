@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TheBrew.App — YouTube Channel Banners</title>
+  <title>TheBrew.App — YouTube Banner Safe Zone Alignment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Playfair+Display:wght@700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
     }
     header {
       text-align: center;
-      margin-bottom: 48px;
+      margin-bottom: 40px;
     }
     .badge {
       display: inline-block;
@@ -30,16 +30,16 @@
       font-size: 11px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: #D4A373;
-      background: rgba(212, 163, 115, 0.1);
-      border: 1px solid rgba(212, 163, 115, 0.3);
+      color: #38BDF8;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       padding: 6px 16px;
       border-radius: 9999px;
       margin-bottom: 16px;
     }
     h1 {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 40px;
+      font-size: 38px;
       font-weight: 700;
       color: #FFFFFF;
       margin-bottom: 10px;
@@ -47,25 +47,25 @@
     p.subtitle {
       color: #94A3B8;
       font-size: 15px;
-      max-width: 680px;
+      max-width: 720px;
       margin: 0 auto 32px auto;
       line-height: 1.6;
     }
-    .banner-section {
+    .banner-card {
       background: #14110E;
-      border: 1px solid rgba(212, 163, 115, 0.25);
+      border: 2px solid #D4A373;
       border-radius: 24px;
       padding: 32px;
       margin-bottom: 40px;
-      box-shadow: 0 20px 50px -10px rgba(0,0,0,0.6);
+      box-shadow: 0 25px 60px -15px rgba(212, 163, 115, 0.25);
     }
-    .banner-header {
+    .card-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 16px;
     }
     .banner-title {
       font-size: 22px;
@@ -75,20 +75,25 @@
       align-items: center;
       gap: 10px;
     }
-    .banner-desc {
-      font-size: 13.5px;
-      color: #94A3B8;
-      margin-top: 4px;
+    .tag-green {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34D399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
     }
-    .banner-preview-wrapper {
+    .banner-viewport {
       position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
       border-radius: 16px;
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.1);
       background: #000;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.7);
     }
     .banner-img {
       width: 100%;
@@ -96,126 +101,129 @@
       object-fit: cover;
       display: block;
     }
-    .actions {
-      margin-top: 20px;
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
     .btn {
       background: #D4A373;
       color: #0B0D10;
-      font-weight: 700;
+      font-weight: 800;
       text-decoration: none;
-      padding: 12px 24px;
+      padding: 14px 28px;
       border-radius: 12px;
-      font-size: 13.5px;
+      font-size: 14px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      transition: opacity 0.2s;
+      box-shadow: 0 6px 16px rgba(212,163,115,0.3);
+      transition: opacity 0.2s, transform 0.2s;
     }
-    .btn:hover { opacity: 0.9; }
-    .btn-secondary {
+    .btn:hover { opacity: 0.92; transform: translateY(-2px); }
+    .toggle-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .toggle-btn {
       background: rgba(255,255,255,0.06);
-      color: #FFF;
+      color: #CBD5E1;
       border: 1px solid rgba(255,255,255,0.15);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .spec-box {
-      background: #0E0B08;
-      border: 1px solid rgba(212,163,115,0.3);
-      border-radius: 16px;
-      padding: 24px;
-      margin-top: 40px;
+    .toggle-btn.active {
+      background: #38BDF8;
+      color: #0B0D10;
+      font-weight: 700;
+      border-color: #38BDF8;
     }
-    .spec-grid {
+    .guide-box {
+      margin-top: 24px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
-      margin-top: 16px;
       font-size: 13px;
     }
-    .spec-item {
-      background: rgba(255,255,255,0.03);
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-    .spec-label {
-      color: #94A3B8;
-      font-size: 11px;
-      text-transform: uppercase;
-      font-family: 'JetBrains Mono', monospace;
+    .guide-item strong {
+      color: #38BDF8;
+      display: block;
       margin-bottom: 4px;
-    }
-    .spec-val {
-      font-weight: 700;
-      color: #D4A373;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <div class="badge">YouTube Channel Assets</div>
-      <h1>TheBrew.App Channel Banners</h1>
-      <p class="subtitle">16:9 4K resolution banners designed specifically for YouTube TV, Desktop, and Mobile safe-zones with the official Alchemy Harmony emblem.</p>
+      <div class="badge">Fixed & Verified for YouTube</div>
+      <h1>YouTube Banner Safe-Zone Fix</h1>
+      <p class="subtitle">The banner has been redesigned with the logo and "TheBrew.App" text placed inside the 1546×423 px safe-zone box so nothing gets cut off on mobile, tablet, or desktop.</p>
     </header>
 
-    <!-- Banner 1 -->
-    <div class="banner-section">
-      <div class="banner-header">
+    <div class="banner-card">
+      <div class="card-top">
         <div>
-          <h2 class="banner-title">Option 1: The Barista Sanctuary (Cinematic Workstation)</h2>
-          <p class="banner-desc">Features a moody dark walnut coffee bar with a matte black kettle, brewing V60 pour over with steam, and ceremonial tea gaiwan flanking the centered gold medallion.</p>
+          <div class="banner-title">
+            <span>TheBrew.App Master YouTube Banner (2560 × 1440)</span>
+            <span class="tag-green">✓ Safe-Zone Verified</span>
+          </div>
+          <p style="color: #94A3B8; font-size: 13.5px; margin-top: 6px;">Both the Alchemy Harmony medallion and the bold gold "TheBrew.App" wordmark sit with 88px vertical padding inside the "Viewable on all devices" crop box.</p>
         </div>
-        <a href="/images/branding/youtube_banner_cinematic.jpg" download="TheBrewApp_YouTube_Banner_Cinematic.jpg" class="btn">
-          ⬇ Download 16:9 Banner
-        </a>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <div class="toggle-group">
+            <button class="toggle-btn active" id="btn-clean" onclick="showClean()">Clean Banner</button>
+            <button class="toggle-btn" id="btn-overlay" onclick="showOverlay()">YouTube Crop Overlay</button>
+          </div>
+          <a href="/images/branding/youtube_banner_safezone_2560x1440.jpg" download="TheBrewApp_YouTube_Banner_2560x1440.jpg" class="btn">
+            ⬇ Download 2560×1440 Banner
+          </a>
+        </div>
       </div>
-      <div class="banner-preview-wrapper">
-        <img src="/images/branding/youtube_banner_cinematic.jpg" alt="Cinematic YouTube Channel Banner" class="banner-img">
-      </div>
-    </div>
 
-    <!-- Banner 2 -->
-    <div class="banner-section">
-      <div class="banner-header">
-        <div>
-          <h2 class="banner-title">Option 2: The Minimalist Obsidian & Gold Monolith</h2>
-          <p class="banner-desc">High-contrast geometric presentation with ambient radial water ripples, golden ratio spiral vectors, and clean typography centered in the mobile safe zone.</p>
-        </div>
-        <a href="/images/branding/youtube_banner_minimal.jpg" download="TheBrewApp_YouTube_Banner_Minimal.jpg" class="btn">
-          ⬇ Download 16:9 Banner
-        </a>
+      <div class="banner-viewport">
+        <img id="banner-display" src="/images/branding/youtube_banner_safezone_2560x1440.jpg" alt="TheBrew.App YouTube Banner" class="banner-img">
       </div>
-      <div class="banner-preview-wrapper">
-        <img src="/images/branding/youtube_banner_minimal.jpg" alt="Minimalist YouTube Channel Banner" class="banner-img">
-      </div>
-    </div>
 
-    <!-- Spec box -->
-    <div class="spec-box">
-      <h3 style="color: #FFF; font-size: 16px;">YouTube Banner Technical Specifications</h3>
-      <div class="spec-grid">
-        <div class="spec-item">
-          <div class="spec-label">Aspect Ratio</div>
-          <div class="spec-val">16:9 (Widescreen)</div>
+      <div class="guide-box">
+        <div class="guide-item">
+          <strong>TV Display (Full Image)</strong>
+          <span>Full 2560×1440 view showing warm walnut bar, soft steam, and dark slate counter.</span>
         </div>
-        <div class="spec-item">
-          <div class="spec-label">Recommended Resolution</div>
-          <div class="spec-val">2560 × 1440 px</div>
+        <div class="guide-item">
+          <strong>Desktop Banner Strip</strong>
+          <span>Full-width 2560×423 strip showing kettle, centered medallion, text, and glass V60 server.</span>
         </div>
-        <div class="spec-item">
-          <div class="spec-label">Safe Zone</div>
-          <div class="spec-val">Centered 1546 × 423 px</div>
-        </div>
-        <div class="spec-item">
-          <div class="spec-label">Supported Formats</div>
-          <div class="spec-val">JPG / PNG (&lt; 6 MB)</div>
+        <div class="guide-item">
+          <strong>Mobile & Tablet Safe Area</strong>
+          <span>Centered 1546×423 box framing the medallion and "TheBrew.App" with 137px side margins.</span>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    const cleanSrc = '/images/branding/youtube_banner_safezone_2560x1440.jpg';
+    const overlaySrc = '/images/branding/youtube_banner_overlay_verification.jpg';
+    const bannerImg = document.getElementById('banner-display');
+    const btnClean = document.getElementById('btn-clean');
+    const btnOverlay = document.getElementById('btn-overlay');
+
+    function showClean() {
+      bannerImg.src = cleanSrc;
+      btnClean.classList.add('active');
+      btnOverlay.classList.remove('active');
+    }
+
+    function showOverlay() {
+      bannerImg.src = overlaySrc;
+      btnOverlay.classList.add('active');
+      btnClean.classList.remove('active');
+    }
+  </script>
 </body>
 </html>
