@@ -20,6 +20,8 @@ import {
   Loader2,
   Mail
 } from 'lucide-react';
+import { BrowserMultiFormatReader } from '@zxing/browser';
+import jsQR from 'jsqr';
 import { getRegisteredCoffees } from '../data/roasterRegistry';
 
 // Verified catalog of real specialty coffee roasters, beans, and extraction parameters
@@ -150,6 +152,10 @@ export default function BarcodeScannerModal({
   const [isScanning, setIsScanning] = useState(false);
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [uncatalogedResult, setUncatalogedResult] = useState(null);
+  const [capturedSnapshot, setCapturedSnapshot] = useState(null);
+  const [isSnapshotScanning, setIsSnapshotScanning] = useState(false);
+  const [shutterFlash, setShutterFlash] = useState(false);
+  const [scanNotice, setScanNotice] = useState(null);
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -165,6 +171,10 @@ export default function BarcodeScannerModal({
       setMatchedBean(null);
       setUncatalogedResult(null);
       setManualCode('');
+      setCapturedSnapshot(null);
+      setIsSnapshotScanning(false);
+      setScanNotice(null);
+      setShutterFlash(false);
     }
     return () => stopCamera();
   }, [isOpen]);
@@ -208,29 +218,150 @@ export default function BarcodeScannerModal({
     setCameraActive(false);
   };
 
-  // Real-time Barcode & QR Code Scanning Loop
+  // Real-time Barcode & QR Code Scanning Loop (cross-browser compatible)
   const startScanLoop = () => {
     if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
 
-    scanIntervalRef.current = setInterval(async () => {
-      if (!videoRef.current || videoRef.current.readyState < 2) return;
+    let isTickBusy = false;
+    const codeReader = new BrowserMultiFormatReader();
 
-      // 1. Native BarcodeDetector API (Chrome, Edge, Safari Technology Preview, Android)
-      if ('BarcodeDetector' in window) {
+    scanIntervalRef.current = setInterval(async () => {
+      if (!videoRef.current || videoRef.current.readyState < 2 || isTickBusy) return;
+
+      isTickBusy = true;
+      try {
+        // 1. Native BarcodeDetector API (Chrome, Edge, Safari Technology Preview, Android)
+        if ('BarcodeDetector' in window) {
+          try {
+            const barcodeDetector = new window.BarcodeDetector({
+              formats: ['qr_code', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39']
+            });
+            const barcodes = await barcodeDetector.detect(videoRef.current);
+            if (barcodes && barcodes.length > 0) {
+              const codeVal = barcodes[0].rawValue;
+              handleCodeDetected(codeVal, barcodes[0].format);
+              isTickBusy = false;
+              return;
+            }
+          } catch (e) {
+            // Fall through to ZXing
+          }
+        }
+
+        // 2. ZXing BrowserMultiFormatReader for browsers without native BarcodeDetector (Firefox, desktop Safari, standard Chrome Windows)
+        try {
+          const zResult = await codeReader.decodeFromVideoElement(videoRef.current);
+          if (zResult && zResult.getText()) {
+            handleCodeDetected(zResult.getText(), zResult.getBarcodeFormat ? zResult.getBarcodeFormat().toString() : 'barcode');
+            isTickBusy = false;
+            return;
+          }
+        } catch (zErr) {
+          // Normal when no barcode in current video frame
+        }
+      } catch (e) {
+        // Suppress continuous tick errors
+      } finally {
+        isTickBusy = false;
+      }
+    }, 700);
+  };
+
+  // High-Resolution Snapshot Capture and Barcode Decoding
+  const captureSnapshotAndScan = async () => {
+    if (!videoRef.current || videoRef.current.readyState < 2) {
+      setScanNotice({
+        type: 'warning',
+        message: 'Camera video is not ready yet. Please wait a moment.'
+      });
+      return;
+    }
+
+    // Trigger physical shutter flash effect
+    setShutterFlash(true);
+    setTimeout(() => setShutterFlash(false), 180);
+
+    try {
+      const video = videoRef.current;
+      const width = video.videoWidth || 1280;
+      const height = video.videoHeight || 720;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, width, height);
+
+      const snapshotUrl = canvas.toDataURL('image/jpeg', 0.9);
+      setCapturedSnapshot(snapshotUrl);
+      setIsSnapshotScanning(true);
+      setScanNotice(null);
+
+      let detectedText = null;
+      let detectedFormat = 'code';
+
+      // Method 1: ZXing Multi-Format Reader
+      try {
+        const codeReader = new BrowserMultiFormatReader();
+        const zResult = await codeReader.decodeFromCanvas(canvas);
+        if (zResult && zResult.getText()) {
+          detectedText = zResult.getText();
+          detectedFormat = zResult.getBarcodeFormat ? zResult.getBarcodeFormat().toString() : 'barcode';
+        }
+      } catch (err) {
+        // Continue to method 2
+      }
+
+      // Method 2: Native BarcodeDetector (if supported)
+      if (!detectedText && 'BarcodeDetector' in window) {
         try {
           const barcodeDetector = new window.BarcodeDetector({
             formats: ['qr_code', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39']
           });
-          const barcodes = await barcodeDetector.detect(videoRef.current);
+          const barcodes = await barcodeDetector.detect(canvas);
           if (barcodes && barcodes.length > 0) {
-            const codeVal = barcodes[0].rawValue;
-            handleCodeDetected(codeVal, barcodes[0].format);
+            detectedText = barcodes[0].rawValue;
+            detectedFormat = barcodes[0].format;
           }
-        } catch (e) {
-          // Fall through to canvas snapshot if BarcodeDetector errors
-        }
+        } catch (err) {}
       }
-    }, 450);
+
+      // Method 3: Fast Dedicated jsQR Decoder
+      if (!detectedText) {
+        try {
+          const imgData = ctx.getImageData(0, 0, width, height);
+          const qrCode = jsQR(imgData.data, width, height);
+          if (qrCode && qrCode.data) {
+            detectedText = qrCode.data;
+            detectedFormat = 'qr_code';
+          }
+        } catch (err) {}
+      }
+
+      setIsSnapshotScanning(false);
+
+      if (detectedText) {
+        handleCodeDetected(detectedText, detectedFormat);
+      } else {
+        setScanNotice({
+          type: 'no_code_found',
+          message: 'Snapshot captured, but no clear barcode or QR code was detected in this angle.'
+        });
+      }
+    } catch (err) {
+      console.warn('Error during snapshot capture & scan:', err);
+      setIsSnapshotScanning(false);
+      setScanNotice({
+        type: 'error',
+        message: 'Could not capture snapshot frame from camera. Please try again.'
+      });
+    }
+  };
+
+  const handleRetakeSnapshot = () => {
+    setCapturedSnapshot(null);
+    setScanNotice(null);
+    setIsSnapshotScanning(false);
   };
 
   const handleCodeDetected = async (rawValue, format = 'code') => {
@@ -347,25 +478,73 @@ export default function BarcodeScannerModal({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const img = new Image();
-    img.onload = async () => {
-      if ('BarcodeDetector' in window) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      setCapturedSnapshot(dataUrl);
+      setIsSnapshotScanning(true);
+      setScanNotice(null);
+
+      const img = new Image();
+      img.onload = async () => {
+        let detectedText = null;
+        let detectedFormat = 'code';
+
+        // 1. ZXing decoding on image element
         try {
-          const barcodeDetector = new window.BarcodeDetector({
-            formats: ['qr_code', 'ean_13', 'ean_8', 'upc_a', 'code_128']
-          });
-          const barcodes = await barcodeDetector.detect(img);
-          if (barcodes && barcodes.length > 0) {
-            handleCodeDetected(barcodes[0].rawValue, barcodes[0].format);
-            return;
+          const codeReader = new BrowserMultiFormatReader();
+          const zResult = await codeReader.decodeFromImageElement(img);
+          if (zResult && zResult.getText()) {
+            detectedText = zResult.getText();
+            detectedFormat = zResult.getBarcodeFormat ? zResult.getBarcodeFormat().toString() : 'barcode';
           }
-        } catch {}
-      }
-      // Demo fallback match for uploaded sample bag images
-      const sample = VERIFIED_BEAN_CATALOG[0];
-      handleCodeDetected(sample.upc, 'upc_a');
+        } catch (err) {}
+
+        // 2. Native BarcodeDetector (if available)
+        if (!detectedText && 'BarcodeDetector' in window) {
+          try {
+            const barcodeDetector = new window.BarcodeDetector({
+              formats: ['qr_code', 'ean_13', 'ean_8', 'upc_a', 'code_128']
+            });
+            const barcodes = await barcodeDetector.detect(img);
+            if (barcodes && barcodes.length > 0) {
+              detectedText = barcodes[0].rawValue;
+              detectedFormat = barcodes[0].format;
+            }
+          } catch (err) {}
+        }
+
+        // 3. Dedicated jsQR via canvas
+        if (!detectedText) {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth || img.width;
+            canvas.height = img.naturalHeight || img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const qrResult = jsQR(imgData.data, canvas.width, canvas.height);
+            if (qrResult && qrResult.data) {
+              detectedText = qrResult.data;
+              detectedFormat = 'qr_code';
+            }
+          } catch (err) {}
+        }
+
+        setIsSnapshotScanning(false);
+
+        if (detectedText) {
+          handleCodeDetected(detectedText, detectedFormat);
+        } else {
+          setScanNotice({
+            type: 'no_code_found',
+            message: 'Uploaded photo analyzed, but no readable barcode or QR code was detected in the image.'
+          });
+        }
+      };
+      img.src = dataUrl;
     };
-    img.src = URL.createObjectURL(file);
+    reader.readAsDataURL(file);
   };
 
   const handleManualSubmit = (e) => {
@@ -436,15 +615,42 @@ export default function BarcodeScannerModal({
           
           {/* Viewfinder Section */}
           <div className="relative rounded-2xl overflow-hidden bg-black border border-white/15 aspect-[4/3] sm:aspect-video flex items-center justify-center shadow-inner">
-            <video
-              ref={videoRef}
-              playsInline
-              muted
-              className={`w-full h-full object-cover transition-opacity duration-300 ${cameraActive ? 'opacity-100' : 'opacity-0'}`}
-            />
+            {/* Live Camera Video */}
+            {!capturedSnapshot && (
+              <video
+                ref={videoRef}
+                playsInline
+                muted
+                className={`w-full h-full object-cover transition-opacity duration-300 ${cameraActive ? 'opacity-100' : 'opacity-0'}`}
+              />
+            )}
 
-            {/* Laser Scan Animation Overlay */}
-            {cameraActive && (
+            {/* Frozen Captured Snapshot View */}
+            {capturedSnapshot && (
+              <div className="relative w-full h-full flex items-center justify-center bg-black">
+                <img
+                  src={capturedSnapshot}
+                  alt="Captured Coffee Bag Snapshot"
+                  className="w-full h-full object-cover"
+                />
+                {isSnapshotScanning && (
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center gap-2 animate-fade-in">
+                    <Loader2 className="w-8 h-8 text-amber-gold animate-spin" />
+                    <span className="text-xs font-mono font-bold text-cream-light bg-black/70 px-3 py-1 rounded-full border border-amber-gold/30">
+                      Analyzing Coffee Bag Snapshot...
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Physical Shutter Flash Animation */}
+            {shutterFlash && (
+              <div className="absolute inset-0 bg-white z-30 pointer-events-none transition-opacity duration-150 opacity-90" />
+            )}
+
+            {/* Laser Scan Animation Overlay (Live Camera Mode) */}
+            {cameraActive && !capturedSnapshot && (
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                 {/* Viewfinder Framing Box */}
                 <div className="relative w-64 h-48 border-2 border-amber-gold/60 rounded-2xl shadow-[0_0_15px_rgba(212,140,70,0.3)]">
@@ -459,8 +665,33 @@ export default function BarcodeScannerModal({
               </div>
             )}
 
+            {/* Prominent Circular Camera Shutter Button (Over Live Camera) */}
+            {cameraActive && !capturedSnapshot && (
+              <div className="absolute bottom-3 sm:bottom-4 inset-x-0 flex flex-col items-center justify-center z-20 pointer-events-auto">
+                <button
+                  type="button"
+                  onClick={captureSnapshotAndScan}
+                  disabled={isSnapshotScanning}
+                  className="group relative flex items-center justify-center w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-black/60 border-4 border-amber-gold shadow-[0_0_25px_rgba(212,140,70,0.6)] backdrop-blur-md hover:scale-110 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-amber-gold/50 cursor-pointer disabled:opacity-50"
+                  title="Snap & Scan Coffee Bag Barcode"
+                  aria-label="Snap photo to scan coffee bag"
+                >
+                  <span className="w-12 h-12 rounded-full bg-amber-gold flex items-center justify-center text-espresso-950 shadow-inner group-hover:bg-amber-300 transition">
+                    {isSnapshotScanning ? (
+                      <Loader2 className="w-6 h-6 animate-spin text-espresso-950" />
+                    ) : (
+                      <Camera className="w-6 h-6 text-espresso-950" />
+                    )}
+                  </span>
+                </button>
+                <div className="mt-1.5 px-3 py-0.5 rounded-full bg-black/80 backdrop-blur text-[11px] font-mono font-bold text-amber-gold shadow border border-amber-gold/40">
+                  {isSnapshotScanning ? 'Scanning Snapshot...' : '📸 Snap & Scan Coffee Bag'}
+                </div>
+              </div>
+            )}
+
             {/* Camera Fallback / Error Display */}
-            {!cameraActive && (
+            {!cameraActive && !capturedSnapshot && (
               <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-3 bg-espresso-950/80">
                 <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-gold">
                   <Camera className="w-6 h-6" />
@@ -483,19 +714,54 @@ export default function BarcodeScannerModal({
             )}
 
             {/* Badge Indicator */}
-            <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur text-[10px] font-mono text-cream-soft border border-white/10 flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${cameraActive ? 'bg-emerald-400 animate-ping' : 'bg-amber-400'}`}></span>
-              <span>{cameraActive ? 'Active Viewfinder' : 'Camera Standby'}</span>
+            <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur text-[10px] font-mono text-cream-soft border border-white/10 flex items-center gap-2 z-10">
+              <span className={`w-2 h-2 rounded-full ${capturedSnapshot ? 'bg-amber-400' : (cameraActive ? 'bg-emerald-400 animate-ping' : 'bg-rose-400')}`}></span>
+              <span>{capturedSnapshot ? 'Captured Snapshot' : (cameraActive ? 'Live Camera Feed' : 'Camera Standby')}</span>
             </div>
+
+            {/* Retake Button Overlay (When Snapshot is Displayed) */}
+            {capturedSnapshot && (
+              <div className="absolute bottom-3 inset-x-0 flex items-center justify-center gap-2 z-20">
+                <button
+                  type="button"
+                  onClick={handleRetakeSnapshot}
+                  className="px-4 py-2 rounded-xl bg-amber-gold text-espresso-950 font-mono font-bold text-xs flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition"
+                >
+                  <RefreshCw className="w-4 h-4 text-espresso-950" />
+                  <span>Retake Photo</span>
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Fallback Controls: File Upload & Preset SKUs */}
+          {/* Action Toolbar: Snap Button, File Upload & Quick Presets */}
           <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-            <label className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light border border-white/10 cursor-pointer transition active:scale-95 font-mono">
-              <Upload className="w-3.5 h-3.5 text-amber-gold" />
-              <span>Upload Bag Photo</span>
-              <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-            </label>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={capturedSnapshot ? handleRetakeSnapshot : captureSnapshotAndScan}
+                disabled={(!cameraActive && !capturedSnapshot) || isSnapshotScanning}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-gold hover:bg-amber-300 text-espresso-950 font-mono font-bold text-xs shadow-lg shadow-amber-gold/20 hover:scale-105 active:scale-95 transition disabled:opacity-50"
+              >
+                {capturedSnapshot ? (
+                  <>
+                    <RefreshCw className="w-4 h-4" />
+                    <span>Retake Photo</span>
+                  </>
+                ) : (
+                  <>
+                    {isSnapshotScanning ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                    <span>{isSnapshotScanning ? 'Analyzing...' : '📸 Snap Photo'}</span>
+                  </>
+                )}
+              </button>
+
+              <label className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light border border-white/10 cursor-pointer transition active:scale-95 font-mono">
+                <Upload className="w-3.5 h-3.5 text-amber-gold" />
+                <span>Upload Bag Photo</span>
+                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+              </label>
+            </div>
 
             {/* Quick Demo SKU Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto py-1">
@@ -520,6 +786,31 @@ export default function BarcodeScannerModal({
               </button>
             </div>
           </div>
+
+          {/* Snapshot Feedback Alert Banner (When no code found in captured snapshot) */}
+          {scanNotice && (
+            <div className="p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-gold shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-bold text-cream-light">
+                    {scanNotice.message}
+                  </p>
+                  <p className="text-[11px] text-cream-soft/70 mt-0.5">
+                    Align the barcode or QR code steadily within the center framing box and snap again, or select a demo bag above.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleRetakeSnapshot}
+                className="shrink-0 px-3.5 py-1.5 rounded-xl bg-white/[0.1] hover:bg-white/[0.18] text-cream-light font-mono text-xs font-bold flex items-center gap-1.5 border border-white/15 transition active:scale-95"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-amber-gold" />
+                <span>Retake Photo</span>
+              </button>
+            </div>
+          )}
 
           {/* Real-time Open Product Lookup Spinner */}
           {isLookingUp && (
