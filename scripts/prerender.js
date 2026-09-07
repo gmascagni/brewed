@@ -544,3 +544,14 @@ fs.writeFileSync(path.join(roasterRootDir, 'index.html'), roasterHtml);
 
 console.log('✓ Successfully prerendered /roasters with Article and FAQPage schemas!');
 
+// Prerender /demo/smart-bag-scanner, /scanner, and /academy
+['demo/smart-bag-scanner', 'scanner', 'scan', 'academy'].forEach((subPath) => {
+  const targetDistDir = path.join(distDir, ...subPath.split('/'));
+  const targetRootDir = path.join(rootDir, ...subPath.split('/'));
+  fs.mkdirSync(targetDistDir, { recursive: true });
+  fs.mkdirSync(targetRootDir, { recursive: true });
+  fs.writeFileSync(path.join(targetDistDir, 'index.html'), templateHtml);
+  fs.writeFileSync(path.join(targetRootDir, 'index.html'), templateHtml);
+});
+console.log('✓ Successfully prerendered /demo/smart-bag-scanner, /scanner, and /academy static routes!');
+

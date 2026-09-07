@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/record_build.js && vite build && node scripts/prerender.js",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:affiliates": "node scripts/check_affiliate_links.mjs",
+    "test:affiliates": "node scripts/check_affiliate_links.mjs"
   },
   "dependencies": {
     "jsbarcode": "^3.12.3",

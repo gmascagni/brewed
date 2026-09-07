@@ -264,6 +264,14 @@ export default function App() {
         'Watch curated 4K specialty coffee tutorials, roaster origins, water science, and dial-in masterclasses with synchronized brew timers.',
         'https://thebrew.app/academy'
       );
+    } else if (path.includes('smart-bag-scanner') || path.startsWith('/demo') || path.startsWith('/scanner') || path.startsWith('/scan')) {
+      setIsRoasterShowcaseView(false);
+      setIsScannerOpen(true);
+      updatePageSeo(
+        'Smart Bag Barcode & QR Scanner Demo | The Brew App',
+        'Scan any specialty coffee bag barcode or Smart Bag QR code to automatically dial in grind size, golden ratios, and water temperature in seconds.',
+        'https://thebrew.app/demo/smart-bag-scanner'
+      );
     } else if (path === '/' || path === '') {
       setIsRoasterShowcaseView(false);
       // Check for Smart Bag deep link query parameters or video parameter:
@@ -275,7 +283,10 @@ export default function App() {
       }
       const roasterParam = searchParams.get('roaster');
       const beanParam = searchParams.get('bean');
-      if (roasterParam || beanParam) {
+      const stepParam = searchParams.get('step');
+      if (stepParam) {
+        setCurrentStep(parseInt(stepParam));
+      } else if (roasterParam || beanParam) {
         const methodParam = searchParams.get('method');
         const ratioParam = parseFloat(searchParams.get('ratio'));
         const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
@@ -648,7 +659,12 @@ export default function App() {
           {/* Native Camera Barcode & QR Scanner Modal */}
           <BarcodeScannerModal
             isOpen={isScannerOpen}
-            onClose={() => setIsScannerOpen(false)}
+            onClose={() => {
+              setIsScannerOpen(false);
+              if (location.pathname.includes('smart-bag-scanner') || location.pathname.startsWith('/demo') || location.pathname.startsWith('/scanner') || location.pathname.startsWith('/scan')) {
+                navigate('/', { replace: true });
+              }
+            }}
             onApplyRecipe={handleApplyScannedRecipe}
             onSaveToJournal={handleSaveScannedToJournal}
             onOpenRoasterPortal={(code) => {
