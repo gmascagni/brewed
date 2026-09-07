@@ -24,7 +24,7 @@ import {
   Check,
   Download
 } from 'lucide-react';
-import { SHOWCASE_ROASTERS, getShowcaseRoaster } from '../data/roasterShowcaseData';
+import { SHOWCASE_ROASTERS, getShowcaseRoaster, getAllShowcaseRoasters } from '../data/roasterShowcaseData';
 import { trackEvent } from '../utils/analytics';
 import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 
@@ -47,6 +47,13 @@ export default function RoasterProfilePage({
   } catch {}
 
   const roaster = getShowcaseRoaster(activeRoasterId);
+  const allRoasters = getAllShowcaseRoasters();
+
+  useEffect(() => {
+    if (initialRoasterId) {
+      setActiveRoasterId(initialRoasterId);
+    }
+  }, [initialRoasterId]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -78,18 +85,28 @@ export default function RoasterProfilePage({
           style={{ background: roaster.brandColor }}
         />
 
-        {/* Gigantic Roaster Monogram Watermark */}
-        <div className="absolute top-12 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center opacity-[0.06] transform scale-110">
-          <span 
-            className="font-serif font-black text-[280px] sm:text-[380px] leading-none tracking-tighter"
-            style={{ color: roaster.brandColor }}
-          >
-            {roaster.monogram}
-          </span>
-          <span className="font-mono text-xs sm:text-sm tracking-[0.3em] uppercase -mt-16 text-cream-soft font-bold">
-            {roaster.emblemSubtitle}
-          </span>
-        </div>
+        {/* Roaster Brand Logo or Monogram Ambient Watermark */}
+        {roaster.logoImage ? (
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[520px] flex items-center justify-center pointer-events-none opacity-25 filter contrast-125 select-none transform scale-105 transition-all duration-700">
+            <img 
+              src={roaster.logoImage} 
+              alt="" 
+              className="max-w-[85vw] sm:max-w-[560px] max-h-[440px] object-contain drop-shadow-[0_0_90px_rgba(212,163,115,0.25)]"
+            />
+          </div>
+        ) : (
+          <div className="absolute top-12 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center opacity-[0.06] transform scale-110">
+            <span 
+              className="font-serif font-black text-[280px] sm:text-[380px] leading-none tracking-tighter"
+              style={{ color: roaster.brandColor }}
+            >
+              {roaster.monogram}
+            </span>
+            <span className="font-mono text-xs sm:text-sm tracking-[0.3em] uppercase -mt-16 text-cream-soft font-bold">
+              {roaster.emblemSubtitle}
+            </span>
+          </div>
+        )}
 
         {/* Ambient vignette gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0A0604]/80 to-[#0A0604]" />
@@ -124,22 +141,27 @@ export default function RoasterProfilePage({
           {/* Roaster Switcher Dropdown / Pills */}
           <div className="flex items-center gap-2">
             <span className="hidden md:inline text-xs font-mono text-cream-soft/60">
-              Demo Showcase:
+              Roasters:
             </span>
-            <div className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10">
-              {SHOWCASE_ROASTERS.map((r) => {
-                const isSelected = r.id === activeRoasterId;
+            <div className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 max-w-[280px] sm:max-w-md overflow-x-auto custom-scrollbar">
+              {allRoasters.map((r) => {
+                const isSelected = r.id.toLowerCase() === activeRoasterId.toLowerCase() || 
+                                   r.slug.toLowerCase() === activeRoasterId.toLowerCase() ||
+                                   r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === activeRoasterId.toLowerCase();
                 return (
                   <button
                     key={r.id}
                     onClick={() => setActiveRoasterId(r.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition whitespace-nowrap ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition whitespace-nowrap flex items-center gap-1.5 ${
                       isSelected
                         ? 'bg-amber-gold text-espresso-950 shadow-md'
                         : 'text-cream-soft hover:text-white hover:bg-white/[0.05]'
                     }`}
                   >
-                    {r.name.split(' ')[0]}
+                    {r.logoImage && (
+                      <img src={r.logoImage} alt="" className="w-3.5 h-3.5 object-contain rounded shrink-0 inline" />
+                    )}
+                    <span>{r.name.split(' ')[0]}</span>
                   </button>
                 );
               })}
@@ -192,14 +214,33 @@ export default function RoasterProfilePage({
             </span>
           </div>
 
-          {/* Roaster Big Title & Tagline */}
-          <div className="space-y-3">
-            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-cream-light tracking-tight leading-none">
-              {roaster.name}
-            </h1>
-            <p className="font-serif italic text-lg sm:text-2xl text-amber-gold font-medium">
-              "{roaster.tagline}"
-            </p>
+          {/* Roaster Big Title & Tagline with Brand Logo Badge */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+            {roaster.logoImage ? (
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white/10 p-2.5 border border-white/20 shadow-2xl backdrop-blur-md shrink-0 flex items-center justify-center overflow-hidden">
+                <img 
+                  src={roaster.logoImage} 
+                  alt={roaster.name} 
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
+            ) : (
+              <div 
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center font-serif text-3xl sm:text-4xl font-black text-espresso-950 shadow-xl shrink-0"
+                style={{ backgroundColor: roaster.brandColor }}
+              >
+                {roaster.monogram}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-cream-light tracking-tight leading-none">
+                {roaster.name}
+              </h1>
+              <p className="font-serif italic text-lg sm:text-2xl text-amber-gold font-medium">
+                "{roaster.tagline}"
+              </p>
+            </div>
           </div>
 
           {/* Transparent Showcase Demonstration & Partner Example Notice */}
@@ -263,7 +304,7 @@ export default function RoasterProfilePage({
             )}
 
             <div className="text-xs font-mono text-cream-soft/60 hidden lg:block ml-2">
-              Founders: <span className="text-cream-light font-bold">{roaster.founders.join(', ')}</span>
+              Founders: <span className="text-cream-light font-bold">{roaster.founders?.length ? roaster.founders.join(', ') : `${roaster.city}${roaster.state ? ', ' + roaster.state : ''}`}</span>
             </div>
           </div>
 
@@ -561,7 +602,7 @@ export default function RoasterProfilePage({
 
               <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
                 <div className="text-cream-soft/80">
-                  Founding Team: <strong className="text-cream-light">{roaster.founders.join(' • ')}</strong>
+                  Founding Team: <strong className="text-cream-light">{roaster.founders?.length ? roaster.founders.join(' • ') : roaster.name}</strong>
                 </div>
                 <div className="text-amber-gold">
                   Headquartered in {roaster.city}, {roaster.state}

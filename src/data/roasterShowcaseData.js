@@ -432,10 +432,163 @@ export const SHOWCASE_ROASTERS = [
   }
 ];
 
+import { getCustomRoasters, getCustomRoasterCoffees } from './roasterRegistry';
+
+function formatCustomRoasterAsShowcase(custom, coffees = []) {
+  const name = custom.name || custom.roaster || 'Specialty Roastery';
+  const slug = (custom.slug || custom.id || name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  const monogram = name.charAt(0).toUpperCase() || 'R';
+  const location = custom.location || 'Artisan Craft Roastery';
+
+  const formattedCoffees = coffees.map((c, idx) => {
+    const ratio = Number(c.recommendedRatio) || 16.5;
+    const dose = 18.0;
+    const waterGrams = Math.round(dose * ratio);
+    const tempF = Number(c.tempF) || 202;
+    const tempC = Math.round(((tempF - 32) * 5) / 9);
+
+    return {
+      id: c.id || `custom_coffee_${idx}`,
+      beanName: c.beanName || 'Single Origin Lot',
+      origin: c.origin || 'Specialty Origin',
+      process: c.process || 'Washed',
+      varietal: c.varietal || 'Specialty Varietal',
+      elevation: c.elevation || '1,800+ MASL',
+      roastLevel: c.roastLevel || 'Light-Medium',
+      cuppingScore: c.cuppingScore || 87.5,
+      harvestYear: 'Current Fresh Crop',
+      tastingNotes: Array.isArray(c.tastingNotes) ? c.tastingNotes : ['Sweet', 'Balanced', 'Clean'],
+      description: c.notes || `Artisan craft roast by ${name}. Optimized for ${c.brewMethod ? c.brewMethod.replace(/_/g, ' ') : 'pour over'}.`,
+      brewMethod: c.brewMethod || 'pour_over',
+      recommendedRatio: ratio,
+      dryDoseGrams: dose,
+      waterGrams,
+      tempF,
+      tempC,
+      recommendedGrind: c.recommendedGrind || 'Medium-Fine',
+      brewTime: c.brewTime || '3m 15s',
+      pourSchedule: [
+        { phase: 'Bloom', time: '0:00 - 0:45', water: `${Math.round(dose * 3)}g`, note: 'Gentle spiral saturation' },
+        { phase: 'Main Pour', time: '0:45 - 2:00', water: `${Math.round(waterGrams * 0.6)}g`, note: 'Steady center pour' },
+        { phase: 'Final Top-up', time: '2:00 - 3:15', water: `${waterGrams}g`, note: 'Gentle swirl and draw down' }
+      ],
+      upc: c.upc || `LOT-${Date.now().toString().slice(-6)}`,
+      price: c.price || '$22.00',
+      bagSize: c.bagSize || '12 oz (340g)',
+      directUrl: c.customUrl || custom.website || 'https://thebrew.app',
+      badge: 'Certified Lot'
+    };
+  });
+
+  return {
+    id: slug,
+    slug,
+    name,
+    isCustomRoaster: true,
+    logoImage: custom.logoImage || '',
+    backgroundImage: custom.backgroundImage || custom.logoImage || '',
+    tagline: custom.tagline || 'Artisan Specialty Roastery & Tasting Room',
+    founded: custom.founded || 'Specialty Craft',
+    city: custom.city || location.split(',')[0]?.trim() || 'Artisan',
+    state: custom.state || location.split(',')[1]?.trim() || '',
+    country: custom.country || 'USA',
+    website: custom.website || 'https://thebrew.app',
+    shopUrl: custom.shopUrl || custom.website || 'https://thebrew.app',
+    brandColor: custom.brandColor || '#D4A373',
+    accentColor: custom.accentColor || '#A66E38',
+    roasterMachines: custom.roasterMachines || 'Artisan Drum & Convection Roasters',
+    sourcingPhilosophy: custom.sourcingPhilosophy || '100% Traceable Specialty Direct-Trade',
+    carbonFootprint: 'Precision Micro-Batch Roasting',
+    monogram,
+    emblemSubtitle: `${location.toUpperCase()} • VERIFIED ROASTERY`,
+    stats: [
+      { label: 'Active Micro-Lots', value: `${formattedCoffees.length} Lots` },
+      { label: 'Roast Style', value: 'Specialty Light-Med' },
+      { label: 'Smart Bag QR', value: 'Active' },
+      { label: 'Quality Grade', value: 'SCA 86+' }
+    ],
+    originStory: [
+      `${name} is an artisan coffee roastery based in ${location}. We source and roast with uncompromising dedication to origin terroir, seasonal freshness, and ethical grower relationships.`,
+      `Every bag we package features certified dial-in specifications so coffee lovers can experience our beans at peak potential.`
+    ],
+    roastingPhilosophy: 
+      custom.roastingPhilosophy || 
+      `We calibrate each roast profile to preserve the sweet enzymatic aromatics and sparkling acidity coaxed from the soil.`,
+    cafes: [
+      {
+        name: `${name} Flagship Roastery & Tasting Bar`,
+        address: location,
+        description: 'Our primary roasting facility, tasting bar, and barista dial-in station.',
+        hours: 'Mon–Sun: 7am – 5pm'
+      }
+    ],
+    recommendedWater: {
+      targetTds: 140,
+      gh: 70,
+      kh: 30,
+      ph: 7.0,
+      philosophy: 'Balanced mineral water with 2:1 magnesium-to-calcium ratio for vibrant sweetness and clean finish.',
+      lotusFormula: { calcium: 2, magnesium: 4, buffer: 1 },
+      diyFormula: { epsomMl: 15, bakingSodaMl: 5 },
+      bottledWaterPairing: 'Crystal Geyser or Volvic Natural Spring Water'
+    },
+    coffees: formattedCoffees
+  };
+}
+
+export function getAllShowcaseRoasters() {
+  const customRoasters = getCustomRoasters();
+  const allCustomCoffees = getCustomRoasterCoffees();
+
+  // Find any unique roaster names from custom coffees that may not be in customRoasters table
+  const coffeeRoasterNames = Array.from(new Set(allCustomCoffees.map(c => c.roaster).filter(Boolean)));
+  
+  const synthList = customRoasters.map(cr => {
+    const coffeesForRoaster = allCustomCoffees.filter(
+      c => c.roaster && c.roaster.toLowerCase() === cr.name.toLowerCase()
+    );
+    return formatCustomRoasterAsShowcase(cr, coffeesForRoaster);
+  });
+
+  // Add any roasters from custom coffees not yet captured
+  coffeeRoasterNames.forEach(rName => {
+    if (!synthList.some(sr => sr.name.toLowerCase() === rName.toLowerCase())) {
+      const coffeesForRoaster = allCustomCoffees.filter(
+        c => c.roaster && c.roaster.toLowerCase() === rName.toLowerCase()
+      );
+      synthList.push(formatCustomRoasterAsShowcase({ name: rName, logoImage: coffeesForRoaster[0]?.logoImage }, coffeesForRoaster));
+    }
+  });
+
+  return [...SHOWCASE_ROASTERS, ...synthList];
+}
+
 export function getShowcaseRoaster(idOrSlug = 'methodical') {
-  return (
-    SHOWCASE_ROASTERS.find(
-      (r) => r.id === idOrSlug || r.slug === idOrSlug || r.name.toLowerCase().includes(idOrSlug.toLowerCase())
-    ) || SHOWCASE_ROASTERS[0]
+  const cleanId = String(idOrSlug).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+  // 1. Check built-in showcase roasters
+  const builtIn = SHOWCASE_ROASTERS.find(
+    (r) => r.id.toLowerCase() === cleanId || 
+           r.slug.toLowerCase() === cleanId || 
+           r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === cleanId ||
+           r.name.toLowerCase().includes(idOrSlug.toLowerCase())
   );
+  if (builtIn) return builtIn;
+
+  // 2. Check custom registered roasters
+  const all = getAllShowcaseRoasters();
+  const matched = all.find(
+    (r) => r.id.toLowerCase() === cleanId || 
+           r.slug.toLowerCase() === cleanId || 
+           r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === cleanId ||
+           r.name.toLowerCase().includes(idOrSlug.toLowerCase())
+  );
+  if (matched) return matched;
+
+  // Default to first showcase roaster if no match found
+  return SHOWCASE_ROASTERS[0];
 }

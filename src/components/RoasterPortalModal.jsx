@@ -25,13 +25,16 @@ import {
   Compass,
   Play
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import QRCode from 'qrcode';
 import {
   getCustomRoasterCoffees,
   saveRoasterCoffee,
   deleteRoasterCoffee,
   generateSmartBagUrl,
-  exportRoasterCatalogJson
+  exportRoasterCatalogJson,
+  saveCustomRoasterProfile,
+  getCustomRoasters
 } from '../data/roasterRegistry';
 import { BREW_METHODS } from '../data/brewData';
 import RoasterVideoPlayer from './RoasterVideoPlayer';
@@ -61,15 +64,42 @@ export default function RoasterPortalModal({
     orchestrator = useAppOrchestrator();
   } catch {}
 
+  const navigate = useNavigate();
+
   // Form State for Onboarding
   const [roasterName, setRoasterName] = useState('');
   const [location, setLocation] = useState('');
   const [website, setWebsite] = useState('');
+  const [logoImage, setLogoImage] = useState('');
+  const [logoFileName, setLogoFileName] = useState('');
   const [beanName, setBeanName] = useState('');
   const [origin, setOrigin] = useState('');
   const [varietal, setVarietal] = useState('');
   const [process, setProcess] = useState('Washed');
   const [elevation, setElevation] = useState('1,850 MASL');
+
+  const handleLogoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Logo image size must be under 5MB.');
+      return;
+    }
+
+    setLogoFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      setLogoImage(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = () => {
+    setLogoImage('');
+    setLogoFileName('');
+  };
   const [roastLevel, setRoastLevel] = useState('Light');
   const [tastingNotesInput, setTastingNotesInput] = useState('Peach, Jasmine, Honey');
   
@@ -101,6 +131,9 @@ export default function RoasterPortalModal({
       setRegisteredCoffees(list);
       if (prefilledBean) {
         if (prefilledBean.roaster) setRoasterName(prefilledBean.roaster);
+        if (prefilledBean.location) setLocation(prefilledBean.location);
+        if (prefilledBean.website) setWebsite(prefilledBean.website);
+        if (prefilledBean.logoImage) setLogoImage(prefilledBean.logoImage);
         if (prefilledBean.beanName) setBeanName(prefilledBean.beanName);
         if (prefilledBean.brewMethod) setBrewMethod(prefilledBean.brewMethod);
         if (prefilledBean.recommendedRatio) setRecommendedRatio(prefilledBean.recommendedRatio);
@@ -221,6 +254,7 @@ export default function RoasterPortalModal({
       roaster: roasterName.trim(),
       location: location.trim(),
       website: website.trim(),
+      logoImage: logoImage || '',
       beanName: beanName.trim(),
       origin: origin.trim() || 'Single Origin',
       varietal: varietal.trim(),
@@ -240,6 +274,16 @@ export default function RoasterPortalModal({
     };
 
     saveRoasterCoffee(newCoffee);
+
+    // Save custom roaster profile with uploaded logoImage for RoasterProfilePage background
+    saveCustomRoasterProfile({
+      name: roasterName.trim(),
+      location: location.trim(),
+      website: website.trim(),
+      logoImage: logoImage || '',
+      backgroundImage: logoImage || ''
+    });
+
     const updated = getCustomRoasterCoffees();
     setRegisteredCoffees(updated);
     setSelectedCoffeeForSticker(newCoffee);
@@ -256,9 +300,49 @@ export default function RoasterPortalModal({
     }
   };
 
-  const handleCopyLink = () => {
-    if (!activeTargetUrl) return;
-    navigator.clipboard.writeText(activeTargetUrl);
+  const getResolvedTargetUrl = () => {
+    if (activeTargetUrl && activeTargetUrl.trim()) return activeTargetUrl;
+    const coffee = selectedCoffeeForSticker || {
+      roaster: roasterName || 'Specialty Roaster',
+      beanName: beanName || 'Single Origin Lot',
+      brewMethod,
+      recommendedRatio,
+      tempF,
+      recommendedGrind,
+      upc
+    };
+    return customUrl.trim() || generateSmartBagUrl(coffee);
+  };
+
+  const handleCopyLink = async () => {
+    const urlToCopy = getResolvedTargetUrl();
+    if (!urlToCopy) return;
+
+    let copied = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(urlToCopy);
+        copied = true;
+      }
+    } catch (err) {
+      console.warn('navigator.clipboard failed, attempting fallback', err);
+    }
+
+    if (!copied) {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = urlToCopy;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        copied = document.execCommand('copy');
+        document.body.removeChild(textarea);
+      } catch (fallbackErr) {
+        console.warn('execCommand copy fallback failed', fallbackErr);
+      }
+    }
+
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2500);
   };
@@ -321,9 +405,17 @@ export default function RoasterPortalModal({
   };
 
   const handleOpenLinkInNewTab = () => {
-    if (activeTargetUrl) {
-      window.open(activeTargetUrl, '_blank');
+    const targetUrl = getResolvedTargetUrl();
+    if (targetUrl) {
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
     }
+  };
+
+  const handleNavigateToPortfolio = () => {
+    const rName = selectedCoffeeForSticker?.roaster || roasterName || 'methodical';
+    const slug = rName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    onClose();
+    navigate(`/roasters/${slug}`);
   };
 
   return (
@@ -463,6 +555,60 @@ export default function RoasterPortalModal({
                       className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold"
                     />
                   </div>
+                </div>
+
+                {/* Brand Logo Upload */}
+                <div className="pt-3 border-t border-white/10">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-cream-soft/80 font-mono text-xs flex items-center gap-1.5 font-bold">
+                      <UploadCloud className="w-3.5 h-3.5 text-amber-gold" />
+                      <span>Roastery Brand Logo (Watermark & Showcase)</span>
+                    </label>
+                    <span className="text-[10px] text-cream-soft/50 font-mono">PNG, JPG, SVG, WebP (Max 5MB)</span>
+                  </div>
+
+                  {logoImage ? (
+                    <div className="flex items-center justify-between p-3 rounded-xl bg-black/60 border border-amber-gold/40">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-lg bg-white/10 p-1 border border-white/20 flex items-center justify-center overflow-hidden shrink-0">
+                          <img src={logoImage} alt="Roaster Logo" className="max-w-full max-h-full object-contain" />
+                        </div>
+                        <div>
+                          <span className="text-xs text-cream-light font-mono font-bold block truncate max-w-xs">
+                            {logoFileName || 'Brand Logo Uploaded'}
+                          </span>
+                          <span className="text-[10px] text-emerald-400 font-mono">
+                            ✓ Ready for packaging stickers & ambient background
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveLogo}
+                        className="p-1.5 px-2.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 text-xs font-mono flex items-center gap-1 transition"
+                        title="Remove Logo"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Remove</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                      <label className="cursor-pointer px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-dashed border-white/25 hover:border-amber-gold text-cream-light font-mono text-xs flex items-center gap-2 transition w-fit">
+                        <UploadCloud className="w-4 h-4 text-amber-gold" />
+                        <span>Upload Roastery Logo</span>
+                        <input
+                          type="file"
+                          accept="image/png, image/jpeg, image/webp, image/svg+xml"
+                          onChange={handleLogoUpload}
+                          className="hidden"
+                        />
+                      </label>
+                      <span className="text-[11px] text-cream-soft/60 font-mono">
+                        This logo becomes the ambient watermark on your Roaster Showcase page & prints on Smart Bag stickers.
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1126,8 +1272,10 @@ export default function RoasterPortalModal({
                 </button>
 
                 <button
+                  type="button"
                   onClick={handleCopyLink}
                   className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold flex items-center gap-2 border border-white/15 transition active:scale-95"
+                  title="Copy the direct recipe and dial-in link to clipboard"
                 >
                   {copySuccess ? (
                     <>
@@ -1143,6 +1291,7 @@ export default function RoasterPortalModal({
                 </button>
 
                 <button
+                  type="button"
                   onClick={handleOpenLinkInNewTab}
                   className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold flex items-center gap-2 border border-white/15 transition active:scale-95"
                   title="Open the generated link in a new tab to test customer experience"
@@ -1150,6 +1299,65 @@ export default function RoasterPortalModal({
                   <ExternalLink className="w-4 h-4 text-amber-gold" />
                   <span>Test Link</span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={handleNavigateToPortfolio}
+                  className="px-4 py-2.5 rounded-xl bg-amber-gold/20 hover:bg-amber-gold/30 text-amber-gold font-mono text-xs font-bold flex items-center gap-2 border border-amber-gold/40 transition active:scale-95"
+                  title="Open this roaster's profile and recipe page directly in the app"
+                >
+                  <Store className="w-4 h-4 text-amber-gold" />
+                  <span>View Portfolio Page</span>
+                </button>
+              </div>
+
+              {/* Direct Recipe & Showcase URL Box */}
+              <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs font-mono">
+                <div className="flex items-center gap-2 overflow-hidden flex-1">
+                  <span className="text-cream-soft/60 uppercase text-[10px] shrink-0 font-bold">Live Target URL:</span>
+                  <input
+                    type="text"
+                    readOnly
+                    value={activeTargetUrl || getResolvedTargetUrl()}
+                    className="w-full bg-black/60 border border-white/15 px-3 py-1.5 rounded-lg text-cream-light font-mono text-[11px] truncate focus:outline-none focus:border-amber-gold"
+                    onClick={(e) => e.target.select()}
+                  />
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="px-3 py-1.5 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-bold flex items-center gap-1.5 border border-white/15 transition active:scale-95 text-[11px]"
+                  >
+                    {copySuccess ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-300">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-amber-gold" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleOpenLinkInNewTab}
+                    className="px-3 py-1.5 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-bold flex items-center gap-1.5 border border-white/15 transition active:scale-95 text-[11px]"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-amber-gold" />
+                    <span>Open New Tab</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleNavigateToPortfolio}
+                    className="px-3 py-1.5 rounded-lg bg-amber-gold text-espresso-950 font-bold flex items-center gap-1.5 transition active:scale-95 text-[11px]"
+                  >
+                    <Store className="w-3.5 h-3.5" />
+                    <span>View In-App</span>
+                  </button>
+                </div>
               </div>
 
               {/* Printer Handoff Guidance Banner */}

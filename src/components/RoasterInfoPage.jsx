@@ -17,7 +17,9 @@ import {
   ChevronRight,
   ExternalLink,
   X,
-  Play
+  Play,
+  Copy,
+  Check
 } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 import RoasterVideoPlayer from './RoasterVideoPlayer';
@@ -26,6 +28,7 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionResponse, setSubmissionResponse] = useState(null);
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const [formData, setFormData] = useState({
     roasteryName: '',
     contactName: '',
@@ -38,6 +41,41 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
   });
 
   const emailHq = 'clay@thebrew.app';
+
+  const handleCopyEmail = () => {
+    try {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(emailHq);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = emailHq;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2000);
+    } catch {}
+  };
+
+  const handleOpenGmail = () => {
+    const subject = encodeURIComponent(`Roastery Label Ingestion Request: ${formData.roasteryName || 'Specialty Coffee Brand'}`);
+    const body = encodeURIComponent(
+      `Hello Brew App HQ,\n\n` +
+      `I would like to add our specialty roastery and coffee labels to The Brew App global verified database.\n\n` +
+      `Roastery Brand: ${formData.roasteryName}\n` +
+      `Contact Name: ${formData.contactName}\n` +
+      `Email: ${formData.email}\n` +
+      `Website: ${formData.website}\n` +
+      `Location: ${formData.location}\n` +
+      `Number of Retail Coffees: ${formData.coffeeCount}\n` +
+      `Sample Retail Barcodes (UPC/EAN): ${formData.sampleBarcodes}\n\n` +
+      `Notes / Roaster Dial-In Details:\n${formData.message}\n\n` +
+      `Looking forward to partnering!`
+    );
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${emailHq}&su=${subject}&body=${body}`, '_blank', 'noopener,noreferrer');
+  };
 
   if (!isOpen) return null;
 
@@ -453,10 +491,48 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
                   />
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                  <span className="text-[11px] text-cream-soft/60">
-                    Direct HQ Contact: <strong className="text-amber-gold">{emailHq}</strong>
-                  </span>
+                {/* Email Explanation & Direct Actions */}
+                <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-2 text-xs font-mono">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-amber-gold" />
+                      <span className="text-cream-soft/80">
+                        Direct HQ Desk: <strong className="text-amber-gold font-mono">{emailHq}</strong>
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleCopyEmail}
+                        className="px-2.5 py-1 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-[11px] font-bold flex items-center gap-1 border border-white/15 transition active:scale-95"
+                        title="Copy email address"
+                      >
+                        {copiedEmail ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-amber-gold" />}
+                        <span>{copiedEmail ? 'Copied!' : 'Copy Email'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleOpenGmail}
+                        className="px-2.5 py-1 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-[11px] font-bold flex items-center gap-1 border border-white/15 transition active:scale-95"
+                        title="Compose email directly in Gmail Web"
+                      >
+                        <ExternalLink className="w-3 h-3 text-amber-gold" />
+                        <span>Open in Gmail</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-cream-soft/60 leading-relaxed">
+                    <strong>How this email works:</strong> Clicking "Submit Request to HQ" packages your roastery credentials and transmits them directly to our barista team at {emailHq}. We will review and verify your bag recipes within 24 hours. You can also self-serve immediately using the Studio below.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                  <div className="text-[11px] font-mono text-cream-soft/60">
+                    No account required • Instant verification review
+                  </div>
 
                   <div className="flex items-center gap-3">
                     {onOpenStudio && (

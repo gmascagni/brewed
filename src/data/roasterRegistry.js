@@ -66,21 +66,65 @@ export function deleteRoasterCoffee(id) {
   return filtered;
 }
 
+const ROASTER_PROFILES_KEY = 'thebrewapp_custom_roasters_v1';
+
 /**
- * Generate a deep-link URL for a coffee profile that opens The Brew App with dial-in parameters pre-set
+ * Get custom roasters registered via the Roaster Portal
  */
-export function generateSmartBagUrl(coffee, baseUrl = 'https://thebrew.app') {
-  if (!coffee) return baseUrl;
+export function getCustomRoasters() {
+  try {
+    const raw = localStorage.getItem(ROASTER_PROFILES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (err) {
+    console.warn('Error reading custom roasters from localStorage:', err);
+    return [];
+  }
+}
+
+/**
+ * Save or update a custom roaster profile (including uploaded logoImage)
+ */
+export function saveCustomRoasterProfile(profile) {
+  if (!profile || !profile.name) return null;
+  const existing = getCustomRoasters();
+  const slug = (profile.slug || profile.name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  const record = {
+    ...profile,
+    id: slug,
+    slug,
+    updatedAt: new Date().toISOString()
+  };
+  const filtered = existing.filter((r) => r.id !== slug && r.slug !== slug);
+  const updated = [record, ...filtered];
+  localStorage.setItem(ROASTER_PROFILES_KEY, JSON.stringify(updated));
+  return record;
+}
+
+/**
+ * Generate a deep-link URL for a coffee profile that opens the Roaster's Portfolio page with dial-in parameters
+ */
+export function generateSmartBagUrl(coffee, baseUrl) {
+  const origin = baseUrl || (typeof window !== 'undefined' ? window.location.origin : 'https://thebrew.app');
+  if (!coffee) return `${origin}/roasters`;
+
+  const roasterSlug = (coffee.roaster || 'roasters')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
   const params = new URLSearchParams();
-  if (coffee.roaster) params.set('roaster', coffee.roaster);
   if (coffee.beanName) params.set('bean', coffee.beanName);
+  if (coffee.id) params.set('coffeeId', coffee.id);
   if (coffee.brewMethod) params.set('method', coffee.brewMethod);
   if (coffee.recommendedRatio) params.set('ratio', coffee.recommendedRatio.toString());
   if (coffee.tempF) params.set('tempF', coffee.tempF.toString());
   if (coffee.recommendedGrind) params.set('grind', coffee.recommendedGrind);
   if (coffee.upc) params.set('upc', coffee.upc);
 
-  return `${baseUrl}/?${params.toString()}`;
+  return `${origin}/roasters/${roasterSlug}?${params.toString()}`;
 }
 
 /**
