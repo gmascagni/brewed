@@ -43,6 +43,8 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   const currentPhaseIndexRef = useRef(0);
   const phasesRef = useRef(phases);
   const lastTickedSecRef = useRef(null);
+  // Track which phases have already spoken during this brew session
+  const announcedPhasesRef = useRef(new Set());
 
   useEffect(() => {
     currentPhaseIndexRef.current = currentPhaseIndex;
@@ -95,6 +97,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     stopSpeechAnnouncement();
     setCurrentPhaseIndex(0);
     currentPhaseIndexRef.current = 0;
+    announcedPhasesRef.current.clear();
     const initialTime = phases[0]?.durationSec || 60;
     setTimeLeft(initialTime);
     endTimeRef.current = null;
@@ -125,6 +128,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       playTimerStartChime(localMuted);
 
       if (!localMuted) {
+        announcedPhasesRef.current.add(nextIdx);
         setIsAnnouncing(true);
         const nameToSay = nextPhase?.name || `Phase ${nextIdx + 1}`;
         const instructionToSay = nextPhase?.instruction || '';
@@ -206,6 +210,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
         setIsCompleted(false);
         setCurrentPhaseIndex(0);
         currentPhaseIndexRef.current = 0;
+        announcedPhasesRef.current.clear();
         secondsToRun = phases[0]?.durationSec || 60;
         setTimeLeft(secondsToRun);
         remainingAtPauseRef.current = null;
@@ -227,29 +232,30 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       // 3. Mark running immediately - NEVER BLOCK COUNTDOWN
       setIsRunning(true);
 
-      // 4. Asynchronous Spoken Voice Guidance ("Bloom Phase, 45 seconds")
-      const phaseDuration = activePhase?.durationSec || 60;
-      const isFreshPhase = secondsToRun === phaseDuration;
+      // 4. Asynchronous Spoken Voice Guidance:
+      // When the clock starts, speak the Active Extraction Instruction for the current phase!
+      // If user pauses and resumes within the same phase, do NOT re-read from start repeatedly.
+      const phaseIdx = currentPhaseIndex;
+      const hasAnnounced = announcedPhasesRef.current.has(phaseIdx);
 
-      if (!localMuted && isFreshPhase) {
+      if (!localMuted && !hasAnnounced) {
+        announcedPhasesRef.current.add(phaseIdx);
         setIsAnnouncing(true);
-        const nameToSay = activePhase?.name || 'Bloom Phase';
+        const nameToSay = activePhase?.name || 'Extraction Phase';
         const instructionToSay = activePhase?.instruction || '';
         setAnnouncementText(instructionToSay || nameToSay);
 
         announcePhase(
           nameToSay, 
-          phaseDuration, 
+          activePhase?.durationSec || 60, 
           localMuted, 
           () => {
             setIsAnnouncing(false);
           },
           instructionToSay,
           activeMethod?.id,
-          currentPhaseIndex
+          phaseIdx
         );
-      } else {
-        setIsAnnouncing(false);
       }
     }
   };
@@ -281,6 +287,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       }
 
       if (!localMuted) {
+        announcedPhasesRef.current.add(nextIdx);
         setIsAnnouncing(true);
         const nameToSay = nextPhase?.name || `Phase ${nextIdx + 1}`;
         const instructionToSay = nextPhase?.instruction || '';
@@ -320,6 +327,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     lastTickedSecRef.current = null;
     setCurrentPhaseIndex(0);
     currentPhaseIndexRef.current = 0;
+    announcedPhasesRef.current.clear();
     setTimeLeft(phases[0]?.durationSec || 60);
   };
 
@@ -332,6 +340,9 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     const instructionToSay = activePhase?.instruction || '';
     const phaseDuration = activePhase?.durationSec || 60;
     setAnnouncementText(instructionToSay || nameToSay);
+
+    // Mark as announced so timer resume won't clash
+    announcedPhasesRef.current.add(currentPhaseIndex);
 
     announcePhase(
       nameToSay,

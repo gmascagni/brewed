@@ -92,6 +92,15 @@ export function playMechanicalClick(isMuted = false) {
 }
 
 let tickAudioInstance = null;
+let isSpeakingAnnouncement = false;
+let announcementTimeout = null;
+
+/**
+ * Returns whether speech announcement is currently active.
+ */
+export function isAnnouncementActive() {
+  return isSpeakingAnnouncement;
+}
 
 /**
  * Play authentic clockwork ticking sound for every second of countdown.
@@ -101,18 +110,24 @@ let tickAudioInstance = null;
 export function playClockTick(isMuted = false, tickNumber = 0) {
   if (isMuted) return;
 
-  // 1. Direct HTML5 audio tick playback (reusable element to prevent memory pressure)
-  try {
-    if (!tickAudioInstance) {
-      tickAudioInstance = new Audio('/audio/timer/clock_tick.wav');
-    }
-    tickAudioInstance.currentTime = 0;
-    tickAudioInstance.volume = 0.85;
-    const p = tickAudioInstance.play();
-    if (p !== undefined) p.catch(() => {});
-  } catch (e) {}
+  // 1. Direct HTML5 audio tick playback
+  // CRITICAL MOBILE STABILITY: When a voice instruction is currently speaking aloud,
+  // do NOT call tickAudioInstance.play(). On iOS Safari & Android Chrome, triggering a second
+  // HTMLAudioElement immediately aborts the active speech stream!
+  // Instead, the Web Audio escapement pulse below continues ticking smoothly without interruption.
+  if (!isSpeakingAnnouncement) {
+    try {
+      if (!tickAudioInstance) {
+        tickAudioInstance = new Audio('/audio/timer/clock_tick.wav');
+      }
+      tickAudioInstance.currentTime = 0;
+      tickAudioInstance.volume = 0.85;
+      const p = tickAudioInstance.play();
+      if (p !== undefined) p.catch(() => {});
+    } catch (e) {}
+  }
 
-  // 2. Web Audio escapement pulse
+  // 2. Web Audio escapement pulse (Always runs concurrently, never interrupts or cancels speech)
   try {
     const ctx = getAudioContext();
     if (!ctx || ctx.state !== 'running') return;
@@ -127,7 +142,9 @@ export function playClockTick(isMuted = false, tickNumber = 0) {
     clickOsc.frequency.setValueAtTime(clickFreq, now);
     clickOsc.frequency.exponentialRampToValueAtTime(400, now + 0.007);
 
-    clickGain.gain.setValueAtTime(0.26, now);
+    // Subtle gain ducking while voice is speaking so instruction is 100% crystal clear
+    const gainLevel = isSpeakingAnnouncement ? 0.16 : 0.26;
+    clickGain.gain.setValueAtTime(gainLevel, now);
     clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.007);
 
     clickOsc.connect(clickGain);
@@ -203,6 +220,11 @@ export function playTimerStartChime(isMuted = false) {
  * Stop any active voice announcement or audio element
  */
 export function stopSpeechAnnouncement() {
+  if (announcementTimeout) {
+    clearTimeout(announcementTimeout);
+    announcementTimeout = null;
+  }
+  isSpeakingAnnouncement = false;
   if (activeAudioElement) {
     try {
       activeAudioElement.pause();
@@ -250,6 +272,7 @@ export function announcePhase(
   const safeFinish = () => {
     if (!finished) {
       finished = true;
+      isSpeakingAnnouncement = false;
       activeAudioElement = null;
       activeSpeechUtterance = null;
       if (onComplete) onComplete();
@@ -270,6 +293,8 @@ export function announcePhase(
     ? `${rawName}, ${durText}. ${rawInstruction}`
     : `${rawName}, ${durText}.`;
 
+  isSpeakingAnnouncement = true;
+
   // Fallback Web Speech Synthesizer implementation
   const fallbackToSpeech = () => {
     if (!('speechSynthesis' in window)) {
@@ -282,7 +307,7 @@ export function announcePhase(
 
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
       utterance.lang = 'en-US';
-      utterance.rate = 1.02;
+      utterance.rate = 1.0;
       utterance.pitch = 1.0;
 
       const voices = window.speechSynthesis.getVoices() || [];
@@ -303,7 +328,7 @@ export function announcePhase(
       utterance.onerror = safeFinish;
 
       // Timeout scaled by length of spoken text (allows long instructions to finish)
-      const maxMs = Math.max(5000, textToSpeak.length * 85);
+      const maxMs = Math.max(6000, textToSpeak.length * 90);
       setTimeout(safeFinish, maxMs);
 
       activeSpeechUtterance = utterance;
@@ -347,7 +372,8 @@ export function announcePhase(
 
       const playPromise = audio.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => {
+        playPromise.catch((err) => {
+          console.warn('[AudioSynth] Candidate failed, trying next fallback:', candidates[idx], err);
           tryPlayIndex(idx + 1);
         });
       }
@@ -356,7 +382,12 @@ export function announcePhase(
     }
   };
 
-  tryPlayIndex(0);
+  // 280ms pleasant stagger: allows the brass bell chime to ding first,
+  // then speaks the Active Extraction Instruction clearly over speakers without audio engine collisions.
+  announcementTimeout = setTimeout(() => {
+    announcementTimeout = null;
+    tryPlayIndex(0);
+  }, 280);
 }
 
 /**
