@@ -90,31 +90,35 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
     });
 
     let liveSuccess = false;
-    try {
-      const res = await fetch('http://127.0.0.1:8000/api/roaster-inquiry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          roastery_name: formData.roasteryName,
-          contact_name: formData.contactName,
-          email: formData.email,
-          website: formData.website,
-          location: formData.location,
-          coffee_count: formData.coffeeCount,
-          sample_barcodes: formData.sampleBarcodes,
-          message: formData.message
-        })
-      });
+    const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.ok) {
-          liveSuccess = true;
-          setSubmissionResponse(data);
+    if (isLocalhost) {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/roaster-inquiry', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roastery_name: formData.roasteryName,
+            contact_name: formData.contactName,
+            email: formData.email,
+            website: formData.website,
+            location: formData.location,
+            coffee_count: formData.coffeeCount,
+            sample_barcodes: formData.sampleBarcodes,
+            message: formData.message
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok) {
+            liveSuccess = true;
+            setSubmissionResponse(data);
+          }
         }
+      } catch (err) {
+        // Dev server not active on port 8000
       }
-    } catch (err) {
-      console.warn('War Room backend unreachable; falling back to direct mailto dispatch', err);
     }
 
     if (!liveSuccess) {
@@ -133,7 +137,7 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
         `Looking forward to partnering!`
       );
       window.location.href = `mailto:${emailHq}?subject=${subject}&body=${body}`;
-      setSubmissionResponse({ ok: true, lead_id: 'LOCAL_MAIL_DISPATCH', fallback: true });
+      setSubmissionResponse({ ok: true, lead_id: 'DIRECT_HQ_DISPATCH', emailClientLaunched: true });
     }
 
     setIsSubmitting(false);

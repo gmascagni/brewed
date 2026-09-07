@@ -679,6 +679,24 @@ export default function App() {
             onSelectMethod={(method) => {
               handleSelectMethodFromGrid(method);
             }}
+            onSelectRecipe={(recipe) => {
+              const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+              const match = allMethods.find(m => m.id === recipe.methodId);
+              if (match) {
+                handleSelectMethodFromGrid(match);
+              }
+              if (recipe.ratio) setCustomRatio(recipe.ratio);
+              setCurrentStep(2);
+              setIsSearchOpen(false);
+            }}
+            onSelectOrigin={(origin) => {
+              setCurrentStep(3);
+              setIsSearchOpen(false);
+              setTimeout(() => {
+                const el = document.getElementById('step-3');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
           />
 
           {/* Community Hub Modal */}

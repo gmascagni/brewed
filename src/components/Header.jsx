@@ -224,21 +224,6 @@ export default function Header({
             </button>
           )}
 
-          {/* Specialty Roaster Partner Portal Trigger */}
-          {(onOpenRoasterInfo || onOpenRoasterPortal) && (
-            <button
-              onClick={onOpenRoasterInfo || onOpenRoasterPortal}
-              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
-                isCoffee
-                  ? 'bg-[#2A1C12]/50 border-orange-500/40 text-orange-300 hover:bg-[#38261A]/60'
-                  : 'bg-emerald-950/50 border-sage-500/40 text-sage-300 hover:bg-emerald-900/60'
-              }`}
-              title="Add Your Roastery Labels & Smart Bag Packaging Codes"
-            >
-              <span className="hidden xl:inline">Partner Ingestion</span>
-            </button>
-          )}
-
           {/* Brew News Dispatch Trigger */}
           <button
             onClick={() => {

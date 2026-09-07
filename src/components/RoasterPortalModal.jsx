@@ -793,6 +793,33 @@ export default function RoasterPortalModal({
                     className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold font-mono"
                   />
                 </div>
+
+                {/* Optional Retail Barcode or Batch Lot SKU */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-cream-soft/70 font-mono text-xs">
+                      Retail Bag Barcode (UPC/EAN) or Batch Lot SKU (Optional)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleGenerateRandomSku}
+                      className="text-[10px] font-mono text-amber-gold hover:underline flex items-center gap-1 font-bold"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>Assign Lot SKU</span>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={upc}
+                    onChange={(e) => setUpc(e.target.value)}
+                    placeholder="e.g. 850012345099 or LOT-2026-WORKA"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light font-mono text-xs focus:outline-none focus:border-amber-gold"
+                  />
+                  <p className="text-[10px] text-cream-soft/50 mt-1">
+                    When customers scan this barcode with the camera scanner, your dialed-in recipe and roastery profile load automatically.
+                  </p>
+                </div>
               </div>
 
               {/* Extraction Parameters Card */}
@@ -804,34 +831,31 @@ export default function RoasterPortalModal({
 
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
                   <div>
-                    <label className="block text-cream-soft/70 font-mono mb-1">Primary Brew Method</label>
+                    <label className="block text-cream-soft/70 font-mono mb-1">Recommended Method</label>
                     <select
                       value={brewMethod}
                       onChange={(e) => setBrewMethod(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold"
                     >
-                      <option value="pour_over">Hario V60 (Pour Over)</option>
-                      <option value="classic_pour_over">Kalita Wave / Flat Bed</option>
-                      <option value="chemex">Chemex</option>
-                      <option value="aeropress">AeroPress</option>
-                      <option value="espresso">Espresso (9 Bar)</option>
-                      <option value="french_press">French Press (Immersion)</option>
-                      <option value="moka_pot">Moka Pot</option>
+                      <option value="classic_pour_over">Flat-Bottom (Kalita Wave)</option>
+                      <option value="pour_over">Conical (Hario V60)</option>
+                      <option value="chemex">Chemex Glass</option>
+                      <option value="aeropress">AeroPress Standard</option>
+                      <option value="french_press">French Press Immersion</option>
+                      <option value="espresso">9-Bar Espresso</option>
+                      <option value="moka_pot">Moka Pot Stovetop</option>
+                      <option value="drip_brewer">Batch Precision Brewer</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-cream-soft/70 font-mono mb-1">
-                      Golden Ratio (1 : X)
-                    </label>
+                    <label className="block text-cream-soft/70 font-mono mb-1">Golden Ratio (1 : X)</label>
                     <input
                       type="number"
                       step="0.1"
-                      min="1"
-                      max="25"
                       value={recommendedRatio}
                       onChange={(e) => setRecommendedRatio(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold font-mono font-bold"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light font-mono focus:outline-none focus:border-amber-gold"
                     />
                   </div>
 
@@ -839,29 +863,27 @@ export default function RoasterPortalModal({
                     <label className="block text-cream-soft/70 font-mono mb-1">Water Temp (°F)</label>
                     <input
                       type="number"
-                      min="160"
-                      max="212"
                       value={tempF}
                       onChange={(e) => setTempF(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold font-mono font-bold"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light font-mono focus:outline-none focus:border-amber-gold"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-cream-soft/70 font-mono mb-1">Grind Size Recommendation</label>
+                    <label className="block text-cream-soft/70 font-mono mb-1">Grind Setting</label>
                     <input
                       type="text"
                       value={recommendedGrind}
                       onChange={(e) => setRecommendedGrind(e.target.value)}
-                      placeholder="e.g. Medium-Fine (650µm)"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold font-mono"
+                      placeholder="e.g. Medium-Fine (550μm)"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light font-mono focus:outline-none focus:border-amber-gold"
                     />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-cream-soft/70 font-mono text-xs mb-1">
-                    Roaster's Extraction Technique & Advice
+                    Roaster Pour Cadence & Bloom Technique
                   </label>
                   <textarea
                     rows={2}
@@ -870,92 +892,6 @@ export default function RoasterPortalModal({
                     placeholder="e.g. 45-second gentle bloom with soft water (60-80 ppm TDS). Pour slowly in concentric rings avoiding filter edges."
                     className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold"
                   />
-                </div>
-              </div>
-
-              {/* CARD 4: REAL QR CODE DESTINATION & LIVE PREVIEW */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-black/30 border border-white/10 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-amber-gold font-mono text-xs uppercase font-bold tracking-wider">
-                    <QrCode className="w-4 h-4" />
-                    <span>4. Smart Bag QR Code Destination & Live Preview</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleGenerateRandomSku}
-                    className="text-[11px] font-mono text-amber-gold hover:underline flex items-center gap-1 font-bold"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Assign Batch Lot SKU</span>
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-cream-soft/70 font-mono mb-1">
-                        Packaging Batch SKU / Lot Code (Optional)
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={upc}
-                          onChange={(e) => setUpc(e.target.value)}
-                          placeholder="e.g. LOT-2026-WORKA or 850012345099"
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light font-mono text-xs focus:outline-none focus:border-amber-gold"
-                        />
-                        <button
-                          type="button"
-                          onClick={handleGenerateRandomSku}
-                          className="px-3 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-gold font-mono text-xs whitespace-nowrap border border-amber-500/40 transition"
-                        >
-                          New Lot
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-cream-soft/70 font-mono mb-1">
-                        Custom Destination URL (Optional Override)
-                      </label>
-                      <input
-                        type="url"
-                        value={customUrl}
-                        onChange={(e) => setCustomUrl(e.target.value)}
-                        placeholder="Leave blank to auto-generate The Brew App deep link"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light font-mono text-xs focus:outline-none focus:border-amber-gold"
-                      />
-                      <p className="text-[10px] text-cream-soft/60 mt-1">
-                        By default, the QR code encodes a direct deep link with your golden ratio, water temperature, and brew guide pre-configured.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Real QR Live Preview Box */}
-                  <div className="p-4 rounded-2xl bg-white text-stone-900 border border-amber-gold/50 flex flex-col items-center justify-center shadow-inner text-center">
-                    <span className="text-[9px] font-mono text-stone-500 uppercase tracking-widest font-bold mb-2">
-                      Live Generated QR Code
-                    </span>
-                    
-                    <div className="p-2 bg-white rounded-xl shadow-md border border-stone-200">
-                      {miniQrDataUrl ? (
-                        <img
-                          src={miniQrDataUrl}
-                          alt="Real QR Code Live Preview"
-                          className="w-32 h-32 object-contain"
-                        />
-                      ) : (
-                        <div className="w-32 h-32 flex items-center justify-center text-stone-400 font-mono text-xs">
-                          Generating QR...
-                        </div>
-                      )}
-                    </div>
-
-                    <span className="text-[9px] font-mono text-emerald-700 font-bold mt-2 flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" />
-                      <span>Scannable with any phone camera right now</span>
-                    </span>
-                  </div>
                 </div>
               </div>
 

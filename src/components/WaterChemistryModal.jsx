@@ -18,7 +18,8 @@ import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
-  Check
+  Check,
+  Copy
 } from 'lucide-react';
 import { BOTTLED_WATERS, BOTTLED_WATER_CATEGORIES } from '../data/bottledWaterData';
 
@@ -85,11 +86,45 @@ export default function WaterChemistryModal({ isOpen, onClose }) {
   const [bottledCategory, setBottledCategory] = useState('all');
   const [bottledSearch, setBottledSearch] = useState('');
   const [expandedWaterId, setExpandedWaterId] = useState(null);
+  const [copiedFormula, setCopiedFormula] = useState(false);
 
   if (!isOpen) return null;
 
   // Scaling factor based on batch volume
   const scale = waterBatchVolumeLiters;
+
+  const handleCopyFormula = () => {
+    let text = '';
+    if (activeTab === 'custom') {
+      if (formulaMode === 'lotus') {
+        const cal = Math.round(selectedPreset.lotusFormula.calcium * scale);
+        const mag = Math.round(selectedPreset.lotusFormula.magnesium * scale);
+        const buf = Math.round(selectedPreset.lotusFormula.buffer * scale);
+        text = `Coffee Water Spec: ${selectedPreset.name} (${waterBatchVolumeLiters}L Batch)\nLotus Drops: ${cal} Calcium, ${mag} Magnesium, ${buf} Buffer\nTarget TDS: ${selectedPreset.tdsTarget} PPM | GH: ${selectedPreset.ghTarget} | KH: ${selectedPreset.khTarget}`;
+      } else {
+        const epsom = (selectedPreset.diyFormula.epsomMl * (waterBatchVolumeLiters / 3.8)).toFixed(1);
+        const soda = (selectedPreset.diyFormula.bakingSodaMl * (waterBatchVolumeLiters / 3.8)).toFixed(1);
+        text = `Coffee Water Spec: ${selectedPreset.name} (${waterBatchVolumeLiters}L Batch)\nDIY Concentrates: ${epsom} mL Epsom Salt (MgSO₄), ${soda} mL Baking Soda (NaHCO₃)\nTarget TDS: ${selectedPreset.tdsTarget} PPM | GH: ${selectedPreset.ghTarget} | KH: ${selectedPreset.khTarget}`;
+      }
+    } else {
+      text = `SCA Bottled Water Target: 150 PPM TDS (Range: 75–250 PPM). Recommended brands: Crystal Geyser (Weed, CA / Mt. Shasta), Volvic, Iceland Pure Spring.`;
+    }
+
+    try {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setCopiedFormula(true);
+      setTimeout(() => setCopiedFormula(false), 2500);
+    } catch {}
+  };
 
   // Filter bottled waters
   const filteredBottledWaters = BOTTLED_WATERS.filter((water) => {
@@ -589,7 +624,14 @@ export default function WaterChemistryModal({ isOpen, onClose }) {
                   <div className="p-5 rounded-2xl bg-black/40 border border-cyan-500/30 space-y-3">
                     <div className="flex items-center justify-between text-xs font-mono">
                       <span className="font-bold text-cream-light">Lotus Coffee Water Drops ({waterBatchVolumeLiters}L batch)</span>
-                      <span className="text-cyan-400 font-bold">Standard 450mL Ratio Scaled</span>
+                      <button
+                        type="button"
+                        onClick={handleCopyFormula}
+                        className="text-[11px] font-mono font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 hover:underline cursor-pointer"
+                      >
+                        {copiedFormula ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-cyan-400" />}
+                        <span>{copiedFormula ? 'Copied' : 'Copy Drops'}</span>
+                      </button>
                     </div>
                     <div className="grid grid-cols-3 gap-3 text-center font-mono">
                       <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10">
@@ -621,7 +663,14 @@ export default function WaterChemistryModal({ isOpen, onClose }) {
                   <div className="p-5 rounded-2xl bg-black/40 border border-amber-500/30 space-y-3">
                     <div className="flex items-center justify-between text-xs font-mono">
                       <span className="font-bold text-cream-light">DIY Concentrates ({waterBatchVolumeLiters}L batch)</span>
-                      <span className="text-amber-gold font-bold">Barista Hustle Standard</span>
+                      <button
+                        type="button"
+                        onClick={handleCopyFormula}
+                        className="text-[11px] font-mono font-bold text-amber-gold hover:text-amber-300 flex items-center gap-1 hover:underline cursor-pointer"
+                      >
+                        {copiedFormula ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-amber-gold" />}
+                        <span>{copiedFormula ? 'Copied' : 'Copy DIY'}</span>
+                      </button>
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-center font-mono">
                       <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10">
@@ -649,16 +698,27 @@ export default function WaterChemistryModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 sm:p-5 border-t border-white/10 bg-black/40 flex items-center justify-between text-xs font-mono">
-          <span className="text-cream-soft/60">
+        <div className="p-4 sm:p-5 border-t border-white/10 bg-black/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
+          <span className="text-cream-soft/60 text-center sm:text-left">
             SCA Target TDS: <strong className="text-amber-gold">150 PPM</strong> (Range: 75–250)
           </span>
-          <button
-            onClick={onClose}
-            className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-bold uppercase tracking-wider transition active:scale-95 cursor-pointer"
-          >
-            Done
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCopyFormula}
+              className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-bold flex items-center gap-1.5 transition active:scale-95 border border-white/15 cursor-pointer"
+            >
+              {copiedFormula ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-amber-gold" />}
+              <span>{copiedFormula ? 'Formula Copied!' : 'Copy Mineral Spec'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-bold uppercase tracking-wider transition active:scale-95 cursor-pointer"
+            >
+              Done
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -918,40 +918,12 @@ export default function BarcodeScannerModal({
                       onOpenRoasterPortal(uncatalogedResult.code);
                       onClose();
                     }}
-                    className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold flex items-center justify-center gap-2 border border-white/15"
+                    className="px-4 py-2.5 rounded-xl bg-amber-gold hover:bg-amber-300 text-espresso-950 font-mono text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
                   >
-                    <Store className="w-4 h-4 text-amber-gold" />
-                    <span>Self-Service Onboard</span>
+                    <Store className="w-4 h-4 text-espresso-950" />
+                    <span>Onboard & Register Recipe</span>
                   </button>
                 )}
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMatchedBean({
-                      id: `custom_${uncatalogedResult.code}`,
-                      upc: uncatalogedResult.code,
-                      roaster: "My Coffee Roastery",
-                      beanName: "Custom Coffee Lot",
-                      origin: "Specialty Origin",
-                      process: "Washed / Natural",
-                      elevation: "Specialty Lot",
-                      roastLevel: "Medium",
-                      tastingNotes: ["Balanced", "Sweet", "Clean"],
-                      recommendedRatio: 16,
-                      recommendedGrind: "Medium",
-                      tempC: 93,
-                      tempF: 200,
-                      brewMethod: "pour_over",
-                      notes: `Custom recipe saved for retail barcode (${uncatalogedResult.code}).`
-                    });
-                    setUncatalogedResult(null);
-                  }}
-                  className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold flex items-center justify-center gap-2 border border-white/15 transition active:scale-95"
-                >
-                  <Coffee className="w-4 h-4 text-amber-gold" />
-                  <span>Home Barista Recipe</span>
-                </button>
               </div>
             </div>
           )}

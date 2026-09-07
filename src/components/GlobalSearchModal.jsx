@@ -5,7 +5,7 @@ import { PRODUCTS_DATA } from '../data/productsData';
 import { COMMUNITY_RECIPES } from '../data/communityRecipesData';
 import { trackEvent } from '../utils/analytics';
 
-export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onSelectProduct, onSelectRecipe }) {
+export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onSelectProduct, onSelectRecipe, onSelectOrigin }) {
   if (!isOpen) return null;
 
   const [query, setQuery] = useState('');
@@ -72,6 +72,18 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
   const handleSelectMethod = (method) => {
     trackEvent('search_select_method', { method_id: method.id, method_name: method.name });
     if (onSelectMethod) onSelectMethod(method);
+    onClose();
+  };
+
+  const handleSelectRecipe = (recipe) => {
+    trackEvent('search_select_recipe', { recipe_id: recipe.id, recipe_title: recipe.title });
+    if (onSelectRecipe) onSelectRecipe(recipe);
+    onClose();
+  };
+
+  const handleSelectOrigin = (origin) => {
+    trackEvent('search_select_origin', { origin_id: origin.id, country: origin.country });
+    if (onSelectOrigin) onSelectOrigin(origin);
     onClose();
   };
 
@@ -149,7 +161,8 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
                 {matchingRecipes.map((recipe) => (
                   <div
                     key={recipe.id}
-                    className="p-3.5 rounded-2xl bg-black/40 border border-white/10 hover:border-amber-gold/50 transition-all flex items-center justify-between gap-3 group cursor-pointer"
+                    onClick={() => handleSelectRecipe(recipe)}
+                    className="p-3.5 rounded-2xl bg-black/40 border border-white/10 hover:border-amber-gold/50 transition-all flex items-center justify-between gap-3 group cursor-pointer active:scale-[0.99]"
                   >
                     <div>
                       <div className="font-serif font-bold text-cream-light text-sm group-hover:text-amber-gold transition-colors">
@@ -243,7 +256,8 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
                 {matchingOrigins.map((orig) => (
                   <div
                     key={orig.id}
-                    className="p-3.5 rounded-2xl bg-black/40 border border-white/10 hover:border-amber-gold/50 transition-all flex flex-col justify-between gap-2 group cursor-pointer"
+                    onClick={() => handleSelectOrigin(orig)}
+                    className="p-3.5 rounded-2xl bg-black/40 border border-white/10 hover:border-amber-gold/50 transition-all flex flex-col justify-between gap-2 group cursor-pointer active:scale-[0.99]"
                   >
                     <div className="flex items-center justify-between">
                       <div className="font-serif font-bold text-cream-light text-sm flex items-center gap-2 group-hover:text-amber-gold transition-colors">
