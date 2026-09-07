@@ -38,7 +38,7 @@ export default function Header({
           </div>
           <div>
             <h1 className="font-serif text-xl font-bold tracking-wider text-cream-light flex items-center gap-2">
-              <span>The Brew App</span>
+              <span>TheBrew.App</span>
               <span className={`whitespace-nowrap text-[9px] uppercase font-mono px-2 py-0.5 rounded-full border transition-colors ${
                 isCoffee
                   ? 'bg-[#A66E38]/20 text-[#D2A06E] border-[#A66E38]/40'
