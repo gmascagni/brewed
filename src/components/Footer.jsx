@@ -35,6 +35,20 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
             </button>
           )}
 
+          {/* Official YouTube Channel Link */}
+          <a
+            href="https://www.youtube.com/@TheBrewapp"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackEvent('youtube_channel_footer_click')}
+            className="py-2 px-3.5 rounded-xl bg-red-600/10 hover:bg-red-600/20 text-red-400 hover:text-red-300 border border-red-500/25 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow"
+            title="Official The Brew App YouTube Channel (@TheBrewapp)"
+          >
+            <Tv className="w-3.5 h-3.5" />
+            <span>YouTube Channel</span>
+            <ExternalLink className="w-3 h-3 opacity-80" />
+          </a>
+
           {onOpenRoasterShowcase && (
             <button
               onClick={onOpenRoasterShowcase}

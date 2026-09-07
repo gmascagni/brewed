@@ -127,6 +127,19 @@ export default function CoffeeVideoAcademyModal({
           </div>
 
           <div className="flex items-center gap-3">
+            <a
+              href="https://www.youtube.com/@TheBrewapp?sub_confirmation=1"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent('youtube_subscribe_modal_header_click')}
+              className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold shadow-lg shadow-red-600/25 transition hover:scale-105 active:scale-95"
+              title="Subscribe to The Brew App on YouTube"
+            >
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>Subscribe</span>
+              <ExternalLink className="w-3 h-3 opacity-80" />
+            </a>
+
             <button
               onClick={onClose}
               className="p-2.5 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-soft hover:text-white border border-white/10 transition"
