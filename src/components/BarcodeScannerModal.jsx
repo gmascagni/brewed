@@ -18,7 +18,9 @@ import {
   BookmarkPlus,
   Store,
   Loader2,
-  Mail
+  Mail,
+  Download,
+  Printer
 } from 'lucide-react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import jsQR from 'jsqr';
@@ -362,6 +364,16 @@ export default function BarcodeScannerModal({
     setCapturedSnapshot(null);
     setScanNotice(null);
     setIsSnapshotScanning(false);
+  };
+
+  const handleDownloadSnapshot = () => {
+    if (!capturedSnapshot) return;
+    const a = document.createElement('a');
+    a.href = capturedSnapshot;
+    a.download = `coffee_bag_snapshot_${Date.now()}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   };
 
   const handleCodeDetected = async (rawValue, format = 'code') => {
@@ -719,16 +731,26 @@ export default function BarcodeScannerModal({
               <span>{capturedSnapshot ? 'Captured Snapshot' : (cameraActive ? 'Live Camera Feed' : 'Camera Standby')}</span>
             </div>
 
-            {/* Retake Button Overlay (When Snapshot is Displayed) */}
+            {/* Retake & Save Buttons Overlay (When Snapshot is Displayed) */}
             {capturedSnapshot && (
-              <div className="absolute bottom-3 inset-x-0 flex items-center justify-center gap-2 z-20">
+              <div className="absolute bottom-3 inset-x-0 flex items-center justify-center gap-2.5 z-20">
                 <button
                   type="button"
                   onClick={handleRetakeSnapshot}
-                  className="px-4 py-2 rounded-xl bg-amber-gold text-espresso-950 font-mono font-bold text-xs flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition"
+                  className="px-3.5 py-1.5 rounded-xl bg-amber-gold text-espresso-950 font-mono font-bold text-xs flex items-center gap-1.5 shadow-2xl hover:scale-105 active:scale-95 transition"
                 >
-                  <RefreshCw className="w-4 h-4 text-espresso-950" />
+                  <RefreshCw className="w-3.5 h-3.5 text-espresso-950" />
                   <span>Retake Photo</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDownloadSnapshot}
+                  className="px-3.5 py-1.5 rounded-xl bg-black/80 hover:bg-black text-cream-light font-mono font-bold text-xs flex items-center gap-1.5 shadow-2xl border border-white/20 hover:scale-105 active:scale-95 transition"
+                  title="Download captured photo to your device"
+                >
+                  <Download className="w-3.5 h-3.5 text-amber-gold" />
+                  <span>Save Image File</span>
                 </button>
               </div>
             )}
@@ -755,6 +777,18 @@ export default function BarcodeScannerModal({
                   </>
                 )}
               </button>
+
+              {capturedSnapshot && (
+                <button
+                  type="button"
+                  onClick={handleDownloadSnapshot}
+                  className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold border border-white/15 transition active:scale-95"
+                  title="Save captured photo to Downloads"
+                >
+                  <Download className="w-3.5 h-3.5 text-amber-gold" />
+                  <span>Save Image</span>
+                </button>
+              )}
 
               <label className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light border border-white/10 cursor-pointer transition active:scale-95 font-mono">
                 <Upload className="w-3.5 h-3.5 text-amber-gold" />
@@ -977,6 +1011,21 @@ export default function BarcodeScannerModal({
 
               {/* Action Buttons */}
               <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-end gap-3">
+                {onOpenRoasterPortal && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onOpenRoasterPortal(matchedBean.upc, matchedBean);
+                      onClose();
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-gold border border-amber-500/40 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95"
+                    title="Open Roaster Studio to export packaging sticker with 'Scan Me for Recipe' or vector SVG for your printer"
+                  >
+                    <QrCode className="w-4 h-4 text-amber-gold" />
+                    <span>Export Sticker for Printer</span>
+                  </button>
+                )}
+
                 <button
                   onClick={handleSaveToCellar}
                   className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light text-xs font-mono font-bold flex items-center gap-2 border border-white/15 transition active:scale-95"

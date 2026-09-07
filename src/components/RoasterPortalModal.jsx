@@ -256,6 +256,195 @@ export default function RoasterPortalModal({
     window.print();
   };
 
+  const handleDownloadFullStickerPng = async () => {
+    const coffee = selectedCoffeeForSticker || {
+      roaster: roasterName || 'Specialty Roaster',
+      location: location || 'Artisan Small Batch',
+      beanName: beanName || 'Single Origin Lot',
+      origin: origin || 'Single Origin',
+      process: process || 'Washed',
+      elevation: elevation || '1,850 MASL',
+      roastLevel: roastLevel || 'Light',
+      tastingNotes: tastingNotesInput ? tastingNotesInput.split(',').map(s => s.trim()).filter(Boolean) : ['Peach', 'Jasmine', 'Honey'],
+      brewMethod: brewMethod || 'pour_over',
+      recommendedRatio: recommendedRatio || 16.5,
+      tempF: tempF || 202,
+      recommendedGrind: recommendedGrind || 'Medium-Fine',
+      upc: upc || 'LOT-2026-CERTIFIED'
+    };
+
+    const targetUrl = customUrl.trim() || generateSmartBagUrl(coffee);
+
+    // Create high-res 300 DPI canvas (1200 x 1800 px for standard 2"x3" or 3"x4.5" commercial bag stickers)
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 1800;
+    const ctx = canvas.getContext('2d');
+
+    // Clean white label background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, 1200, 1800);
+
+    // Outer printer bleed & border
+    ctx.strokeStyle = '#1C1917';
+    ctx.lineWidth = 10;
+    ctx.strokeRect(30, 30, 1140, 1740);
+
+    // Inner hairline frame
+    ctx.strokeStyle = '#E7E5E4';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(45, 45, 1110, 1710);
+
+    // Category Top Header
+    ctx.fillStyle = '#78716C';
+    ctx.font = 'bold 22px -apple-system, monospace, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('SPECIALTY COFFEE ROASTERY • SMART BAG CERTIFIED', 70, 105);
+
+    // Roast Level Pill Badge
+    const roastText = (coffee.roastLevel || 'LIGHT').toUpperCase();
+    ctx.font = 'bold 22px monospace, sans-serif';
+    const badgeW = ctx.measureText(roastText).width + 36;
+    ctx.fillStyle = '#1C1917';
+    ctx.fillRect(1200 - 70 - badgeW, 78, badgeW, 42);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(roastText, 1200 - 70 - badgeW + 18, 107);
+
+    // Roaster Title
+    ctx.fillStyle = '#1C1917';
+    ctx.font = 'bold 52px Georgia, "Times New Roman", serif';
+    ctx.fillText(coffee.roaster, 70, 180);
+
+    // Roaster Location
+    ctx.fillStyle = '#57534E';
+    ctx.font = '28px -apple-system, sans-serif';
+    ctx.fillText(coffee.location || 'Artisan Small Batch', 70, 225);
+
+    // Dividing Rule
+    ctx.strokeStyle = '#1C1917';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(70, 255);
+    ctx.lineTo(1130, 255);
+    ctx.stroke();
+
+    // Coffee Lot Name
+    ctx.fillStyle = '#0C0A09';
+    ctx.font = 'bold 44px Georgia, serif';
+    ctx.fillText(coffee.beanName, 70, 315);
+
+    // Terroir Specs
+    ctx.fillStyle = '#44403C';
+    ctx.font = '500 26px -apple-system, sans-serif';
+    const originStr = `${coffee.origin || 'Single Origin'} • ${coffee.process || 'Washed'} • ${coffee.elevation || 'High Altitude'}`;
+    ctx.fillText(originStr, 70, 360);
+
+    // Tasting Notes
+    const notesStr = (coffee.tastingNotes || []).slice(0, 4).join(', ');
+    if (notesStr) {
+      ctx.fillStyle = '#92400E';
+      ctx.font = 'italic 26px Georgia, serif';
+      ctx.fillText(`Notes: ${notesStr}`, 70, 405);
+    }
+
+    // --- PROMINENT "SCAN ME FOR RECIPE" BANNER ---
+    const bannerY = 460;
+    const bannerH = 75;
+    ctx.fillStyle = '#1C1917';
+    if (ctx.roundRect) {
+      ctx.beginPath();
+      ctx.roundRect(140, bannerY, 920, bannerH, 37);
+      ctx.fill();
+    } else {
+      ctx.fillRect(140, bannerY, 920, bannerH);
+    }
+
+    ctx.fillStyle = '#F59E0B'; // Amber Gold
+    ctx.font = 'bold 32px -apple-system, monospace, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('✨  SCAN ME FOR RECIPE  ✨', 600, bannerY + 49);
+
+    // QR Code generation
+    const qrCanvas = document.createElement('canvas');
+    await QRCode.toCanvas(qrCanvas, targetUrl, {
+      width: 700,
+      margin: 1,
+      errorCorrectionLevel: 'H',
+      color: { dark: '#000000', light: '#FFFFFF' }
+    });
+
+    // Draw QR centered
+    ctx.drawImage(qrCanvas, 250, 560, 700, 700);
+
+    // Callout subtitle
+    ctx.fillStyle = '#78716C';
+    ctx.font = 'bold 22px monospace, sans-serif';
+    ctx.fillText('AIM PHONE CAMERA TO DIAL-IN & BREW', 600, 1315);
+
+    // Extraction Parameter Box
+    ctx.fillStyle = '#F5F5F4';
+    ctx.fillRect(70, 1360, 1060, 230);
+    ctx.strokeStyle = '#D6D3D1';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(70, 1360, 1060, 230);
+
+    ctx.fillStyle = '#78716C';
+    ctx.font = 'bold 20px monospace, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('BARISTA DIAL-IN SPECIFICATIONS', 100, 1400);
+
+    const colW = 1060 / 4;
+    const colY = 1455;
+
+    // Col 1: Ratio
+    ctx.fillStyle = '#78716C';
+    ctx.font = 'bold 18px monospace, sans-serif';
+    ctx.fillText('WATER RATIO', 100, colY);
+    ctx.fillStyle = '#92400E';
+    ctx.font = 'bold 36px monospace, sans-serif';
+    ctx.fillText(`1:${coffee.recommendedRatio}`, 100, colY + 45);
+
+    // Col 2: Water Temp
+    ctx.fillStyle = '#78716C';
+    ctx.font = 'bold 18px monospace, sans-serif';
+    ctx.fillText('WATER TEMP', 100 + colW, colY);
+    ctx.fillStyle = '#1C1917';
+    ctx.font = 'bold 36px monospace, sans-serif';
+    ctx.fillText(`${coffee.tempF}°F`, 100 + colW, colY + 45);
+
+    // Col 3: Method
+    ctx.fillStyle = '#78716C';
+    ctx.font = 'bold 18px monospace, sans-serif';
+    ctx.fillText('BREW METHOD', 100 + colW * 2, colY);
+    ctx.fillStyle = '#1C1917';
+    ctx.font = 'bold 28px -apple-system, sans-serif';
+    ctx.fillText((coffee.brewMethod || 'pour_over').replace(/_/g, ' '), 100 + colW * 2, colY + 42);
+
+    // Col 4: Grind
+    ctx.fillStyle = '#78716C';
+    ctx.font = 'bold 18px monospace, sans-serif';
+    ctx.fillText('GRIND SIZE', 100 + colW * 3, colY);
+    ctx.fillStyle = '#1C1917';
+    ctx.font = 'bold 26px -apple-system, sans-serif';
+    ctx.fillText((coffee.recommendedGrind || 'Medium-Fine').split('(')[0].trim(), 100 + colW * 3, colY + 42);
+
+    // Footer
+    ctx.fillStyle = '#A8A29E';
+    ctx.font = 'bold 22px monospace, sans-serif';
+    ctx.fillText('thebrew.app dial-in', 70, 1660);
+    ctx.textAlign = 'right';
+    ctx.fillText(`LOT: ${coffee.upc || 'CERTIFIED-LOT'}`, 1130, 1660);
+
+    // Trigger Download to user's device Downloads directory
+    const slug = (coffee.beanName || 'coffee').toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `smart_bag_sticker_${slug}_print_ready_300dpi.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
   const handleDownloadQrPng = () => {
     if (!qrDataUrl) return;
     const a = document.createElement('a');
@@ -875,6 +1064,12 @@ export default function RoasterPortalModal({
 
                     {/* Real High-Resolution QR Code */}
                     <div className="p-3 bg-white border border-stone-200 rounded-2xl flex flex-col items-center justify-center shadow-inner mx-auto w-fit">
+                      {/* Prominent "Scan Me for Recipe" Callout Badge */}
+                      <div className="flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-stone-900 text-white font-mono text-[10px] font-bold uppercase tracking-wider mb-2.5 shadow-md border border-stone-700">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Scan Me for Recipe</span>
+                      </div>
+
                       {qrDataUrl ? (
                         <img
                           src={qrDataUrl}
@@ -886,8 +1081,8 @@ export default function RoasterPortalModal({
                           Generating QR...
                         </div>
                       )}
-                      <span className="text-[9px] font-mono text-stone-500 font-bold uppercase tracking-wider mt-1.5">
-                        Scan with phone camera to brew
+                      <span className="text-[9px] font-mono text-stone-600 font-bold uppercase tracking-wider mt-1.5">
+                        Aim phone camera to brew
                       </span>
                     </div>
 
@@ -946,7 +1141,13 @@ export default function RoasterPortalModal({
                       </p>
                     </div>
 
-                    <div className="flex justify-center p-3 bg-white rounded-2xl shadow-md mx-auto w-fit">
+                    <div className="flex flex-col items-center justify-center p-3.5 bg-white rounded-2xl shadow-md mx-auto w-fit">
+                      {/* Prominent "Scan Me for Recipe" Badge */}
+                      <div className="flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-[#1A120B] text-amber-gold font-mono text-[10px] font-bold uppercase tracking-wider mb-2 border border-amber-gold/40 shadow-sm">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-gold" />
+                        <span>Scan Me for Recipe</span>
+                      </div>
+
                       {qrDataUrl ? (
                         <img
                           src={qrDataUrl}
@@ -1007,7 +1208,13 @@ export default function RoasterPortalModal({
                       </p>
                     </div>
 
-                    <div className="flex justify-center">
+                    <div className="flex flex-col items-center justify-center">
+                      {/* Prominent "Scan Me for Recipe" Badge */}
+                      <div className="flex items-center justify-center gap-1 px-2.5 py-0.5 rounded-full bg-stone-900 text-white font-mono text-[9px] font-bold uppercase tracking-wider mb-1.5 shadow-sm">
+                        <Sparkles className="w-3 h-3 text-amber-400" />
+                        <span>Scan Me for Recipe</span>
+                      </div>
+
                       {qrDataUrl ? (
                         <img
                           src={qrDataUrl}
@@ -1034,11 +1241,20 @@ export default function RoasterPortalModal({
               {/* Action Buttons for QR Studio */}
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <button
-                  onClick={handlePrintSticker}
-                  className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold flex items-center gap-2 shadow-lg transition active:scale-95"
+                  onClick={handleDownloadFullStickerPng}
+                  className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-gold/20 hover:scale-105 active:scale-95 transition"
+                  title="Download complete 300 DPI composite packaging sticker PNG ready to email or upload to your printer"
                 >
-                  <Printer className="w-4 h-4" />
-                  <span>Print Active QR Label</span>
+                  <Download className="w-4 h-4 text-espresso-950" />
+                  <span>Download Complete Sticker (PNG)</span>
+                </button>
+
+                <button
+                  onClick={handlePrintSticker}
+                  className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold flex items-center gap-2 border border-white/15 transition active:scale-95"
+                >
+                  <Printer className="w-4 h-4 text-amber-gold" />
+                  <span>Print Label Direct</span>
                 </button>
 
                 <button
@@ -1047,7 +1263,7 @@ export default function RoasterPortalModal({
                   title="Download scalable vector SVG for commercial bag packaging printers"
                 >
                   <Download className="w-4 h-4 text-amber-gold" />
-                  <span>Download Vector (SVG)</span>
+                  <span>Vector QR (SVG)</span>
                 </button>
 
                 <button
@@ -1056,7 +1272,7 @@ export default function RoasterPortalModal({
                   title="Download ultra-crisp 1200px PNG"
                 >
                   <Download className="w-4 h-4 text-amber-gold" />
-                  <span>Download High-Res (PNG)</span>
+                  <span>Standalone QR (PNG)</span>
                 </button>
 
                 <button
@@ -1084,6 +1300,22 @@ export default function RoasterPortalModal({
                   <ExternalLink className="w-4 h-4 text-amber-gold" />
                   <span>Test Link</span>
                 </button>
+              </div>
+
+              {/* Printer Handoff Guidance Banner */}
+              <div className="p-4 rounded-2xl bg-black/40 border border-white/10 flex items-start gap-3 text-xs font-mono text-cream-soft/80">
+                <FileText className="w-4 h-4 text-amber-gold shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <span className="font-bold text-cream-light block">
+                    Where Files Save & Handoff to Your Packaging Printer:
+                  </span>
+                  <p className="text-[11px] leading-relaxed">
+                    When you click <strong>"Download Complete Sticker (PNG)"</strong> or <strong>"Vector QR (SVG)"</strong>, your browser saves the high-resolution file directly into your device's default <strong>Downloads</strong> folder (e.g. <code>Downloads/smart_bag_sticker_*.png</code>).
+                  </p>
+                  <p className="text-[11px] leading-relaxed text-amber-gold/90">
+                    You can email the 300-DPI PNG directly to your label printer for thermal sticker rolls (Avery, Zebra, Rollo, Dymo), or provide the vector SVG to your bag packaging manufacturer. The sticker includes the prominent <strong>"Scan Me for Recipe"</strong> callout so customers can instantly scan it on retail shelves.
+                  </p>
+                </div>
               </div>
 
             </div>

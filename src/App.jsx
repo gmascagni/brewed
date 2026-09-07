@@ -667,8 +667,9 @@ export default function App() {
             }}
             onApplyRecipe={handleApplyScannedRecipe}
             onSaveToJournal={handleSaveScannedToJournal}
-            onOpenRoasterPortal={(code) => {
-              setRoasterPrefillBarcode(code || '');
+            onOpenRoasterPortal={(code, bean) => {
+              setRoasterPrefillBarcode(typeof code === 'string' ? code : '');
+              setRoasterPrefillBean(bean || null);
               setIsRoasterPortalOpen(true);
             }}
             onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
