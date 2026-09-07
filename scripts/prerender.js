@@ -452,7 +452,7 @@ const roasterJsonLd = {
           "name": "How do I add my roastery and coffee labels to The Brew App?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Specialty roasters can contact HQ at gmascagni@gmail.com with their roastery details, coffee varieties, and retail UPC/EAN barcodes, or use the interactive Roaster Portal inside the app."
+            "text": "Specialty roasters can contact HQ at clay@thebrew.app with their roastery details, coffee varieties, and retail UPC/EAN barcodes, or use the interactive Roaster Portal inside the app."
           }
         },
         {
@@ -510,7 +510,7 @@ const roasterContent = `
     <section style="background: rgba(212, 140, 70, 0.08); border: 1px solid rgba(212, 140, 70, 0.3); border-radius: 16px; padding: 24px; margin-bottom: 32px;">
       <h2 style="font-family: Georgia, serif; font-size: 20px; color: #D48C46; margin-top: 0;">Contact HQ to Add Your Labels</h2>
       <p style="font-size: 14px; color: #E4D5C7;">To request inclusion in our verified specialty coffee database, please contact our roaster partnerships team directly:</p>
-      <p style="font-family: monospace; font-size: 15px; color: #FFF;">Email: <a href="mailto:gmascagni@gmail.com?subject=Roastery%20Label%20Ingestion" style="color: #D48C46; text-decoration: underline;">gmascagni@gmail.com</a></p>
+      <p style="font-family: monospace; font-size: 15px; color: #FFF;">Email: <a href="mailto:clay@thebrew.app?subject=Roastery%20Label%20Ingestion" style="color: #D48C46; text-decoration: underline;">clay@thebrew.app</a></p>
       <p style="font-size: 12px; color: #C5A894;">Or open <a href="https://thebrew.app" style="color: #D48C46; text-decoration: underline;">The Brew App</a> and click <strong>For Roasters</strong> in the header navigation.</p>
     </section>
 

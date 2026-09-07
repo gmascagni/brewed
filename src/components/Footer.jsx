@@ -4,7 +4,7 @@ import { trackEvent } from '../utils/analytics';
 
 export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpenRoasterShowcase }) {
   const isCoffee = trackMode === 'coffee';
-  const emailAddress = 'gmascagni@gmail.com';
+  const emailAddress = 'clay@thebrew.app';
 
   const handleMailtoClick = () => {
     trackEvent('contact_click_mailto', { email: emailAddress });

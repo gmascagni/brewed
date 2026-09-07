@@ -37,7 +37,7 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
     message: ''
   });
 
-  const emailHq = 'gmascagni@gmail.com';
+  const emailHq = 'clay@thebrew.app';
 
   if (!isOpen) return null;
 
