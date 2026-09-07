@@ -2,6 +2,8 @@
 // Manages verified partner roasters, custom bean profiles, and packaging QR generation.
 
 import QRCode from 'qrcode';
+import { doc, setDoc, deleteDoc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
+import { db } from '../services/firebase.js';
 
 const STORAGE_KEY = 'thebrewapp_roaster_registry_v1';
 
@@ -66,6 +68,23 @@ export function saveRoasterCoffee(coffee) {
       console.error('Failed to save coffee to localStorage:', fallbackErr);
     }
   }
+
+  // Asynchronous Cloud Firestore Persistence
+  try {
+    if (db) {
+      const cloudRecord = { ...record };
+      if (cloudRecord.logoImage && cloudRecord.logoImage.length > 50000) delete cloudRecord.logoImage;
+      setDoc(doc(db, 'coffees', id), cloudRecord, { merge: true }).catch(e => {
+        console.warn('Firestore coffee sync error:', e);
+      });
+      if (record.upc) {
+        setDoc(doc(db, 'coffees', `upc_${record.upc}`), cloudRecord, { merge: true }).catch(() => {});
+      }
+    }
+  } catch (syncErr) {
+    console.warn('Firestore sync failed:', syncErr);
+  }
+
   return record;
 }
 
@@ -80,6 +99,13 @@ export function deleteRoasterCoffee(id) {
   } catch (err) {
     console.error('Failed to delete coffee from localStorage:', err);
   }
+
+  try {
+    if (db) {
+      deleteDoc(doc(db, 'coffees', id)).catch(() => {});
+    }
+  } catch (e) {}
+
   return filtered;
 }
 
@@ -131,7 +157,93 @@ export function saveCustomRoasterProfile(profile) {
       console.error('Failed to save roaster profile to localStorage:', fallbackErr);
     }
   }
+
+  // Asynchronous Cloud Firestore Persistence
+  try {
+    if (db) {
+      const cloudProfile = { ...record };
+      if (cloudProfile.logoImage && cloudProfile.logoImage.length > 50000) delete cloudProfile.logoImage;
+      if (cloudProfile.backgroundImage && cloudProfile.backgroundImage.length > 50000) delete cloudProfile.backgroundImage;
+      setDoc(doc(db, 'roasters', slug), cloudProfile, { merge: true }).catch(e => {
+        console.warn('Firestore roaster profile sync error:', e);
+      });
+    }
+  } catch (syncErr) {
+    console.warn('Firestore roaster sync failed:', syncErr);
+  }
+
   return record;
+}
+
+/**
+ * Asynchronously query Cloud Firestore for a coffee by UPC barcode or coffee ID
+ */
+export async function fetchRemoteCoffeeByCode(code) {
+  if (!code || !db) return null;
+  const cleanCode = String(code).trim();
+  try {
+    // 1. Direct O(1) alias check (upc_...)
+    const aliasRef = doc(db, 'coffees', `upc_${cleanCode}`);
+    const aliasSnap = await getDoc(aliasRef);
+    if (aliasSnap.exists()) return aliasSnap.data();
+
+    // 2. Direct ID check
+    const directRef = doc(db, 'coffees', cleanCode);
+    const directSnap = await getDoc(directRef);
+    if (directSnap.exists()) return directSnap.data();
+
+    // 3. Query by upc field
+    const q = query(collection(db, 'coffees'), where('upc', '==', cleanCode));
+    const qSnap = await getDocs(q);
+    if (!qSnap.empty) {
+      return qSnap.docs[0].data();
+    }
+  } catch (err) {
+    console.warn('Error fetching coffee from Firestore:', err);
+  }
+  return null;
+}
+
+/**
+ * Sync Cloud Firestore catalog with local cache
+ */
+export async function syncCloudCatalog() {
+  if (!db || typeof window === 'undefined') return;
+  try {
+    // 1. Sync Roasters
+    const roasterSnap = await getDocs(collection(db, 'roasters'));
+    if (!roasterSnap.empty) {
+      const remoteRoasters = roasterSnap.docs.map(d => d.data());
+      const localRoasters = getCustomRoasters();
+      const roasterMap = new Map();
+      remoteRoasters.forEach(r => roasterMap.set(r.slug || r.id, r));
+      localRoasters.forEach(r => {
+        if (!roasterMap.has(r.slug || r.id)) {
+          roasterMap.set(r.slug || r.id, r);
+        }
+      });
+      localStorage.setItem(ROASTER_PROFILES_KEY, JSON.stringify(Array.from(roasterMap.values())));
+    }
+
+    // 2. Sync Coffees
+    const coffeeSnap = await getDocs(collection(db, 'coffees'));
+    if (!coffeeSnap.empty) {
+      const remoteCoffees = coffeeSnap.docs
+        .filter(d => !d.id.startsWith('upc_'))
+        .map(d => d.data());
+      const localCoffees = getCustomRoasterCoffees();
+      const coffeeMap = new Map();
+      remoteCoffees.forEach(c => coffeeMap.set(c.id, c));
+      localCoffees.forEach(c => {
+        if (!coffeeMap.has(c.id)) {
+          coffeeMap.set(c.id, c);
+        }
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(coffeeMap.values())));
+    }
+  } catch (err) {
+    console.warn('Background Cloud Firestore sync error:', err);
+  }
 }
 
 /**

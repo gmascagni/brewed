@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import jsQR from 'jsqr';
-import { getRegisteredCoffees } from '../data/roasterRegistry';
+import { getRegisteredCoffees, fetchRemoteCoffeeByCode, saveRoasterCoffee } from '../data/roasterRegistry';
 import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 import { createCoffeeProfile } from '../models/coffeeProfile';
 
@@ -412,7 +412,24 @@ export default function BarcodeScannerModal({
       return;
     }
 
-    // 2. Check if the scanned code is a direct The Brew App Smart Bag URL
+    // 2. Check live Cloud Firestore for remote roasters and coffees
+    setIsLookingUp(true);
+    try {
+      const remoteCoffee = await fetchRemoteCoffeeByCode(cleanVal);
+      if (remoteCoffee) {
+        setMatchedBean(remoteCoffee);
+        // Cache to local registry so subsequent offline scans are instantaneous
+        saveRoasterCoffee(remoteCoffee);
+        setIsScanning(false);
+        setIsLookingUp(false);
+        return;
+      }
+    } catch (e) {
+      console.warn('Firestore remote lookup error:', e);
+    }
+    setIsLookingUp(false);
+
+    // 3. Check if the scanned code is a direct The Brew App Smart Bag URL
     if (cleanVal.includes('thebrew.app') && cleanVal.includes('bean=')) {
       try {
         const urlObj = new URL(cleanVal.startsWith('http') ? cleanVal : `https://${cleanVal}`);

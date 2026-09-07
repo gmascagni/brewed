@@ -432,7 +432,7 @@ export const SHOWCASE_ROASTERS = [
   }
 ];
 
-import { getCustomRoasters, getCustomRoasterCoffees } from './roasterRegistry';
+import { getCustomRoasters, getCustomRoasterCoffees } from './roasterRegistry.js';
 
 function formatCustomRoasterAsShowcase(custom, coffees = []) {
   const name = custom.name || custom.roaster || 'Specialty Roastery';

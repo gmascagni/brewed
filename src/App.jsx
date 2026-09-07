@@ -30,6 +30,7 @@ import { AppOrchestratorProvider } from './context/AppOrchestratorContext';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { getMethodJsonLd, updatePageSeo } from './utils/seo';
+import { syncCloudCatalog } from './data/roasterRegistry';
 import { ChevronRight, ChevronLeft, Sparkles, Coffee } from 'lucide-react';
 
 const DEFAULT_LOCAL_PROFILES = [];
@@ -91,6 +92,11 @@ export default function App() {
       console.warn('Unable to persist currentUser to localStorage:', err);
     }
   }, [currentUser]);
+
+  // Synchronize Cloud Firestore roaster & coffee registry in background
+  useEffect(() => {
+    syncCloudCatalog().catch(() => {});
+  }, []);
 
   // Platform Modal States
   const [isJournalOpen, setIsJournalOpen] = useState(false);

@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Coffees collection: Public read for all app users and barcode scans
+    match /coffees/{coffeeId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.beanName is string &&
+                               request.resource.data.beanName.size() > 0 &&
+                               request.resource.data.roaster is string &&
+                               request.resource.data.roaster.size() > 0;
+      allow delete: if true;
+    }
+
+    // Roasters collection: Public read for directory and profile pages
+    match /roasters/{roasterSlug} {
+      allow read: if true;
+      allow create, update: if request.resource.data.name is string &&
+                               request.resource.data.name.size() > 0;
+      allow delete: if true;
+    }
+
+    // Default deny for all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
