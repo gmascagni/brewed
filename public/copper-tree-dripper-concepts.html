@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artisan Copper Tree Pour-Over Concepts • TheBrew.App</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #0c0806;
+      color: #f5f0eb;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .copper-gradient {
+      background: linear-gradient(135deg, #d97745 0%, #b85d19 40%, #ffaa6e 70%, #8f3e09 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .card-glass {
+      background: rgba(26, 17, 12, 0.85);
+      border: 1px solid rgba(217, 119, 69, 0.25);
+      backdrop-filter: blur(12px);
+    }
+    .card-glass:hover {
+      border-color: rgba(217, 119, 69, 0.6);
+      box-shadow: 0 12px 32px -8px rgba(217, 119, 69, 0.2);
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8 md:p-12 selection:bg-amber-700 selection:text-white">
+
+  <!-- Header Section -->
+  <header class="max-w-6xl mx-auto mb-12 text-center">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-950/60 border border-amber-600/30 text-amber-400 font-mono text-xs uppercase tracking-widest mb-4">
+      <span>🪵 Handcrafted Wood & Twisted Copper Tubing</span>
+      <span>•</span>
+      <span>5 Artisan Blueprints</span>
+    </div>
+    <h1 class="text-3xl sm:text-5xl font-serif font-bold text-white mb-4 tracking-tight">
+      The <span class="copper-gradient">Arbor Tree</span> Pour-Over Collection
+    </h1>
+    <p class="max-w-2xl mx-auto text-stone-400 text-sm sm:text-base leading-relaxed">
+      Custom, organic pour-over stands featuring solid hardwood bases and hand-twisted copper tubing spiraling upward like tree branches to cradle a conical dripper ring.
+    </p>
+  </header>
+
+  <!-- Interactive 3D Interactive Canvas Viewer -->
+  <section class="max-w-6xl mx-auto mb-16">
+    <div class="card-glass rounded-3xl p-6 sm:p-8 border border-amber-600/30 relative overflow-hidden">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
+        <div>
+          <span class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">Interactive 3D Preview</span>
+          <h2 class="text-2xl font-serif font-bold text-white mt-1">Procedural 3D Model: The Banyan Arbor Helix</h2>
+          <p class="text-xs text-stone-400 mt-1">Click & drag with your mouse or finger to rotate the 3D copper tree stand in real time.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="reset3dBtn" class="px-4 py-2 rounded-xl bg-amber-900/40 hover:bg-amber-900/70 border border-amber-600/40 text-xs font-mono text-amber-200 transition">Reset View</button>
+          <button id="toggleSpinBtn" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-mono font-bold text-xs transition">Pause Auto-Spin</button>
+        </div>
+      </div>
+
+      <!-- 3D Canvas Box -->
+      <div class="w-full h-[400px] sm:h-[480px] rounded-2xl bg-gradient-to-b from-[#0e0a07] to-[#17100b] border border-stone-800/80 relative cursor-grab active:cursor-grabbing overflow-hidden">
+        <canvas id="viewer3d"></canvas>
+        <div class="absolute bottom-4 left-4 pointer-events-none bg-black/60 backdrop-blur px-3 py-1.5 rounded-lg border border-white/10 text-[11px] font-mono text-stone-300">
+          Left Click + Drag: Rotate • Scroll: Zoom
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 Distinct Concepts Grid -->
+  <section class="max-w-6xl mx-auto space-y-12">
+
+    <!-- CONCEPT 1 -->
+    <div class="card-glass rounded-3xl p-6 sm:p-8 transition-all">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-6 bg-[#120c08] rounded-2xl p-6 border border-stone-800/80 flex items-center justify-center">
+          <svg viewBox="0 0 400 460" class="w-full h-auto max-h-[400px]" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="copperC1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffd5b8"/>
+                <stop offset="30%" stop-color="#d97745"/>
+                <stop offset="70%" stop-color="#9a4310"/>
+                <stop offset="100%" stop-color="#ffb888"/>
+              </linearGradient>
+              <linearGradient id="woodC1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#3c2617"/>
+                <stop offset="50%" stop-color="#5a3d28"/>
+                <stop offset="100%" stop-color="#2d1c10"/>
+              </linearGradient>
+              <linearGradient id="glassC1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.3)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0.05)"/>
+              </linearGradient>
+            </defs>
+            <ellipse cx="200" cy="410" rx="140" ry="25" fill="#1b120c"/>
+            <rect x="70" y="380" width="260" height="28" rx="8" fill="url(#woodC1)" stroke="#d97745" stroke-opacity="0.3"/>
+            <ellipse cx="200" cy="385" rx="45" ry="8" fill="#1f140d" stroke="#5a3d28"/>
+            <path d="M165 380 L170 310 L230 310 L235 380 Z" fill="url(#glassC1)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <path d="M232 325 C255 330 255 365 233 370" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+            <path d="M168 380 L172 345 L228 345 L232 380 Z" fill="#603010" fill-opacity="0.75"/>
+            <path d="M100 380 Q115 360 130 330 Q145 280 145 220" fill="none" stroke="url(#copperC1)" stroke-width="8" stroke-linecap="round"/>
+            <path d="M115 380 Q125 350 140 310 Q155 260 150 200" fill="none" stroke="url(#copperC1)" stroke-width="7" stroke-linecap="round"/>
+            <path d="M130 330 Q160 300 140 260 Q120 220 150 180" fill="none" stroke="url(#copperC1)" stroke-width="9" stroke-linecap="round"/>
+            <path d="M140 310 Q115 270 145 230 Q165 190 140 160" fill="none" stroke="url(#copperC1)" stroke-width="8" stroke-linecap="round"/>
+            <path d="M150 180 Q155 140 170 125" fill="none" stroke="url(#copperC1)" stroke-width="8" stroke-linecap="round"/>
+            <path d="M140 160 Q130 135 150 122" fill="none" stroke="url(#copperC1)" stroke-width="7" stroke-linecap="round"/>
+            <ellipse cx="200" cy="120" rx="60" ry="18" fill="none" stroke="url(#copperC1)" stroke-width="9"/>
+            <ellipse cx="200" cy="120" rx="55" ry="16" fill="none" stroke="#ffd5b8" stroke-width="2"/>
+            <polygon points="145,115 255,115 200,210" fill="url(#glassC1)" stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+            <polygon points="152,112 248,112 200,195" fill="#f5f0eb" fill-opacity="0.9"/>
+            <polygon points="168,145 232,145 200,195" fill="#4a2511"/>
+            <circle cx="200" cy="235" r="2.5" fill="#8f4a18"/>
+            <circle cx="200" cy="265" r="2.5" fill="#8f4a18"/>
+            <circle cx="200" cy="295" r="3" fill="#8f4a18"/>
+            <line x1="280" y1="120" x2="330" y2="120" stroke="#d97745" stroke-dasharray="2,2"/>
+            <text x="335" y="124" fill="#ffd5b8" font-size="11" font-family="monospace">Ring Ø 78mm</text>
+          </svg>
+        </div>
+        <div class="lg:col-span-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 font-mono text-xs font-bold border border-amber-500/30">Concept 01</span>
+            <span class="text-xs text-stone-400 font-mono">Quad Banyan Braid</span>
+          </div>
+          <h3 class="text-2xl font-serif font-bold text-white">The Arbor Helix (Braided Banyan Trunk)</h3>
+          <p class="text-stone-300 text-sm leading-relaxed">
+            Inspired by wild banyan tree roots. Four lengths of thick annealed copper tubing emerge from brass ferrule grommets in the rear corner of the live-edge walnut base. They twist tightly around each other to form a rigid structural trunk, then gracefully splay outward at the canopy to forge a continuous welded holding collar.
+          </p>
+          <div class="grid grid-cols-2 gap-3 pt-2 text-xs font-mono">
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Base Material</span>
+              <span class="text-stone-300">Live-Edge Black Walnut (25mm)</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Copper Spec</span>
+              <span class="text-stone-300">4x 3/8" Soft Annealed Tubing</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Clearance Height</span>
+              <span class="text-stone-300">185mm (Fits carafe + Acaia scale)</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Dripper Fit</span>
+              <span class="text-stone-300">V60 Glass 01/02, Origami, Chemex</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 2 -->
+    <div class="card-glass rounded-3xl p-6 sm:p-8 transition-all">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-6 bg-[#120c08] rounded-2xl p-6 border border-stone-800/80 flex items-center justify-center">
+          <svg viewBox="0 0 400 460" class="w-full h-auto max-h-[400px]" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="200" cy="410" rx="120" ry="25" fill="#1b120c"/>
+            <ellipse cx="200" cy="385" rx="110" ry="20" fill="#4d3320" stroke="#d97745" stroke-opacity="0.3"/>
+            <path d="M90 385 C90 405 310 405 310 385 L310 400 C310 420 90 420 90 400 Z" fill="#3c2617"/>
+            <path d="M165 380 L170 310 L230 310 L235 380 Z" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <path d="M168 380 L172 345 L228 345 L232 380 Z" fill="#603010" fill-opacity="0.75"/>
+            <path d="M130 385 C 100 370, 80 340, 110 320 C 160 290, 220 320, 210 270 C 200 230, 120 250, 135 200 C 150 150, 220 180, 200 135" fill="none" stroke="url(#copperC1)" stroke-width="11" stroke-linecap="round"/>
+            <ellipse cx="200" cy="120" rx="58" ry="18" fill="none" stroke="url(#copperC1)" stroke-width="11"/>
+            <polygon points="148,115 252,115 200,205" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
+            <polygon points="154,112 246,112 200,195" fill="#f5f0eb" fill-opacity="0.9"/>
+            <polygon points="170,145 230,145 200,195" fill="#4a2511"/>
+            <line x1="200" y1="210" x2="200" y2="345" stroke="#8f4a18" stroke-width="2" stroke-dasharray="6,4"/>
+            <text x="50" y="240" fill="#ffd5b8" font-size="11" font-family="monospace">Continuous</text>
+            <text x="50" y="255" fill="#d97745" font-size="11" font-family="monospace">Single Tube</text>
+          </svg>
+        </div>
+        <div class="lg:col-span-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 font-mono text-xs font-bold border border-amber-500/30">Concept 02</span>
+            <span class="text-xs text-stone-400 font-mono">Continuous Fibonacci Helix</span>
+          </div>
+          <h3 class="text-2xl font-serif font-bold text-white">The Solitary Vine (Single Seamless Helix)</h3>
+          <p class="text-stone-300 text-sm leading-relaxed">
+            Minimalist kinetic poetry. One single, uninterrupted 6-foot length of 1/2" rigid copper pipe is cold-bent in an ascending conical spiral. Like a tendril climbing toward morning light, it wraps around the empty air space of the carafe before crowning into a horizontal support halo. Zero brazing or solder seams — pure mechanical bending perfection.
+          </p>
+          <div class="grid grid-cols-2 gap-3 pt-2 text-xs font-mono">
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Base Material</span>
+              <span class="text-stone-300">Turned White Oak Round (180mm Ø)</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Copper Spec</span>
+              <span class="text-stone-300">1x 1/2" Type L Heavy Copper Pipe</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Construction</span>
+              <span class="text-stone-300">100% Seamless Continuous Bend</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Stability</span>
+              <span class="text-stone-300">Internal Solid Steel Core in Base</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 3 -->
+    <div class="card-glass rounded-3xl p-6 sm:p-8 transition-all">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-6 bg-[#120c08] rounded-2xl p-6 border border-stone-800/80 flex items-center justify-center">
+          <svg viewBox="0 0 400 460" class="w-full h-auto max-h-[400px]" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="200,360 80,410 320,410" fill="#382214" stroke="#d97745" stroke-opacity="0.3" stroke-width="2"/>
+            <polygon points="200,375 95,415 305,415" fill="#4d311d"/>
+            <path d="M170 380 L175 310 L225 310 L230 380 Z" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <path d="M172 380 L176 345 L224 345 L228 380 Z" fill="#603010" fill-opacity="0.75"/>
+            <path d="M105 405 C 130 360, 160 300, 185 240" fill="none" stroke="url(#copperC1)" stroke-width="8" stroke-linecap="round"/>
+            <path d="M295 405 C 270 360, 240 300, 215 240" fill="none" stroke="url(#copperC1)" stroke-width="8" stroke-linecap="round"/>
+            <path d="M200 365 C 190 320, 210 270, 200 240" fill="none" stroke="url(#copperC1)" stroke-width="8" stroke-linecap="round"/>
+            <circle cx="200" cy="235" r="16" fill="#1b120c" stroke="url(#copperC1)" stroke-width="5"/>
+            <circle cx="200" cy="235" r="7" fill="#ffd5b8"/>
+            <path d="M190 225 Q160 160 150 120" fill="none" stroke="url(#copperC1)" stroke-width="7" stroke-linecap="round"/>
+            <path d="M210 225 Q240 160 250 120" fill="none" stroke="url(#copperC1)" stroke-width="7" stroke-linecap="round"/>
+            <path d="M200 220 Q200 150 200 110" fill="none" stroke="url(#copperC1)" stroke-width="6" stroke-linecap="round"/>
+            <ellipse cx="200" cy="115" rx="58" ry="18" fill="none" stroke="url(#copperC1)" stroke-width="9"/>
+            <polygon points="148,110 252,110 200,200" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
+            <polygon points="154,107 246,107 200,190" fill="#f5f0eb" fill-opacity="0.9"/>
+          </svg>
+        </div>
+        <div class="lg:col-span-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 font-mono text-xs font-bold border border-amber-500/30">Concept 03</span>
+            <span class="text-xs text-stone-400 font-mono">Tripod Tree of Life</span>
+          </div>
+          <h3 class="text-2xl font-serif font-bold text-white">The Trinity Canopy (Tripod Tree of Life)</h3>
+          <p class="text-stone-300 text-sm leading-relaxed">
+            Engineered for zero wobble and maximum architectural balance. Three copper "roots" emerge from three corners of a sculpted triangular hardwood block. They arch inward toward the center, lock together in a braided Celtic copper knot at mid-height, and branch outward in a balanced tripod to suspend the upper copper crown ring.
+          </p>
+          <div class="grid grid-cols-2 gap-3 pt-2 text-xs font-mono">
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Base Material</span>
+              <span class="text-stone-300">Sculpted Ash or Hard Maple Triangle</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Copper Spec</span>
+              <span class="text-stone-300">3x 3/8" Copper Tube with Silver Brazed Node</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Structural Rigidity</span>
+              <span class="text-stone-300">Rock-solid (handles aggressive kettle swirl)</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Aesthetic</span>
+              <span class="text-stone-300">Mid-Century Modern meets Sacred Geometry</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 4 -->
+    <div class="card-glass rounded-3xl p-6 sm:p-8 transition-all">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-6 bg-[#120c08] rounded-2xl p-6 border border-stone-800/80 flex items-center justify-center">
+          <svg viewBox="0 0 400 460" class="w-full h-auto max-h-[400px]" xmlns="http://www.w3.org/2000/svg">
+            <rect x="70" y="380" width="260" height="30" rx="6" fill="#321e14" stroke="#d97745" stroke-opacity="0.3"/>
+            <rect x="80" y="383" width="240" height="24" rx="4" fill="#462c1d"/>
+            <rect x="140" y="385" width="120" height="18" rx="3" fill="#1b120c" stroke="#d97745" stroke-width="0.5"/>
+            <path d="M165 380 L170 310 L230 310 L235 380 Z" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <path d="M168 380 L172 345 L228 345 L232 380 Z" fill="#603010" fill-opacity="0.75"/>
+            <path d="M120 380 C 100 320, 190 280, 160 220 C 130 160, 220 160, 170 120" fill="none" stroke="url(#copperC1)" stroke-width="8" stroke-linecap="round"/>
+            <path d="M140 380 C 170 320, 90 280, 140 220 C 190 160, 110 160, 190 120" fill="none" stroke="#e09060" stroke-width="7" stroke-linecap="round"/>
+            <ellipse cx="200" cy="120" rx="62" ry="19" fill="none" stroke="url(#copperC1)" stroke-width="6"/>
+            <ellipse cx="200" cy="125" rx="55" ry="17" fill="none" stroke="#e09060" stroke-width="5"/>
+            <polygon points="148,115 252,115 200,205" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
+            <polygon points="154,112 246,112 200,195" fill="#f5f0eb" fill-opacity="0.9"/>
+          </svg>
+        </div>
+        <div class="lg:col-span-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 font-mono text-xs font-bold border border-amber-500/30">Concept 04</span>
+            <span class="text-xs text-stone-400 font-mono">Double Helix Alchemy</span>
+          </div>
+          <h3 class="text-2xl font-serif font-bold text-white">The Double Helix (Coffee & Tea Spire)</h3>
+          <p class="text-stone-300 text-sm leading-relaxed">
+            The physical embodiment of TheBrew.App’s Alchemy Harmony logo. Two parallel copper tubes represent coffee and tea, spiraling symmetrically in an open-cage double helix DNA structure. One tube terminates as the outer stabilizing rim, while the second tube forms an inner concentric suspension ledge for the dripper cone.
+          </p>
+          <div class="grid grid-cols-2 gap-3 pt-2 text-xs font-mono">
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Base Material</span>
+              <span class="text-stone-300">Reclaimed Bourbon Barrel White Oak</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Copper Spec</span>
+              <span class="text-stone-300">2x 1/2" Tubes in Synchronized Helix Twist</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Visual Weight</span>
+              <span class="text-stone-300">Airy, geometric, conversation-starter</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Finish Option</span>
+              <span class="text-stone-300">Raw Polished Copper with Natural Patina</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 5 -->
+    <div class="card-glass rounded-3xl p-6 sm:p-8 transition-all">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-6 bg-[#120c08] rounded-2xl p-6 border border-stone-800/80 flex items-center justify-center">
+          <svg viewBox="0 0 400 460" class="w-full h-auto max-h-[400px]" xmlns="http://www.w3.org/2000/svg">
+            <rect x="60" y="385" width="280" height="25" rx="8" fill="#3a2516" stroke="#d97745" stroke-opacity="0.3"/>
+            <rect x="150" y="388" width="100" height="15" rx="3" fill="#b8860b" fill-opacity="0.8"/>
+            <line x1="160" y1="395" x2="240" y2="395" stroke="#1f140d" stroke-width="1.5" stroke-dasharray="3,3"/>
+            <path d="M175 380 L180 310 L220 310 L225 380 Z" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+            <path d="M177 380 L181 345 L219 345 L223 380 Z" fill="#603010" fill-opacity="0.75"/>
+            <rect x="75" y="375" width="22" height="15" rx="3" fill="#b85d19" stroke="#ffd5b8" stroke-width="1"/>
+            <path d="M85 375 C 80 280, 110 200, 140 160 C 160 130, 180 110, 200 105" fill="none" stroke="url(#copperC1)" stroke-width="12" stroke-linecap="round"/>
+            <ellipse cx="200" cy="115" rx="58" ry="18" fill="none" stroke="url(#copperC1)" stroke-width="10"/>
+            <polygon points="148,110 252,110 200,200" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
+            <polygon points="154,107 246,107 200,190" fill="#f5f0eb" fill-opacity="0.9"/>
+            <text x="75" y="270" fill="#ffd5b8" font-size="10" font-family="monospace">Cantilever Arc</text>
+            <text x="75" y="284" fill="#d97745" font-size="10" font-family="monospace">Counterbalanced</text>
+          </svg>
+        </div>
+        <div class="lg:col-span-6 space-y-4">
+          <div class="flex items-center gap-3">
+            <span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 font-mono text-xs font-bold border border-amber-500/30">Concept 05</span>
+            <span class="text-xs text-stone-400 font-mono">Wabi-Sabi Cantilever</span>
+          </div>
+          <h3 class="text-2xl font-serif font-bold text-white">The Cantilever Crane (Windswept Bonsai)</h3>
+          <p class="text-stone-300 text-sm leading-relaxed">
+            A dramatic, floating cantilever inspired by windswept coastal pines. Anchored in a heavy machined brass mounting block at the far rear corner of the live-edge board, a heavy 5/8" copper branch sweeps up and forward in an organic 540-degree spiral curve, suspending the dripper ring in mid-air directly over the center of the wooden plinth.
+          </p>
+          <div class="grid grid-cols-2 gap-3 pt-2 text-xs font-mono">
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Base Material</span>
+              <span class="text-stone-300">Claro Walnut Plinth with Perforated Brass Grill</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Copper Spec</span>
+              <span class="text-stone-300">5/8" Heavy-Wall Pipe with Internal Tension Rod</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Counterbalance</span>
+              <span class="text-stone-300">Internal Weight embedded inside wood base</span>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-900/80 border border-stone-800">
+              <span class="text-amber-400 block font-bold mb-1">Vibe</span>
+              <span class="text-stone-300">Dramatic floating centerpiece; Japanese Wabi-Sabi</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Step-by-Step Crafting & Commissioning Guide -->
+  <section class="max-w-6xl mx-auto mb-16">
+    <div class="card-glass rounded-3xl p-6 sm:p-10 border border-amber-600/30">
+      <h2 class="text-2xl sm:text-3xl font-serif font-bold text-white mb-6">🛠️ How to Craft or Commission One: Simple 3-Step Recipe</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-stone-300">
+        <div class="p-5 rounded-2xl bg-stone-900/60 border border-stone-800 space-y-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 font-mono font-bold flex items-center justify-center border border-amber-500/30">1</div>
+          <h4 class="font-bold text-white text-base">The Wood Base</h4>
+          <p class="text-xs text-stone-400 leading-relaxed">
+            Source a live-edge black walnut offcut or turned circular block from a local woodworker or Rockler/Woodcraft ($15–$30). Drill a 1/2" or 3/8" blind mounting hole, seal with food-grade Danish oil or beeswax.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-stone-900/60 border border-stone-800 space-y-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 font-mono font-bold flex items-center justify-center border border-amber-500/30">2</div>
+          <h4 class="font-bold text-white text-base">Bending the Copper Tubing</h4>
+          <p class="text-xs text-stone-400 leading-relaxed">
+            Use standard soft annealed copper refrigeration tubing (available at Home Depot/Lowe's for $18). Pack the inside with fine sand or use a spring pipe-bender to prevent kinking as you hand-wrap it around a tapered wooden fence post or cylindrical mandrel.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-stone-900/60 border border-stone-800 space-y-3">
+          <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 font-mono font-bold flex items-center justify-center border border-amber-500/30">3</div>
+          <h4 class="font-bold text-white text-base">Forming the Top Halo Ring</h4>
+          <p class="text-xs text-stone-400 leading-relaxed">
+            Bend the top into a 75mm – 78mm outer diameter ring (the exact size to cradle a Hario V60 02, Chemex funnel, or Origami dripper). Secure the base with epoxy and buff the copper to a brilliant raw shine or seal with Renaissance Wax.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive 3D WebGL / Canvas Procedural Engine Script -->
+  <script>
+    const canvas = document.getElementById('viewer3d');
+    const ctx = canvas.getContext('2d');
+
+    let width = canvas.width = canvas.parentElement.clientWidth;
+    let height = canvas.height = canvas.parentElement.clientHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = canvas.parentElement.clientWidth;
+      height = canvas.height = canvas.parentElement.clientHeight;
+    });
+
+    let isAutoSpin = true;
+    let isDragging = false;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+    let rotY = 0.5;
+    let rotX = 0.25;
+    let zoom = 1.0;
+
+    const toggleBtn = document.getElementById('toggleSpinBtn');
+    const resetBtn = document.getElementById('reset3dBtn');
+
+    toggleBtn.addEventListener('click', () => {
+      isAutoSpin = !isAutoSpin;
+      toggleBtn.textContent = isAutoSpin ? 'Pause Auto-Spin' : 'Resume Auto-Spin';
+    });
+
+    resetBtn.addEventListener('click', () => {
+      rotY = 0.5;
+      rotX = 0.25;
+      zoom = 1.0;
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevMouseX;
+      const dy = e.clientY - prevMouseY;
+      rotY += dx * 0.01;
+      rotX += dy * 0.01;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+    });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      zoom += e.deltaY * -0.001;
+      zoom = Math.max(0.6, Math.min(zoom, 1.8));
+    });
+
+    function project(x, y, z) {
+      const cosY = Math.cos(rotY);
+      const sinY = Math.sin(rotY);
+      const x1 = x * cosY - z * sinY;
+      const z1 = z * cosY + x * sinY;
+
+      const cosX = Math.cos(rotX);
+      const sinX = Math.sin(rotX);
+      const y2 = y * cosX - z1 * sinX;
+      const z2 = z1 * cosX + y * sinX;
+
+      const fov = 450 * zoom;
+      const cameraDist = 400;
+      const pz = z2 + cameraDist;
+      const scale = fov / pz;
+
+      return {
+        x: width / 2 + x1 * scale,
+        y: height / 2 + y2 * scale,
+        scale: scale,
+        depth: z2
+      };
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, width, height);
+
+      if (isAutoSpin && !isDragging) {
+        rotY += 0.008;
+      }
+
+      const baseRadius = 110;
+      const baseY = 100;
+
+      ctx.beginPath();
+      for (let i = 0; i <= 36; i++) {
+        const theta = (i / 36) * Math.PI * 2;
+        const bx = Math.cos(theta) * baseRadius;
+        const bz = Math.sin(theta) * baseRadius;
+        const pTop = project(bx, baseY, bz);
+        if (i === 0) ctx.moveTo(pTop.x, pTop.y);
+        else ctx.lineTo(pTop.x, pTop.y);
+      }
+      ctx.fillStyle = '#3c2617';
+      ctx.fill();
+      ctx.strokeStyle = '#6e4529';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.beginPath();
+      for (let i = 0; i <= 24; i++) {
+        const theta = (i / 24) * Math.PI * 2;
+        const cx = Math.cos(theta) * 45;
+        const cz = Math.sin(theta) * 45;
+        const p = project(cx, baseY - 5, cz);
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      const strands = [0, (Math.PI * 2) / 3, (Math.PI * 4) / 3];
+      const steps = 60;
+
+      strands.forEach((phase, sIdx) => {
+        ctx.beginPath();
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const y = baseY - (t * 220);
+          
+          let r;
+          if (t < 0.25) {
+            r = 75 - t * 180;
+          } else if (t < 0.75) {
+            r = 30 + Math.sin(t * Math.PI * 3) * 6;
+          } else {
+            r = 30 + Math.pow((t - 0.75) * 4, 1.8) * 35;
+          }
+
+          const angle = phase + t * Math.PI * 4.5;
+          const x = Math.cos(angle) * r;
+          const z = Math.sin(angle) * r;
+
+          const p = project(x, y, z);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+
+        ctx.strokeStyle = sIdx === 0 ? '#d97745' : (sIdx === 1 ? '#ffaa6e' : '#b85d19');
+        ctx.lineWidth = 6 * zoom;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+      });
+
+      ctx.beginPath();
+      const ringRadius = 55;
+      for (let i = 0; i <= 48; i++) {
+        const theta = (i / 48) * Math.PI * 2;
+        const rx = Math.cos(theta) * ringRadius;
+        const rz = Math.sin(theta) * ringRadius;
+        const p = project(rx, -120, rz);
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = '#ffd5b8';
+      ctx.lineWidth = 8 * zoom;
+      ctx.stroke();
+
+      ctx.beginPath();
+      const pApex = project(0, -30, 0);
+      const pLeft = project(-48, -120, 0);
+      const pRight = project(48, -120, 0);
+      ctx.moveTo(pLeft.x, pLeft.y);
+      ctx.lineTo(pApex.x, pApex.y);
+      ctx.lineTo(pRight.x, pRight.y);
+      ctx.strokeStyle = 'rgba(255, 235, 215, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      requestAnimationFrame(render);
+    }
+
+    render();
+  </script>
+</body>
+</html>
