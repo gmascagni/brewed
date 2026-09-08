@@ -220,7 +220,7 @@ export default function Header({
               title="View Roaster Showcase & Dial-In Profiles (Methodical, Onyx, Black & White)"
             >
               <Store className="w-4 h-4 text-amber-gold" />
-              <span className="hidden xl:inline">Roasters</span>
+              <span className="hidden sm:inline">Roasters</span>
             </button>
           )}
 

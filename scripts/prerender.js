@@ -538,6 +538,16 @@ const roasterContent = `
       <strong>Showcase Demonstration Notice:</strong> Featured roaster profiles illustrate The Brew App Smart Bag & verified catalog integration. Independent roasters can onboard their official retail labels at zero cost.
     </div>
 
+    <!-- 60-Second Video Walkthrough Embedded Player -->
+    <div style="background: #000; border-radius: 20px; overflow: hidden; max-width: 360px; margin: 28px auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); border: 1px solid rgba(212, 140, 70, 0.4); text-align: center;">
+      <video controls playsinline autoplay loop muted style="width: 100%; display: block; aspect-ratio: 9/16; object-fit: cover;">
+        <source src="/videos/v60_timer_recipe_short.mp4" type="video/mp4">
+      </video>
+      <div style="padding: 12px; font-size: 12px; color: #D4A373; font-family: monospace; background: #120A06;">
+        ▶ 60s Smart Bag & Live V60 Dial-In Walkthrough
+      </div>
+    </div>
+
     <section style="margin-bottom: 32px;">
       <h2 style="font-family: Georgia, serif; font-size: 22px; color: #D48C46; margin-bottom: 12px;">Why Partner With The Brew App?</h2>
       <p style="font-size: 14px; color: #E4D5C7;">Specialty coffee roasters spend weeks sourcing and roasting exceptional lots, but home baristas often underextract or overextract the beans using generic ratios. When your labels are registered in our global verified database, scanning your retail bag barcode instantly configures your dialed-in recipe, water temperature, and voice-guided timer.</p>

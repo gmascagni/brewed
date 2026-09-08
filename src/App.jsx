@@ -456,6 +456,7 @@ export default function App() {
           onOpenRoasterShowcase={() => {
             setIsRoasterShowcaseView(true);
             navigate('/roasters');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
           isMuted={isMuted}

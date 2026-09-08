@@ -23,7 +23,9 @@ import {
   Share2,
   Check,
   Download,
-  Bookmark
+  Bookmark,
+  Play,
+  X
 } from 'lucide-react';
 import { SHOWCASE_ROASTERS, getShowcaseRoaster, getAllShowcaseRoasters, normalizeRoasterKey, getRoasterShortName } from '../data/roasterShowcaseData';
 import { trackEvent } from '../utils/analytics';
@@ -42,6 +44,13 @@ export default function RoasterProfilePage({
   const [copiedLink, setCopiedLink] = useState(false);
   const [scannedBeanName, setScannedBeanName] = useState('');
   const [savedToJournalId, setSavedToJournalId] = useState(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return Boolean(params.get('video') || window.location.hash === '#video');
+    }
+    return false;
+  });
 
   let orchestrator = null;
   try {
@@ -63,6 +72,9 @@ export default function RoasterProfilePage({
       const beanParam = params.get('bean');
       if (beanParam) {
         setScannedBeanName(beanParam);
+      }
+      if (params.get('video') || window.location.hash === '#video') {
+        setIsVideoModalOpen(true);
       }
     } catch {}
   }, []);
@@ -325,6 +337,42 @@ export default function RoasterProfilePage({
             </div>
           )}
 
+          {/* 60-Second Video Walkthrough Hero Banner */}
+          <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#180F09] via-[#26150C] to-[#180F09] border border-amber-500/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 backdrop-blur-md">
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setIsVideoModalOpen(true)}
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-gold text-espresso-950 flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition shadow-lg shadow-amber-gold/20 shrink-0 group"
+                title="Play 60-Second Video Walkthrough"
+              >
+                <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current ml-0.5 group-hover:scale-110 transition-transform" />
+              </button>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold bg-amber-950/80 px-2 py-0.5 rounded border border-amber-gold/30">
+                    60-Second Video Demo
+                  </span>
+                  <span className="text-[11px] font-mono text-cream-soft/70">Packaging Barcode Scan & V60 Timer</span>
+                </div>
+                <h3 className="font-serif text-base sm:text-lg font-bold text-cream-light leading-snug">
+                  Watch How Smart Bag Scanning Works for {roaster.shortName || roaster.name}
+                </h3>
+                <p className="text-xs text-cream-soft/80 font-sans max-w-xl">
+                  See how smartphone camera bag scanning automatically loads the roaster's golden ratio, water temperature, and synchronized multi-phase timer.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsVideoModalOpen(true)}
+              className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition shrink-0 self-stretch md:self-auto justify-center"
+            >
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>Watch Video (60s)</span>
+            </button>
+          </div>
+
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
             {roaster.stats.map((stat, i) => (
@@ -363,6 +411,16 @@ export default function RoasterProfilePage({
             >
               <Coffee className="w-3.5 h-3.5 text-amber-gold" />
               <span>Browse Coffees & Dial-In Recipes ({roaster.coffees?.length || 0})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsVideoModalOpen(true)}
+              className="px-5 py-3 rounded-2xl bg-[#2A1810] hover:bg-[#3D2216] text-amber-gold border border-amber-gold/50 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-950/40 hover:scale-105 active:scale-95 transition"
+              title="Watch 60s Smart Bag Walkthrough Video & Live V60 Dial-In"
+            >
+              <Play className="w-3.5 h-3.5 fill-current text-amber-gold" />
+              <span>Watch Video (60s)</span>
             </button>
 
             <div className="text-xs font-mono text-cream-soft/60 hidden lg:block ml-2">
@@ -892,6 +950,47 @@ export default function RoasterProfilePage({
         )}
 
       </main>
+
+      {/* Video Walkthrough Theater Modal */}
+      {isVideoModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+          onClick={() => setIsVideoModalOpen(false)}
+        >
+          <div 
+            className="relative max-w-sm w-full bg-[#14110E] border border-amber-gold/50 rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
+              <div className="flex items-center gap-2">
+                <Play className="w-4 h-4 text-amber-gold fill-current" />
+                <span className="font-mono text-xs font-bold text-amber-gold uppercase tracking-wider">Smart Bag Dial-In Walkthrough</span>
+              </div>
+              <button 
+                type="button"
+                onClick={() => setIsVideoModalOpen(false)} 
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white transition cursor-pointer"
+                title="Close Video"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="relative aspect-[9/16] w-full bg-black flex items-center justify-center">
+              <video
+                src="/videos/v60_timer_recipe_short.mp4"
+                controls
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="p-3.5 bg-black/60 text-center border-t border-white/10 space-y-1">
+              <p className="text-xs text-stone-200 font-mono font-bold">Precision V60 Pour-Over Dial-In & Live Timer</p>
+              <p className="text-[11px] text-amber-gold/80 font-mono">Camera Barcode Scanning • Multi-Phase Bloom Coaching</p>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
