@@ -180,11 +180,11 @@ export default function RoasterProfilePage({
             {onBackToApp && (
               <button
                 onClick={onBackToApp}
-                className="py-1.5 px-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-soft hover:text-white border border-white/10 text-xs font-mono flex items-center gap-1.5 transition shadow"
+                className="py-1.5 px-3 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-cream-light hover:text-amber-gold border border-white/15 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow"
                 title="Return to Brewing Station"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Brewing Station</span>
+                <span>Brewing Station</span>
               </button>
             )}
 

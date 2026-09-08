@@ -139,6 +139,35 @@ export default function App() {
     trackEvent('brew_with_video_applied', { video_id: video.id, method_id: targetMethod.id, ratio });
   };
 
+  // Handler for Brew News navigation (resets sub-views and smoothly scrolls)
+  const handleOpenBrewNews = () => {
+    if (isRoasterShowcaseView) {
+      setIsRoasterShowcaseView(false);
+      navigate('/');
+    }
+    window.dispatchEvent(new CustomEvent('open-world-news'));
+    const tryScroll = (attempts = 0) => {
+      const el = document.getElementById('world-news');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      } else if (attempts < 10) {
+        setTimeout(() => tryScroll(attempts + 1), 60);
+      }
+    };
+    setTimeout(() => tryScroll(0), 60);
+  };
+
+  // Handler for Specialty Roaster Showcase Navigation
+  const handleOpenRoasterShowcase = () => {
+    if (isRoasterShowcaseView) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setIsRoasterShowcaseView(true);
+      navigate('/roasters');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // Handlers for Scanned / Roaster Dial-In Actions
   const handleApplyScannedRecipe = (scannedBean) => {
     if (!scannedBean) return;
@@ -453,12 +482,10 @@ export default function App() {
           onOpenWaterLab={() => setIsWaterLabOpen(true)}
           onOpenRoasterPortal={() => { setRoasterPrefillBarcode(''); setRoasterPrefillBean(null); setIsRoasterPortalOpen(true); }}
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
-          onOpenRoasterShowcase={() => {
-            setIsRoasterShowcaseView(true);
-            navigate('/roasters');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
+          onOpenRoasterShowcase={handleOpenRoasterShowcase}
+          isRoasterShowcaseView={isRoasterShowcaseView}
           onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
+          onOpenNews={handleOpenBrewNews}
           isMuted={isMuted}
           onToggleMute={() => setIsMuted(!isMuted)}
           currentUser={currentUser}
@@ -832,10 +859,7 @@ export default function App() {
         <Footer
           trackMode={trackMode}
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
-          onOpenRoasterShowcase={() => {
-            setIsRoasterShowcaseView(true);
-            navigate('/roasters');
-          }}
+          onOpenRoasterShowcase={handleOpenRoasterShowcase}
           onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
         />
 

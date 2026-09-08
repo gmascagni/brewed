@@ -16,7 +16,9 @@ export default function Header({
   onOpenRoasterPortal,
   onOpenRoasterInfo,
   onOpenRoasterShowcase,
+  isRoasterShowcaseView = false,
   onOpenVideoAcademy,
+  onOpenNews,
   isMuted = false,
   onToggleMute,
   currentUser 
@@ -204,7 +206,7 @@ export default function Header({
               title="Open Coffee Academy & Video Masterclasses"
             >
               <Tv className="w-4 h-4 text-red-400" />
-              <span className="hidden lg:inline">Academy</span>
+              <span className="hidden sm:inline">Academy</span>
             </button>
           )}
 
@@ -213,28 +215,33 @@ export default function Header({
             <button
               onClick={onOpenRoasterShowcase}
               className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
-                isCoffee
-                  ? 'bg-[#2A1C12]/50 border-amber-gold/40 text-amber-gold hover:bg-[#38261A]/60'
-                  : 'bg-emerald-950/50 border-sage-500/40 text-sage-300 hover:bg-emerald-900/60'
+                isRoasterShowcaseView
+                  ? 'bg-amber-gold text-espresso-950 border-amber-gold shadow-amber-500/30 ring-2 ring-amber-gold/50'
+                  : isCoffee
+                    ? 'bg-[#2A1C12]/50 border-amber-gold/40 text-amber-gold hover:bg-[#38261A]/60'
+                    : 'bg-emerald-950/50 border-sage-500/40 text-sage-300 hover:bg-emerald-900/60'
               }`}
-              title="View Roaster Showcase & Dial-In Profiles (Methodical, Onyx, Black & White)"
+              title={isRoasterShowcaseView ? "You are viewing the Roaster Showcase (Click to scroll to top)" : "View Roaster Showcase & Dial-In Profiles (Methodical, Onyx, Black & White)"}
             >
-              <Store className="w-4 h-4 text-amber-gold" />
+              <Store className={`w-4 h-4 ${isRoasterShowcaseView ? 'text-espresso-950' : 'text-amber-gold'}`} />
               <span className="hidden sm:inline">Roasters</span>
+              {isRoasterShowcaseView && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse ml-0.5" />
+              )}
             </button>
           )}
 
           {/* Brew News Dispatch Trigger */}
           <button
-            onClick={() => {
+            onClick={onOpenNews || (() => {
               window.dispatchEvent(new CustomEvent('open-world-news'));
               setTimeout(() => {
                 const el = document.getElementById('world-news');
                 if (el) {
                   el.scrollIntoView({ behavior: 'smooth' });
                 }
-              }, 50);
-            }}
+              }, 60);
+            })}
             className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border font-mono font-bold transition-all active:scale-95 shadow-md ${
               isCoffee
                 ? 'bg-[#2A1C12]/50 border-[#A66E38]/40 text-[#D2A06E] hover:bg-[#38261A]/60'
@@ -242,8 +249,8 @@ export default function Header({
             }`}
             title="Jump to Brew News"
           >
-            <Newspaper className="w-4 h-4" />
-            <span className="hidden md:inline">Brew News</span>
+            <Newspaper className="w-4 h-4 text-amber-500" />
+            <span className="hidden sm:inline">Brew News</span>
           </button>
 
           {/* Brew Journal Trigger */}
