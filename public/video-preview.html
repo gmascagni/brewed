@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Brew App • 9:16 Social Video Preview</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #090d16;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .badge {
+      display: inline-block;
+      background: #f59e0b;
+      color: #0f172a;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 6px 0;
+      color: #ffffff;
+    }
+    p {
+      font-size: 13px;
+      color: #94a3b8;
+      margin: 0;
+    }
+    .player-wrapper {
+      position: relative;
+      width: 360px;
+      height: 640px; /* 9:16 ratio */
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      background: #000;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .meta-cards {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 480px;
+      width: 100%;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .card-label {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-family: monospace;
+    }
+    .card-val {
+      font-size: 14px;
+      font-weight: bold;
+      color: #38bdf8;
+      margin-top: 4px;
+    }
+    .cta-links {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      background: #f59e0b;
+      color: #0f172a;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #d97706;
+    }
+    .btn-secondary {
+      background: #334155;
+      color: #ffffff;
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <span class="badge">9:16 Vertical Short Video</span>
+    <h1>The Brew App • Recipe Timer Masterclass</h1>
+    <p>Targeted for TikTok, Instagram Reels & YouTube Shorts</p>
+  </div>
+
+  <div class="player-wrapper">
+    <video controls autoplay loop playsinline>
+      <source src="/videos/v60_timer_recipe_short.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <div class="meta-cards">
+    <div class="card">
+      <div class="card-label">Resolution</div>
+      <div class="card-val">1080 x 1920</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Duration</div>
+      <div class="card-val">32.4s (4 Scenes)</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Voiceover</div>
+      <div class="card-val">Neural Studio TTS</div>
+    </div>
+  </div>
+
+  <div class="cta-links">
+    <a href="/videos/v60_timer_recipe_short.mp4" download class="btn">⬇️ Download MP4</a>
+    <a href="/" class="btn btn-secondary">☕ Launch The Brew App</a>
+  </div>
+</body>
+</html>

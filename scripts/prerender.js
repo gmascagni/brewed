@@ -394,9 +394,11 @@ waterHtml = waterHtml.replace(/<link rel="canonical" href=".*?" \/>/i, `<link re
 waterHtml = waterHtml.replace(/<meta property="og:title" content=".*?" \/>/i, `<meta property="og:title" content="${waterGuideTitle}" />`);
 waterHtml = waterHtml.replace(/<meta property="og:description" content=".*?" \/>/i, `<meta property="og:description" content="${waterGuideDesc}" />`);
 waterHtml = waterHtml.replace(/<meta property="og:url" content=".*?" \/>/i, `<meta property="og:url" content="${waterGuideUrl}" />`);
+waterHtml = waterHtml.replace(/<meta property="og:image" content=".*?" \/>/i, `<meta property="og:image" content="https://thebrew.app/images/social/water_chemistry_guide.jpg" />`);
 waterHtml = waterHtml.replace(/<meta name="twitter:title" content=".*?" \/>/i, `<meta name="twitter:title" content="${waterGuideTitle}" />`);
 waterHtml = waterHtml.replace(/<meta name="twitter:description" content=".*?" \/>/i, `<meta name="twitter:description" content="${waterGuideDesc}" />`);
 waterHtml = waterHtml.replace(/<meta name="twitter:url" content=".*?" \/>/i, `<meta name="twitter:url" content="${waterGuideUrl}" />`);
+waterHtml = waterHtml.replace(/<meta name="twitter:image" content=".*?" \/>/i, `<meta name="twitter:image" content="https://thebrew.app/images/social/water_chemistry_guide.jpg" />`);
 
 const waterJsonLdTag = `<script id="json-ld-structured-data" type="application/ld+json">${JSON.stringify(waterGuideJsonLd)}</script>`;
 waterHtml = waterHtml.replace('</head>', `  ${waterJsonLdTag}\n  </head>`);
@@ -404,8 +406,56 @@ waterHtml = waterHtml.replace('<div id="root"></div>', `<div id="root">${waterGu
 
 fs.writeFileSync(path.join(guideDistDir, 'index.html'), waterHtml);
 fs.writeFileSync(path.join(guideRootDir, 'index.html'), waterHtml);
+// Clean URL file (avoids GitHub Pages 301 trailing slash redirect)
+fs.writeFileSync(path.join(distDir, 'guides', 'coffee-water-chemistry.html'), waterHtml);
+fs.writeFileSync(path.join(rootDir, 'guides', 'coffee-water-chemistry.html'), waterHtml);
 
 console.log('✓ Successfully prerendered /guides/coffee-water-chemistry with Article, HowTo, and FAQPage schemas!');
+
+// ----------------------------------------------------
+// Prerender Guides: /guides/water-chemistry-gh-kh
+// ----------------------------------------------------
+console.log('Prerendering /guides/water-chemistry-gh-kh guide page...');
+
+const ghKhDistDir = path.join(distDir, 'guides', 'water-chemistry-gh-kh');
+fs.mkdirSync(ghKhDistDir, { recursive: true });
+const ghKhRootDir = path.join(rootDir, 'guides', 'water-chemistry-gh-kh');
+fs.mkdirSync(ghKhRootDir, { recursive: true });
+
+const ghKhTitle = 'Coffee Water Chemistry: GH vs. KH Cheat Sheet | The Brew App';
+const ghKhUrl = 'https://thebrew.app/guides/water-chemistry-gh-kh';
+const ghKhImage = 'https://thebrew.app/images/social/water_chemistry_guide.jpg';
+
+let ghKhHtml = templateHtml;
+ghKhHtml = ghKhHtml.replace(/<title>.*?<\/title>/i, `<title>${ghKhTitle}</title>`);
+ghKhHtml = ghKhHtml.replace(/<meta name="description" content=".*?" \/>/i, `<meta name="description" content="${waterGuideDesc}" />`);
+ghKhHtml = ghKhHtml.replace(/<link rel="canonical" href=".*?" \/>/i, `<link rel="canonical" href="${ghKhUrl}" />`);
+ghKhHtml = ghKhHtml.replace(/<meta property="og:title" content=".*?" \/>/i, `<meta property="og:title" content="${ghKhTitle}" />`);
+ghKhHtml = ghKhHtml.replace(/<meta property="og:description" content=".*?" \/>/i, `<meta property="og:description" content="${waterGuideDesc}" />`);
+ghKhHtml = ghKhHtml.replace(/<meta property="og:url" content=".*?" \/>/i, `<meta property="og:url" content="${ghKhUrl}" />`);
+ghKhHtml = ghKhHtml.replace(/<meta property="og:image" content=".*?" \/>/i, `<meta property="og:image" content="${ghKhImage}" />`);
+ghKhHtml = ghKhHtml.replace(/<meta name="twitter:title" content=".*?" \/>/i, `<meta name="twitter:title" content="${ghKhTitle}" />`);
+ghKhHtml = ghKhHtml.replace(/<meta name="twitter:description" content=".*?" \/>/i, `<meta name="twitter:description" content="${waterGuideDesc}" />`);
+ghKhHtml = ghKhHtml.replace(/<meta name="twitter:url" content=".*?" \/>/i, `<meta name="twitter:url" content="${ghKhUrl}" />`);
+ghKhHtml = ghKhHtml.replace(/<meta name="twitter:image" content=".*?" \/>/i, `<meta name="twitter:image" content="${ghKhImage}" />`);
+
+const ghKhJsonLd = JSON.parse(JSON.stringify(waterGuideJsonLd));
+if (ghKhJsonLd['@graph'] && ghKhJsonLd['@graph'][0]) {
+  ghKhJsonLd['@graph'][0].headline = 'Coffee Water Chemistry: GH vs. KH Cheat Sheet';
+  ghKhJsonLd['@graph'][0].url = ghKhUrl;
+}
+
+const ghKhJsonLdTag = `<script id="json-ld-structured-data" type="application/ld+json">${JSON.stringify(ghKhJsonLd)}</script>`;
+ghKhHtml = ghKhHtml.replace('</head>', `  ${ghKhJsonLdTag}\n  </head>`);
+ghKhHtml = ghKhHtml.replace('<div id="root"></div>', `<div id="root">${waterGuideContent}</div>`);
+
+fs.writeFileSync(path.join(ghKhDistDir, 'index.html'), ghKhHtml);
+fs.writeFileSync(path.join(ghKhRootDir, 'index.html'), ghKhHtml);
+// Clean URL direct files (so Pinterest/Buffer receives immediate HTTP 200 without redirect)
+fs.writeFileSync(path.join(distDir, 'guides', 'water-chemistry-gh-kh.html'), ghKhHtml);
+fs.writeFileSync(path.join(rootDir, 'guides', 'water-chemistry-gh-kh.html'), ghKhHtml);
+
+console.log('✓ Successfully prerendered /guides/water-chemistry-gh-kh with Article, HowTo, and direct HTML!');
 
 // ==========================================
 // PRERENDER: /roasters (Roaster Partner Program & Label Ingestion)

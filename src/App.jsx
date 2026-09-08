@@ -269,13 +269,18 @@ export default function App() {
           script.textContent = JSON.stringify(jsonLdData);
         }
       }
-    } else if (path.startsWith('/guides/coffee-water-chemistry')) {
+    } else if (path.startsWith('/guides/coffee-water-chemistry') || path.startsWith('/guides/water-chemistry-gh-kh')) {
       setIsRoasterShowcaseView(false);
       setIsWaterLabOpen(true);
+      const isGhKh = path.startsWith('/guides/water-chemistry-gh-kh');
       updatePageSeo(
-        'Coffee Water Chemistry & Extraction Yield Guide',
+        isGhKh
+          ? 'Coffee Water Chemistry: GH vs. KH Cheat Sheet | The Brew App'
+          : 'Coffee Water Chemistry & Extraction Yield Guide | The Brew App',
         'Master coffee water chemistry: SCA water specs, Lotus drop recipes, DIY mineral recipes (GH & KH), and extraction yield optimization for specialty coffee.',
-        'https://thebrew.app/guides/coffee-water-chemistry'
+        isGhKh
+          ? 'https://thebrew.app/guides/water-chemistry-gh-kh'
+          : 'https://thebrew.app/guides/coffee-water-chemistry'
       );
     } else if (path.startsWith('/roasters') || path.startsWith('/roaster')) {
       if (path === '/roasters/partner' || path === '/roasters/info') {
