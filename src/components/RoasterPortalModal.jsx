@@ -523,10 +523,13 @@ export default function RoasterPortalModal({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 px-6 py-3 border-b border-white/10 bg-black/20 overflow-x-auto text-xs font-mono">
+        <div 
+          className="flex items-center gap-2 px-4 sm:px-6 py-3 border-b border-white/10 bg-black/20 overflow-x-auto overflow-y-hidden no-scrollbar text-xs font-mono shrink-0 select-none [&::-webkit-scrollbar]:hidden"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           <button
             onClick={() => setActiveTab('onboard')}
-            className={`px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap ${
+            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
               activeTab === 'onboard'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
@@ -538,37 +541,37 @@ export default function RoasterPortalModal({
 
           <button
             onClick={() => setActiveTab('sticker')}
-            className={`px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap ${
+            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
               activeTab === 'sticker'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
             }`}
           >
-            <QrCode className="w-3.5 h-3.5" />
+            <QrCode className="w-3.5 h-3.5 shrink-0" />
             <span>2. Smart Bag QR Studio</span>
           </button>
 
           <button
             onClick={() => setActiveTab('catalog')}
-            className={`px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap ${
+            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
               activeTab === 'catalog'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
             }`}
           >
-            <Store className="w-3.5 h-3.5" />
+            <Store className="w-3.5 h-3.5 shrink-0" />
             <span>3. Registered Coffees ({registeredCoffees.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('video')}
-            className={`px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap ${
+            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
               activeTab === 'video'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
             }`}
           >
-            <Play className="w-3.5 h-3.5" />
+            <Play className="w-3.5 h-3.5 shrink-0" />
             <span>4. Walkthrough Video</span>
           </button>
         </div>

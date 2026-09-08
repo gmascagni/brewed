@@ -177,7 +177,10 @@ export default function WaterChemistryModal({ isOpen, onClose }) {
         </div>
 
         {/* Top Mode Navigation Tabs */}
-        <div className="flex border-b border-white/10 bg-black/30 px-5 sm:px-6 pt-3 gap-3 sm:gap-6 overflow-x-auto">
+        <div 
+          className="flex border-b border-white/10 bg-black/30 px-5 sm:px-6 pt-3 gap-3 sm:gap-6 overflow-x-auto overflow-y-hidden no-scrollbar select-none [&::-webkit-scrollbar]:hidden"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           <button
             type="button"
             onClick={() => setActiveTab('bottled')}

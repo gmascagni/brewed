@@ -114,7 +114,10 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
         </div>
 
         {/* Category Filter Pills */}
-        <div className="flex items-center gap-2 px-6 py-3 border-b border-white/10 overflow-x-auto text-xs font-mono font-bold bg-black/20">
+        <div 
+          className="flex items-center gap-2 px-6 py-3 border-b border-white/10 overflow-x-auto overflow-y-hidden no-scrollbar text-xs font-mono font-bold bg-black/20 select-none [&::-webkit-scrollbar]:hidden"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           <button
             onClick={() => setActiveCategory('all')}
             className={`px-3 py-1 rounded-xl transition-all ${activeCategory === 'all' ? 'bg-amber-gold text-espresso-950 shadow-md font-extrabold' : 'text-stone-400 hover:text-cream-light'}`}
