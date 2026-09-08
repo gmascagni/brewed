@@ -248,13 +248,30 @@ input[type=range]::-webkit-slider-thumb:hover {
   animation: bounceSubtle 2.5s ease-in-out infinite;
 }
 
-/* Custom Scrollbars */
+/* Sleek Hidden & Minimalist Scrollbars */
 .no-scrollbar::-webkit-scrollbar {
-  display: none;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 .no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 163, 115, 0.5);
 }
 
 /* Print Optimization for Roastery Barcode Labels */

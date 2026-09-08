@@ -4,6 +4,7 @@
 import QRCode from 'qrcode';
 import { doc, setDoc, deleteDoc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase.js';
+import { deduplicateCoffees, normalizeRoasterKey } from './roasterShowcaseData.js';
 
 const STORAGE_KEY = 'thebrewapp_roaster_registry_v1';
 
@@ -12,12 +13,12 @@ const STORAGE_KEY = 'thebrewapp_roaster_registry_v1';
  */
 export function getRegisteredCoffees(builtinCatalog = []) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
     const customList = raw ? JSON.parse(raw) : [];
-    return [...customList, ...builtinCatalog];
+    return deduplicateCoffees([...customList, ...builtinCatalog]);
   } catch (err) {
     console.warn('Error reading roaster registry from localStorage:', err);
-    return [...builtinCatalog];
+    return deduplicateCoffees([...builtinCatalog]);
   }
 }
 
@@ -206,20 +207,62 @@ export async function fetchRemoteCoffeeByCode(code) {
 
 /**
  * Sync Cloud Firestore catalog with local cache
+/**
+ * Purge stale duplicate roasters and duplicate coffees from local storage
+ */
+export function cleanupLocalRegistry() {
+  if (typeof window === 'undefined') return;
+  try {
+    // 1. Clean Roaster Profiles (filter out built-in showcase roasters and deduplicate custom ones)
+    const rawRoasters = localStorage.getItem(ROASTER_PROFILES_KEY);
+    if (rawRoasters) {
+      const roasters = JSON.parse(rawRoasters);
+      const seen = new Set(['methodical', 'onyx', 'black-white']);
+      const cleaned = [];
+      for (const r of roasters) {
+        if (!r) continue;
+        const k = normalizeRoasterKey(r.id || r.slug || r.name);
+        if (k && !seen.has(k)) {
+          seen.add(k);
+          cleaned.push(r);
+        }
+      }
+      localStorage.setItem(ROASTER_PROFILES_KEY, JSON.stringify(cleaned));
+    }
+
+    // 2. Clean Coffees (deduplicate all custom coffees)
+    const rawCoffees = localStorage.getItem(STORAGE_KEY);
+    if (rawCoffees) {
+      const coffees = JSON.parse(rawCoffees);
+      const cleanedCoffees = deduplicateCoffees(coffees);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanedCoffees));
+    }
+  } catch (err) {
+    console.warn('Error during local registry cleanup:', err);
+  }
+}
+
+/**
+ * Sync Cloud Firestore catalog with local cache (with strict deduplication)
  */
 export async function syncCloudCatalog() {
   if (!db || typeof window === 'undefined') return;
+  cleanupLocalRegistry();
   try {
     // 1. Sync Roasters
     const roasterSnap = await getDocs(collection(db, 'roasters'));
     if (!roasterSnap.empty) {
       const remoteRoasters = roasterSnap.docs.map(d => d.data());
       const localRoasters = getCustomRoasters();
+      const seenBuiltins = new Set(['methodical', 'onyx', 'black-white']);
       const roasterMap = new Map();
-      remoteRoasters.forEach(r => roasterMap.set(r.slug || r.id, r));
-      localRoasters.forEach(r => {
-        if (!roasterMap.has(r.slug || r.id)) {
-          roasterMap.set(r.slug || r.id, r);
+
+      // Only save non-builtin custom roasters into the local custom storage
+      [...remoteRoasters, ...localRoasters].forEach(r => {
+        if (!r) return;
+        const k = normalizeRoasterKey(r.id || r.slug || r.name);
+        if (k && !seenBuiltins.has(k) && !roasterMap.has(k)) {
+          roasterMap.set(k, r);
         }
       });
       localStorage.setItem(ROASTER_PROFILES_KEY, JSON.stringify(Array.from(roasterMap.values())));
@@ -232,14 +275,8 @@ export async function syncCloudCatalog() {
         .filter(d => !d.id.startsWith('upc_'))
         .map(d => d.data());
       const localCoffees = getCustomRoasterCoffees();
-      const coffeeMap = new Map();
-      remoteCoffees.forEach(c => coffeeMap.set(c.id, c));
-      localCoffees.forEach(c => {
-        if (!coffeeMap.has(c.id)) {
-          coffeeMap.set(c.id, c);
-        }
-      });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(coffeeMap.values())));
+      const merged = deduplicateCoffees([...remoteCoffees, ...localCoffees]);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
     }
   } catch (err) {
     console.warn('Background Cloud Firestore sync error:', err);

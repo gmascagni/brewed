@@ -25,7 +25,7 @@ import {
   Download,
   Bookmark
 } from 'lucide-react';
-import { SHOWCASE_ROASTERS, getShowcaseRoaster, getAllShowcaseRoasters } from '../data/roasterShowcaseData';
+import { SHOWCASE_ROASTERS, getShowcaseRoaster, getAllShowcaseRoasters, normalizeRoasterKey, getRoasterShortName } from '../data/roasterShowcaseData';
 import { trackEvent } from '../utils/analytics';
 import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 
@@ -189,14 +189,20 @@ export default function RoasterProfilePage({
             <span className="hidden md:inline text-xs font-mono text-cream-soft/60">
               Roasters:
             </span>
-            <div className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 max-w-[280px] sm:max-w-md overflow-x-auto custom-scrollbar">
+            <div 
+              className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 max-w-[280px] sm:max-w-md md:max-w-lg overflow-x-auto no-scrollbar"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
               {allRoasters.map((r) => {
-                const isSelected = r.id.toLowerCase() === activeRoasterId.toLowerCase() || 
-                                   r.slug.toLowerCase() === activeRoasterId.toLowerCase() ||
-                                   r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === activeRoasterId.toLowerCase();
+                const targetKey = normalizeRoasterKey(activeRoasterId);
+                const isSelected = 
+                  normalizeRoasterKey(r.id) === targetKey ||
+                  normalizeRoasterKey(r.slug) === targetKey ||
+                  normalizeRoasterKey(r.name) === targetKey;
+                const displayName = r.shortName || getRoasterShortName(r.name);
                 return (
                   <button
-                    key={r.id}
+                    key={r.id || r.slug || r.name}
                     onClick={() => setActiveRoasterId(r.id)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition whitespace-nowrap flex items-center gap-1.5 ${
                       isSelected
@@ -207,7 +213,7 @@ export default function RoasterProfilePage({
                     {r.logoImage && (
                       <img src={r.logoImage} alt="" className="w-3.5 h-3.5 object-contain rounded shrink-0 inline" />
                     )}
-                    <span>{r.name.split(' ')[0]}</span>
+                    <span>{displayName}</span>
                   </button>
                 );
               })}

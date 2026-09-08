@@ -7,6 +7,7 @@ export const SHOWCASE_ROASTERS = [
     id: 'methodical',
     slug: 'methodical-coffee',
     name: 'Methodical Coffee',
+    shortName: 'Methodical',
     isDemoExample: true,
     demoNotice: 'Demonstration & Showcase Partner Example',
     tagline: 'Coffee, Hospitality, Design',
@@ -177,6 +178,7 @@ export const SHOWCASE_ROASTERS = [
     id: 'onyx',
     slug: 'onyx-coffee-lab',
     name: 'Onyx Coffee Lab',
+    shortName: 'Onyx',
     isDemoExample: true,
     demoNotice: 'Demonstration & Showcase Partner Example',
     tagline: 'Never Settle for Good Enough',
@@ -307,6 +309,7 @@ export const SHOWCASE_ROASTERS = [
     id: 'black_and_white',
     slug: 'black-and-white-coffee',
     name: 'Black & White Coffee Roasters',
+    shortName: 'Black & White',
     isDemoExample: true,
     demoNotice: 'Demonstration & Showcase Partner Example',
     tagline: 'Creating Opportunities Through Coffee',
@@ -540,55 +543,172 @@ function formatCustomRoasterAsShowcase(custom, coffees = []) {
   };
 }
 
+/**
+ * Canonical normalization for roaster identification across all forms (id, slug, name, alias).
+ */
+export function normalizeRoasterKey(input) {
+  if (!input) return '';
+  let clean = String(input).toLowerCase().trim();
+  const KNOWN_ALIASES = {
+    'bw': 'black-white',
+    'b-w': 'black-white',
+    'b&w': 'black-white',
+    'bandw': 'black-white',
+    'mth': 'methodical',
+    'onx': 'onyx'
+  };
+  if (KNOWN_ALIASES[clean]) return KNOWN_ALIASES[clean];
+
+  clean = clean
+    .replace(/&/g, ' ')
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
+  clean = clean.replace(/\band\b/g, ' ').replace(/\s+/g, ' ').trim();
+
+  const suffixPattern = /\b(coffee|roasters|roaster|roastery|lab|company|co)\b$/;
+  while (suffixPattern.test(clean)) {
+    clean = clean.replace(suffixPattern, '').trim();
+  }
+
+  const result = clean.replace(/\s+/g, '-');
+  return KNOWN_ALIASES[result] || result;
+}
+
+/**
+ * Clean short name for navigation badges and pills (e.g., "Methodical", "Onyx", "Black & White").
+ */
+export function getRoasterShortName(name) {
+  if (!name) return 'Roaster';
+  const clean = String(name).trim();
+  if (/^black\s*(&|and)\s*white/i.test(clean)) {
+    return 'Black & White';
+  }
+  const stripped = clean
+    .replace(/\s+(Coffee|Roasters|Roastery|Lab|Company|Co\.|Roast\s+Lab|Boutique).*$/i, '')
+    .trim();
+  if (stripped.length > 0 && stripped.length <= 18) {
+    return stripped;
+  }
+  return clean.split(' ')[0] || clean;
+}
+
+/**
+ * Deduplicate an array of coffee items by ID, UPC, and composite (roaster + beanName).
+ */
+export function deduplicateCoffees(coffees = []) {
+  const seenIds = new Set();
+  const seenUpcs = new Set();
+  const seenNames = new Set();
+  const unique = [];
+
+  for (const c of coffees) {
+    if (!c) continue;
+    const cid = c.id ? String(c.id).toLowerCase().trim() : '';
+    const cupc = c.upc ? String(c.upc).trim() : '';
+    const cname = c.beanName ? String(c.beanName).toLowerCase().trim().replace(/[^a-z0-9]+/g, ' ') : '';
+    const croaster = c.roaster ? normalizeRoasterKey(c.roaster) : '';
+    const compositeKey = `${croaster}:::${cname}`;
+
+    if (cid && seenIds.has(cid)) continue;
+    if (cupc && seenUpcs.has(cupc)) continue;
+    if (cname && seenNames.has(compositeKey)) continue;
+
+    if (cid) seenIds.add(cid);
+    if (cupc) seenUpcs.add(cupc);
+    if (cname) seenNames.add(compositeKey);
+
+    unique.push(c);
+  }
+
+  return unique;
+}
+
 export function getAllShowcaseRoasters() {
   const customRoasters = getCustomRoasters();
   const allCustomCoffees = getCustomRoasterCoffees();
 
-  // Find any unique roaster names from custom coffees that may not be in customRoasters table
-  const coffeeRoasterNames = Array.from(new Set(allCustomCoffees.map(c => c.roaster).filter(Boolean)));
-  
-  const synthList = customRoasters.map(cr => {
-    const coffeesForRoaster = allCustomCoffees.filter(
-      c => c.roaster && c.roaster.toLowerCase() === cr.name.toLowerCase()
+  const seenKeys = new Set();
+  const roastersList = [];
+
+  // 1. Process built-in SHOWCASE_ROASTERS, recording all known canonical aliases
+  SHOWCASE_ROASTERS.forEach((sr) => {
+    const canonical = normalizeRoasterKey(sr.id) || normalizeRoasterKey(sr.slug) || normalizeRoasterKey(sr.name);
+    seenKeys.add(canonical);
+    if (sr.id) seenKeys.add(normalizeRoasterKey(sr.id));
+    if (sr.slug) seenKeys.add(normalizeRoasterKey(sr.slug));
+    if (sr.name) seenKeys.add(normalizeRoasterKey(sr.name));
+
+    // Merge in any custom coffees registered for this showcase roaster
+    const matchingCustomCoffees = allCustomCoffees.filter(
+      (c) => c.roaster && normalizeRoasterKey(c.roaster) === canonical
     );
-    return formatCustomRoasterAsShowcase(cr, coffeesForRoaster);
+
+    const mergedCoffees = deduplicateCoffees([...(sr.coffees || []), ...matchingCustomCoffees]);
+
+    roastersList.push({
+      ...sr,
+      shortName: sr.shortName || getRoasterShortName(sr.name),
+      coffees: mergedCoffees
+    });
   });
 
-  // Add any roasters from custom coffees not yet captured
-  coffeeRoasterNames.forEach(rName => {
-    if (!synthList.some(sr => sr.name.toLowerCase() === rName.toLowerCase())) {
-      const coffeesForRoaster = allCustomCoffees.filter(
-        c => c.roaster && c.roaster.toLowerCase() === rName.toLowerCase()
-      );
-      synthList.push(formatCustomRoasterAsShowcase({ name: rName, logoImage: coffeesForRoaster[0]?.logoImage }, coffeesForRoaster));
-    }
+  // 2. Process custom registered roaster profiles (e.g. from Roaster Studio or Firestore)
+  customRoasters.forEach((cr) => {
+    if (!cr || !cr.name) return;
+    const canonical = normalizeRoasterKey(cr.id) || normalizeRoasterKey(cr.slug) || normalizeRoasterKey(cr.name);
+    if (!canonical || seenKeys.has(canonical)) return; // Prevents duplicate roasters
+
+    seenKeys.add(canonical);
+    if (cr.id) seenKeys.add(normalizeRoasterKey(cr.id));
+    if (cr.slug) seenKeys.add(normalizeRoasterKey(cr.slug));
+    if (cr.name) seenKeys.add(normalizeRoasterKey(cr.name));
+
+    const coffeesForRoaster = allCustomCoffees.filter(
+      (c) => c.roaster && normalizeRoasterKey(c.roaster) === canonical
+    );
+
+    const formatted = formatCustomRoasterAsShowcase(cr, deduplicateCoffees(coffeesForRoaster));
+    formatted.shortName = getRoasterShortName(formatted.name);
+    roastersList.push(formatted);
   });
 
-  return [...SHOWCASE_ROASTERS, ...synthList];
+  // 3. Process any custom coffees with roaster names not yet captured
+  const coffeeRoasterNames = Array.from(new Set(allCustomCoffees.map((c) => c.roaster).filter(Boolean)));
+  coffeeRoasterNames.forEach((rName) => {
+    const canonical = normalizeRoasterKey(rName);
+    if (!canonical || seenKeys.has(canonical)) return; // Skip if already present
+
+    seenKeys.add(canonical);
+    const coffeesForRoaster = allCustomCoffees.filter(
+      (c) => c.roaster && normalizeRoasterKey(c.roaster) === canonical
+    );
+
+    const formatted = formatCustomRoasterAsShowcase(
+      { name: rName, logoImage: coffeesForRoaster[0]?.logoImage },
+      deduplicateCoffees(coffeesForRoaster)
+    );
+    formatted.shortName = getRoasterShortName(formatted.name);
+    roastersList.push(formatted);
+  });
+
+  return roastersList;
 }
 
 export function getShowcaseRoaster(idOrSlug = 'methodical') {
-  const cleanId = String(idOrSlug).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-
-  // 1. Check built-in showcase roasters
-  const builtIn = SHOWCASE_ROASTERS.find(
-    (r) => r.id.toLowerCase() === cleanId || 
-           r.slug.toLowerCase() === cleanId || 
-           r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === cleanId ||
-           r.name.toLowerCase().includes(idOrSlug.toLowerCase())
-  );
-  if (builtIn) return builtIn;
-
-  // 2. Check custom registered roasters
   const all = getAllShowcaseRoasters();
-  const matched = all.find(
-    (r) => r.id.toLowerCase() === cleanId || 
-           r.slug.toLowerCase() === cleanId || 
-           r.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') === cleanId ||
-           r.name.toLowerCase().includes(idOrSlug.toLowerCase())
-  );
-  if (matched) return matched;
+  if (!idOrSlug) return all[0];
 
-  // Default to first showcase roaster if no match found
-  return SHOWCASE_ROASTERS[0];
+  const targetKey = normalizeRoasterKey(idOrSlug);
+
+  const matched = all.find((r) => {
+    return (
+      normalizeRoasterKey(r.id) === targetKey ||
+      normalizeRoasterKey(r.slug) === targetKey ||
+      normalizeRoasterKey(r.name) === targetKey
+    );
+  });
+
+  return matched || all[0];
 }
