@@ -294,7 +294,7 @@ class FullSiteQASuite:
     async def test_uc_2_5_step04_multiphase_timer(self, s, base):
         timer_state = await s.evaluate("""(() => {
             const timerEl = document.getElementById('step-4') || document.querySelector('.font-mono.tabular-nums');
-            const startBtn = Array.from(document.querySelectorAll('button')).find(b => b.innerText.toUpperCase().includes('START') || b.innerText.toUpperCase().includes('EXTRACTION'));
+            const startBtn = Array.from(document.querySelectorAll('button')).find(b => (b.innerText.toUpperCase().includes('START') || b.innerText.toUpperCase().includes('EXTRACTION')) && b.offsetParent !== null);
             return {
                 timerMounted: !!timerEl,
                 startBtnFound: !!startBtn
@@ -305,7 +305,7 @@ class FullSiteQASuite:
 
         # Start timer
         await s.evaluate("""(() => {
-            const startBtn = Array.from(document.querySelectorAll('button')).find(b => b.innerText.toUpperCase().includes('START') || b.innerText.toUpperCase().includes('EXTRACTION'));
+            const startBtn = Array.from(document.querySelectorAll('button')).find(b => (b.innerText.toUpperCase().includes('START') || b.innerText.toUpperCase().includes('EXTRACTION')) && b.offsetParent !== null);
             if (startBtn) startBtn.click();
         })()""")
         await asyncio.sleep(2)
@@ -679,6 +679,9 @@ class FullSiteQASuite:
     # DOMAIN 9: WORLD NEWS & COLLAPSIBLE DRAWERS
     # =========================================================================
     async def test_uc_9_1_world_news_content(self, s, base):
+        # Support drawers (including World News) are housed in the dedicated /learn section
+        await s.navigate(f"{base}/learn#world-news")
+        await asyncio.sleep(1.5)
         news_state = await s.evaluate("""(() => {
             const el = document.getElementById('world-news');
             if (!el) return { found: false };

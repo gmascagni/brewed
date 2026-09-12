@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import OnBarSwitcher from './OnBarSwitcher';
 import StatWidget from './StatWidget';
+import { getCafeTelemetry } from '../utils/telemetry';
 
 const STORAGE_KEY = 'thebrewapp_cafe_portal_v1';
 
@@ -260,6 +261,16 @@ export default function CafePartnerPortal({
             }`}
           >
             🗓️ Cuppings & Events ({cafeData.events.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('telemetry')}
+            className={`py-2 px-4 rounded-xl font-sans text-xs font-bold transition-all ${
+              activeTab === 'telemetry'
+                ? 'bg-[#14110F] text-[#FAF7F2] shadow-sm'
+                : 'text-[#766A62] hover:text-[#14110F] hover:bg-white border border-transparent hover:border-[#ECE6DC]'
+            }`}
+          >
+            📊 Telemetry & Insights
           </button>
         </div>
 
@@ -518,6 +529,133 @@ export default function CafePartnerPortal({
             </div>
           </div>
         )}
+
+        {/* TAB 4: TELEMETRY & MARKET INTELLIGENCE */}
+        {activeTab === 'telemetry' && (() => {
+          const telemetry = getCafeTelemetry(cafeData.id || 'default');
+          return (
+            <div className="space-y-8 animate-fade-in">
+              {/* Telemetry Header */}
+              <div className="editorial-card p-6 bg-gradient-to-br from-[#FAF7F2] via-white to-[#F7F4EE]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#A25A24] font-bold bg-[#FAF0E6] px-2.5 py-1 rounded-full border border-[#ECD4BD]">
+                      Partner Telemetry Engine
+                    </span>
+                    <h2 className="font-editorial text-2xl font-bold text-[#14110F] mt-2">
+                      Local Consumer Telemetry & Foot-Traffic Analytics
+                    </h2>
+                    <p className="text-xs text-[#5C524B] mt-1 max-w-2xl">
+                      Anonymized, real-time engagement data captured when local specialty coffee connoisseurs search your cafe and explore your "On Bar Today" live menu.
+                    </p>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-[#2F663C] bg-[#EBF3ED] px-3 py-1.5 rounded-xl border border-[#C8E0CD] self-start sm:self-auto">
+                    🟢 Telemetry Sync Active
+                  </span>
+                </div>
+              </div>
+
+              {/* Metric KPI Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="editorial-card p-5">
+                  <span className="text-xs font-sans text-[#766A62]">Menu Impressions</span>
+                  <div className="font-editorial text-3xl font-bold text-[#14110F] mt-1">
+                    {telemetry.menuImpressions}
+                  </div>
+                  <span className="text-[11px] font-mono text-[#2F663C] font-semibold mt-1 inline-block">
+                    ↑ 18% vs last week
+                  </span>
+                </div>
+
+                <div className="editorial-card p-5">
+                  <span className="text-xs font-sans text-[#766A62]">Direction Requests</span>
+                  <div className="font-editorial text-3xl font-bold text-[#14110F] mt-1">
+                    {telemetry.directionClicks}
+                  </div>
+                  <span className="text-[11px] font-mono text-[#2F663C] font-semibold mt-1 inline-block">
+                    GPS Navigations
+                  </span>
+                </div>
+
+                <div className="editorial-card p-5">
+                  <span className="text-xs font-sans text-[#766A62]">Avg Search Radius</span>
+                  <div className="font-editorial text-3xl font-bold text-[#14110F] mt-1">
+                    {telemetry.searchRadiusMiles} mi
+                  </div>
+                  <span className="text-[11px] font-mono text-[#766A62] mt-1 inline-block">
+                    Local customer perimeter
+                  </span>
+                </div>
+
+                <div className="editorial-card p-5">
+                  <span className="text-xs font-sans text-[#766A62]">Top Searched Bean</span>
+                  <div className="font-editorial text-base font-bold text-[#A25A24] mt-2 line-clamp-1">
+                    {telemetry.popularOnBar}
+                  </div>
+                  <span className="text-[11px] font-mono text-[#766A62] mt-1 inline-block">
+                    Highest barista interest
+                  </span>
+                </div>
+              </div>
+
+              {/* Tiers Breakdown: Large Free Tier vs Telemetry Pro Pack */}
+              <div className="editorial-card p-6 border-2 border-[#ECE6DC]">
+                <h3 className="font-editorial text-xl font-bold text-[#14110F] mb-2">
+                  Partner Tiers & Telemetry Packages
+                </h3>
+                <p className="text-xs text-[#766A62] mb-6">
+                  We believe in empowering independent specialty cafes with a generous free foundation.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Large Free Tier */}
+                  <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-sans font-bold text-sm text-[#14110F]">Specialty Cafe Free Tier</span>
+                        <span className="text-xs font-mono font-bold text-[#2F663C] bg-[#EBF3ED] px-2 py-0.5 rounded">FREE FOREVER</span>
+                      </div>
+                      <p className="text-xs text-[#766A62] mb-4">Complete operational presence on TheBrew.App Cafe Radar.</p>
+                      <ul className="text-xs text-[#443B36] space-y-2">
+                        <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#2F663C]" /> Unlimited "On Bar Today" live toggles</li>
+                        <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#2F663C]" /> Commercial equipment & grinder showcase</li>
+                        <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#2F663C]" /> Free public cupping & events calendar</li>
+                        <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#2F663C]" /> Basic 7-day menu view metrics</li>
+                      </ul>
+                    </div>
+                    <div className="mt-6 pt-4 border-t border-[#ECE6DC] text-[11px] font-mono text-[#2F663C] font-bold">
+                      ✓ Active on your account
+                    </div>
+                  </div>
+
+                  {/* Telemetry Market Intelligence Pro */}
+                  <div className="p-5 rounded-2xl bg-gradient-to-br from-[#FAF0E6] to-[#FAF7F2] border-2 border-[#ECD4BD] flex flex-col justify-between shadow-md relative">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-sans font-bold text-sm text-[#A25A24]">Telemetry Market Intelligence Pack</span>
+                        <span className="text-xs font-mono font-bold text-[#A25A24] bg-white px-2 py-0.5 rounded shadow-xs">$19 / month</span>
+                      </div>
+                      <p className="text-xs text-[#766A62] mb-4">Actionable consumer extraction and foot-traffic intelligence.</p>
+                      <ul className="text-xs text-[#2A2421] space-y-2">
+                        <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#A25A24]" /> <strong>Top-of-Radar Priority Pin</strong> on local map</li>
+                        <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#A25A24]" /> <strong>Verified PROMOTED PARTNER badge</strong></li>
+                        <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#A25A24]" /> Customer brew method breakdown (Pour-over vs Espresso)</li>
+                        <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[#A25A24]" /> Peak local search hour heatmaps & radius demand</li>
+                      </ul>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => alert('Spotlight & Telemetry Pro requested! Your shop priority pin and market intelligence reports are being configured.')}
+                      className="mt-6 w-full py-2.5 rounded-xl bg-[#14110F] text-[#FAF7F2] hover:bg-[#2A2421] font-sans font-bold text-xs shadow-md transition-all active:scale-95"
+                    >
+                      Activate Telemetry Pro ($19/mo)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </main>
     </div>
   );

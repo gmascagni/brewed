@@ -27,10 +27,12 @@ import RoasterProfilePage from './components/RoasterProfilePage';
 import CoffeeVideoAcademyModal from './components/CoffeeVideoAcademyModal';
 import ConsumerDiscoveryFeed from './components/ConsumerDiscoveryFeed';
 import CafePartnerPortal from './components/CafePartnerPortal';
+import LearnSection from './components/LearnSection';
 import Footer from './components/Footer';
 import { AppOrchestratorProvider } from './context/AppOrchestratorContext';
 import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
+import { recordTelemetryEvent } from './utils/telemetry';
 import { getMethodJsonLd, updatePageSeo } from './utils/seo';
 import { syncCloudCatalog } from './data/roasterRegistry';
 import { ChevronRight, ChevronLeft, Sparkles, Coffee } from 'lucide-react';
@@ -116,6 +118,7 @@ export default function App() {
   const [roasterPrefillBean, setRoasterPrefillBean] = useState(null);
   const [isRoasterShowcaseView, setIsRoasterShowcaseView] = useState(false);
   const [isCafePortalView, setIsCafePortalView] = useState(false);
+  const [isLearnView, setIsLearnView] = useState(false);
   const [selectedRoasterSlug, setSelectedRoasterSlug] = useState('methodical');
   const [isVideoAcademyOpen, setIsVideoAcademyOpen] = useState(false);
   const [selectedAcademyVideoId, setSelectedAcademyVideoId] = useState(null);
@@ -141,22 +144,21 @@ export default function App() {
     trackEvent('brew_with_video_applied', { video_id: video.id, method_id: targetMethod.id, ratio });
   };
 
-  // Handler for Brew News navigation (resets sub-views and smoothly scrolls)
+  // Handler for Brew News navigation (resets sub-views, opens Learn, and smoothly scrolls)
   const handleOpenBrewNews = () => {
-    if (isRoasterShowcaseView) {
-      setIsRoasterShowcaseView(false);
-      navigate('/');
-    }
+    setIsCafePortalView(false);
+    setIsRoasterShowcaseView(false);
+    setIsLearnView(true);
     window.dispatchEvent(new CustomEvent('open-world-news'));
     const tryScroll = (attempts = 0) => {
       const el = document.getElementById('world-news');
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
-      } else if (attempts < 10) {
+      } else if (attempts < 15) {
         setTimeout(() => tryScroll(attempts + 1), 60);
       }
     };
-    setTimeout(() => tryScroll(0), 60);
+    setTimeout(() => tryScroll(0), 80);
   };
 
   // Handler for Specialty Roaster Showcase Navigation
@@ -209,6 +211,13 @@ export default function App() {
       roaster: scannedBean.roaster,
       bean: scannedBean.beanName,
       method: targetMethod.id,
+      ratio
+    });
+
+    recordTelemetryEvent('bean_dial_in', {
+      roaster: scannedBean.roaster,
+      beanName: scannedBean.beanName,
+      methodId: targetMethod.id,
       ratio
     });
   };
@@ -328,8 +337,17 @@ export default function App() {
       setIsVideoAcademyOpen(true);
       updatePageSeo(
         'Coffee Academy & Video Masterclasses | The Brew App',
-        'Watch curated 4K specialty coffee tutorials, roaster origins, water science, and dial-in masterclasses with synchronized brew timers.',
+        'Learn specialty coffee brewing from world barista champions: James Hoffmann, Lance Hedrick, and Onyx Coffee Lab.',
         'https://thebrew.app/academy'
+      );
+    } else if (path.startsWith('/learn')) {
+      setIsRoasterShowcaseView(false);
+      setIsCafePortalView(false);
+      setIsLearnView(true);
+      updatePageSeo(
+        'Specialty Coffee Learning Center & Extraction Science | TheBrew.App',
+        'Master specialty coffee brewing: video masterclasses, extraction channeling diagnostics, SCA water mineral chemistry, and gear guides.',
+        'https://thebrew.app/learn'
       );
     } else if (path.includes('smart-bag-scanner') || path.startsWith('/demo') || path.startsWith('/scanner') || path.startsWith('/scan')) {
       setIsRoasterShowcaseView(false);
@@ -456,18 +474,25 @@ export default function App() {
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
           onOpenRoasterShowcase={handleOpenRoasterShowcase}
           isRoasterShowcaseView={isRoasterShowcaseView}
-          currentView={isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : (currentStep > 1 ? 'brew_station' : 'discovery')}
+          currentView={isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : (currentStep > 1 ? 'brew_station' : 'discovery')}
           onSelectView={(v) => {
             if (v === 'discovery') {
               setIsCafePortalView(false);
               setIsRoasterShowcaseView(false);
+              setIsLearnView(false);
               setCurrentStep(1);
               navigate('/');
             } else if (v === 'brew_station') {
               setIsCafePortalView(false);
               setIsRoasterShowcaseView(false);
+              setIsLearnView(false);
               const el = document.getElementById('brew-atelier');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
+            } else if (v === 'learn') {
+              setIsCafePortalView(false);
+              setIsRoasterShowcaseView(false);
+              setIsLearnView(true);
+              navigate('/learn');
             }
           }}
           onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
@@ -477,8 +502,8 @@ export default function App() {
           currentUser={currentUser}
         />
         
-        {/* Step Progress Bar Pinned Inside Sticky Top Bar (hidden in Roaster Showcase or Cafe Portal) */}
-        {!isRoasterShowcaseView && !isCafePortalView && (
+        {/* Step Progress Bar Pinned Inside Sticky Top Bar (hidden in Roaster Showcase, Cafe Portal, or Learn) */}
+        {!isRoasterShowcaseView && !isCafePortalView && !isLearnView && (
           <StepIndicator
             currentStep={currentStep}
             setCurrentStep={(stepNum) => {
@@ -525,6 +550,14 @@ export default function App() {
               onOpenRoasterInfo={() => {
                 setIsRoasterInfoOpen(true);
               }}
+            />
+          ) : isLearnView ? (
+            <LearnSection
+              trackMode={trackMode}
+              activeMethod={currentActiveMethod}
+              activeVideo={activeVideo}
+              setActiveVideo={setActiveVideo}
+              onOpenWaterLab={() => setIsWaterLabOpen(true)}
             />
           ) : (
             <>
@@ -691,26 +724,6 @@ export default function App() {
               />
             </div>
           )}
-
-          {/* Collapsible Video Masterclasses Drawer */}
-          <MasterclassHub
-            trackMode={trackMode}
-            activeMethod={currentActiveMethod}
-            activeVideo={activeVideo}
-            setActiveVideo={setActiveVideo}
-          />
-
-          {/* Collapsible Diagnostics & Water Chemistry Drawer */}
-          <DiagnosticsDrawer trackMode={trackMode} />
-
-          {/* Collapsible Knowledge Base & Terroir Atlas Drawer */}
-          <KnowledgeBaseDrawer trackMode={trackMode} />
-
-          {/* Collapsible Equipment & Gear Store Drawer */}
-          <ShopDrawer trackMode={trackMode} activeMethod={currentActiveMethod} />
-
-          {/* Brew News Dispatch Section */}
-          <WorldNewsSection trackMode={trackMode} />
         </>
       )}
 

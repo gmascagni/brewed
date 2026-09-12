@@ -180,6 +180,25 @@ export default function GrindVisualGuide({ activeMethod }) {
         </div>
       )}
 
+      {/* Contextual Amazon Affiliate Grinder Callout */}
+      <div className="mt-8 p-4 rounded-2xl bg-black/60 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div className="flex items-center space-x-2 text-stone-300">
+          <Gauge className="w-4 h-4 flex-shrink-0 text-[#D2A06E]" />
+          <span>Consistent micron distribution requires precision European 40mm steel conical burrs (Baratza Encore, Fellow Ode, 1Zpresso).</span>
+        </div>
+        <a
+          href="https://www.amazon.com/dp/B007F183LK/?tag=thebrewapp13-20"
+          target="_blank"
+          rel="nofollow sponsored noopener"
+          data-product-name="Baratza Encore Conical Burr Grinder"
+          data-link-id="baratza_encore_grinder"
+          data-context="step3_grind_visual_guide"
+          className="px-4 py-2 rounded-xl border font-extrabold text-[11px] uppercase tracking-wider transition-all whitespace-nowrap flex-shrink-0 bg-[#A66E38]/20 text-[#D2A06E] hover:bg-[#A66E38]/30 border-[#A66E38]/40 shadow-xs active:scale-95"
+        >
+          Check Baratza Encore on Amazon ↗
+        </a>
+      </div>
+
     </section>
   );
 }

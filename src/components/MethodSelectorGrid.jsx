@@ -142,15 +142,36 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
         })}
       </div>
 
+      {/* Contextual Amazon Affiliate Paper Filter Callout for Pour-Over Methods */}
+      {(activeMethod?.id === 'pour_over' || activeMethod?.id === 'classic_pour_over' || activeMethod?.id === 'chemex') && (
+        <div className="p-4 rounded-2xl bg-black/60 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center space-x-2 text-stone-300">
+            <Sparkles className="w-4 h-4 flex-shrink-0 text-[#D2A06E]" />
+            <span>Pristine pour-over clarity and flow rate require high-density oxygen-bleached micro-pore paper filters (Hario V60 Size 02, Chemex Bonded).</span>
+          </div>
+          <a
+            href="https://www.amazon.com/dp/B001U7EOYA/?tag=thebrewapp13-20"
+            target="_blank"
+            rel="nofollow sponsored noopener"
+            data-product-name="Hario V60 Paper Filters Size 02"
+            data-link-id="hario_v60_filters"
+            data-context="step1_method_filter_pick"
+            className="px-4 py-2 rounded-xl border font-extrabold text-[11px] uppercase tracking-wider transition-all whitespace-nowrap flex-shrink-0 bg-[#A66E38]/20 text-[#D2A06E] hover:bg-[#A66E38]/30 border-[#A66E38]/40 shadow-xs active:scale-95"
+          >
+            Check V60 Paper Filters on Amazon ↗
+          </a>
+        </div>
+      )}
+
       {/* Step Navigation Action Footer */}
-      <div className="flex items-center justify-between pt-8 border-t border-white/[0.08]">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-white/[0.08]">
         <div className="text-xs text-stone-400 font-medium">
-          Active Selection: <strong className="text-cream-light font-serif font-bold text-sm ml-1">{activeMethod?.name}</strong>
+          Active Selection: <strong className="text-cream-light font-serif font-bold text-base ml-1">{activeMethod?.name}</strong>
         </div>
 
         <button
           onClick={onNextStep}
-          className="py-4 px-9 rounded-2xl font-extrabold text-xs tracking-wider uppercase flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all btn-tactile-coffee text-[#140C08]"
+          className="w-full sm:w-auto py-4 px-10 rounded-2xl font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2.5 shadow-[0_10px_25px_-5px_rgba(200,138,75,0.4)] hover:scale-105 active:scale-95 transition-all btn-tactile-coffee text-[#140C08]"
         >
           <span>Step 02: Ratio & Scaler</span>
           <ChevronRight className="w-4 h-4" />

@@ -16,7 +16,11 @@ import {
   Building2, 
   QrCode,
   Compass,
-  Sparkles
+  Sparkles,
+  GraduationCap,
+  SlidersHorizontal,
+  Layers,
+  Wrench
 } from 'lucide-react';
 import BrandLogo from './BrandLogo';
 
@@ -37,19 +41,19 @@ export default function Header({
   onOpenVideoAcademy,
   onOpenNews,
   onSelectView,
-  currentView = 'discovery', // 'discovery' | 'brew_station' | 'roasters' | 'cafe_portal'
+  currentView = 'discovery', // 'discovery' | 'brew_station' | 'roasters' | 'cafe_portal' | 'learn'
   isMuted = false,
   onToggleMute,
   currentUser 
 }) {
-  const [isPartnerMenuOpen, setIsPartnerMenuOpen] = useState(false);
-  const partnerMenuRef = useRef(null);
+  const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
+  const toolsMenuRef = useRef(null);
 
   // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event) {
-      if (partnerMenuRef.current && !partnerMenuRef.current.contains(event.target)) {
-        setIsPartnerMenuOpen(false);
+      if (toolsMenuRef.current && !toolsMenuRef.current.contains(event.target)) {
+        setIsToolsMenuOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -57,62 +61,97 @@ export default function Header({
   }, []);
 
   return (
-    <div className="relative z-40 px-4 lg:px-8 py-3 transition-colors duration-400 bg-white/95 backdrop-blur-md border-b border-[#ECE6DC] text-[#14110F]">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div className="relative z-40 px-3 sm:px-6 lg:px-8 py-2.5 transition-colors duration-400 bg-white/95 backdrop-blur-md border-b border-[#ECE6DC] text-[#14110F]">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
         
         {/* 1. Left: Editorial Logo & Brand Title */}
-        <div className="flex items-center space-x-3.5">
-          <div 
-            onClick={() => onSelectView && onSelectView('discovery')}
-            className="cursor-pointer p-1.5 rounded-2xl transition-all duration-300 flex items-center justify-center bg-[#FAF7F2] border border-[#ECE6DC] shadow-xs hover:border-[#D69550]"
-          >
-            <BrandLogo size={34} />
-          </div>
-          <div>
-            <h1 
+        <div className="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start">
+          <div className="flex items-center space-x-3">
+            <div 
               onClick={() => onSelectView && onSelectView('discovery')}
-              className="font-editorial text-2xl font-bold tracking-tight text-[#14110F] flex items-center gap-2 cursor-pointer"
+              className="cursor-pointer p-1.5 rounded-2xl transition-all duration-300 flex items-center justify-center bg-[#FAF7F2] border border-[#ECE6DC] shadow-xs hover:border-[#D69550]"
             >
-              <span>TheBrew.App</span>
-              <span className="whitespace-nowrap text-[9px] uppercase font-mono px-2 py-0.5 rounded-full border bg-[#FAF0E6] text-[#A25A24] border-[#ECD4BD] font-bold">
-                Master
-              </span>
-            </h1>
-            <p className="text-[11px] text-[#766A62] font-sans">Precision Specialty Coffee Guide</p>
+              <BrandLogo size={32} />
+            </div>
+            <div>
+              <h1 
+                onClick={() => onSelectView && onSelectView('discovery')}
+                className="font-editorial text-xl sm:text-2xl font-bold tracking-tight text-[#14110F] flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>TheBrew.App</span>
+                <span className="whitespace-nowrap text-[9px] uppercase font-mono px-2 py-0.5 rounded-full border bg-[#FAF0E6] text-[#A25A24] border-[#ECD4BD] font-bold">
+                  Master
+                </span>
+              </h1>
+              <p className="text-[10.5px] text-[#766A62] font-sans">Precision Specialty Coffee Guide</p>
+            </div>
+          </div>
+
+          {/* Mobile Tools Menu Toggle */}
+          <div className="flex items-center gap-1.5 md:hidden">
+            {onOpenSearch && (
+              <button
+                onClick={onOpenSearch}
+                className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B]"
+                title="Open Global Search (Ctrl + K)"
+              >
+                <Search className="w-3.5 h-3.5" />
+              </button>
+            )}
+            <button
+              onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
+              className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#14110F] flex items-center gap-1 text-xs font-bold font-sans"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 text-[#C88A4B]" />
+            </button>
           </div>
         </div>
 
-        {/* 2. Center: Editorial Navigation Hierarchy */}
-        <nav className="hidden md:flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-2xl border border-[#ECE6DC]">
-          <button
-            type="button"
-            onClick={() => onSelectView && onSelectView('discovery')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all ${
-              currentView === 'discovery' && !isRoasterShowcaseView
-                ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
-                : 'text-[#766A62] hover:text-[#14110F]'
-            }`}
-          >
-            Explore
-          </button>
-
+        {/* 2. Center: 5 PRIMARY NAVIGATION ITEMS (Brew, Recipes, Shops, Roasters, Learn) */}
+        <nav className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-2xl border border-[#ECE6DC] w-full md:w-auto justify-center overflow-x-auto">
+          
+          {/* Primary 1: Brew */}
           <button
             type="button"
             onClick={() => onSelectView && onSelectView('brew_station')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all ${
-              currentView === 'brew_station' && !isRoasterShowcaseView
+            className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
+              (currentView === 'brew_station' || currentView === 'discovery') && !isRoasterShowcaseView
                 ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                 : 'text-[#766A62] hover:text-[#14110F]'
             }`}
           >
-            Brew Station
+            Brew
           </button>
 
+          {/* Primary 2: Recipes */}
+          <button
+            type="button"
+            onClick={onOpenCommunity || onOpenJournal}
+            className="px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold text-[#766A62] hover:text-[#14110F] transition-all whitespace-nowrap"
+            title="Open Recipe Vault & Custom Studio"
+          >
+            Recipes
+          </button>
+
+          {/* Primary 3: Shops / Shop Local Coffee Radar */}
+          {onOpenLocalCoffee && (
+            <button
+              type="button"
+              onClick={onOpenLocalCoffee}
+              className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold text-[#766A62] hover:text-[#14110F] transition-all whitespace-nowrap"
+              title="Shop Local Coffee & Roasters"
+            >
+              <Compass className="w-3.5 h-3.5 text-[#C88A4B]" />
+              <span>Shop Local</span>
+            </button>
+          )}
+
+          {/* Primary 4: Roasters */}
           {onOpenRoasterShowcase && (
             <button
               type="button"
               onClick={onOpenRoasterShowcase}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
                 isRoasterShowcaseView
                   ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                   : 'text-[#766A62] hover:text-[#14110F]'
@@ -127,32 +166,27 @@ export default function Header({
             </button>
           )}
 
-          {onOpenLocalCoffee && (
-            <button
-              type="button"
-              onClick={onOpenLocalCoffee}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold text-[#766A62] hover:text-[#14110F] transition-all"
-            >
-              Cafe Radar
-            </button>
-          )}
+          {/* Primary 5: Learn */}
+          <button
+            type="button"
+            onClick={() => onSelectView && onSelectView('learn')}
+            className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
+              currentView === 'learn'
+                ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                : 'text-[#766A62] hover:text-[#14110F]'
+            }`}
+            title="Specialty Coffee Learning Center, Video Masterclasses, Diagnostics & World News"
+          >
+            <GraduationCap className="w-3.5 h-3.5 text-[#C88A4B]" />
+            <span>Learn</span>
+            {currentView === 'learn' && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse" />
+            )}
+          </button>
         </nav>
 
-        {/* 3. Right: Utility Controls, Partner Portals, and Profile */}
-        <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
-
-          {/* Shop Local Coffee Button (Preserves exact QA selector) */}
-          {onOpenLocalCoffee && (
-            <button
-              onClick={onOpenLocalCoffee}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl font-bold font-sans shadow-xs hover:shadow-sm active:scale-95 transition-all bg-[#14110F] text-[#FAF7F2] hover:bg-[#2A2421]"
-              title="Shop Local Coffee & Roasters"
-            >
-              <Coffee className="w-3.5 h-3.5 text-[#E8AF72]" />
-              <span className="hidden sm:inline">Shop Local Coffee</span>
-              <span className="text-[10px] bg-white/20 text-white px-1.5 py-0.2 rounded-full font-mono font-bold">📍</span>
-            </button>
-          )}
+        {/* 3. Right: Utility Controls & Consolidated Secondary Menu */}
+        <div className="hidden md:flex items-center gap-2 text-xs">
 
           {/* Global Audible / Mute Sound Toggle Button */}
           {onToggleMute && (
@@ -192,181 +226,254 @@ export default function Header({
             </button>
           )}
 
-          {/* B2B Partner Portals Dropdown Hub */}
-          <div className="relative z-50" ref={partnerMenuRef}>
+          {/* Consolidated Secondary Dropdown Menu ("Tools & Barista") */}
+          <div className="relative z-50" ref={toolsMenuRef}>
             <button
               type="button"
-              onClick={() => setIsPartnerMenuOpen(!isPartnerMenuOpen)}
+              onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#ECE6DC] bg-[#FAF7F2] text-[#2A2421] hover:text-[#14110F] hover:border-[#C88A4B] font-sans font-semibold text-xs shadow-xs transition-all active:scale-95"
-              title="Open Partner Hub (Roaster & Cafe Portals)"
+              title="Open Secondary Tools & Barista Menu"
             >
-              <Briefcase className="w-3.5 h-3.5 text-[#C88A4B]" />
-              <span className="hidden sm:inline">Partner Hub</span>
-              <ChevronDown className={`w-3.5 h-3.5 text-[#766A62] transition-transform ${isPartnerMenuOpen ? 'rotate-180' : ''}`} />
+              <SlidersHorizontal className="w-3.5 h-3.5 text-[#C88A4B]" />
+              <span>Tools</span>
+              <ChevronDown className={`w-3.5 h-3.5 text-[#766A62] transition-transform ${isToolsMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
-            {isPartnerMenuOpen && (
-              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white border border-[#ECE6DC] shadow-2xl p-2.5 z-50 animate-fade-in space-y-1">
-                <div className="px-3 py-1.5 border-b border-[#ECE6DC] mb-1">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#766A62]">
-                    B2B Operational Portals
-                  </span>
-                </div>
+            {/* Dropdown Container (Always in DOM with transition for instantaneous accessibility & testing) */}
+            <div className={`absolute right-0 mt-2 w-80 rounded-2xl bg-white border border-[#ECE6DC] shadow-2xl p-2.5 z-50 transition-all duration-200 space-y-1 ${
+              isToolsMenuOpen 
+                ? 'opacity-100 scale-100 pointer-events-auto' 
+                : 'opacity-0 scale-95 pointer-events-none hidden'
+            }`}>
+              
+              {/* Section Header: Tools & Utilities */}
+              <div className="px-3 py-1.5 border-b border-[#ECE6DC] mb-1 flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#766A62]">
+                  Barista Tools & Utility Suite
+                </span>
+                <span className="text-[10px] font-mono font-bold text-[#A25A24] bg-[#FAF0E6] px-1.5 py-0.5 rounded">
+                  Free
+                </span>
+              </div>
 
-                {/* Roaster SaaS Portal Trigger */}
+              {/* 1. Scan Bag Barcode Scanner */}
+              {onOpenScanner && (
                 <button
                   type="button"
                   onClick={() => {
-                    setIsPartnerMenuOpen(false);
-                    if (onOpenRoasterPortal) onOpenRoasterPortal();
+                    setIsToolsMenuOpen(false);
+                    onOpenScanner();
                   }}
-                  className="w-full text-left flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
+                  className="w-full text-left flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
+                  title="Scan Bean Bag Barcode or QR Code with Device Camera"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center text-[#A25A24] shrink-0 mt-0.5">
-                    <Store className="w-4 h-4" />
+                  <div className="w-7 h-7 rounded-lg bg-[#FAF7F2] border border-[#ECE6DC] flex items-center justify-center text-[#C88A4B] shrink-0 mt-0.5">
+                    <ScanLine className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <h4 className="font-sans font-bold text-xs text-[#14110F] group-hover:text-[#A8622D] transition-colors">
-                      Roaster Portal
+                      Scan Bag
                     </h4>
                     <p className="text-[11px] text-[#766A62]">
-                      Manage lots, cupping scores, and packaging thermal labels.
+                      Camera barcode & QR scanner with instant 1-click recipe dial-in.
                     </p>
                   </div>
                 </button>
+              )}
 
-                {/* Cafe B2B Portal Trigger */}
+              {/* 2. Water Chemistry Lab */}
+              {onOpenWaterLab && (
                 <button
                   type="button"
                   onClick={() => {
-                    setIsPartnerMenuOpen(false);
-                    if (onOpenCafePortal) onOpenCafePortal();
+                    setIsToolsMenuOpen(false);
+                    onOpenWaterLab();
                   }}
-                  className="w-full text-left flex items-start gap-2.5 p-2.5 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
+                  className="w-full text-left flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
+                  title="Open Coffee Water Chemistry Lab & Mineral Recipes"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-[#EBF3ED] border border-[#C8E0CD] flex items-center justify-center text-[#2F663C] shrink-0 mt-0.5">
-                    <Coffee className="w-4 h-4" />
+                  <div className="w-7 h-7 rounded-lg bg-[#FAF7F2] border border-[#ECE6DC] flex items-center justify-center text-cyan-600 shrink-0 mt-0.5">
+                    <FlaskConical className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <h4 className="font-sans font-bold text-xs text-[#14110F] group-hover:text-[#2F663C] transition-colors">
-                      Coffee Shop Portal
+                    <h4 className="font-sans font-bold text-xs text-[#14110F] group-hover:text-[#A8622D] transition-colors">
+                      Water Lab
                     </h4>
                     <p className="text-[11px] text-[#766A62]">
-                      "On Bar Today" live menu switcher and cafe gear setup.
+                      SCA hardness (GH/KH) mineral calculator & recipe builder.
                     </p>
                   </div>
                 </button>
-              </div>
-            )}
-          </div>
-
-          {/* Native Camera Barcode & QR Scanner Trigger */}
-          {onOpenScanner && (
-            <button
-              onClick={onOpenScanner}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-[#ECE6DC] bg-[#FAF7F2] text-[#2A2421] hover:bg-[#FFFFFF] font-sans font-semibold transition-all active:scale-95 shadow-xs"
-              title="Scan Bean Bag Barcode or QR Code with Device Camera"
-            >
-              <ScanLine className="w-3.5 h-3.5 text-[#C88A4B]" />
-              <span className="hidden lg:inline">Scan Bag</span>
-            </button>
-          )}
-
-          {/* Water Chemistry Lab Trigger */}
-          {onOpenWaterLab && (
-            <button
-              onClick={onOpenWaterLab}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-[#ECE6DC] bg-[#FAF7F2] text-[#2A2421] hover:bg-[#FFFFFF] font-sans font-semibold transition-all active:scale-95 shadow-xs"
-              title="Open Coffee Water Chemistry Lab & Mineral Recipes"
-            >
-              <FlaskConical className="w-3.5 h-3.5 text-cyan-600" />
-              <span className="hidden lg:inline">Water Lab</span>
-            </button>
-          )}
-
-          {/* Master Recipe Vault Trigger */}
-          {onOpenCommunity && (
-            <button
-              onClick={onOpenCommunity}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-[#ECE6DC] bg-[#FAF7F2] text-[#2A2421] hover:bg-[#FFFFFF] font-sans font-semibold transition-all active:scale-95 shadow-xs"
-              title="Open Master Recipe Vault & Custom Studio"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-[#C88A4B]" />
-              <span className="hidden md:inline">Recipe Vault</span>
-            </button>
-          )}
-
-          {/* Coffee Academy & Video Hub Trigger */}
-          {onOpenVideoAcademy && (
-            <button
-              onClick={onOpenVideoAcademy}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-[#ECE6DC] bg-[#FAF7F2] text-[#2A2421] hover:bg-[#FFFFFF] font-sans font-semibold transition-all active:scale-95 shadow-xs"
-              title="Open Coffee Academy & Video Masterclasses"
-            >
-              <Tv className="w-3.5 h-3.5 text-rose-600" />
-              <span className="hidden sm:inline">Academy</span>
-            </button>
-          )}
-
-          {/* Brew News Trigger */}
-          <button
-            onClick={onOpenNews || (() => {
-              window.dispatchEvent(new CustomEvent('open-world-news'));
-              setTimeout(() => {
-                const el = document.getElementById('world-news');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }, 60);
-            })}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-[#ECE6DC] bg-[#FAF7F2] text-[#2A2421] hover:bg-[#FFFFFF] font-sans font-semibold transition-all active:scale-95 shadow-xs"
-            title="Jump to Brew News"
-          >
-            <Newspaper className="w-3.5 h-3.5 text-[#C88A4B]" />
-            <span className="hidden sm:inline">Brew News</span>
-          </button>
-
-          {/* Tasting Journal Trigger */}
-          {onOpenJournal && (
-            <button
-              onClick={onOpenJournal}
-              className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B] hover:text-[#14110F] hover:border-[#D69550] transition-all active:scale-95 shadow-xs"
-              title="Open Tasting Journal"
-            >
-              <BookOpen className="w-4 h-4" />
-            </button>
-          )}
-
-          {/* User Profile Avatar / Sign In Trigger */}
-          {currentUser ? (
-            <button
-              onClick={onOpenProfile}
-              className="flex items-center space-x-2 p-1 pl-1.5 pr-2.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] hover:border-[#C88A4B] transition-all shadow-xs group"
-              title="Open Barista Profile Dashboard"
-            >
-              {currentUser.avatar && currentUser.avatar !== '/' ? (
-                <img
-                  src={currentUser.avatar}
-                  alt={currentUser.displayName}
-                  className="w-6 h-6 rounded-full object-cover border border-[#C88A4B]"
-                />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center">
-                  <User className="w-3.5 h-3.5 text-[#A25A24]" />
-                </div>
               )}
-              <span className="font-sans text-xs font-bold text-[#14110F] group-hover:text-[#A8622D] transition-colors hidden lg:inline max-w-[90px] truncate">
-                {currentUser.displayName}
-              </span>
-            </button>
-          ) : (
-            <button
-              onClick={onOpenAuth}
-              className="px-3 py-1.5 rounded-xl font-bold font-sans text-xs flex items-center space-x-1.5 transition-all shadow-xs active:scale-95 bg-[#14110F] text-[#FAF7F2] hover:bg-[#2A2421]"
-              title="Barista Profile & Backup"
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>Profile</span>
-            </button>
-          )}
+
+              {/* 3. Video Academy */}
+              {onOpenVideoAcademy && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsToolsMenuOpen(false);
+                    onOpenVideoAcademy();
+                  }}
+                  className="w-full text-left flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
+                  title="Open Coffee Academy & Video Masterclasses"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-[#FAF7F2] border border-[#ECE6DC] flex items-center justify-center text-rose-600 shrink-0 mt-0.5">
+                    <Tv className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <h4 className="font-sans font-bold text-xs text-[#14110F] group-hover:text-[#A8622D] transition-colors">
+                      Academy
+                    </h4>
+                    <p className="text-[11px] text-[#766A62]">
+                      Masterclass video library by world champion baristas.
+                    </p>
+                  </div>
+                </button>
+              )}
+
+              {/* 4. Tasting Journal */}
+              {onOpenJournal && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsToolsMenuOpen(false);
+                    onOpenJournal();
+                  }}
+                  className="w-full text-left flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
+                  title="Open Tasting Journal"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-[#FAF7F2] border border-[#ECE6DC] flex items-center justify-center text-[#C88A4B] shrink-0 mt-0.5">
+                    <BookOpen className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <h4 className="font-sans font-bold text-xs text-[#14110F] group-hover:text-[#A8622D] transition-colors">
+                      Tasting Journal
+                    </h4>
+                    <p className="text-[11px] text-[#766A62]">
+                      Log sensory notes, brew specs, and favorite roasts.
+                    </p>
+                  </div>
+                </button>
+              )}
+
+              {/* 5. Brew News */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsToolsMenuOpen(false);
+                  if (onOpenNews) onOpenNews();
+                }}
+                className="w-full text-left flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
+                title="Brew News"
+              >
+                <div className="w-7 h-7 rounded-lg bg-[#FAF7F2] border border-[#ECE6DC] flex items-center justify-center text-[#C88A4B] shrink-0 mt-0.5">
+                  <Newspaper className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h4 className="font-sans font-bold text-xs text-[#14110F] group-hover:text-[#A8622D] transition-colors">
+                    Brew News
+                  </h4>
+                  <p className="text-[11px] text-[#766A62]">
+                    Curated RSS dispatch from Daily Coffee News and Sprudge.
+                  </p>
+                </div>
+              </button>
+
+              {/* B2B Partner Portals Section Header */}
+              <div className="px-3 py-1.5 border-t border-b border-[#ECE6DC] mt-2 mb-1 flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#766A62]">
+                  B2B Partner Hub (Large Free Tier)
+                </span>
+                <span className="text-[10px] font-mono font-bold text-[#2F663C] bg-[#EBF3ED] px-1.5 py-0.5 rounded">
+                  Free
+                </span>
+              </div>
+
+              {/* Roaster SaaS Portal Trigger */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsToolsMenuOpen(false);
+                  if (onOpenRoasterPortal) onOpenRoasterPortal();
+                }}
+                className="w-full text-left flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
+                title="Open Roaster Portal"
+              >
+                <div className="w-7 h-7 rounded-lg bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center text-[#A25A24] shrink-0 mt-0.5">
+                  <Store className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h4 className="font-sans font-bold text-xs text-[#14110F] group-hover:text-[#A8622D] transition-colors">
+                    Roaster Portal
+                  </h4>
+                  <p className="text-[11px] text-[#766A62]">
+                    Free lot management, roast curves, thermal QR labels & telemetry.
+                  </p>
+                </div>
+              </button>
+
+              {/* Cafe B2B Portal Trigger */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsToolsMenuOpen(false);
+                  if (onOpenCafePortal) onOpenCafePortal();
+                }}
+                className="w-full text-left flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
+                title="Open Coffee Shop Portal"
+              >
+                <div className="w-7 h-7 rounded-lg bg-[#EBF3ED] border border-[#C8E0CD] flex items-center justify-center text-[#2F663C] shrink-0 mt-0.5">
+                  <Coffee className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h4 className="font-sans font-bold text-xs text-[#14110F] group-hover:text-[#2F663C] transition-colors">
+                    Coffee Shop Portal
+                  </h4>
+                  <p className="text-[11px] text-[#766A62]">
+                    Free "On Bar Today" live menu switcher, bar gear setup & foot-traffic.
+                  </p>
+                </div>
+              </button>
+
+              {/* Profile & Account Bottom Action */}
+              <div className="pt-2 border-t border-[#ECE6DC] mt-1">
+                {currentUser ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsToolsMenuOpen(false);
+                      if (onOpenProfile) onOpenProfile();
+                    }}
+                    className="w-full flex items-center justify-between p-2 rounded-xl bg-[#FAF7F2] hover:bg-[#FAF0E6] transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center text-[#A25A24] text-xs font-bold font-mono">
+                        {currentUser.displayName ? currentUser.displayName[0] : 'B'}
+                      </div>
+                      <span className="font-sans text-xs font-bold text-[#14110F] truncate max-w-[150px]">
+                        {currentUser.displayName || 'Barista'}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-[#A25A24] font-bold">Manage Profile →</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsToolsMenuOpen(false);
+                      if (onOpenAuth) onOpenAuth();
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-[#14110F] text-[#FAF7F2] hover:bg-[#2A2421] font-sans font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-xs"
+                    title="Profile"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    <span>Barista Profile Login / Sign Up</span>
+                  </button>
+                )}
+              </div>
+
+            </div>
+          </div>
 
         </div>
 
