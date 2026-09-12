@@ -232,6 +232,34 @@ export default function App() {
     });
   };
 
+  // Handler for Quick-Start Direct Brew from Hero Calculator
+  const handleLaunchDirectBrew = ({ methodId, waterGrams, ratio }) => {
+    const allMethods = BREW_METHODS.coffee;
+    const targetMethod = allMethods.find(m => m.id === methodId || m.id.includes(methodId) || methodId.includes(m.id)) || allMethods[0];
+    const finalRatio = Number(ratio || targetMethod.ratio || 16);
+    const finalWater = Number(waterGrams || 300);
+
+    setActiveMethod(targetMethod);
+    setCustomRatio(finalRatio);
+    setCustomWaterMl(finalWater);
+    setCupCount(1);
+    setCupMl(finalWater);
+
+    setCurrentStep(4);
+    navigate(`/methods/${targetMethod.id}`);
+
+    setTimeout(() => {
+      const timerEl = document.getElementById('step-4') || document.querySelector('main');
+      if (timerEl) timerEl.scrollIntoView({ behavior: 'smooth' });
+    }, 150);
+
+    trackEvent('hero_calculator_brew_started', {
+      method: targetMethod.id,
+      waterGrams: finalWater,
+      ratio: finalRatio
+    });
+  };
+
   const handleSaveScannedToJournal = (scannedBean) => {
     if (!scannedBean) return;
     try {
@@ -694,6 +722,7 @@ export default function App() {
                 <div className="space-y-12">
                   <ConsumerDiscoveryFeed
                     onSelectBeanToBrew={handleApplyScannedRecipe}
+                    onLaunchDirectBrew={handleLaunchDirectBrew}
                     onNavigateToRoaster={(roasterSlug) => {
                       setSelectedRoasterSlug(roasterSlug);
                       setIsRoasterShowcaseView(true);
@@ -715,11 +744,11 @@ export default function App() {
 
                   <div id="brew-atelier" className="pt-8 border-t border-[#ECE6DC]">
                     <div className="mb-4">
-                      <span className="text-xs font-mono uppercase tracking-wider text-[#A8622D] font-semibold">
-                        Brewing Equipment Atelier
+                      <span className="text-xs font-sans font-semibold text-[#A8622D]">
+                        Brewing Guides
                       </span>
                       <h2 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
-                        Select Your Extraction Method
+                        Pick your favorite way to brew
                       </h2>
                     </div>
 

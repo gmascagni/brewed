@@ -14,45 +14,34 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
   };
 
   return (
-    <div className="space-y-10 md:space-y-12 animate-fade-in">
-      {/* Step Header with Extraction Method Background Image */}
-      <div className="p-8 md:p-10 lg:p-12 rounded-3xl relative overflow-hidden shadow-2xl border transition-all duration-500 glass-panel-coffee border-[#A66E38]/40">
-        {/* Background Extraction Image Overlay */}
-        <div className="absolute inset-0 z-0 opacity-35 pointer-events-none">
-          <img
-            key={activeMethod?.heroImage || 'coffee_hero'}
-            src={(activeMethod?.heroImage && activeMethod.heroImage !== '/') ? activeMethod.heroImage : '/pour_over_hero.jpg'}
-            alt="Extraction Background"
-            className="w-full h-full object-cover object-center transform scale-105 filter contrast-125 brightness-90"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#140D09] via-[#140D09]/85 to-[#140D09]/50" />
-        </div>
-
-        <div className="relative z-10">
-          <div className="inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] mb-3 text-[#D2A06E]">
-            <Sparkles className="w-4 h-4 animate-pulse" />
-            <span>Step 01 of 04 • Atelier Selection</span>
+    <div className="space-y-8 animate-fade-in">
+      {/* Step Header: Warm and welcoming cafe atmosphere */}
+      <div className="p-6 sm:p-8 md:p-10 rounded-3xl relative overflow-hidden bg-gradient-to-br from-[#FFFDF9] via-[#FAF7F2] to-[#F5EFE8] border border-[#ECE6DC] shadow-sm">
+        <div className="relative z-10 max-w-3xl space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] text-xs font-sans font-semibold">
+            <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
+            <span>Step 1 • Pick your brewer</span>
           </div>
 
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-extrabold text-cream-light mb-3 leading-tight drop-shadow-lg">
-            Master the Craft of Coffee Extraction
+          <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#14110F] leading-tight">
+            How would you like to brew today?
           </h2>
           
-          <p className="text-xs md:text-sm text-stone-300 max-w-3xl leading-relaxed font-normal mb-6 drop-shadow">
-            Precision specialty coffee ratio calculator, SCA golden cup standards, burr grinder dial-in targets, and real-time pour-over timers. Select your brewing equipment below:
+          <p className="text-sm text-[#5C524B] leading-relaxed font-sans">
+            Select your favorite method below. We'll automatically calculate the exact coffee dose, water volume, grind size, and step-by-step timer for your cup.
           </p>
 
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2A1C12]/70 border border-[#A66E38]/40 text-[#D2A06E] font-mono text-xs">
-            <Coffee className="w-4 h-4 text-amber-gold" />
-            <span className="font-bold">The Coffee Lab</span>
-            <span className="text-stone-400">•</span>
-            <span className="text-stone-300">8 Curated Specialty Extraction Profiles</span>
+          <div className="inline-flex items-center gap-2 pt-1 text-xs text-[#766A62] font-sans">
+            <Coffee className="w-4 h-4 text-[#C88A4B]" />
+            <span className="font-medium text-[#2A2421]">8 Easy Brewing Guides</span>
+            <span className="text-[#DFD7CB]">•</span>
+            <span>Tested for beginner & experienced coffee lovers</span>
           </div>
         </div>
       </div>
 
       {/* Grid of Extraction Methods */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {methods.map((method) => {
           const isSelected = activeMethod?.id === method.id;
           const totalDurationStr = getTotalDurationString(method.phases);
@@ -62,76 +51,68 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
             <button
               key={method.id}
               onClick={() => setActiveMethod(method)}
-              className={`p-8 md:p-9 rounded-3xl border text-left transition-all duration-300 relative flex flex-col justify-between group shadow-xl hover:-translate-y-1.5 ${
+              className={`p-6 sm:p-7 rounded-2xl border text-left transition-all duration-300 relative flex flex-col justify-between group shadow-sm hover:shadow-md cursor-pointer ${
                 isSelected
-                  ? 'bg-[#A66E38]/20 border-[#C48B56]/70 text-cream-light ring-1 ring-[#C48B56]/40 shadow-[0_15px_40px_-10px_rgba(166,110,56,0.35)] backdrop-blur-xl'
-                  : 'bg-[#18120D]/80 border-white/[0.08] text-stone-300 hover:bg-[#221B14] hover:border-[#A66E38]/30'
+                  ? 'bg-[#FFFDF9] border-[#C88A4B] ring-2 ring-[#C88A4B]/25 text-[#14110F] -translate-y-1'
+                  : 'bg-white border-[#ECE6DC] text-[#2A2421] hover:border-[#D69550] hover:bg-[#FAF7F2]'
               }`}
             >
               {/* Method Card Header */}
               <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className={`p-3.5 rounded-2xl transition-all ${
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`p-3 rounded-xl transition-all ${
                     isSelected
-                      ? 'bg-[#C48B56] text-[#140C08] shadow-[0_0_15px_rgba(166,110,56,0.5)] font-bold'
-                      : 'bg-white/[0.06] text-[#D2A06E] border border-white/[0.08]'
+                      ? 'bg-[#C88A4B] text-white shadow-sm'
+                      : 'bg-[#FAF7F2] text-[#A8622D] border border-[#ECE6DC] group-hover:border-[#D69550]'
                   }`}>
-                    <Coffee className="w-6 h-6" />
+                    <Coffee className="w-5 h-5" />
                   </div>
 
                   {isSelected && (
-                    <span className="px-3.5 py-1 rounded-full text-[10px] font-mono tracking-[0.15em] font-extrabold uppercase border flex items-center gap-1.5 shadow-inner bg-[#A66E38]/20 text-[#D2A06E] border-[#A66E38]/30">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Active</span>
+                    <span className="px-3 py-1 rounded-full text-xs font-sans font-semibold border flex items-center gap-1.5 bg-[#FAF0E6] text-[#A25A24] border-[#ECD4BD]">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#C88A4B]" />
+                      <span>Selected</span>
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-serif text-2xl font-bold mb-2.5 leading-snug drop-shadow text-cream-light">
+                <h3 className="font-editorial text-2xl font-bold mb-2 text-[#14110F] group-hover:text-[#A8622D] transition-colors">
                   {method.name}
                 </h3>
                 
-                <p className="text-xs text-stone-400 leading-relaxed mb-6 font-normal">
+                <p className="text-xs text-[#5C524B] leading-relaxed mb-5 font-sans">
                   {method.description}
                 </p>
               </div>
 
-              {/* Specs Pills Row */}
-              <div className={`pt-5 border-t ${isSelected ? 'border-white/15' : 'border-white/[0.08]'} space-y-2.5 text-xs font-mono font-medium`}>
+              {/* Specs Row */}
+              <div className={`pt-4 border-t ${isSelected ? 'border-[#ECD4BD]' : 'border-[#ECE6DC]'} space-y-2 text-xs font-sans`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-stone-400">
-                    Ratio Target:
-                  </span>
-                  <span className="font-bold text-cream-light">
-                    1 : {method.ratio}
-                  </span>
+                  <span className="text-[#766A62]">Ratio target:</span>
+                  <span className="font-semibold text-[#14110F]">1 : {method.ratio}</span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-stone-400">
-                    Water Temp:
-                  </span>
-                  <span className="flex items-center gap-1.5 font-bold text-cyan-300">
-                    <Thermometer className="w-3.5 h-3.5 opacity-80" />
+                  <span className="text-[#766A62]">Water temp:</span>
+                  <span className="flex items-center gap-1 font-semibold text-[#14110F]">
+                    <Thermometer className="w-3.5 h-3.5 text-[#C88A4B]" />
                     {tempStr}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-stone-400">
-                    Brew Duration:
-                  </span>
-                  <span className="flex items-center gap-1.5 font-bold text-cream-light">
-                    <Clock className="w-3.5 h-3.5 opacity-80" />
+                  <span className="text-[#766A62]">Brew time:</span>
+                  <span className="flex items-center gap-1 font-semibold text-[#14110F]">
+                    <Clock className="w-3.5 h-3.5 text-[#C88A4B]" />
                     {totalDurationStr}
                   </span>
                 </div>
 
                 {method.grind && (
-                  <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
-                    <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-[#D2A06E]">Grind Size:</span>
-                    <span className="flex items-center gap-1.5 font-bold text-[#D2A06E]">
-                      <Gauge className="w-3.5 h-3.5 opacity-80" />
+                  <div className="flex items-center justify-between pt-1.5 border-t border-[#ECE6DC]">
+                    <span className="text-[#766A62]">Grind size:</span>
+                    <span className="flex items-center gap-1 font-semibold text-[#A8622D]">
+                      <Gauge className="w-3.5 h-3.5" />
                       {method.grind}
                     </span>
                   </div>
@@ -142,12 +123,12 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
         })}
       </div>
 
-      {/* Contextual Amazon Affiliate Paper Filter Callout for Pour-Over Methods */}
+      {/* Contextual Paper Filter Callout */}
       {(activeMethod?.id === 'pour_over' || activeMethod?.id === 'classic_pour_over' || activeMethod?.id === 'chemex') && (
-        <div className="p-4 rounded-2xl bg-black/60 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="flex items-center space-x-2 text-stone-300">
-            <Sparkles className="w-4 h-4 flex-shrink-0 text-[#D2A06E]" />
-            <span>Pristine pour-over clarity and flow rate require high-density oxygen-bleached micro-pore paper filters (Hario V60 Size 02, Chemex Bonded).</span>
+        <div className="p-4 rounded-2xl bg-[#FFFDF9] border border-[#ECD4BD] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center space-x-2 text-[#5C524B] font-sans">
+            <Sparkles className="w-4 h-4 flex-shrink-0 text-[#C88A4B]" />
+            <span>For clean, bright flavor, we recommend oxygen-cleansed paper filters (Hario V60 Size 02 or Chemex Bonded).</span>
           </div>
           <a
             href="https://www.amazon.com/dp/B001U7EOYA/?tag=thebrewapp13-20"
@@ -156,25 +137,25 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
             data-product-name="Hario V60 Paper Filters Size 02"
             data-link-id="hario_v60_filters"
             data-context="step1_method_filter_pick"
-            className="px-4 py-2 rounded-xl border font-extrabold text-[11px] uppercase tracking-wider transition-all whitespace-nowrap flex-shrink-0 bg-[#A66E38]/20 text-[#D2A06E] hover:bg-[#A66E38]/30 border-[#A66E38]/40 shadow-xs active:scale-95"
+            className="px-4 py-2 rounded-xl border font-semibold text-xs transition-all whitespace-nowrap flex-shrink-0 bg-[#FAF0E6] text-[#A25A24] hover:bg-[#F3E2CF] border-[#ECD4BD] shadow-xs active:scale-95"
           >
-            Check V60 Paper Filters on Amazon ↗
+            Check filters on Amazon ↗
           </a>
         </div>
       )}
 
       {/* Step Navigation Action Footer */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-white/[0.08]">
-        <div className="text-xs text-stone-400 font-medium">
-          Active Selection: <strong className="text-cream-light font-serif font-bold text-base ml-1">{activeMethod?.name}</strong>
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-[#ECE6DC]">
+        <div className="text-xs text-[#5C524B] font-sans">
+          Selected brewer: <strong className="text-[#14110F] font-editorial font-bold text-base ml-1">{activeMethod?.name}</strong>
         </div>
 
         <button
           onClick={onNextStep}
-          className="w-full sm:w-auto py-4 px-10 rounded-2xl font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2.5 shadow-[0_10px_25px_-5px_rgba(200,138,75,0.4)] hover:scale-105 active:scale-95 transition-all btn-tactile-coffee text-[#140C08]"
+          className="w-full sm:w-auto py-3 px-8 rounded-2xl font-sans font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-card hover:shadow-elevated active:scale-95 transition-all bg-[#14110F] hover:bg-[#2A2421] text-[#FAF7F2] cursor-pointer"
         >
-          <span>Step 02: Ratio & Scaler</span>
-          <ChevronRight className="w-4 h-4" />
+          <span>Continue to Coffee & Water</span>
+          <ChevronRight className="w-4 h-4 text-[#E8AF72]" />
         </button>
       </div>
     </div>

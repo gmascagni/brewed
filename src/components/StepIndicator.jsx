@@ -5,10 +5,10 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
   const isCoffee = trackMode === 'coffee';
 
   const STEPS = [
-    { id: 1, title: 'Choose Method', subtitle: isCoffee ? '8 Devices' : '10 Teas', icon: isCoffee ? Coffee : Leaf },
-    { id: 2, title: 'Ratio & Scaler', subtitle: 'Cups & Volume', icon: Scale },
-    { id: 3, title: 'Grind & Specs', subtitle: isCoffee ? 'Micron & Roasts' : 'Leaf & Steeps', icon: Gauge },
-    { id: 4, title: 'Guided Brew', subtitle: 'Timer & Extr.', icon: Timer }
+    { id: 1, title: 'Choose Brewer', subtitle: isCoffee ? '8 Methods' : '10 Teas', icon: isCoffee ? Coffee : Leaf },
+    { id: 2, title: 'Coffee & Water', subtitle: 'Cups & Volume', icon: Scale },
+    { id: 3, title: 'Grind Guide', subtitle: isCoffee ? 'Size & Tips' : 'Leaf & Steeps', icon: Gauge },
+    { id: 4, title: 'Brew Timer', subtitle: 'Step-by-step', icon: Timer }
   ];
 
   return (

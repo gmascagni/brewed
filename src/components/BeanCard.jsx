@@ -52,18 +52,14 @@ export default function BeanCard({
             <div className="w-7 h-7 rounded-lg bg-[#FAF7F2] border border-[#ECE6DC] flex items-center justify-center text-xs font-serif font-bold text-[#A8622D] shadow-xs group-hover:border-[#D69550] transition-colors">
               {roaster.charAt(0)}
             </div>
-            <span className="text-xs font-sans font-semibold tracking-wider uppercase text-[#766A62]">
+            <span className="text-xs font-sans font-medium text-[#5C524B]">
               {roaster}
             </span>
           </div>
 
-          {/* SCA Cupping Score Badge */}
-          {cuppingScore && (
-            <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FAF7F2] border border-[#ECE6DC] text-xs font-mono font-bold text-[#14110F]">
-              <Award className="w-3.5 h-3.5 text-[#C88A4B]" />
-              <span>{cuppingScore} <span className="text-[9px] font-sans text-[#8C8178]">SCA</span></span>
-            </div>
-          )}
+          <span className="text-[11px] font-sans text-[#766A62] bg-[#FAF7F2] px-2.5 py-0.5 rounded-full border border-[#ECE6DC]">
+            {roastLevel || 'Light roast'}
+          </span>
         </div>
 
         {/* Bean Headline */}
@@ -71,22 +67,16 @@ export default function BeanCard({
           {beanName}
         </h3>
 
-        {/* Origin & Terroir Metadata */}
-        <div className="flex flex-wrap items-center gap-y-1 gap-x-2.5 text-xs text-[#766A62] font-sans mb-4">
-          <span className="flex items-center gap-1 text-[#2A2421] font-medium">
-            <MapPin className="w-3 h-3 text-[#C88A4B]" />
-            {origin}
-          </span>
+        {/* Origin & Friendly Details */}
+        <div className="flex items-center gap-1.5 text-xs text-[#766A62] font-sans mb-3.5">
+          <MapPin className="w-3 h-3 text-[#C88A4B] shrink-0" />
+          <span className="text-[#2A2421] font-medium">{origin}</span>
           <span className="text-[#DFD7CB]">•</span>
-          <span>{elevation}</span>
-          <span className="text-[#DFD7CB]">•</span>
-          <span className={`text-[10.5px] px-2 py-0.2 rounded-md font-semibold border ${processStyle}`}>
-            {processing}
-          </span>
+          <span className="text-[#766A62]">{processing}</span>
         </div>
 
         {/* Tasting Note Pills */}
-        <div className="flex flex-wrap gap-1.5 mb-6">
+        <div className="flex flex-wrap gap-1.5 mb-5">
           {tastingNotes.slice(0, 4).map((note, idx) => (
             <TastingNoteBadge key={idx} note={note} size="xs" />
           ))}
@@ -94,43 +84,33 @@ export default function BeanCard({
       </div>
 
       {/* Footer Actions */}
-      <div className="pt-4 border-t border-[#ECE6DC] flex items-center justify-between gap-2 mt-auto">
-        {onViewRadar && (
-          <button
-            type="button"
-            onClick={() => onViewRadar(coffee)}
-            className="text-xs font-sans font-semibold text-[#766A62] hover:text-[#14110F] flex items-center gap-1 transition-colors py-1.5 px-2 rounded-lg hover:bg-[#FAF7F2]"
-            title="Inspect 5-Axis Sensory Flavor Radar"
+      <div className="pt-3.5 border-t border-[#ECE6DC] flex items-center justify-between gap-2 mt-auto">
+        {shopUrl ? (
+          <a
+            href={shopUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-sans text-[#766A62] hover:text-[#14110F] flex items-center gap-1 py-1.5 px-2 rounded-lg hover:bg-[#FAF7F2] transition-colors"
+            title={`Buy ${beanName} from ${roaster}`}
           >
-            <Compass className="w-3.5 h-3.5 text-[#C88A4B]" />
-            <span>Sensory Radar</span>
-          </button>
+            <span>Visit Roaster</span>
+            <ExternalLink className="w-3 h-3 text-[#8C8178]" />
+          </a>
+        ) : (
+          <span className="text-[11px] font-sans text-[#8C8178]">Freshly roasted</span>
         )}
 
-        <div className="flex items-center gap-2 ml-auto">
-          {shopUrl && (
-            <a
-              href={shopUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-xl text-[#766A62] hover:text-[#14110F] hover:bg-[#FAF7F2] border border-transparent hover:border-[#ECE6DC] transition-all"
-              title={`Buy ${beanName} from ${roaster}`}
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          )}
-
-          {onBrew && (
-            <button
-              type="button"
-              onClick={() => onBrew(coffee)}
-              className="py-2 px-3.5 rounded-xl bg-[#14110F] hover:bg-[#2A2421] text-[#FAF7F2] font-sans font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:shadow-md active:scale-95 transition-all"
-            >
-              <span>Dial-In</span>
-              <ChevronRight className="w-3.5 h-3.5 text-[#E8AF72]" />
-            </button>
-          )}
-        </div>
+        {onBrew && (
+          <button
+            type="button"
+            onClick={() => onBrew(coffee)}
+            className="py-2 px-3.5 rounded-xl bg-[#14110F] hover:bg-[#2A2421] text-[#FAF7F2] font-sans font-semibold text-xs flex items-center gap-1.5 shadow-sm hover:shadow-md active:scale-95 transition-all cursor-pointer ml-auto"
+            title={`Brew a cup of ${beanName}`}
+          >
+            <Coffee className="w-3.5 h-3.5 text-[#E8AF72]" />
+            <span>Brew this coffee</span>
+          </button>
+        )}
       </div>
     </article>
   );
