@@ -1,10 +1,13 @@
-import React from 'react';
-import { ExternalLink, Star, ShoppingBag, Sparkles, CheckCircle2, Award } from 'lucide-react';
+import React, { useState } from 'react';
+import { ExternalLink, Star, ShoppingBag, Sparkles, CheckCircle2, Award, Coffee } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
+import { getAssetUrl } from '../utils/assetUrl';
 
-export default function ProductCard({ product, activeMethod }) {
-  const isMethodMatched = product.methodIds && activeMethod && product.methodIds.includes(activeMethod.id);
+export default function ProductCard({ product, activeMethod, trackMode, isMethodMatched: propIsMethodMatched }) {
+  const [imgError, setImgError] = useState(false);
+  const isMethodMatched = propIsMethodMatched ?? (product.methodIds && activeMethod && product.methodIds.includes(activeMethod.id));
   const isTopRated = product.topRated || product.rating >= 4.9;
+  const isCoffee = (trackMode || product.track || 'coffee') === 'coffee';
 
   const handleAmazonClick = () => {
     trackEvent('amazon_click', {
@@ -25,20 +28,24 @@ export default function ProductCard({ product, activeMethod }) {
       
       <div>
         {/* Card Thumbnail Image & Badges Overlay */}
-        <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden border border-white/[0.08] mb-5 relative group/img bg-black/40 flex items-center justify-center">
-          {product.image && product.image !== '/' ? (
+        <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden border border-white/[0.08] mb-5 relative group/img bg-black/60 flex items-center justify-center">
+          {product.image && product.image !== '/' && !imgError ? (
             <img
-              src={product.image}
+              src={getAssetUrl(product.image)}
               alt={product.name}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
+              loading="lazy"
+              onError={() => setImgError(true)}
               className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700 filter brightness-95"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-espresso-950/60 text-amber-gold/60">
-              <ShoppingBag className="w-8 h-8 mb-2" />
-              <span className="text-[10px] font-mono uppercase tracking-wider">Specialty Gear</span>
+            <div className={`w-full h-full flex flex-col items-center justify-center p-6 text-center ${
+              isCoffee ? 'bg-gradient-to-br from-amber-950/40 via-espresso-950/60 to-black text-amber-gold/70' : 'bg-gradient-to-br from-emerald-950/40 via-stone-950/60 to-black text-sage-300/70'
+            }`}>
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center mb-2 shadow-inner">
+                {isCoffee ? <Coffee className="w-6 h-6 text-amber-gold" /> : <ShoppingBag className="w-6 h-6 text-sage-300" />}
+              </div>
+              <span className="text-[11px] font-serif font-bold text-cream-light leading-snug line-clamp-1">{product.name}</span>
+              <span className="text-[9px] font-mono uppercase tracking-wider text-stone-400 mt-1">Specialty Equipment</span>
             </div>
           )}
 

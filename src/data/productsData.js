@@ -8,6 +8,12 @@ export const PRODUCT_CATEGORIES = {
     { id: 'water_kettles', label: 'Water & Kettles' },
     { id: 'beans', label: 'Whole Bean Coffees' },
     { id: 'top_rated', label: 'Top Rated ⭐ 4.9+' }
+  ],
+  tea: [
+    { id: 'all', label: 'All Tea Gear' },
+    { id: 'method_kit', label: 'Steeping Kits' },
+    { id: 'water_kettles', label: 'Kettles & Teaware' },
+    { id: 'top_rated', label: 'Top Rated ⭐ 4.9+' }
   ]
 };
 
@@ -29,7 +35,7 @@ export const PRODUCTS_DATA = [
     topRated: true,
     asin: 'B002VUSWGQ',
     amazonUrl: `https://www.amazon.com/dp/B002VUSWGQ/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/pour_over_hero.jpg',
+    image: '/images/gear/v60_ceramic_dripper.jpg',
     description: 'The iconic 60-degree spiral ribbed ceramic pour-over cone for maximum flow rate control and pristine citric clarity.'
   },
   {
@@ -44,7 +50,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$9 - $12',
     asin: 'B001U7EOYA',
     amazonUrl: `https://www.amazon.com/dp/B001U7EOYA/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/pour_over_hero.jpg',
+    image: '/images/gear/v60_paper_filters.jpg',
     description: 'High-density Japanese oxygen-bleached tabbed paper filters that trap sediment and oils for a tea-like body.'
   },
   {
@@ -59,7 +65,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$48 - $54',
     asin: 'B000I1WP7W',
     amazonUrl: `https://www.amazon.com/dp/B000I1WP7W/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/chemex_hero.jpg',
+    image: '/images/gear/chemex_8cup.jpg',
     description: 'Non-porous Borosilicate glass carafe with polished wood collar and leather tie. Uses heavy Chemex bond filters.'
   },
   {
@@ -74,7 +80,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$35 - $42',
     asin: 'B00008XEWG',
     amazonUrl: `https://www.amazon.com/dp/B00008XEWG/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/french_press.jpg',
+    image: '/images/gear/bodum_french_press.jpg',
     description: 'Heat-resistant borosilicate glass with stainless steel frame and 3-part mesh plunger for heavy chocolate body.'
   },
   {
@@ -89,7 +95,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$38 - $45',
     asin: 'B0000CF3Q6',
     amazonUrl: `https://www.amazon.com/dp/B0000CF3Q6/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/french_press.jpg',
+    image: '/images/gear/bialetti_moka_express.jpg',
     description: 'Octagonal food-grade aluminum body made in Italy. Generates 1.5 bar steam pressure for syrupy crema-rich coffee.'
   },
   {
@@ -105,7 +111,7 @@ export const PRODUCTS_DATA = [
     topRated: true,
     asin: 'B0047BIWSK',
     amazonUrl: `https://www.amazon.com/dp/B0047BIWSK/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/moka_pot_hero.jpg',
+    image: '/images/gear/aeropress_original.jpg',
     description: 'Patented air-pressure immersion technology brewing zero-bitterness coffee in 60 seconds.'
   },
   {
@@ -120,7 +126,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$149 - $169',
     asin: 'B007F183LK',
     amazonUrl: `https://www.amazon.com/dp/B007F183LK/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/aeropress_hero.jpg',
+    image: '/images/gear/baratza_encore.jpg',
     description: '40 individual coarseness settings from 250 to 1200 microns. 40mm alloy steel burrs engineered in Europe.'
   },
   {
@@ -135,7 +141,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$52 - $59',
     asin: 'B0CKYV8WRC',
     amazonUrl: `https://www.amazon.com/dp/B0CKYV8WRC/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/medium_grind.jpg',
+    image: '/images/gear/timemore_black_mirror.jpg',
     description: 'Ultra-fast 0.1g precision sensor with auto-starting brew timer, hidden LED display, and USB-C rechargeable battery.'
   },
   {
@@ -150,7 +156,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$165 - $195',
     asin: 'B077JBQZPX',
     amazonUrl: `https://www.amazon.com/dp/B077JBQZPX/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/coffee_setup.jpg',
+    image: '/images/gear/fellow_stagg_ekg.jpg',
     description: 'PID degree-by-degree temperature control (135°F - 212°F) with precision counterbalanced gooseneck pour spout.'
   },
   {
@@ -165,7 +171,7 @@ export const PRODUCTS_DATA = [
     priceRange: '$15 - $18',
     asin: 'B07732KPT8',
     amazonUrl: `https://www.amazon.com/dp/B07732KPT8/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/electric_kettle.jpg',
+    image: '/images/gear/third_wave_water.jpg',
     description: 'Remineralizes distilled or RO water with exact magnesium, calcium, and sodium ratios to eliminate papery sourness.'
   },
   {
@@ -181,7 +187,7 @@ export const PRODUCTS_DATA = [
     topRated: true,
     asin: 'B07QHDMQGH',
     amazonUrl: `https://www.amazon.com/dp/B07QHDMQGH/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/coffee_setup.jpg',
+    image: '/images/gear/stumptown_hair_bender.jpg',
     description: 'The cup that started a movement. A complex, rich blend of Latin America, Africa, and Indonesia featuring sweet cherry, dark chocolate, and toffee.'
   },
   {
@@ -197,8 +203,27 @@ export const PRODUCTS_DATA = [
     topRated: true,
     asin: 'B000SDKDM4',
     amazonUrl: `https://www.amazon.com/dp/B000SDKDM4/?tag=${AMAZON_AFFILIATE_TAG}`,
-    image: '/avatar_roast_beans.jpg',
+    image: '/images/gear/lavazza_super_crema.jpg',
     description: 'Medium espresso roast crafted in Italy. A velvet harmonic blend of washed and natural beans with notes of hazelnut, roasted almond, and brown sugar.'
+  },
+  // ==========================================
+  // 2. TEA STORE PRODUCTS (track: 'tea')
+  // ==========================================
+  {
+    id: 'hario_chacha_kyusu',
+    name: "Hario Chacha Kyusu 'Maru' Glass Teapot 700ml",
+    track: 'tea',
+    category: 'method_kit',
+    methodIds: ['green_tea', 'black_tea', 'oolong_tea', 'white_tea', 'herbal_infusion'],
+    badge: 'Artisan Glass',
+    rating: 4.8,
+    reviewsCount: 8200,
+    priceRange: '$18 - $24',
+    topRated: true,
+    asin: 'B0006HINDI',
+    amazonUrl: `https://www.amazon.com/dp/B0006HINDI/?tag=${AMAZON_AFFILIATE_TAG}`,
+    image: '/images/gear/hario_chacha_kyusu.jpg',
+    description: 'Heat-resistant Japanese borosilicate glass teapot with wide stainless steel mesh strainer for full loose leaf expansion and crystal-clear liquor.'
   }
 ];
 
