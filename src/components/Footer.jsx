@@ -70,7 +70,7 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
 
           {/* Compact Contact HQ Button */}
           <a
-            href={`mailto:${emailAddress}?subject=The%20Brew%20App%20Inquiry`}
+            href={`mailto:${emailAddress}?subject=TheBrew.App%20Inquiry`}
             onClick={handleMailtoClick}
             className={`py-2 px-4 rounded-xl text-xs font-extrabold tracking-wider uppercase flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all ${
               isCoffee

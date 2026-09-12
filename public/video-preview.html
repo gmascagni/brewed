@@ -113,35 +113,41 @@
 </head>
 <body>
   <div class="header">
-    <span class="badge">9:16 Vertical Short Video</span>
-    <h1>The Brew App • Recipe Timer Masterclass</h1>
-    <p>Targeted for TikTok, Instagram Reels & YouTube Shorts</p>
+    <span class="badge">9:16 Vertical Short Videos</span>
+    <h1>The Brew App • Broadcast Video Library</h1>
+    <p>Targeted for TikTok, Instagram Reels, YouTube Shorts & In-App Walkthroughs</p>
   </div>
 
-  <div class="player-wrapper">
-    <video controls autoplay loop playsinline>
-      <source src="/videos/v60_timer_recipe_short.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; max-width: 900px; margin: 0 auto;">
+    <div style="flex: 1; min-width: 320px; max-width: 380px;">
+      <h3 style="color: #f59e0b; margin-bottom: 8px;">1. Smart Bag Barcode Scan Demo</h3>
+      <div class="player-wrapper">
+        <video controls autoplay loop muted playsinline>
+          <source src="/videos/smart_bag_scan_demo.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <div class="cta-links" style="margin-top: 12px;">
+        <a href="/videos/smart_bag_scan_demo.mp4" download class="btn">⬇️ Download Smart Bag Demo</a>
+      </div>
+    </div>
+
+    <div style="flex: 1; min-width: 320px; max-width: 380px;">
+      <h3 style="color: #0284c7; margin-bottom: 8px;">2. V60 Pour-Over Dial-In Masterclass</h3>
+      <div class="player-wrapper">
+        <video controls loop muted playsinline>
+          <source src="/videos/v60_timer_recipe_short.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <div class="cta-links" style="margin-top: 12px;">
+        <a href="/videos/v60_timer_recipe_short.mp4" download class="btn">⬇️ Download V60 Masterclass</a>
+      </div>
+    </div>
   </div>
 
-  <div class="meta-cards">
-    <div class="card">
-      <div class="card-label">Resolution</div>
-      <div class="card-val">1080 x 1920</div>
-    </div>
-    <div class="card">
-      <div class="card-label">Duration</div>
-      <div class="card-val">32.4s (4 Scenes)</div>
-    </div>
-    <div class="card">
-      <div class="card-label">Voiceover</div>
-      <div class="card-val">Neural Studio TTS</div>
-    </div>
-  </div>
-
-  <div class="cta-links">
-    <a href="/videos/v60_timer_recipe_short.mp4" download class="btn">⬇️ Download MP4</a>
+  <div class="cta-links" style="margin-top: 24px;">
+    <a href="/roasters" class="btn">🏬 Open Roasters Showcase</a>
     <a href="/" class="btn btn-secondary">☕ Launch The Brew App</a>
   </div>
 </body>

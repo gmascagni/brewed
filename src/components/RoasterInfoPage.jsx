@@ -124,8 +124,8 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
     if (!liveSuccess) {
       const subject = encodeURIComponent(`Roastery Label Ingestion Request: ${formData.roasteryName}`);
       const body = encodeURIComponent(
-        `Hello Brew App HQ,\n\n` +
-        `I would like to add our specialty roastery and coffee labels to The Brew App global verified database.\n\n` +
+        `Hello TheBrew.App HQ,\n\n` +
+        `I would like to add our specialty roastery and coffee labels to TheBrew.App global verified database.\n\n` +
         `Roastery Brand: ${formData.roasteryName}\n` +
         `Contact Name: ${formData.contactName}\n` +
         `Email: ${formData.email}\n` +

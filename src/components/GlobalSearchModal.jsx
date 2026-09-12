@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, X, Coffee, Leaf, ShoppingBag, BookOpen, GraduationCap, ChevronRight, Star, Compass } from 'lucide-react';
+import { Search, X, Coffee, ShoppingBag, BookOpen, GraduationCap, ChevronRight, Star, Compass } from 'lucide-react';
 import { BREW_METHODS, TERROIR_ATLAS } from '../data/brewData';
 import { PRODUCTS_DATA } from '../data/productsData';
 import { COMMUNITY_RECIPES } from '../data/communityRecipesData';
@@ -92,7 +92,7 @@ export default function GlobalSearchModal({ isOpen, onClose, onSelectMethod, onS
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-20 px-4 bg-black/85 backdrop-blur-xl animate-fade-in">
       
-      <div className="relative max-w-3xl w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 shadow-2xl overflow-hidden text-cream-light flex flex-col max-h-[85vh]">
+      <div role="dialog" aria-modal="true" aria-label="Global Search" className="relative max-w-3xl w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 shadow-2xl overflow-hidden text-cream-light flex flex-col max-h-[85vh]">
         
         {/* Search Input Bar */}
         <div className="p-4 sm:p-6 border-b border-white/10 flex items-center gap-3 bg-black/40">

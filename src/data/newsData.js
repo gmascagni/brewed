@@ -1,5 +1,5 @@
-// World Coffee & Tea News Dispatch
-// Automatically synced from live RSS feeds: Daily Coffee News, World Tea Press, Specialty Coffee Press.
+// World Coffee News Dispatch
+// Automatically synced from live RSS feeds: Daily Coffee News, Specialty Coffee Press.
 // Last Synced: Sep 5, 2026, 5:31 PM
 
 export const LAST_UPDATED = "Sep 5, 2026, 5:31 PM";
@@ -112,85 +112,13 @@ export const WORLD_BREW_NEWS = [
       "Published by Daily Coffee News on Sep 2, 2026",
       "Direct coverage covering market & trade"
     ]
-  },
-  {
-    "id": "news_21987593513",
-    "title": "Specialty Tea Market Size, Share, Industry Growth, 2034 - fortunebusinessinsights.com",
-    "source": "fortunebusinessinsights.com",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBzMnNBUXUtQk9kaXotbHFhbWtaaHNVNWxUTjR0U29YM01rdmVjZHEtSlJDVWxtRTFSeEh4bGNySjRFcU5YRVRScjNCdUNuTnhxaGVzOVltWEd2ZnpqNmhJSVlxeU9kN1A0d0lReFdtUlkzMWFaQWc?oc=5",
-    "publishedDate": "Aug 10, 2026",
-    "dateIso": "2026-08-10",
-    "category": "tea",
-    "tag": "Fine Tea Dispatch",
-    "readTime": "2 min read",
-    "featured": true,
-    "summary": "Global market analysis and projections for the specialty tea industry through 2034, tracking volume expansion, single-origin demand, and market trends.",
-    "keyPoints": [
-      "Published by fortunebusinessinsights.com on Aug 10, 2026",
-      "Direct coverage covering fine tea dispatch"
-    ]
-  },
-  {
-    "id": "news_26879627794",
-    "title": "Is Brazil’s Specialty Coffee Sector on the Rise? - STiR Coffee and Tea Magazine",
-    "source": "STiR Coffee and Tea Magazine",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNeGR4UElqTzl2dTBYZ01TRk1tdWdEZkVselFxUkdnbzZzYmpidHJOZHlEODhqMWllTmxPWi1qSlBKVlRqR1FEZlFhUjdVcnQyYjN2emVTbjFxWFZNOW4xNjlCRW5UeDM3eFJGczlZV1pOX09zQW43S2F6dm9YRUVSM1hyb0tVSkxOWldwa1E1VFZVRVA1XzlPdnhQTnZJUUU2ZFE?oc=5",
-    "publishedDate": "Apr 19, 2026",
-    "dateIso": "2026-04-19",
-    "category": "tea",
-    "tag": "Fine Tea Dispatch",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "In-depth examination of Brazil’s evolving specialty coffee sector, assessing harvest investments, quality scoring, and producer infrastructure.",
-    "keyPoints": [
-      "Published by STiR Coffee and Tea Magazine on Apr 19, 2026",
-      "Direct coverage covering fine tea dispatch"
-    ]
-  },
-  {
-    "id": "news_10521141577",
-    "title": "China’s Tea Industry Shifts from Volume to Value - WorldTeaNews",
-    "source": "WorldTeaNews",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxONWlpcFlpS2paR1BBY1lUQ2VxLUYyTjJRWW9zd2oxazBzeVFaRjZJa2g4TWRYTTNmTEtHbXMwMld2bGhuQ1o4a1VYRkRFOXB0T1BoVFExUkkwWGFEdEhPM19IT1dLTjNYaTZ5dW9za1VEamVzd2EwYmx5U0xaTEpnMWpPRUVSWEFv?oc=5",
-    "publishedDate": "Mar 11, 2026",
-    "dateIso": "2026-03-11",
-    "category": "tea",
-    "tag": "Fine Tea Dispatch",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Analysis of China's domestic and export tea markets as producers pivot toward high-grade single-origin harvests and artisanal processing.",
-    "keyPoints": [
-      "Published by WorldTeaNews on Mar 11, 2026",
-      "Direct coverage covering fine tea dispatch"
-    ]
-  },
-  {
-    "id": "news_16872986195",
-    "title": "The Future of Specialty Coffee - Tea & Coffee Trade Journal",
-    "source": "Tea & Coffee Trade Journal",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9kdGlwSG9GTEdUUzRQN1k0TG42MDVmQ0NmSVVyOWt6dkpva2hfdGJOMWxzQ0pPb2FKWVdCeExNZS1YSEVTQm5ZcUpPQVdnWkJMbFY4UlA0U2JtbWpkVmlSdFF5NFFjNzFnSVpoZ1BJanR2a1pPZFNnZDZIZ1hSRUk?oc=5",
-    "publishedDate": "Jan 29, 2026",
-    "dateIso": "2026-01-29",
-    "category": "tea",
-    "tag": "Fine Tea Dispatch",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Industry leaders discuss technological shifts, sustainable farming practices, and consumer preferences shaping the specialty coffee landscape.",
-    "keyPoints": [
-      "Published by Tea & Coffee Trade Journal on Jan 29, 2026",
-      "Direct coverage covering fine tea dispatch"
-    ]
   }
 ];
 
 export const NEWS_CATEGORIES = [
   { id: 'all', label: 'All News' },
-  { id: 'coffee', label: 'Coffee' },
-  { id: 'tea', label: 'Tea' },
+  { id: 'coffee', label: 'Specialty Coffee' },
   { id: 'origin', label: 'Farm & Origin' },
   { id: 'competition', label: 'Competitions' }
 ];
+

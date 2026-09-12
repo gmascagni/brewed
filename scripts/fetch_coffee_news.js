@@ -160,13 +160,12 @@ async function fetchFeed(url, sourceName, category) {
 }
 
 async function run() {
-  console.log('=== World Coffee & Tea News Live RSS Crawler ===');
+  console.log('=== World Coffee News Live RSS Crawler ===');
   console.log(`Timestamp: ${new Date().toISOString()}`);
 
-  const [dcnItems, googleCoffeeItems, googleTeaItems] = await Promise.all([
+  const [dcnItems, googleCoffeeItems] = await Promise.all([
     fetchFeed('https://dailycoffeenews.com/feed/', 'Daily Coffee News', 'coffee'),
-    fetchFeed('https://news.google.com/rss/search?q=specialty+coffee+industry&hl=en-US&gl=US&ceid=US:en', 'Specialty Coffee Press', 'coffee'),
-    fetchFeed('https://news.google.com/rss/search?q=specialty+tea+harvest+industry&hl=en-US&gl=US&ceid=US:en', 'Fine Tea Dispatch', 'tea')
+    fetchFeed('https://news.google.com/rss/search?q=specialty+coffee+industry&hl=en-US&gl=US&ceid=US:en', 'Specialty Coffee Press', 'coffee')
   ]);
 
   // Combine and deduplicate by URL or normalized Title
@@ -175,7 +174,7 @@ async function run() {
   const seenTitles = new Set();
 
   // Prioritize primary publisher (Daily Coffee News) first
-  for (const item of [...dcnItems, ...googleTeaItems, ...googleCoffeeItems]) {
+  for (const item of [...dcnItems, ...googleCoffeeItems]) {
     const normTitle = item.title.toLowerCase().replace(/[^a-z0-9]/g, '');
     if (seenUrls.has(item.url) || seenTitles.has(normTitle)) {
       continue;
@@ -190,10 +189,8 @@ async function run() {
     return;
   }
 
-  // Pick the top 10 fresh, diverse articles (at least 3 tea, at least 4 coffee)
-  const coffeeList = combined.filter(a => a.category === 'coffee').slice(0, 6);
-  const teaList = combined.filter(a => a.category === 'tea').slice(0, 4);
-  const finalArticles = [...coffeeList, ...teaList];
+  // Pick top 8 fresh coffee articles
+  const finalArticles = combined.filter(a => a.category === 'coffee').slice(0, 8);
 
   const nowFormatted = new Date().toLocaleDateString('en-US', { 
     month: 'short', 
@@ -203,8 +200,8 @@ async function run() {
     minute: '2-digit'
   });
 
-  const fileContent = `// World Coffee & Tea News Dispatch
-// Automatically synced from live RSS feeds: Daily Coffee News, World Tea Press, Specialty Coffee Press.
+  const fileContent = `// World Coffee News Dispatch
+// Automatically synced from live RSS feeds: Daily Coffee News, Specialty Coffee Press.
 // Last Synced: ${nowFormatted}
 
 export const LAST_UPDATED = ${JSON.stringify(nowFormatted)};
@@ -213,8 +210,7 @@ export const WORLD_BREW_NEWS = ${JSON.stringify(finalArticles, null, 2)};
 
 export const NEWS_CATEGORIES = [
   { id: 'all', label: 'All News' },
-  { id: 'coffee', label: 'Coffee' },
-  { id: 'tea', label: 'Tea' },
+  { id: 'coffee', label: 'Specialty Coffee' },
   { id: 'origin', label: 'Farm & Origin' },
   { id: 'competition', label: 'Competitions' }
 ];

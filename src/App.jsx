@@ -121,14 +121,13 @@ export default function App() {
   // Handler for Brew Along With Video Action
   const handleBrewWithVideo = (video) => {
     if (!video || !video.recipeSync) return;
-    const { methodId, ratio, waterTempF } = video.recipeSync;
-    const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+    const { methodId, ratio } = video.recipeSync;
+    const allMethods = BREW_METHODS.coffee;
     const targetMethod = allMethods.find(m => m.id === methodId) || allMethods[0];
     setActiveMethod(targetMethod);
     if (ratio) {
       setCustomRatio(ratio);
     }
-    setTrackMode('coffee');
     setIsVideoAcademyOpen(false);
     setCurrentStep(4); // Advance straight to the active guided timer so user brews along
     navigate(`/methods/${targetMethod.id}`);
@@ -187,11 +186,10 @@ export default function App() {
 
     // 3. Resolve target brew method
     const targetMethodId = scannedBean.brewMethod || scannedBean.extraction?.method || 'pour_over';
-    const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+    const allMethods = BREW_METHODS.coffee;
     const targetMethod = allMethods.find(m => m.id === targetMethodId || m.id.includes(targetMethodId) || targetMethodId.includes(m.id)) || allMethods[0];
 
     setActiveMethod(targetMethod);
-    setTrackMode('coffee');
     setDialedInCoffee(scannedBean);
 
     // 4. Advance straight to Step 4 (Guided Brew Timer) and navigate URL
@@ -266,14 +264,11 @@ export default function App() {
     if (path.startsWith('/methods/')) {
       setIsRoasterShowcaseView(false);
       const methodId = path.replace('/methods/', '').replace(/\/$/, '');
-      const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+      const allMethods = BREW_METHODS.coffee;
       const found = allMethods.find(m => m.id === methodId);
 
       if (found) {
         setActiveMethod(found);
-        if (found.category && found.category !== trackMode) {
-          setTrackMode(found.category);
-        }
         if (currentStep === 1) {
           setCurrentStep(2);
         }
@@ -358,18 +353,17 @@ export default function App() {
       } else if (roasterParam || beanParam) {
         const methodParam = searchParams.get('method');
         const ratioParam = parseFloat(searchParams.get('ratio'));
-        const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+        const allMethods = BREW_METHODS.coffee;
         const found = allMethods.find(m => m.id === methodParam) || allMethods[0];
         setActiveMethod(found);
         if (ratioParam) setCustomRatio(ratioParam);
-        setTrackMode('coffee');
         setCurrentStep(2);
       } else {
         setCurrentStep(1);
       }
       updatePageSeo(
         'The Art of Extraction',
-        'Precision specialty coffee & fine tea extraction ratio scaler, multi-phase countdown timer, burr grinder macro texture guide, and troubleshooting compendium.',
+        'Precision specialty coffee extraction ratio scaler, multi-phase countdown timer, burr grinder macro texture guide, and troubleshooting compendium.',
         'https://thebrew.app/'
       );
 
@@ -381,17 +375,6 @@ export default function App() {
     }
   }, [location.pathname, location.search]);
 
-  // Sync active method when track mode switches
-  const handleTrackSwitch = (newTrack) => {
-    setTrackMode(newTrack);
-    const newMethods = BREW_METHODS[newTrack] || BREW_METHODS.coffee;
-    setActiveMethod(newMethods[0]);
-    setCustomRatio(null);
-    setCustomWaterMl(null);
-    if (setActiveVideo) setActiveVideo(null);
-    trackEvent('switch_track_mode', { track_mode: newTrack });
-  };
-
   const handleSelectMethodFromGrid = (method) => {
     setActiveMethod(method);
     setCustomRatio(null);
@@ -402,13 +385,12 @@ export default function App() {
     trackEvent('select_method', { method_id: method.id, method_name: method.name });
   };
 
-  const isCoffee = trackMode === 'coffee';
-  const isTea = trackMode === 'tea';
+  const isCoffee = true;
 
-  // Sync body theme class whenever track changes
+  // Sync body theme class
   useEffect(() => {
-    document.body.className = `theme-${trackMode}`;
-  }, [trackMode]);
+    document.body.className = 'theme-coffee';
+  }, []);
 
   // Scroll to top smoothly when changing steps so mobile screens always show the active step container
   useEffect(() => {
@@ -442,36 +424,22 @@ export default function App() {
       onOpenJournal={() => setIsJournalOpen(true)}
       navigate={navigate}
     >
-      <div className={`min-h-screen font-sans flex flex-col transition-colors duration-700 relative ${
-        isCoffee
-          ? 'bg-[#0E0906] text-[#F8F5F1] selection:bg-[#C48B56] selection:text-[#140C08]'
-          : 'bg-[#08110B] text-[#EBF7EE] selection:bg-sage-400 selection:text-[#07130B]'
-      }`}>
+      <div className="min-h-screen font-sans flex flex-col transition-colors duration-700 relative bg-[#0E0906] text-[#F8F5F1] selection:bg-[#C48B56] selection:text-[#140C08]">
 
       {/* High-Definition Extraction Method Background Image Overlay */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30 md:opacity-40 transition-all duration-1000">
         <img
-          key={currentActiveMethod?.heroImage || trackMode}
-          src={currentActiveMethod?.heroImage || (isCoffee ? '/pour_over_hero.jpg' : '/tea_ceremony.jpg')}
+          key={currentActiveMethod?.heroImage || 'coffee_hero'}
+          src={currentActiveMethod?.heroImage || '/pour_over_hero.jpg'}
           alt={currentActiveMethod?.name || 'Extraction Background'}
           className="w-full h-full object-cover object-center filter blur-[2px] scale-105 transform transition-transform duration-1000 brightness-90 contrast-110"
         />
-        <div className={`absolute inset-0 ${
-          isCoffee
-            ? 'bg-gradient-to-b from-[#0E0906]/80 via-[#0E0906]/55 to-[#0E0906]/90'
-            : 'bg-gradient-to-b from-[#08110B]/80 via-[#08110B]/55 to-[#08110B]/90'
-        }`} />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0E0906]/80 via-[#0E0906]/55 to-[#0E0906]/90" />
       </div>
       
       {/* 100% Bulletproof Sticky Top Header Container */}
-      <header className={`sticky top-0 z-50 backdrop-blur-2xl transition-all duration-700 border-b shadow-2xl ${
-        isCoffee
-          ? 'bg-[#160E09]/95 border-[#A66E38]/40 shadow-[0_10px_30px_rgba(166,110,56,0.15)]'
-          : 'bg-[#0B1710]/95 border-sage-500/40 shadow-[0_10px_30px_rgba(94,150,106,0.15)]'
-      }`}>
+      <header className="sticky top-0 z-50 backdrop-blur-2xl transition-all duration-700 border-b shadow-2xl bg-[#160E09]/95 border-[#A66E38]/40 shadow-[0_10px_30px_rgba(166,110,56,0.15)]">
         <Header
-          trackMode={trackMode}
-          setTrackMode={handleTrackSwitch}
           onOpenJournal={() => setIsJournalOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
           onOpenProfile={() => setIsProfileOpen(true)}
@@ -610,9 +578,7 @@ export default function App() {
 
                 <button
                   onClick={() => setCurrentStep(4)}
-                  className={`py-3.5 px-8 rounded-2xl font-extrabold text-xs flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all ${
-                    isCoffee ? 'btn-tactile-coffee text-[#140C08]' : 'btn-tactile-tea text-white'
-                  }`}
+                  className="py-3.5 px-8 rounded-2xl font-extrabold text-xs flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all btn-tactile-coffee text-[#140C08]"
                 >
                   <span>Step 04: Guided Brew Timer</span>
                   <ChevronRight className="w-4 h-4" />
@@ -719,7 +685,7 @@ export default function App() {
               handleSelectMethodFromGrid(method);
             }}
             onSelectRecipe={(recipe) => {
-              const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+              const allMethods = BREW_METHODS.coffee;
               const match = allMethods.find(m => m.id === recipe.methodId);
               if (match) {
                 handleSelectMethodFromGrid(match);
@@ -747,7 +713,7 @@ export default function App() {
             onOpenAuth={() => setIsAuthModalOpen(true)}
             onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
             onSelectRecipe={(recipe) => {
-              const allMethods = [...BREW_METHODS.coffee, ...BREW_METHODS.tea];
+              const allMethods = BREW_METHODS.coffee;
               const match = allMethods.find(m => m.id === recipe.methodId);
               if (match) {
                 handleSelectMethodFromGrid(match);

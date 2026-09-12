@@ -170,7 +170,7 @@ export default function BrewJournal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-black/85 backdrop-blur-2xl animate-fade-in overflow-y-auto">
       
       {/* Main Dialog Panel */}
-      <div className="relative max-w-4xl w-full rounded-3xl bg-[#120F0D] border border-white/[0.12] p-6 md:p-9 shadow-2xl overflow-hidden my-8">
+      <div role="dialog" aria-modal="true" aria-label="Tasting Journal & Extraction Log" className="relative max-w-4xl w-full rounded-3xl bg-[#120F0D] border border-white/[0.12] p-6 md:p-9 shadow-2xl overflow-hidden my-8">
         
         {/* Ambient Top Glow */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -222,6 +222,8 @@ export default function BrewJournal({
 
             <button
               onClick={onClose}
+              title="Close Journal"
+              aria-label="Close Tasting Journal"
               className="p-2.5 rounded-2xl bg-white/[0.08] text-stone-300 hover:text-amber-gold hover:bg-white/[0.15] transition-all border border-white/[0.12]"
             >
               <X className="w-5 h-5" />

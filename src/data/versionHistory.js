@@ -2,6 +2,26 @@
 
 export const VERSION_HISTORY = [
   {
+    version: "1.6.0",
+    releaseDate: "2026-09-12",
+    title: "Specialty Coffee Atelier Refocus & Security Hardening",
+    summary: "Refocused application strictly on specialty coffee extraction, removed legacy tea tracks, hardened Cloud Firestore deletion security, cleaned affiliate links, and aligned sitemaps.",
+    highlights: [
+      {
+        type: "feature",
+        badge: "Specialty Focus",
+        title: "Dedicated Coffee Extraction Experience",
+        description: "Streamlined navigation and extraction profiles exclusively around specialty coffee methods, SCA golden cup standards, and water mineral chemistry."
+      },
+      {
+        type: "security",
+        badge: "Security",
+        title: "Cloud Firestore Rules Hardening",
+        description: "Hardened deletion rules on roaster and coffee documents to prevent unauthorized deletion."
+      }
+    ]
+  },
+  {
     version: "1.5.0",
     releaseDate: "2026-09-06",
     title: "Specialty Roaster Verification Ecosystem, Smart Bag Studio & War Room CRM Bridge",
@@ -29,7 +49,7 @@ export const VERSION_HISTORY = [
         type: "enhancement",
         badge: "Brand & UX",
         title: "Brew News & Digital Trail Labs LLC Attribution",
-        description: "Syndicated coffee & tea news renamed to Brew News; updated parent company attribution to Digital Trail Labs LLC; moved release notes to War Room admin portal."
+        description: "Syndicated specialty coffee news renamed to Brew News; updated parent company attribution to Digital Trail Labs LLC; moved release notes to War Room admin portal."
       }
     ]
   },
@@ -81,7 +101,7 @@ export const VERSION_HISTORY = [
         type: "feature",
         badge: "54 Studio Tracks",
         title: "54 Neural British Voice Clips for Every Method",
-        description: "Synthesized 54 studio audio files using Microsoft Edge Neural Voice (en-GB-SoniaNeural) covering all 18 coffee and tea methods with exact extraction instructions and fallback Web Speech API synthesis."
+        description: "Synthesized 54 studio audio files using Microsoft Edge Neural Voice (en-GB-SoniaNeural) covering all specialty coffee methods with exact extraction instructions and fallback Web Speech API synthesis."
       },
       {
         type: "enhancement",
@@ -101,7 +121,7 @@ export const VERSION_HISTORY = [
     version: "1.4.2",
     releaseDate: "2026-09-06",
     title: "Mechanical Clockwork Ticking, Studio Audio Voice & Dual Mute Controls",
-    summary: "Introduced authentic mechanical clockwork escapement ticking every second, tactile switch clicks on all controls, studio British female voice guidance for all 48 coffee/tea extraction phases, and dual prominent mute buttons.",
+    summary: "Introduced authentic mechanical clockwork escapement ticking every second, tactile switch clicks on all controls, studio British female voice guidance for all specialty coffee extraction phases, and dual prominent mute buttons.",
     highlights: [
       {
         type: "feature",
@@ -113,7 +133,7 @@ export const VERSION_HISTORY = [
         type: "feature",
         badge: "Studio Voice",
         title: "Pre-Rendered British Female Voice Guidance",
-        description: "All 48 coffee and tea phases now feature pre-rendered studio voice guidance ('Bloom Phase, 45 seconds', 'First Pulse Pour, 45 seconds', etc.) ensuring loud, reliable audio on both desktop and mobile devices."
+        description: "Specialty coffee phases now feature pre-rendered studio voice guidance ('Bloom Phase, 45 seconds', 'First Pulse Pour, 45 seconds', etc.) ensuring loud, reliable audio on both desktop and mobile devices."
       },
       {
         type: "enhancement",
@@ -254,7 +274,7 @@ export const VERSION_HISTORY = [
   {
     version: "1.1.0",
     releaseDate: "2026-09-06",
-    title: "World Coffee & Tea News Hardening",
+    title: "World Coffee News Hardening",
     summary: "Eliminated unescaped HTML entities in syndicated news feeds and implemented defensive entity decoding.",
     highlights: [
       {
@@ -274,14 +294,14 @@ export const VERSION_HISTORY = [
   {
     version: "1.0.0",
     releaseDate: "2026-09-05",
-    title: "Foundational Release: Dial-in Station & 18 Extraction Methods",
-    summary: "Comprehensive specialty coffee and fine tea brewing workstation.",
+    title: "Foundational Release: Dial-in Station & Extraction Methods",
+    summary: "Comprehensive specialty coffee brewing workstation.",
     highlights: [
       {
         type: "feature",
         badge: "Brew Methods",
-        title: "18 Prerendered Extraction Methods",
-        description: "Precise parameters for V60, Chemex, AeroPress, French Press, Espresso, Moka Pot, and ceremonial teas."
+        title: "Prerendered Extraction Methods",
+        description: "Precise parameters for V60, Chemex, AeroPress, French Press, Espresso, and Moka Pot."
       },
       {
         type: "feature",

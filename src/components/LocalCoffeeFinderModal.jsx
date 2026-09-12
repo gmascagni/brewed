@@ -670,7 +670,7 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-xl animate-fade-in">
-      <div className="relative w-full max-w-6xl bg-[#120F0D] border-2 border-amber-gold/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      <div role="dialog" aria-modal="true" aria-label="Local Coffee Finder" className="relative w-full max-w-6xl bg-[#120F0D] border-2 border-amber-gold/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Modal Header */}
         <div className="p-5 md:p-6 bg-gradient-to-r from-amber-950/60 via-[#1A1613] to-espresso-950 border-b border-white/10 flex items-center justify-between">

@@ -1,8 +1,7 @@
 import React from 'react';
-import { Thermometer, Clock, CheckCircle2, ChevronRight, Sparkles, Coffee, Leaf, Gauge } from 'lucide-react';
+import { Thermometer, Clock, CheckCircle2, ChevronRight, Sparkles, Coffee, Gauge } from 'lucide-react';
 
-export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, activeMethod, setActiveMethod, onNextStep, unitSystem }) {
-  const isCoffee = trackMode === 'coffee';
+export default function MethodSelectorGrid({ methods, activeMethod, setActiveMethod, onNextStep, unitSystem }) {
   const isMetric = unitSystem === 'metric';
 
   // Helper to format total duration of a method's phases
@@ -17,102 +16,42 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
   return (
     <div className="space-y-10 md:space-y-12 animate-fade-in">
       {/* Step Header with Extraction Method Background Image */}
-      <div className={`p-8 md:p-10 lg:p-12 rounded-3xl relative overflow-hidden shadow-2xl border transition-all duration-500 ${
-        isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
-      }`}>
+      <div className="p-8 md:p-10 lg:p-12 rounded-3xl relative overflow-hidden shadow-2xl border transition-all duration-500 glass-panel-coffee border-[#A66E38]/40">
         {/* Background Extraction Image Overlay */}
         <div className="absolute inset-0 z-0 opacity-35 pointer-events-none">
           <img
-            key={activeMethod?.heroImage || trackMode}
-            src={(activeMethod?.heroImage && activeMethod.heroImage !== '/') ? activeMethod.heroImage : (isCoffee ? '/pour_over_hero.jpg' : '/tea_ceremony.jpg')}
+            key={activeMethod?.heroImage || 'coffee_hero'}
+            src={(activeMethod?.heroImage && activeMethod.heroImage !== '/') ? activeMethod.heroImage : '/pour_over_hero.jpg'}
             alt="Extraction Background"
             className="w-full h-full object-cover object-center transform scale-105 filter contrast-125 brightness-90"
           />
-          <div className={`absolute inset-0 ${
-            isCoffee
-              ? 'bg-gradient-to-r from-[#140D09] via-[#140D09]/85 to-[#140D09]/50'
-              : 'bg-gradient-to-r from-[#0B130E] via-[#0B130E]/85 to-[#0B130E]/50'
-          }`} />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#140D09] via-[#140D09]/85 to-[#140D09]/50" />
         </div>
 
         <div className="relative z-10">
-          <div className={`inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] mb-3 ${
-            isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
-          }`}>
+          <div className="inline-flex items-center space-x-2 text-[11px] font-mono font-extrabold uppercase tracking-[0.2em] mb-3 text-[#D2A06E]">
             <Sparkles className="w-4 h-4 animate-pulse" />
             <span>Step 01 of 04 • Atelier Selection</span>
           </div>
 
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-extrabold text-cream-light mb-3 leading-tight drop-shadow-lg">
-            Master the Craft of Brewed Extraction
+            Master the Craft of Coffee Extraction
           </h2>
           
-          <p className="text-xs md:text-sm text-stone-300 max-w-3xl leading-relaxed font-normal mb-8 drop-shadow">
-            Precision specialty coffee ratio calculator, fine tea steeping timers, and extraction troubleshooting guide. Select your brewing path below:
+          <p className="text-xs md:text-sm text-stone-300 max-w-3xl leading-relaxed font-normal mb-6 drop-shadow">
+            Precision specialty coffee ratio calculator, SCA golden cup standards, burr grinder dial-in targets, and real-time pour-over timers. Select your brewing equipment below:
           </p>
 
-          {/* 2-Path Entry Buttons: The Coffee Lab vs The Tea Room */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl">
-            
-            {/* 1. The Coffee Lab Button */}
-            <button
-              type="button"
-              onClick={() => setTrackMode && setTrackMode('coffee')}
-              className={`p-5 md:p-6 rounded-2xl border text-left transition-all duration-300 cursor-pointer active:scale-95 group backdrop-blur-md ${
-                isCoffee
-                  ? 'btn-tactile-coffee text-[#140C08] ring-2 ring-[#C48B56]/50 shadow-2xl scale-[1.02]'
-                  : 'bg-black/50 border-white/10 text-stone-300 opacity-70 hover:opacity-100 hover:border-[#A66E38]/50 hover:bg-black/70'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <div className={`p-3 rounded-xl transition-colors ${
-                  isCoffee ? 'bg-black/30 text-current border border-current/20' : 'bg-[#A66E38]/20 text-[#D2A06E] border border-[#A66E38]/30'
-                }`}>
-                  <Coffee className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className={`font-serif text-base md:text-lg font-bold ${isCoffee ? 'text-[#140C08]' : 'text-cream-light group-hover:text-[#D2A06E] transition-colors'}`}>
-                    The Coffee Lab
-                  </h3>
-                  <p className={`text-[11px] ${isCoffee ? 'text-[#140C08]/90 font-medium' : 'text-stone-400'}`}>
-                    SCA Ratios, Burr Grinders & Pour Over
-                  </p>
-                </div>
-              </div>
-            </button>
-
-            {/* 2. The Tea Room Button */}
-            <button
-              type="button"
-              onClick={() => setTrackMode && setTrackMode('tea')}
-              className={`p-5 md:p-6 rounded-2xl border text-left transition-all duration-300 cursor-pointer active:scale-95 group backdrop-blur-md ${
-                !isCoffee
-                  ? 'btn-tactile-tea text-white ring-2 ring-sage-400/50 shadow-2xl scale-[1.02]'
-                  : 'bg-black/50 border-white/10 text-stone-300 opacity-70 hover:opacity-100 hover:border-sage-400/50 hover:bg-black/70'
-              }`}
-            >
-              <div className="flex items-center space-x-3">
-                <div className={`p-3 rounded-xl transition-colors ${
-                  !isCoffee ? 'bg-black/30 text-current border border-current/20' : 'bg-sage-500/20 text-sage-300 border border-sage-500/30'
-                }`}>
-                  <Leaf className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className={`font-serif text-base md:text-lg font-bold ${!isCoffee ? 'text-white' : 'text-cream-light group-hover:text-sage-300 transition-colors'}`}>
-                    The Tea Room
-                  </h3>
-                  <p className={`text-[11px] ${!isCoffee ? 'text-white/90 font-medium' : 'text-stone-400'}`}>
-                    Gongfu Gaiwan, Steeping & Terroirs
-                  </p>
-                </div>
-              </div>
-            </button>
-
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2A1C12]/70 border border-[#A66E38]/40 text-[#D2A06E] font-mono text-xs">
+            <Coffee className="w-4 h-4 text-amber-gold" />
+            <span className="font-bold">The Coffee Lab</span>
+            <span className="text-stone-400">•</span>
+            <span className="text-stone-300">8 Curated Specialty Extraction Profiles</span>
           </div>
         </div>
       </div>
 
-      {/* Grid of Devices / Teas */}
+      {/* Grid of Extraction Methods */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
         {methods.map((method) => {
           const isSelected = activeMethod?.id === method.id;
@@ -125,12 +64,8 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
               onClick={() => setActiveMethod(method)}
               className={`p-8 md:p-9 rounded-3xl border text-left transition-all duration-300 relative flex flex-col justify-between group shadow-xl hover:-translate-y-1.5 ${
                 isSelected
-                  ? isCoffee
-                    ? 'bg-[#A66E38]/20 border-[#C48B56]/70 text-cream-light ring-1 ring-[#C48B56]/40 shadow-[0_15px_40px_-10px_rgba(166,110,56,0.35)] backdrop-blur-xl'
-                    : 'bg-emerald-500/20 border-sage-400/70 text-cream-light ring-1 ring-sage-400/40 shadow-[0_15px_40px_-10px_rgba(81,158,100,0.35)] backdrop-blur-xl'
-                  : isCoffee
-                  ? 'bg-[#18120D]/80 border-white/[0.08] text-stone-300 hover:bg-[#221B14] hover:border-[#A66E38]/30'
-                  : 'bg-[#0E1A11]/80 border-white/[0.08] text-stone-300 hover:bg-[#15271A] hover:border-sage-500/30'
+                  ? 'bg-[#A66E38]/20 border-[#C48B56]/70 text-cream-light ring-1 ring-[#C48B56]/40 shadow-[0_15px_40px_-10px_rgba(166,110,56,0.35)] backdrop-blur-xl'
+                  : 'bg-[#18120D]/80 border-white/[0.08] text-stone-300 hover:bg-[#221B14] hover:border-[#A66E38]/30'
               }`}
             >
               {/* Method Card Header */}
@@ -138,22 +73,14 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
                 <div className="flex items-center justify-between mb-5">
                   <div className={`p-3.5 rounded-2xl transition-all ${
                     isSelected
-                      ? isCoffee
-                        ? 'bg-[#C48B56] text-[#140C08] shadow-[0_0_15px_rgba(166,110,56,0.5)] font-bold'
-                        : 'bg-sage-300 text-slate-950 shadow-[0_0_15px_rgba(81,158,100,0.5)] font-bold'
-                      : isCoffee
-                      ? 'bg-white/[0.06] text-[#D2A06E] border border-white/[0.08]'
-                      : 'bg-white/[0.06] text-sage-300 border border-white/[0.08]'
+                      ? 'bg-[#C48B56] text-[#140C08] shadow-[0_0_15px_rgba(166,110,56,0.5)] font-bold'
+                      : 'bg-white/[0.06] text-[#D2A06E] border border-white/[0.08]'
                   }`}>
-                    {isCoffee ? <Coffee className="w-6 h-6" /> : <Leaf className="w-6 h-6" />}
+                    <Coffee className="w-6 h-6" />
                   </div>
 
                   {isSelected && (
-                    <span className={`px-3.5 py-1 rounded-full text-[10px] font-mono tracking-[0.15em] font-extrabold uppercase border flex items-center gap-1.5 shadow-inner ${
-                      isCoffee
-                        ? 'bg-[#A66E38]/20 text-[#D2A06E] border-[#A66E38]/30'
-                        : 'bg-sage-500/20 text-sage-300 border-sage-500/30'
-                    }`}>
+                    <span className="px-3.5 py-1 rounded-full text-[10px] font-mono tracking-[0.15em] font-extrabold uppercase border flex items-center gap-1.5 shadow-inner bg-[#A66E38]/20 text-[#D2A06E] border-[#A66E38]/30">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       <span>Active</span>
                     </span>
@@ -176,7 +103,7 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
                     Ratio Target:
                   </span>
                   <span className="font-bold text-cream-light">
-                    {isCoffee ? `1 : ${method.ratio}` : `1g / ${method.ratio}mL`}
+                    1 : {method.ratio}
                   </span>
                 </div>
 
@@ -184,9 +111,7 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
                   <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-stone-400">
                     Water Temp:
                   </span>
-                  <span className={`flex items-center gap-1.5 font-bold ${
-                    isCoffee ? 'text-cyan-300' : 'text-sage-300'
-                  }`}>
+                  <span className="flex items-center gap-1.5 font-bold text-cyan-300">
                     <Thermometer className="w-3.5 h-3.5 opacity-80" />
                     {tempStr}
                   </span>
@@ -194,7 +119,7 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
 
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-stone-400">
-                    {isCoffee ? 'Brew Duration:' : 'Steep Duration:'}
+                    Brew Duration:
                   </span>
                   <span className="flex items-center gap-1.5 font-bold text-cream-light">
                     <Clock className="w-3.5 h-3.5 opacity-80" />
@@ -202,7 +127,7 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
                   </span>
                 </div>
 
-                {isCoffee && method.grind && (
+                {method.grind && (
                   <div className="flex items-center justify-between pt-2 border-t border-white/[0.06]">
                     <span className="text-[10px] uppercase font-mono tracking-[0.15em] text-[#D2A06E]">Grind Size:</span>
                     <span className="flex items-center gap-1.5 font-bold text-[#D2A06E]">
@@ -225,9 +150,7 @@ export default function MethodSelectorGrid({ trackMode, setTrackMode, methods, a
 
         <button
           onClick={onNextStep}
-          className={`py-4 px-9 rounded-2xl font-extrabold text-xs tracking-wider uppercase flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all ${
-            isCoffee ? 'btn-tactile-coffee text-[#140C08]' : 'btn-tactile-tea text-white'
-          }`}
+          className="py-4 px-9 rounded-2xl font-extrabold text-xs tracking-wider uppercase flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all btn-tactile-coffee text-[#140C08]"
         >
           <span>Step 02: Ratio & Scaler</span>
           <ChevronRight className="w-4 h-4" />

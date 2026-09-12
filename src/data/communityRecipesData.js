@@ -52,30 +52,6 @@ export const CURATED_MASTER_RECIPES = [
     ]
   },
   {
-    id: 'rec_gaiwan_alishan',
-    title: 'Traditional High Mountain Gongfu Multi-Steep',
-    technique: 'Taiwanese Gongfu Cha Heritage Protocol',
-    badge: 'Heritage Protocol',
-    methodId: 'oolong_tea',
-    methodName: 'Gongfu Oolong Gaiwan',
-    trackMode: 'tea',
-    beanName: 'High Mountain Alishan Rolled Oolong',
-    roasterName: 'Hand-Harvested High Elevation Spring Pluck',
-    ratio: 20.0,
-    dryDoseGrams: 7.5,
-    waterAmountMl: 150.0,
-    waterTempC: 92,
-    grindSetting: 'Whole Tightly Rolled Pearls',
-    totalTimeSec: 240,
-    description: 'High leaf-to-water ratio unlocking rich orchid honey sweetness, buttery mouthfeel, and deep mineral aftertaste across progressive infusions.',
-    steps: [
-      { order: 1, durationSec: 10, waterMl: 150, action: 'Flash Rinse & Awaken Leaves (Discard Rinse)' },
-      { order: 2, durationSec: 20, waterMl: 150, action: '1st Steep: Floral Aromatics & Creamy Body' },
-      { order: 3, durationSec: 25, waterMl: 150, action: '2nd Steep: Honey Nectar & Orchid Notes' },
-      { order: 4, durationSec: 35, waterMl: 150, action: '3rd Steep: Lingering Sweet Finish & Mineral Tone' }
-    ]
-  },
-  {
     id: 'rec_aeropress_inverted',
     title: 'World AeroPress Inverted Bloom Method',
     technique: 'Competition Inverted Protocol',

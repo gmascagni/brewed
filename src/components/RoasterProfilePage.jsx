@@ -977,7 +977,7 @@ export default function RoasterProfilePage({
             </div>
             <div className="relative aspect-[9/16] w-full bg-black flex items-center justify-center">
               <video
-                src="/videos/v60_timer_recipe_short.mp4"
+                src="/videos/smart_bag_scan_demo.mp4"
                 controls
                 autoPlay
                 playsInline
@@ -985,7 +985,7 @@ export default function RoasterProfilePage({
               />
             </div>
             <div className="p-3.5 bg-black/60 text-center border-t border-white/10 space-y-1">
-              <p className="text-xs text-stone-200 font-mono font-bold">Precision V60 Pour-Over Dial-In & Live Timer</p>
+              <p className="text-xs text-stone-200 font-mono font-bold">Smart Bag Barcode Scan & Roaster Dial-In</p>
               <p className="text-[11px] text-amber-gold/80 font-mono">Camera Barcode Scanning • Multi-Phase Bloom Coaching</p>
             </div>
           </div>

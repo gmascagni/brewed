@@ -133,7 +133,7 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
         email: cleanEmail,
         username: cleanHandle,
         displayName: displayName.trim() || cleanEmail.split('@')[0],
-        bio: bio.trim() || 'Specialty Coffee & Fine Tea Enthusiast',
+        bio: bio.trim() || 'Specialty Coffee Enthusiast',
         avatar: avatar || AVATAR_PRESETS[0].url,
         role: 'user'
       };
@@ -146,7 +146,7 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
-      <div className="relative max-w-md w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] text-cream-light">
+      <div role="dialog" aria-modal="true" aria-label="Account Authorization" className="relative max-w-md w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] text-cream-light">
         
         {/* Modal Close Button */}
         <button

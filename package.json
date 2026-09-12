@@ -8,7 +8,8 @@
     "build": "node scripts/record_build.js && vite build && node scripts/prerender.js",
     "preview": "vite preview",
     "check:affiliates": "node scripts/check_affiliate_links.mjs",
-    "test:affiliates": "node scripts/check_affiliate_links.mjs"
+    "test:affiliates": "node scripts/check_affiliate_links.mjs",
+    "test:qa": "python tests/run_all_qa.py"
   },
   "dependencies": {
     "@zxing/browser": "^0.2.1",

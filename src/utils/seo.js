@@ -14,7 +14,7 @@ export function getMethodJsonLd(method) {
     "supply": [
       {
         "@type": "HowToSupply",
-        "name": method.category === 'tea' ? "Specialty Loose Leaf Tea" : "Specialty Single-Origin Coffee"
+        "name": "Specialty Single-Origin Coffee"
       },
       {
         "@type": "HowToSupply",
@@ -48,7 +48,7 @@ export function updatePageSeo(title, description, canonicalUrl, ogImage) {
   if (typeof document === 'undefined') return;
 
   // Title
-  document.title = title ? `${title} | The Brew App` : 'The Brew App: The Art of Extraction | Precision Coffee & Tea Guide';
+  document.title = title ? `${title} | The Brew App` : 'The Brew App: The Art of Extraction | Precision Specialty Coffee Guide';
 
   // Description
   const metaDesc = document.querySelector('meta[name="description"]');

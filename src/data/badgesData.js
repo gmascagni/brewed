@@ -25,7 +25,7 @@ export const BADGES_DATA = [
     id: 'streak_3_days',
     slug: 'streak_3_days',
     name: '3-Day Brew Streak',
-    description: 'Brewed coffee or tea for 3 consecutive days.',
+    description: 'Brewed coffee for 3 consecutive days.',
     category: 'streak',
     icon: '🔥',
     criteriaType: 'streak_days',
@@ -52,7 +52,7 @@ export const BADGES_DATA = [
     threshold: 5
   },
   {
-    id: 'french_press:expert',
+    id: 'french_press_expert',
     slug: 'french_press_expert',
     name: 'Immersion Master',
     description: 'Mastered 4-minute crust skimming in the French Press.',
@@ -65,7 +65,7 @@ export const BADGES_DATA = [
     id: 'terroir_explorer',
     slug: 'terroir_explorer',
     name: 'Terroir Atlas Explorer',
-    description: 'Explored single-origin coffee or tea varieties across 5 growing nations.',
+    description: 'Explored single-origin coffee varieties across 5 growing nations.',
     category: 'knowledge',
     icon: '🌍',
     criteriaType: 'origin_count',

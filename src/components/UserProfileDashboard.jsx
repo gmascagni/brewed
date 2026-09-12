@@ -77,7 +77,7 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
   if (realStreak >= 3) unlockedBadgeIds.push('streak_3_days');
   if (realStreak >= 7) unlockedBadgeIds.push('streak_7_days');
   if (journalLogs.filter((l) => l.methodId === 'pour_over' || l.methodId === 'classic_pour_over').length >= 5) unlockedBadgeIds.push('pour_over_aficionado');
-  if (journalLogs.filter((l) => l.methodId === 'french_press' || l.methodId === 'french_press_expert').length >= 5) unlockedBadgeIds.push('french_press:expert');
+  if (journalLogs.filter((l) => l.methodId === 'french_press' || l.methodId === 'french_press_expert').length >= 5) unlockedBadgeIds.push('french_press_expert');
   if (new Set(journalLogs.map((l) => l.origin).filter(Boolean)).size >= 5) unlockedBadgeIds.push('terroir_explorer');
   if (customRecipes.length >= 1) unlockedBadgeIds.push('recipe_creator');
 
@@ -86,7 +86,7 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
-      <div className="relative max-w-3xl w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] text-cream-light">
+      <div role="dialog" aria-modal="true" aria-label="User Profile Dashboard" className="relative max-w-3xl w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] text-cream-light">
         
         {/* Modal Close Button */}
         <button
