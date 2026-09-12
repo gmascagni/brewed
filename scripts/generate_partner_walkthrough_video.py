@@ -243,14 +243,17 @@ def draw_hud(draw: ImageDraw.ImageDraw, card_type: str, progress: float, center_
 def render_frame(scene: dict, progress: float, bg_base: Image.Image) -> Image.Image:
     frame = Image.new("RGBA", (WIDTH, HEIGHT), (20, 17, 15, 255))
     
-    # 1. Ken Burns Zoom & Subtle Vertical Pan
+    # 1. Ken Burns Zoom & Subtle Vertical Pan with aspect-ratio preserving cover
     zoom = 1.0 + (progress * 0.10)
-    nw = int(WIDTH * zoom)
-    nh = int(HEIGHT * zoom)
+    target_w = int(WIDTH * zoom)
+    target_h = int(HEIGHT * zoom)
+    scale = max(target_w / bg_base.width, target_h / bg_base.height)
+    nw = int(bg_base.width * scale)
+    nh = int(bg_base.height * scale)
     resized_bg = bg_base.resize((nw, nh), Image.Resampling.BILINEAR)
     
     ox = (nw - WIDTH) // 2
-    oy = int((nh - HEIGHT) * (0.2 + 0.6 * progress))
+    oy = int((nh - HEIGHT) * (0.1 + 0.4 * progress))
     cropped = resized_bg.crop((ox, oy, ox + WIDTH, oy + HEIGHT))
     frame.paste(cropped, (0, 0))
     

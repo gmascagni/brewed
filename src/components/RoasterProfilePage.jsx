@@ -31,6 +31,7 @@ import { SHOWCASE_ROASTERS, getShowcaseRoaster, getAllShowcaseRoasters, normaliz
 import { trackEvent } from '../utils/analytics';
 import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 import { getAssetUrl } from '../utils/assetUrl';
+import RoasterVideoPlayer from './RoasterVideoPlayer';
 
 export default function RoasterProfilePage({
   initialRoasterId = 'methodical',
@@ -41,17 +42,32 @@ export default function RoasterProfilePage({
   onOpenRoasterInfo
 }) {
   const [activeRoasterId, setActiveRoasterId] = useState(initialRoasterId);
-  const [activeTab, setActiveTab] = useState('coffees'); // 'coffees' | 'story' | 'water' | 'cafes'
+  const [activeTab, setActiveTab] = useState('coffees'); // 'coffees' | 'story' | 'water' | 'cafes' | 'walkthrough'
   const [copiedLink, setCopiedLink] = useState(false);
   const [scannedBeanName, setScannedBeanName] = useState('');
   const [savedToJournalId, setSavedToJournalId] = useState(null);
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      return Boolean(params.get('video') || window.location.hash === '#video');
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  // In-page walkthrough navigation helper (eliminates forced modal popups and X buttons)
+  const handleOpenWalkthroughTab = () => {
+    setActiveTab('walkthrough');
+    const tabsEl = document.getElementById('roaster-tabs');
+    if (tabsEl) {
+      tabsEl.scrollIntoView({ behavior: 'smooth' });
     }
-    return false;
-  });
+  };
+
+  // Keyboard accessibility: close theater modal on Escape key
+  useEffect(() => {
+    if (!isVideoModalOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsVideoModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isVideoModalOpen]);
 
   let orchestrator = null;
   try {
@@ -75,7 +91,7 @@ export default function RoasterProfilePage({
         setScannedBeanName(beanParam);
       }
       if (params.get('video') || window.location.hash === '#video') {
-        setIsVideoModalOpen(true);
+        setActiveTab('walkthrough');
       }
     } catch {}
   }, []);
@@ -343,7 +359,7 @@ export default function RoasterProfilePage({
             <div className="flex items-center gap-4">
               <button
                 type="button"
-                onClick={() => setIsVideoModalOpen(true)}
+                onClick={handleOpenWalkthroughTab}
                 className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-gold text-espresso-950 flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition shadow-lg shadow-amber-gold/20 shrink-0 group"
                 title="Play 60-Second Video Walkthrough"
               >
@@ -366,8 +382,8 @@ export default function RoasterProfilePage({
             </div>
             <button
               type="button"
-              onClick={() => setIsVideoModalOpen(true)}
-              className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition shrink-0 self-stretch md:self-auto justify-center"
+              onClick={handleOpenWalkthroughTab}
+              className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition shrink-0 self-stretch md:self-auto justify-center cursor-pointer"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Watch Walkthrough</span>
@@ -416,12 +432,12 @@ export default function RoasterProfilePage({
 
             <button
               type="button"
-              onClick={() => setIsVideoModalOpen(true)}
-              className="px-5 py-3 rounded-2xl bg-[#2A1810] hover:bg-[#3D2216] text-amber-gold border border-amber-gold/50 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-950/40 hover:scale-105 active:scale-95 transition"
+              onClick={handleOpenWalkthroughTab}
+              className="px-5 py-3 rounded-2xl bg-[#2A1810] hover:bg-[#3D2216] text-amber-gold border border-amber-gold/50 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-950/40 hover:scale-105 active:scale-95 transition cursor-pointer"
               title="Watch Smart Bag & Partner Brand Onboarding Walkthrough"
             >
               <Play className="w-3.5 h-3.5 fill-current text-amber-gold" />
-              <span>Watch Walkthrough</span>
+              <span>Watch Walkthrough (60s)</span>
             </button>
 
             <div className="text-xs font-mono text-cream-soft/60 hidden lg:block ml-2">
@@ -474,7 +490,7 @@ export default function RoasterProfilePage({
 
             <button
               onClick={() => setActiveTab('cafes')}
-              className={`px-4 py-2.5 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap ${
+              className={`px-4 py-2.5 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap cursor-pointer ${
                 activeTab === 'cafes'
                   ? 'bg-amber-gold text-espresso-950 shadow'
                   : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
@@ -482,6 +498,21 @@ export default function RoasterProfilePage({
             >
               <Building className="w-4 h-4" />
               <span>Cafes & Roastery Labs ({roaster.cafes.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('walkthrough')}
+              className={`px-4 py-2.5 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap cursor-pointer ${
+                activeTab === 'walkthrough'
+                  ? 'bg-amber-gold text-espresso-950 shadow'
+                  : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+              }`}
+            >
+              <Play className="w-4 h-4 fill-current text-amber-gold" />
+              <span>Smart Bag Walkthrough (60s)</span>
+              {activeTab === 'walkthrough' && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse ml-0.5" />
+              )}
             </button>
           </div>
         </div>
@@ -914,6 +945,64 @@ export default function RoasterProfilePage({
         )}
 
         {/* ========================================================================= */}
+        {/* TAB 5: SMART BAG & PARTNER ONBOARDING WALKTHROUGH                        */}
+        {/* ========================================================================= */}
+        {activeTab === 'walkthrough' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-[#14110E] border border-amber-gold/30 shadow-xl">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#2F663C] animate-pulse" />
+                  <span className="font-mono text-xs font-bold text-amber-gold uppercase tracking-wider">
+                    Partner Brand Onboarding & Smart Bag Workflow
+                  </span>
+                </div>
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream-light mt-1">
+                  How {roaster.name} & Partner Cafes Connect to Customer Cups
+                </h3>
+                <p className="text-xs sm:text-sm text-cream-soft/80 font-sans mt-1 max-w-2xl">
+                  Watch the complete dual-sided workflow: from 300 DPI thermal roll labels to camera-based optical scan and synchronized live slurry timers.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab('coffees');
+                  document.getElementById('roaster-tabs')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/10 flex items-center gap-2 transition self-start sm:self-auto shrink-0 cursor-pointer"
+                title="Return to Coffees Tab"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-amber-gold" />
+                <span>Back to Certified Coffees</span>
+              </button>
+            </div>
+
+            <RoasterVideoPlayer
+              onOpenLiveDemo={() => {
+                const defaultBean = roaster.coffees && roaster.coffees[0];
+                const payload = {
+                  roaster: roaster.name,
+                  beanName: defaultBean?.beanName || '',
+                  brewMethod: defaultBean?.brewMethod || 'pour_over',
+                  recommendedRatio: defaultBean?.recommendedRatio || 16.5,
+                  tempF: defaultBean?.tempF || 202,
+                  recommendedGrind: defaultBean?.recommendedGrind || 'Medium-Fine',
+                  upc: defaultBean?.upc || '',
+                  customUrl: defaultBean?.directUrl || roaster.shopUrl
+                };
+                if (orchestrator) {
+                  orchestrator.package(payload);
+                } else if (onOpenRoasterPortalWithBean) {
+                  onOpenRoasterPortalWithBean(payload);
+                }
+              }}
+            />
+          </div>
+        )}
+
+        {/* ========================================================================= */}
         {/* 5. ROASTERY PARTNER & PACKAGING TOOLING (DISCRETE OWNER FOOTER)           */}
         {/* ========================================================================= */}
         {onOpenRoasterPortalWithBean && (
@@ -952,29 +1041,48 @@ export default function RoasterProfilePage({
 
       </main>
 
-      {/* Video Walkthrough Theater Modal */}
+      {/* Video Walkthrough Theater Modal (Optional Fallback / Direct Link Mode) */}
       {isVideoModalOpen && (
         <div 
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
           onClick={() => setIsVideoModalOpen(false)}
         >
           <div 
-            className="relative max-w-sm w-full bg-[#14110E] border border-amber-gold/50 rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+            className="relative max-w-sm w-full bg-[#14110E] border border-amber-gold/50 rounded-3xl overflow-hidden shadow-2xl flex flex-col cursor-default"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
-              <div className="flex items-center gap-2">
-                <Play className="w-4 h-4 text-amber-gold fill-current" />
-                <span className="font-mono text-xs font-bold text-amber-gold uppercase tracking-wider">Smart Bag & Partner Brand Onboarding</span>
-              </div>
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 gap-2">
               <button 
                 type="button"
                 onClick={() => setIsVideoModalOpen(false)} 
-                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white transition cursor-pointer"
-                title="Close Video"
+                className="px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-stone-200 hover:text-white text-xs font-mono font-bold flex items-center gap-1.5 transition cursor-pointer"
+                title="Return to Roaster Profile"
               >
-                <X className="w-4 h-4" />
+                <ArrowLeft className="w-3.5 h-3.5 text-amber-gold" />
+                <span>Return</span>
               </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsVideoModalOpen(false);
+                    handleOpenWalkthroughTab();
+                  }}
+                  className="px-2.5 py-1 rounded-xl bg-amber-gold/20 hover:bg-amber-gold/30 text-amber-gold text-[11px] font-mono font-bold border border-amber-gold/40 transition cursor-pointer"
+                  title="View directly inside page tabs without modal"
+                >
+                  View In-Page
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => setIsVideoModalOpen(false)} 
+                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white transition cursor-pointer"
+                  title="Close Video (Esc)"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
             <div className="relative aspect-[9/16] w-full bg-black flex items-center justify-center">
               <video
@@ -991,7 +1099,7 @@ export default function RoasterProfilePage({
                 Your browser does not support HTML5 video playback.
               </video>
             </div>
-            <div className="p-3.5 bg-black/60 text-center border-t border-white/10 space-y-2">
+            <div className="p-3.5 bg-black/60 text-center border-t border-white/10 space-y-2.5">
               <p className="text-xs text-stone-200 font-mono font-bold">How Roasters & Cafes Onboard Their Brand</p>
               <p className="text-[11px] text-amber-gold/80 font-mono">300 DPI Thermal Smart Labels • Live Camera Scan & Slurry Timer</p>
               <div className="pt-1 flex items-center justify-center gap-2">
@@ -1015,6 +1123,14 @@ export default function RoasterProfilePage({
                   <span>Open Direct Link</span>
                 </a>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setIsVideoModalOpen(false)}
+                className="w-full py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold border border-white/10 transition cursor-pointer"
+              >
+                ← Back to Roaster Profile
+              </button>
             </div>
           </div>
         </div>

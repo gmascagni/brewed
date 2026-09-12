@@ -121,100 +121,110 @@ export default function Header({
         </div>
 
         {/* 2. Center: 5 PRIMARY NAVIGATION ITEMS (Brew, Recipes, Shops, Roasters, Learn) */}
-        <nav className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-2xl border border-[#ECE6DC] w-full md:w-auto justify-center overflow-x-auto">
-          
-          {/* Primary 1: Brew */}
-          <button
-            type="button"
-            onClick={() => onSelectView && onSelectView('brew_station')}
-            className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
-              (currentView === 'brew_station' || currentView === 'discovery') && !isRoasterShowcaseView && !isShopsView && currentView !== 'shops' && currentView !== 'recipes' && currentView !== 'learn'
-                ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
-                : 'text-[#766A62] hover:text-[#14110F]'
-            }`}
-            title="Interactive Precision Brewing Atelier & Timer"
-          >
-            <span>Brew</span>
-            {(currentView === 'brew_station' || currentView === 'discovery') && !isRoasterShowcaseView && !isShopsView && currentView !== 'shops' && currentView !== 'recipes' && currentView !== 'learn' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse" />
-            )}
-          </button>
+        {(() => {
+          const isRoastersActive = isRoasterShowcaseView || currentView === 'roasters';
+          const isShopsActive = isShopsView || currentView === 'shops';
+          const isRecipesActive = currentView === 'recipes';
+          const isLearnActive = currentView === 'learn';
+          const isBrewActive = !isRoastersActive && !isShopsActive && !isRecipesActive && !isLearnActive;
 
-          {/* Primary 2: Recipes */}
-          <button
-            type="button"
-            onClick={() => onSelectView ? onSelectView('recipes') : (onOpenCommunity && onOpenCommunity())}
-            className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
-              currentView === 'recipes'
-                ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
-                : 'text-[#766A62] hover:text-[#14110F]'
-            }`}
-            title="Open Recipe Vault & Custom Studio"
-          >
-            <span>Recipes</span>
-            {currentView === 'recipes' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse" />
-            )}
-          </button>
+          return (
+            <nav className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-2xl border border-[#ECE6DC] w-full md:w-auto justify-center overflow-x-auto">
+              
+              {/* Primary 1: Brew */}
+              <button
+                type="button"
+                onClick={() => onSelectView && onSelectView('brew_station')}
+                className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                  isBrewActive
+                    ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                    : 'text-[#766A62] hover:text-[#14110F]'
+                }`}
+                title="Interactive Precision Brewing Atelier & Timer"
+              >
+                <span>Brew</span>
+                {isBrewActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
+                )}
+              </button>
 
-          {/* Primary 3: Shops / Shop Local Coffee Radar */}
-          {(onOpenLocalCoffee || onSelectView) && (
-            <button
-              type="button"
-              onClick={() => onSelectView ? onSelectView('shops') : (onOpenLocalCoffee && onOpenLocalCoffee())}
-              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
-                currentView === 'shops' || isShopsView
-                  ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
-                  : 'text-[#766A62] hover:text-[#14110F]'
-              }`}
-              title="Shop Local Coffee & Roasters"
-            >
-              <Compass className="w-3.5 h-3.5 text-[#C88A4B]" />
-              <span>Shop Local</span>
-              {(currentView === 'shops' || isShopsView) && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse" />
+              {/* Primary 2: Recipes */}
+              <button
+                type="button"
+                onClick={() => onSelectView ? onSelectView('recipes') : (onOpenCommunity && onOpenCommunity())}
+                className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                  isRecipesActive
+                    ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                    : 'text-[#766A62] hover:text-[#14110F]'
+                }`}
+                title="Open Recipe Vault & Custom Studio"
+              >
+                <span>Recipes</span>
+                {isRecipesActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
+                )}
+              </button>
+
+              {/* Primary 3: Shops / Shop Local Coffee Radar */}
+              {(onOpenLocalCoffee || onSelectView) && (
+                <button
+                  type="button"
+                  onClick={() => onSelectView ? onSelectView('shops') : (onOpenLocalCoffee && onOpenLocalCoffee())}
+                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                    isShopsActive
+                      ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                      : 'text-[#766A62] hover:text-[#14110F]'
+                  }`}
+                  title="Shop Local Coffee & Roasters"
+                >
+                  <Compass className="w-3.5 h-3.5 text-[#C88A4B]" />
+                  <span>Shop Local</span>
+                  {isShopsActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
+                  )}
+                </button>
               )}
-            </button>
-          )}
 
-          {/* Primary 4: Roasters */}
-          {onOpenRoasterShowcase && (
-            <button
-              type="button"
-              onClick={onOpenRoasterShowcase}
-              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
-                isRoasterShowcaseView || currentView === 'roasters'
-                  ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
-                  : 'text-[#766A62] hover:text-[#14110F]'
-              }`}
-              title="View Roaster Showcase & Dial-In Profiles (Methodical, Onyx, Black & White)"
-            >
-              <Store className="w-3.5 h-3.5 text-[#C88A4B]" />
-              <span>Roasters</span>
-              {(isRoasterShowcaseView || currentView === 'roasters') && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse" />
+              {/* Primary 4: Roasters */}
+              {(onOpenRoasterShowcase || onSelectView) && (
+                <button
+                  type="button"
+                  onClick={() => onSelectView ? onSelectView('roasters') : (onOpenRoasterShowcase && onOpenRoasterShowcase())}
+                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                    isRoastersActive
+                      ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                      : 'text-[#766A62] hover:text-[#14110F]'
+                  }`}
+                  title="View Roaster Showcase & Dial-In Profiles (Methodical, Onyx, Black & White)"
+                >
+                  <Store className="w-3.5 h-3.5 text-[#C88A4B]" />
+                  <span>Roasters</span>
+                  {isRoastersActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
+                  )}
+                </button>
               )}
-            </button>
-          )}
 
-          {/* Primary 5: Learn */}
-          <button
-            type="button"
-            onClick={() => onSelectView && onSelectView('learn')}
-            className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
-              currentView === 'learn'
-                ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
-                : 'text-[#766A62] hover:text-[#14110F]'
-            }`}
-            title="Specialty Coffee Learning Center, Video Masterclasses, Diagnostics & World News"
-          >
-            <GraduationCap className="w-3.5 h-3.5 text-[#C88A4B]" />
-            <span>Learn</span>
-            {currentView === 'learn' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse" />
-            )}
-          </button>
-        </nav>
+              {/* Primary 5: Learn */}
+              <button
+                type="button"
+                onClick={() => onSelectView && onSelectView('learn')}
+                className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                  isLearnActive
+                    ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                    : 'text-[#766A62] hover:text-[#14110F]'
+                }`}
+                title="Specialty Coffee Learning Center, Video Masterclasses, Diagnostics & World News"
+              >
+                <GraduationCap className="w-3.5 h-3.5 text-[#C88A4B]" />
+                <span>Learn</span>
+                {isLearnActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
+                )}
+              </button>
+            </nav>
+          );
+        })()}
 
         {/* 3. Right: Utility Controls & Consolidated Secondary Menu */}
         <div className="hidden md:flex items-center gap-2 text-xs">

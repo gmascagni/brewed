@@ -169,6 +169,10 @@ export default function App() {
 
   // Handler for Specialty Roaster Showcase Navigation
   const handleOpenRoasterShowcase = () => {
+    setIsCafePortalView(false);
+    setIsLearnView(false);
+    setIsRecipesView(false);
+    setIsShopsView(false);
     if (isRoasterShowcaseView) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
@@ -326,6 +330,9 @@ export default function App() {
       );
     } else if (path.startsWith('/roasters') || path.startsWith('/roaster')) {
       setIsShopsView(false);
+      setIsCafePortalView(false);
+      setIsLearnView(false);
+      setIsRecipesView(false);
       if (path === '/roasters/partner' || path === '/roasters/info') {
         setIsRoasterInfoOpen(true);
       } else {
