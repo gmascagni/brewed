@@ -1,0 +1,62 @@
+{
+  "name": "The Brew App: Precision Specialty Coffee Guide",
+  "short_name": "TheBrewApp",
+  "description": "Precision specialty coffee extraction ratio scaler, multi-phase countdown timer, burr grinder macro texture guide, and roaster showcase.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#14110F",
+  "theme_color": "#14110F",
+  "categories": ["food", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Brew Station",
+      "short_name": "Brew",
+      "description": "Start precision coffee brewing session",
+      "url": "/?step=1",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Scan Bag Barcode",
+      "short_name": "Scan",
+      "description": "Scan coffee retail bag for dialed-in recipes",
+      "url": "/demo/smart-bag-scanner",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Master Recipe Vault",
+      "short_name": "Recipes",
+      "description": "Explore champion barista recipes",
+      "url": "/recipes",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Specialty Roaster Radar",
+      "short_name": "Radar",
+      "description": "Find verified specialty roasters and cafes",
+      "url": "/roasters",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    }
+  ]
+}

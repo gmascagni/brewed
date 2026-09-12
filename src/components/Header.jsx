@@ -37,6 +37,7 @@ export default function Header({
   onOpenCafePortal,
   onOpenRoasterInfo,
   onOpenRoasterShowcase,
+  onOpenMobileTools,
   isRoasterShowcaseView = false,
   onOpenVideoAcademy,
   onOpenNews,
@@ -91,18 +92,29 @@ export default function Header({
           <div className="flex items-center gap-1.5 md:hidden">
             {onOpenSearch && (
               <button
+                type="button"
                 onClick={onOpenSearch}
-                className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B]"
+                className="p-2.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B] mobile-touch-target flex items-center justify-center"
                 title="Open Global Search (Ctrl + K)"
+                aria-label="Open Global Search"
               >
-                <Search className="w-3.5 h-3.5" />
+                <Search className="w-4 h-4" />
               </button>
             )}
             <button
-              onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
-              className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#14110F] flex items-center gap-1 text-xs font-bold font-sans"
+              type="button"
+              onClick={() => {
+                if (onOpenMobileTools) {
+                  onOpenMobileTools();
+                } else {
+                  setIsToolsMenuOpen(!isToolsMenuOpen);
+                }
+              }}
+              className="p-2.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#14110F] flex items-center justify-center gap-1 text-xs font-bold font-sans mobile-touch-target"
+              title="Open Barista Tools & Settings"
+              aria-label="Open Barista Tools Menu"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-[#C88A4B]" />
+              <SlidersHorizontal className="w-4 h-4 text-[#C88A4B]" />
             </button>
           </div>
         </div>

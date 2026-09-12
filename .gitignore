@@ -29,6 +29,7 @@ __pycache__/
 *$py.class
 .venv/
 temp_video_render/
+scratch/
 
 # GitHub Actions workflows (handled via GitHub web interface to bypass local PAT workflow scope limits)
 .github/

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CupSoda, Scale, Sliders, CheckCircle2, Sparkles, Thermometer, Clock, ChevronRight, ChevronLeft, Volume2, VolumeX, Lightbulb, Gauge, RotateCcw } from 'lucide-react';
 import V60ProTipModal from './V60ProTipModal';
+import { hapticTap } from '../utils/haptics';
 
 export default function PrecisionCalculator({
   trackMode,
@@ -48,16 +49,19 @@ export default function PrecisionCalculator({
   ];
 
   const handleCupCountChange = (count) => {
+    hapticTap();
     setCupCount(count);
     if (customWaterMl !== null) setCustomWaterMl(null);
   };
 
   const handleCupMlChange = (ml) => {
+    hapticTap();
     setCupMl(ml);
     if (customWaterMl !== null) setCustomWaterMl(null);
   };
 
   const handleAdjustWater = (deltaMl) => {
+    hapticTap();
     const current = customWaterMl !== null ? customWaterMl : (cupCount * cupMl);
     const updated = Math.max(50, Math.min(3000, current + deltaMl));
     setCustomWaterMl(updated);
@@ -446,9 +450,10 @@ export default function PrecisionCalculator({
                 {isMetric ? '-10' : '-0.5oz'}
               </button>
 
-              <div className="flex-1 flex items-center bg-black/70 border border-white/15 rounded-lg px-2 py-1 focus-within:border-amber-gold/50">
+              <div className="flex-1 flex items-center bg-black/70 border border-white/15 rounded-lg px-2 py-1.5 focus-within:border-amber-gold/50">
                 <input
                   type="number"
+                  inputMode="decimal"
                   min="50"
                   max="3000"
                   step={isMetric ? "5" : "0.5"}

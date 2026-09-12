@@ -12,6 +12,8 @@ import {
   playClockTick,
   playMechanicalClick
 } from '../utils/audioSynth';
+import { requestScreenWakeLock, releaseScreenWakeLock } from '../utils/wakeLock';
+import { hapticStart, hapticPhaseChange, hapticComplete, hapticTap } from '../utils/haptics';
 import V60ProTipModal from './V60ProTipModal';
 
 export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, unitSystem = 'imperial', isMuted, setIsMuted, onPrevStep, onOpenJournal }) {
@@ -107,6 +109,13 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     setIsCompleted(false);
   }, [activeMethod?.id, trackMode]);
 
+  // Release wake lock safely on unmount
+  useEffect(() => {
+    return () => {
+      releaseScreenWakeLock();
+    };
+  }, []);
+
   // Advance to next phase safely or complete extraction
   const handlePhaseAdvance = useCallback(() => {
     lastTickedSecRef.current = null;
@@ -124,8 +133,9 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       endTimeRef.current = Date.now() + nextDuration * 1000;
       remainingAtPauseRef.current = null;
 
-      // Bell chime for phase transition
+      // Bell chime for phase transition + mobile haptic feedback
       playTimerStartChime(localMuted);
+      hapticPhaseChange();
 
       if (!localMuted) {
         announcedPhasesRef.current.add(nextIdx);
@@ -152,6 +162,8 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       setIsCompleted(true);
       endTimeRef.current = null;
       remainingAtPauseRef.current = null;
+      releaseScreenWakeLock();
+      hapticComplete();
       playCompletionChime(localMuted);
     }
   }, [localMuted]);
@@ -196,6 +208,8 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       setIsRunning(false);
       setIsAnnouncing(false);
       stopSpeechAnnouncement();
+      releaseScreenWakeLock();
+      hapticTap();
 
       if (endTimeRef.current) {
         const remaining = Math.max(0, Math.ceil((endTimeRef.current - Date.now()) / 1000));
@@ -203,7 +217,10 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
         setTimeLeft(remaining);
       }
     } else {
-      // Start or Resume action
+      // Start or Resume action: Request screen wake lock & trigger start haptic vibration
+      requestScreenWakeLock();
+      hapticStart();
+
       let secondsToRun = timeLeft;
 
       if (isCompleted) {
@@ -278,6 +295,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       currentPhaseIndexRef.current = nextIdx;
       setTimeLeft(nextDuration);
       playTimerStartChime(localMuted);
+      hapticPhaseChange();
 
       if (isRunning) {
         endTimeRef.current = Date.now() + nextDuration * 1000;
@@ -309,6 +327,8 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       setIsCompleted(true);
       endTimeRef.current = null;
       remainingAtPauseRef.current = null;
+      releaseScreenWakeLock();
+      hapticComplete();
       playCompletionChime(localMuted);
     }
   };
@@ -319,6 +339,8 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     playMechanicalClick(localMuted);
     stopCompletionChime();
     stopSpeechAnnouncement();
+    releaseScreenWakeLock();
+    hapticTap();
     setIsAnnouncing(false);
     setIsRunning(false);
     setIsCompleted(false);

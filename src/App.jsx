@@ -29,6 +29,8 @@ import ConsumerDiscoveryFeed from './components/ConsumerDiscoveryFeed';
 import CafePartnerPortal from './components/CafePartnerPortal';
 import LearnSection from './components/LearnSection';
 import RecipeExplorer from './components/RecipeExplorer';
+import MobileBottomNav from './components/MobileBottomNav';
+import MobileToolsDrawer from './components/MobileToolsDrawer';
 import Footer from './components/Footer';
 import { AppOrchestratorProvider } from './context/AppOrchestratorContext';
 import { BREW_METHODS } from './data/brewData';
@@ -49,6 +51,7 @@ export default function App() {
   const [unitSystem, setUnitSystem] = useState('imperial'); // 'imperial' | 'metric'
   const [isMuted, setIsMuted] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // 1 | 2 | 3 | 4
+  const [isMobileToolsOpen, setIsMobileToolsOpen] = useState(false);
 
   // User Accounts State (Persisted in localStorage)
   const [usersList, setUsersList] = useState(() => {
@@ -490,6 +493,7 @@ export default function App() {
           onOpenCafePortal={() => { setIsRoasterShowcaseView(false); setIsCafePortalView(true); }}
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
           onOpenRoasterShowcase={handleOpenRoasterShowcase}
+          onOpenMobileTools={() => setIsMobileToolsOpen(true)}
           isRoasterShowcaseView={isRoasterShowcaseView}
           currentView={isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : isRecipesView ? 'recipes' : (currentStep > 1 ? 'brew_station' : 'discovery')}
           onSelectView={(v) => {
@@ -557,7 +561,7 @@ export default function App() {
       </header>
 
       {/* Main Workspace Container */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 pb-24 md:pb-8">
 
         <main className="mt-4 space-y-10">
 
@@ -951,6 +955,66 @@ export default function App() {
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
           onOpenRoasterShowcase={handleOpenRoasterShowcase}
           onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
+        />
+
+        {/* Mobile Sticky 1-Thumb Bottom Navigation Bar */}
+        <MobileBottomNav
+          currentView={isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : isRecipesView ? 'recipes' : (currentStep > 1 ? 'brew_station' : 'discovery')}
+          onSelectView={(v) => {
+            // Dismiss all open modals when navigating primary views
+            setIsCommunityOpen(false);
+            setIsRoasterPortalOpen(false);
+            setIsLocalCoffeeOpen(false);
+            setIsWaterLabOpen(false);
+            setIsVideoAcademyOpen(false);
+            setIsJournalOpen(false);
+            setIsProfileOpen(false);
+            setIsSearchOpen(false);
+            setIsMobileToolsOpen(false);
+
+            if (v === 'discovery') {
+              setIsCafePortalView(false);
+              setIsRoasterShowcaseView(false);
+              setIsLearnView(false);
+              setIsRecipesView(false);
+              setCurrentStep(1);
+              navigate('/');
+            } else if (v === 'recipes') {
+              setIsCafePortalView(false);
+              setIsRoasterShowcaseView(false);
+              setIsLearnView(false);
+              setIsRecipesView(true);
+              navigate('/recipes');
+            }
+          }}
+          onOpenLocalCoffee={() => {
+            setIsMobileToolsOpen(false);
+            setIsLocalCoffeeOpen(true);
+          }}
+          onOpenRoasterShowcase={() => {
+            setIsMobileToolsOpen(false);
+            handleOpenRoasterShowcase();
+          }}
+          onOpenTools={() => setIsMobileToolsOpen(true)}
+          isToolsOpen={isMobileToolsOpen}
+        />
+
+        {/* Mobile Slide-Up Barista Tools & Settings Drawer */}
+        <MobileToolsDrawer
+          isOpen={isMobileToolsOpen}
+          onClose={() => setIsMobileToolsOpen(false)}
+          onOpenScanner={() => setIsScannerOpen(true)}
+          onOpenWaterLab={() => setIsWaterLabOpen(true)}
+          onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
+          onOpenJournal={() => setIsJournalOpen(true)}
+          onOpenNews={handleOpenBrewNews}
+          onOpenRoasterPortal={() => { setRoasterPrefillBarcode(''); setRoasterPrefillBean(null); setIsRoasterPortalOpen(true); }}
+          onOpenCafePortal={() => { setIsRoasterShowcaseView(false); setIsCafePortalView(true); }}
+          onOpenProfile={() => setIsProfileOpen(true)}
+          onOpenAuth={() => setIsAuthModalOpen(true)}
+          isMuted={isMuted}
+          onToggleMute={() => setIsMuted(!isMuted)}
+          currentUser={currentUser}
         />
 
       </div>
