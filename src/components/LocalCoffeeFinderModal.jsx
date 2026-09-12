@@ -34,6 +34,7 @@ const CURATED_SPECIALTY_SHOPS = [
     phone: '(404) 939-6615',
     specialtyGrade: 'Specialty Roastery & Single-Origin Micro-Lots',
     isCurated: true,
+    onBar: 'Worka Sakaro Natural (Methodical)',
     equipment: 'Synesso MVP Hydra, Mahlkönig EK43, Kalita Wave Bar',
     description: 'Premier Atlanta specialty roaster in Armour Yards with single-origin pour-overs, nitro cold brew, and seasonal espresso drinks.'
   },
@@ -51,6 +52,7 @@ const CURATED_SPECIALTY_SHOPS = [
     phone: '(404) 835-2431',
     specialtyGrade: 'High Elevation Ethiopian & Colombian Micro-Lots',
     isCurated: true,
+    onBar: 'Pink Bourbon Washed (Huila)',
     equipment: 'La Marzocco GS3, Hario V60 Bar',
     description: 'Serene Midtown Atlanta specialty coffee shop featuring seasonal single-origins, house matcha, and botanical espresso drinks.'
   },
@@ -68,6 +70,7 @@ const CURATED_SPECIALTY_SHOPS = [
     phone: '(404) 906-8801',
     specialtyGrade: 'Multi-Roaster Specialty Guest Bar',
     isCurated: true,
+    onBar: 'Geometry Blend (Onyx Guest Bar)',
     equipment: 'La Marzocco Strada, Chemex Glass Bar',
     description: 'High-energy specialty multi-roaster inside Ponce City Market serving Intelligentsia, George Howell, and guest micro-lots.'
   },
@@ -850,6 +853,13 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
                         <span>{shop.specialtyGrade}</span>
                       </div>
                       <p className="text-stone-400 line-clamp-2 leading-relaxed">{shop.description}</p>
+                      {shop.onBar && (
+                        <div className="mt-2 py-1 px-2.5 rounded-lg bg-[#FAF0E6]/20 border border-[#ECD4BD]/30 flex items-center gap-1.5 text-[10.5px] font-sans text-amber-300">
+                          <Coffee className="w-3 h-3 text-amber-gold shrink-0" />
+                          <span className="font-semibold text-amber-gold">On Bar Today:</span>
+                          <span className="truncate text-cream-soft font-medium">{shop.onBar}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[11px]">

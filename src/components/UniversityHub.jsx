@@ -1,154 +1,125 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { GraduationCap, MapPin, Sparkles, Award, Compass, Store, ShoppingBag, Mountain, Globe, Dna, Sun, BookOpen } from 'lucide-react';
 import { TERROIR_ATLAS, COFFEE_BELT_OVERVIEW, BOTANICAL_COMPARISON } from '../data/brewData';
 
-export default function UniversityHub({ trackMode = 'coffee' }) {
-  const isCoffee = trackMode === 'coffee';
-
-  const origins = TERROIR_ATLAS[trackMode] || TERROIR_ATLAS.coffee;
+export default function UniversityHub() {
+  const origins = TERROIR_ATLAS.coffee || [];
   const [activeOriginId, setActiveOriginId] = useState(origins[0]?.id || 'ethiopia');
-
-  // Reset selected origin when switching between Coffee and Tea tracks
-  useEffect(() => {
-    const currentOrigins = TERROIR_ATLAS[trackMode] || TERROIR_ATLAS.coffee;
-    setActiveOriginId(currentOrigins[0]?.id || (trackMode === 'coffee' ? 'ethiopia' : 'japan_uji'));
-  }, [trackMode]);
 
   const activeOrigin = origins.find((o) => o.id === activeOriginId) || origins[0];
 
   return (
-    <section className={`mt-12 p-7 md:p-9 rounded-3xl shadow-2xl transition-all duration-500 border ${
-      isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
-    }`}>
+    <section className="mt-8 p-6 md:p-8 rounded-3xl shadow-sm transition-all duration-500 border border-[#ECE6DC] bg-[#FAF7F2] text-[#14110F]">
       
       {/* 1. Section Main Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-[#ECE6DC]">
         <div>
-          <div className={`inline-flex items-center space-x-2 text-xs font-extrabold uppercase tracking-widest mb-1.5 ${
-            isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
-          }`}>
-            <GraduationCap className="w-4 h-4 animate-pulse" />
-            <span>The Brew App University • {isCoffee ? 'Coffee Belt & Species Atlas' : 'Specialty Tea Garden Atlas'}</span>
+          <div className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-widest mb-1.5 text-[#A8622D]">
+            <GraduationCap className="w-4 h-4" />
+            <span>The Brew App University • Specialty Coffee Belt & Species Atlas</span>
           </div>
 
-          <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light drop-shadow-md">
-            {isCoffee
-              ? 'The Global Coffee Belt, Agronomy & Sourced Brands'
-              : 'Specialty Tea Terroirs, Leaf Agronomy & Famous Tea Houses'}
+          <h3 className="font-editorial text-2xl md:text-3xl font-bold text-[#14110F]">
+            The Global Coffee Belt, Agronomy & Sourced Roasters
           </h3>
 
-          <p className="text-xs md:text-sm text-cream-soft/70 mt-1 max-w-3xl leading-relaxed">
-            {isCoffee
-              ? 'An enthusiast guide to the Coffee Belt (Tropics of Cancer & Capricorn), Arabica vs Robusta species, volcanic soil science, and famous roasters.'
-              : 'An enthusiast guide to mountain tea gardens, shading chemistry, leaf cultivars, and historic tea houses.'}
+          <p className="text-xs md:text-sm text-[#766A62] mt-1 max-w-3xl leading-relaxed">
+            An enthusiast guide to the Coffee Belt (Tropics of Cancer & Capricorn), Arabica vs Robusta botanical genetics, volcanic soil terroir science, and famous roasters.
           </p>
         </div>
 
-        <span className={`text-xs font-extrabold px-3.5 py-1.5 rounded-full border shadow-inner whitespace-nowrap ${
-          isCoffee 
-            ? 'bg-amber-gold/20 text-amber-gold border-amber-gold/40 shadow-amber-gold/10' 
-            : 'bg-sage-500/20 text-sage-300 border-sage-500/40 shadow-sage-500/10'
-        }`}>
-          {isCoffee ? '12 Global Growing Nations' : '5 Famous Tea Terroirs'}
+        <span className="text-xs font-mono font-bold px-3.5 py-1.5 rounded-full border border-[#D8CFC4] bg-[#F7F4EE] text-[#A8622D] shadow-xs whitespace-nowrap">
+          12 Global Growing Origins
         </span>
       </div>
 
-      {/* 2. THE COFFEE BELT OVERVIEW BANNER (Coffee Track Only) */}
-      {isCoffee && (
-        <div className="mb-8 p-6 rounded-3xl bg-espresso-950/90 border border-amber-gold/30 shadow-2xl relative overflow-hidden">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-5 pb-4 border-b border-white/10">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 rounded-2xl bg-amber-gold/15 border border-amber-gold/30 text-amber-gold">
-                <Globe className="w-6 h-6 animate-spin-slow" />
-              </div>
-              <div>
-                <h4 className="font-serif text-xl font-extrabold text-cream-light">
-                  The Coffee Belt (Tropics of Cancer & Capricorn)
-                </h4>
-                <p className="text-xs text-cream-soft/80 mt-0.5">
-                  {COFFEE_BELT_OVERVIEW.description}
-                </p>
-              </div>
+      {/* 2. THE COFFEE BELT OVERVIEW BANNER */}
+      <div className="mb-8 p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-xs relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-5 pb-4 border-b border-[#ECE6DC]">
+          <div className="flex items-center space-x-3">
+            <div className="p-2.5 rounded-xl bg-[#FAF0E6] text-[#A8622D]">
+              <Globe className="w-6 h-6" />
             </div>
-
-            <span className="text-[11px] font-mono font-bold bg-amber-gold/10 text-amber-gold border border-amber-gold/30 px-3 py-1 rounded-xl">
-              23.5° N — 23.5° S Latitude
-            </span>
-          </div>
-
-          {/* Three Macro Geographic Regions Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {COFFEE_BELT_OVERVIEW.macroRegions.map((region, idx) => (
-              <div key={idx} className="p-4 rounded-2xl bg-black/40 border border-white/10 hover:border-amber-gold/40 transition-all duration-300">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-extrabold text-amber-gold uppercase tracking-wider">{region.name}</span>
-                  <Sun className="w-3.5 h-3.5 text-amber-gold/70" />
-                </div>
-                <div className="text-[11px] font-bold text-cream-light mb-1.5">{region.leader}</div>
-                <p className="text-[11px] text-cream-soft/70 leading-relaxed">{region.characteristics}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 3. ARABICA VS ROBUSTA SPECIES COMPARISON CARD (Coffee Track Only) */}
-      {isCoffee && (
-        <div className="mb-8 p-6 rounded-3xl bg-black/50 border border-white/15 shadow-2xl">
-          <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-white/10">
-            <Dna className="w-5 h-5 text-amber-gold" />
-            <h4 className="font-serif text-lg font-extrabold text-cream-light">
-              Botanical Species: Arabica vs. Robusta
-            </h4>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Arabica Specie */}
-            <div className="p-5 rounded-2xl bg-white/5 border border-amber-gold/30">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-amber-gold uppercase tracking-wider">{BOTANICAL_COMPARISON.arabica.name}</span>
-                <span className="text-[10px] font-mono bg-amber-gold/20 text-amber-gold px-2.5 py-0.5 rounded-full font-bold">{BOTANICAL_COMPARISON.arabica.share}</span>
-              </div>
-              <div className="space-y-1.5 text-xs text-cream-soft/90 mb-3">
-                <div><strong className="text-cream-light">Elevation:</strong> {BOTANICAL_COMPARISON.arabica.elevation}</div>
-                <div><strong className="text-cream-light">Genetics:</strong> {BOTANICAL_COMPARISON.arabica.chromosomes}</div>
-                <div><strong className="text-cream-light">Caffeine:</strong> {BOTANICAL_COMPARISON.arabica.caffeine}</div>
-                <div><strong className="text-cream-light">Lipids & Sugars:</strong> {BOTANICAL_COMPARISON.arabica.sugarsLipids}</div>
-              </div>
-              <p className="text-[11px] text-cream-soft/80 bg-black/30 p-2.5 rounded-xl border border-white/5">
-                <strong className="text-amber-gold">Sensory Cup:</strong> {BOTANICAL_COMPARISON.arabica.flavorProfile}
-              </p>
-            </div>
-
-            {/* Robusta Specie */}
-            <div className="p-5 rounded-2xl bg-white/5 border border-white/15">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-extrabold text-cream-light uppercase tracking-wider">{BOTANICAL_COMPARISON.robusta.name}</span>
-                <span className="text-[10px] font-mono bg-white/10 text-cream-soft px-2.5 py-0.5 rounded-full font-bold">{BOTANICAL_COMPARISON.robusta.share}</span>
-              </div>
-              <div className="space-y-1.5 text-xs text-cream-soft/90 mb-3">
-                <div><strong className="text-cream-light">Elevation:</strong> {BOTANICAL_COMPARISON.robusta.elevation}</div>
-                <div><strong className="text-cream-light">Genetics:</strong> {BOTANICAL_COMPARISON.robusta.chromosomes}</div>
-                <div><strong className="text-cream-light">Caffeine:</strong> {BOTANICAL_COMPARISON.robusta.caffeine}</div>
-                <div><strong className="text-cream-light">Antioxidants:</strong> {BOTANICAL_COMPARISON.robusta.sugarsLipids}</div>
-              </div>
-              <p className="text-[11px] text-cream-soft/80 bg-black/30 p-2.5 rounded-xl border border-white/5">
-                <strong className="text-amber-gold">Sensory Cup:</strong> {BOTANICAL_COMPARISON.robusta.flavorProfile}
+            <div>
+              <h4 className="font-editorial text-lg font-bold text-[#14110F]">
+                {COFFEE_BELT_OVERVIEW.title}
+              </h4>
+              <p className="text-xs text-[#766A62]">
+                {COFFEE_BELT_OVERVIEW.geographicBand}
               </p>
             </div>
           </div>
+          <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#766A62] bg-[#FAF7F2] px-3 py-1.5 rounded-lg border border-[#ECE6DC]">
+            <Sun className="w-4 h-4 text-[#D69550]" />
+            <span>Microclimates: {COFFEE_BELT_OVERVIEW.idealClimate}</span>
+          </div>
         </div>
-      )}
+
+        <p className="text-xs md:text-sm text-[#574C45] leading-relaxed mb-6 font-sans">
+          {COFFEE_BELT_OVERVIEW.geologicalSignificance}
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {COFFEE_BELT_OVERVIEW.keyFactors.map((f, idx) => (
+            <div key={idx} className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC]">
+              <div className="text-xs font-bold text-[#A8622D] uppercase tracking-wider mb-1">
+                {f.factor}
+              </div>
+              <div className="text-[11px] text-[#766A62] leading-snug">
+                {f.detail}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. ARABICA VS ROBUSTA BOTANICAL SCIENCE */}
+      <div className="mb-8 p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-xs">
+        <div className="flex items-center space-x-2.5 mb-4 text-[#A8622D]">
+          <Dna className="w-5 h-5" />
+          <h4 className="font-editorial text-lg font-bold text-[#14110F]">
+            Botanical Genetics: Coffea Arabica vs Coffea Canephora
+          </h4>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-editorial text-base font-bold text-[#14110F]">Coffea Arabica</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FAF0E6] text-[#A8622D] border border-[#ECD4BD] font-bold">44 Chromosomes (Self-Pollinating)</span>
+            </div>
+            <p className="text-xs text-[#766A62] leading-relaxed mb-3">
+              Grown at high altitudes (1,000 - 2,200m). Produces complex citric, malic, and phosphoric acidity, floral aromatics, and layered sugar sweetness.
+            </p>
+            <div className="text-[11px] font-mono text-[#574C45] space-y-1">
+              <div>• Caffeine: ~1.2 - 1.5%</div>
+              <div>• Sugars & Lipids: High Sucrose (6-9%), 15-17% Lipids</div>
+              <div>• Sensory: Jasmine, peach, bergamot, berry, cacao</div>
+            </div>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-editorial text-base font-bold text-[#14110F]">Coffea Canephora (Robusta)</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#EAE5DC] text-[#574C45] border border-[#D8CFC4] font-bold">22 Chromosomes (Cross-Pollinating)</span>
+            </div>
+            <p className="text-xs text-[#766A62] leading-relaxed mb-3">
+              Grown at low altitudes (0 - 800m). Resilient to pests, heat, and rust fungi. Delivers heavy body, dense persistent crema, and dark bitter notes.
+            </p>
+            <div className="text-[11px] font-mono text-[#574C45] space-y-1">
+              <div>• Caffeine: ~2.2 - 2.7% (Natural pesticide)</div>
+              <div>• Sugars & Lipids: Lower Sugars (3-5%), 10-12% Lipids</div>
+              <div>• Sensory: Dark chocolate, toasted walnut, woody, crema</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* 4. Origin Country Selection Grid */}
       <div className="mb-8">
-        <label className="block text-xs uppercase tracking-widest font-extrabold text-cream-soft/70 mb-3.5 flex items-center justify-between">
-          <span>
-            {isCoffee
-              ? 'Select Growing Origin / Nation:'
-              : 'Select Specialty Tea Terroir:'}
-          </span>
-          <span className="text-[11px] font-mono text-amber-gold">Click Country to Explore</span>
+        <label className="block text-xs uppercase tracking-wider font-bold text-[#766A62] mb-3 flex items-center justify-between">
+          <span>Select Growing Origin / Nation:</span>
+          <span className="text-[11px] font-mono text-[#A8622D]">Click Country to Explore</span>
         </label>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
@@ -158,20 +129,18 @@ export default function UniversityHub({ trackMode = 'coffee' }) {
               <button
                 key={origin.id}
                 onClick={() => setActiveOriginId(origin.id)}
-                className={`p-3 rounded-2xl border text-center transition-all duration-300 hover:-translate-y-1 shadow-lg ${
+                className={`p-3 rounded-2xl border text-center transition-all duration-200 hover:-translate-y-0.5 shadow-xs ${
                   isSelected
-                    ? isCoffee
-                      ? 'btn-tactile-amber text-espresso-950 scale-105 font-extrabold ring-2 ring-amber-gold'
-                      : 'btn-tactile-sage text-cream-light scale-105 font-extrabold ring-2 ring-sage-400'
-                    : 'bg-espresso-900/80 border-white/10 text-cream-soft hover:bg-white/10 hover:border-white/20'
+                    ? 'bg-white border-[#D69550] shadow-md ring-2 ring-[#D69550]/20'
+                    : 'bg-white border-[#ECE6DC] text-[#766A62] hover:border-[#D8CFC4]'
                 }`}
               >
                 <div className="text-2xl mb-1">{origin.flag}</div>
-                <div className="text-xs font-extrabold tracking-wide truncate drop-shadow">{origin.country ? origin.country.split(' ')[0] : 'Terroir'}</div>
-                <div className={`text-[9px] mt-0.5 truncate ${isSelected ? 'opacity-90 font-bold' : 'text-cream-soft/60'}`}>
-                  {isCoffee
-                    ? (origin.macroRegion ? origin.macroRegion.split(' ')[0] : 'Coffee')
-                    : (origin.famousTeas && origin.famousTeas[0] ? origin.famousTeas[0].split(' ')[0] : 'Tea')}
+                <div className={`text-xs font-bold tracking-wide truncate ${isSelected ? 'text-[#14110F]' : 'text-[#574C45]'}`}>
+                  {origin.country ? origin.country.split(' ')[0] : 'Origin'}
+                </div>
+                <div className="text-[9px] mt-0.5 truncate text-[#A89F91]">
+                  {origin.macroRegion ? origin.macroRegion.split(' ')[0] : 'Coffee'}
                 </div>
               </button>
             );
@@ -181,65 +150,45 @@ export default function UniversityHub({ trackMode = 'coffee' }) {
 
       {/* 5. Selected Origin Detailed Master Showcase Card */}
       {activeOrigin && (
-        <div className={`p-6 md:p-8 rounded-3xl border shadow-2xl relative overflow-hidden ${
-          isCoffee
-            ? 'bg-espresso-950/95 border-amber-gold/40'
-            : 'bg-[#08110B]/95 border-sage-500/40'
-        }`}>
+        <div className="p-6 md:p-8 rounded-2xl border border-[#ECE6DC] bg-white shadow-xs relative overflow-hidden">
           
           {/* Top Title & Elevation Banner */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-5 border-b border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#ECE6DC]">
             <div className="flex items-center space-x-3.5">
               <span className="text-5xl">{activeOrigin.flag}</span>
               <div>
                 <div className="flex items-center space-x-2">
-                  <h4 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light tracking-wide">
+                  <h4 className="font-editorial text-2xl md:text-3xl font-bold text-[#14110F]">
                     {activeOrigin.country}
                   </h4>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border ${
-                    isCoffee ? 'bg-amber-gold/20 text-amber-gold border-amber-gold/30' : 'bg-sage-500/20 text-sage-300 border-sage-500/30'
-                  }`}>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border bg-[#FAF0E6] text-[#A8622D] border-[#ECD4BD]">
                     {activeOrigin.macroRegion || 'Specialty Grade'}
                   </span>
                 </div>
-                <div className={`text-xs font-bold flex items-center gap-1.5 mt-1 ${
-                  isCoffee ? 'text-amber-gold' : 'text-sage-300'
-                }`}>
-                  <MapPin className="w-3.5 h-3.5" />
+                <div className="text-xs font-semibold flex items-center gap-1.5 mt-1 text-[#766A62]">
+                  <MapPin className="w-3.5 h-3.5 text-[#A8622D]" />
                   <span>Key Microclimates & Regions: {activeOrigin.regions}</span>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-mono font-bold bg-white/10 px-3.5 py-1.5 rounded-xl border border-white/15 text-cream-light flex items-center gap-1.5">
-                <Mountain className={`w-4 h-4 ${isCoffee ? 'text-amber-gold' : 'text-sage-300'}`} />
-                <span>
-                  {isCoffee
-                    ? `Elevation: ${activeOrigin.altitude}`
-                    : `Steep: ${activeOrigin.steepStyle || 'Gongfu'}`}
-                </span>
+              <span className="text-xs font-mono font-bold bg-[#FAF7F2] px-3.5 py-1.5 rounded-xl border border-[#ECE6DC] text-[#14110F] flex items-center gap-1.5">
+                <Mountain className="w-4 h-4 text-[#A8622D]" />
+                <span>Elevation: {activeOrigin.altitude}</span>
               </span>
             </div>
           </div>
 
           {/* FAMOUS BRANDS & SPECIALTY ROASTERS GRID */}
-          <div className="p-5 md:p-6 rounded-2xl bg-black/60 border border-white/10 shadow-2xl mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-white/10">
-              <div className={`flex items-center space-x-2 text-sm uppercase font-extrabold tracking-wider ${
-                isCoffee ? 'text-amber-gold' : 'text-sage-300'
-              }`}>
+          <div className="p-5 md:p-6 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] shadow-xs mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-[#ECE6DC]">
+              <div className="flex items-center space-x-2 text-sm uppercase font-bold tracking-wider text-[#A8622D]">
                 <Store className="w-5 h-5" />
-                <span>
-                  {isCoffee
-                    ? `Famous Brands & Specialty Roasters Sourced From ${activeOrigin.country}:`
-                    : `Famous Tea Houses & Estates Sourced From ${activeOrigin.country}:`}
-                </span>
+                <span>Famous Specialty Roasters Sourced From {activeOrigin.country}:</span>
               </div>
-              <span className="text-[11px] font-mono text-cream-soft/60">
-                {isCoffee
-                  ? 'Curated Specialty Roasters'
-                  : 'Curated Specialty Tea Houses'}
+              <span className="text-[11px] font-mono text-[#766A62]">
+                Curated Specialty Roasters
               </span>
             </div>
 
@@ -247,57 +196,30 @@ export default function UniversityHub({ trackMode = 'coffee' }) {
               {(activeOrigin.sourcedBrands || []).map((brand, idx) => (
                 <div
                   key={idx}
-                  className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-amber-gold/50 hover:bg-white/10 transition-all duration-300 flex flex-col justify-between group shadow-md"
+                  className="p-4 rounded-xl bg-white border border-[#ECE6DC] hover:border-[#D69550] transition-all duration-200 flex flex-col justify-between shadow-xs"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-extrabold text-cream-light group-hover:text-amber-gold transition-colors">
-                        {brand.name}
-                      </span>
-                      <ShoppingBag className={`w-3.5 h-3.5 ${isCoffee ? 'text-amber-gold' : 'text-sage-300'}`} />
+                      <span className="font-bold text-xs text-[#14110F]">{brand.name}</span>
+                      <ShoppingBag className="w-3.5 h-3.5 text-[#A8622D]" />
                     </div>
-                    
-                    <div className={`text-xs font-bold mb-2 ${isCoffee ? 'text-amber-gold/90' : 'text-sage-300'}`}>
+                    <div className="text-[11px] font-semibold text-[#A8622D] mb-1.5">
                       {brand.offering}
                     </div>
-
-                    <p className="text-[11px] text-cream-soft/80 font-medium leading-relaxed">
+                    <p className="text-[11px] text-[#766A62] leading-snug">
                       {brand.note}
                     </p>
-                  </div>
-
-                  <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px] text-cream-soft/70">
-                    <span>Direct Origin Sourcing</span>
-                    <a
-                      href={`https://www.amazon.com/s?k=${encodeURIComponent(brand.name + ' ' + (brand.offering || ''))}&tag=thebrewapp13-20`}
-                      target="_blank"
-                      rel="nofollow sponsored noopener"
-                      data-product-name={brand.name}
-                      data-link-id={`brand_${brand.name.toLowerCase().replace(/\s+/g, '_')}`}
-                      data-context="terroir_brand_recommendation"
-                      className={`px-2.5 py-1 rounded-lg border text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1 transition-all ${
-                        isCoffee
-                          ? 'bg-amber-400/20 text-amber-gold border-amber-400/40 hover:bg-amber-400/30'
-                          : 'bg-sage-500/20 text-sage-300 border-sage-500/40 hover:bg-sage-500/30'
-                      }`}
-                    >
-                      <span>Buy on Amazon</span>
-                      <ShoppingBag className="w-3 h-3" />
-                    </a>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Flavor Notes & Sensory Profile Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
-            
+          {/* Agronomy Matrix */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             {/* Box 1: Signature Flavor Notes */}
-            <div className="p-4 rounded-2xl bg-black/40 border border-white/10 shadow-inner">
-              <div className={`text-xs font-extrabold uppercase tracking-wider mb-3 flex items-center gap-1.5 ${
-                isCoffee ? 'text-amber-gold' : 'text-sage-300'
-              }`}>
+            <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#A8622D] mb-3 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4" />
                 <span>Signature Flavor Notes:</span>
               </div>
@@ -305,11 +227,7 @@ export default function UniversityHub({ trackMode = 'coffee' }) {
                 {(activeOrigin.flavorNotes || []).map((note, idx) => (
                   <span
                     key={idx}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-extrabold shadow-sm border ${
-                      isCoffee
-                        ? 'bg-amber-gold/15 text-amber-gold border-amber-gold/30'
-                        : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
-                    }`}
+                    className="px-2.5 py-1 rounded-lg text-xs font-semibold border bg-white text-[#14110F] border-[#ECE6DC] shadow-2xs"
                   >
                     {note}
                   </span>
@@ -318,76 +236,55 @@ export default function UniversityHub({ trackMode = 'coffee' }) {
             </div>
 
             {/* Box 2: Agronomy Genetics & Processing */}
-            <div className="p-4 rounded-2xl bg-black/40 border border-white/10 shadow-inner">
-              <div className="text-xs font-extrabold uppercase tracking-wider text-cream-soft/80 mb-3 flex items-center gap-1.5">
-                <Award className="w-4 h-4 text-emerald-400" />
-                <span>{isCoffee ? 'Genetics & Processing:' : 'Famous Tea Varieties:'}</span>
+            <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC]">
+              <div className="text-xs font-bold uppercase tracking-wider text-[#A8622D] mb-3 flex items-center gap-1.5">
+                <Award className="w-4 h-4 text-[#2D8B55]" />
+                <span>Genetics & Processing:</span>
               </div>
-              
-              {isCoffee ? (
-                <div className="space-y-1.5 text-xs text-cream-soft/90 font-medium">
-                  <div><strong className="text-cream-light">Cultivars:</strong> {activeOrigin.genetics}</div>
-                  <div><strong className="text-cream-light">Processing:</strong> {activeOrigin.processing}</div>
-                </div>
-              ) : (
-                <div className="space-y-1.5 text-xs text-cream-soft/90 font-medium">
-                  <div><strong className="text-cream-light">Cultivars:</strong> {activeOrigin.genetics || 'Camellia sinensis'}</div>
-                  <div className="flex flex-wrap gap-1.5 mt-1">
-                    {(activeOrigin.famousTeas || []).map((tea, idx) => (
-                      <span key={idx} className="px-2 py-0.5 rounded-md bg-sage-500/20 text-sage-300 border border-sage-500/30 text-[11px] font-semibold">
-                        {tea}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <div className="space-y-1.5 text-xs text-[#574C45]">
+                <div><strong className="text-[#14110F]">Cultivars:</strong> {activeOrigin.genetics}</div>
+                <div><strong className="text-[#14110F]">Processing:</strong> {activeOrigin.processing}</div>
+              </div>
             </div>
 
             {/* Box 3: Extraction Pairing & Acidity */}
-            <div className="p-4 rounded-2xl bg-black/40 border border-white/10 shadow-inner flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] flex flex-col justify-between">
               <div>
-                <div className="text-xs font-extrabold uppercase tracking-wider text-cream-soft/80 mb-1.5 flex items-center gap-1.5">
-                  <Compass className="w-4 h-4 text-cyan-400" />
+                <div className="text-xs font-bold uppercase tracking-wider text-[#A8622D] mb-1.5 flex items-center gap-1.5">
+                  <Compass className="w-4 h-4 text-[#357ABD]" />
                   <span>Extraction & Acid Profile:</span>
                 </div>
-                <div className="text-sm font-extrabold text-cream-light">
+                <div className="text-sm font-bold text-[#14110F]">
                   {activeOrigin.recommendedMethod}
                 </div>
-                <div className={`text-xs font-mono font-bold mt-1 ${
-                  isCoffee ? 'text-amber-gold' : 'text-sage-300'
-                }`}>
-                  {isCoffee ? activeOrigin.acidProfile : activeOrigin.soilType}
+                <div className="text-xs font-mono font-bold mt-1 text-[#A8622D]">
+                  {activeOrigin.acidProfile}
                 </div>
               </div>
 
-              <div className="mt-3 text-[11px] text-cream-soft/60 font-medium">
-                {isCoffee ? `Ideal Roast: ${activeOrigin.roastPairing}` : `Processing: ${activeOrigin.processing}`}
+              <div className="mt-3 text-[11px] text-[#766A62]">
+                Ideal Roast: {activeOrigin.roastPairing}
               </div>
             </div>
-
           </div>
 
           {/* Deep Agronomy, Soil Geology & Terroir Science Note */}
-          <div className="p-5 rounded-2xl bg-white/5 border border-white/15 text-xs text-cream-soft/90 font-medium leading-relaxed shadow-inner">
-            <div className={`flex items-center space-x-2 font-extrabold uppercase tracking-wider mb-2 text-xs ${
-              isCoffee ? 'text-amber-gold' : 'text-sage-300'
-            }`}>
+          <div className="p-5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#574C45] leading-relaxed">
+            <div className="flex items-center space-x-2 font-bold uppercase tracking-wider mb-2 text-xs text-[#A8622D]">
               <BookOpen className="w-4 h-4" />
               <span>Deep Terroir & Agronomy Science Insight:</span>
             </div>
-            <p className="mb-2 text-cream-soft leading-relaxed">
+            <p className="mb-2 leading-relaxed text-[#574C45]">
               {activeOrigin.agronomyDeepDive || activeOrigin.terroirOverview}
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 pt-3 border-t border-white/10 text-[11px]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#ECE6DC] text-[11px]">
               <div>
-                <strong className="text-cream-light font-bold">Soil Geology: </strong>
+                <strong className="text-[#14110F]">Soil Geology: </strong>
                 <span>{activeOrigin.soilType}</span>
               </div>
               <div>
-                <strong className="text-cream-light font-bold">
-                  {isCoffee ? 'Microclimate & Climate: ' : 'Harvest & Steep: '}
-                </strong>
-                <span>{isCoffee ? activeOrigin.climate : activeOrigin.steepStyle}</span>
+                <strong className="text-[#14110F]">Microclimate & Climate: </strong>
+                <span>{activeOrigin.climate}</span>
               </div>
             </div>
           </div>

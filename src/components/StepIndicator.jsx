@@ -12,15 +12,11 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
   ];
 
   return (
-    <nav className={`w-full py-2 px-2 sm:px-4 lg:px-8 transition-colors duration-500 border-t ${
-      isCoffee
-        ? 'bg-[#120B07]/95 border-[#A66E38]/30'
-        : 'bg-[#07130B]/95 border-sage-500/30'
-    }`}>
+    <nav className="w-full py-2 px-2 sm:px-4 lg:px-8 transition-colors duration-400 border-t border-b bg-[#FAF7F2] border-[#ECE6DC]">
       <div className="max-w-7xl mx-auto flex items-center justify-between relative gap-1 sm:gap-3">
         
         {/* Background Connecting Timeline Line */}
-        <div className="absolute top-1/2 left-6 right-6 h-[1.5px] bg-white/10 -translate-y-1/2 z-0 hidden md:block" />
+        <div className="absolute top-1/2 left-6 right-6 h-[1.5px] bg-[#ECE6DC] -translate-y-1/2 z-0 hidden md:block" />
 
         {STEPS.map((step) => {
           const StepIcon = step.icon;
@@ -31,16 +27,12 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
             <div key={step.id} className="relative z-10 flex-1 flex justify-center min-w-0">
               <button
                 onClick={() => setCurrentStep(step.id)}
-                className={`w-full group flex items-center justify-center sm:justify-start space-x-1 sm:space-x-2 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border transition-all duration-300 active:scale-95 ${
+                className={`w-full group flex items-center justify-center sm:justify-start space-x-1 sm:space-x-2 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border transition-all duration-200 active:scale-95 ${
                   isActive
-                    ? isCoffee
-                      ? 'btn-tactile-coffee text-[#140C08] font-extrabold shadow-[0_0_20px_rgba(166,110,56,0.5)] scale-[1.02] border-[#C48B56]'
-                      : 'btn-tactile-tea text-white font-extrabold shadow-[0_0_20px_rgba(81,158,100,0.5)] scale-[1.02] border-sage-300'
+                    ? 'bg-[#14110F] text-[#FAF7F2] font-extrabold shadow-sm scale-[1.02] border-[#14110F]'
                     : isCompleted
-                    ? isCoffee
-                      ? 'bg-[#1C140D]/90 border-[#A66E38]/40 text-[#D2A06E] hover:bg-[#251B12]'
-                      : 'bg-[#0E1A11]/90 border-sage-500/40 text-sage-300 hover:bg-[#142418]'
-                    : 'bg-[#12100E]/80 border-white/15 text-stone-300 hover:text-cream-light hover:bg-white/[0.08] hover:border-white/25'
+                    ? 'bg-[#EBF3ED] border-[#C8E0CD] text-[#2F663C] hover:bg-[#DDF0E2]'
+                    : 'bg-white/90 border-[#ECE6DC] text-[#766A62] hover:text-[#14110F] hover:bg-white'
                 }`}
               >
                 {/* Node Icon Circle */}

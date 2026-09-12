@@ -25,6 +25,8 @@ import RoasterPortalModal from './components/RoasterPortalModal';
 import RoasterInfoPage from './components/RoasterInfoPage';
 import RoasterProfilePage from './components/RoasterProfilePage';
 import CoffeeVideoAcademyModal from './components/CoffeeVideoAcademyModal';
+import ConsumerDiscoveryFeed from './components/ConsumerDiscoveryFeed';
+import CafePartnerPortal from './components/CafePartnerPortal';
 import Footer from './components/Footer';
 import { AppOrchestratorProvider } from './context/AppOrchestratorContext';
 import { BREW_METHODS } from './data/brewData';
@@ -113,6 +115,7 @@ export default function App() {
   const [roasterPrefillBarcode, setRoasterPrefillBarcode] = useState('');
   const [roasterPrefillBean, setRoasterPrefillBean] = useState(null);
   const [isRoasterShowcaseView, setIsRoasterShowcaseView] = useState(false);
+  const [isCafePortalView, setIsCafePortalView] = useState(false);
   const [selectedRoasterSlug, setSelectedRoasterSlug] = useState('methodical');
   const [isVideoAcademyOpen, setIsVideoAcademyOpen] = useState(false);
   const [selectedAcademyVideoId, setSelectedAcademyVideoId] = useState(null);
@@ -424,21 +427,21 @@ export default function App() {
       onOpenJournal={() => setIsJournalOpen(true)}
       navigate={navigate}
     >
-      <div className="min-h-screen font-sans flex flex-col transition-colors duration-700 relative bg-[#0E0906] text-[#F8F5F1] selection:bg-[#C48B56] selection:text-[#140C08]">
+      <div className="min-h-screen font-sans flex flex-col transition-colors duration-700 relative bg-[#FAF7F2] text-[#14110F] selection:bg-[#C48B56] selection:text-white">
 
       {/* High-Definition Extraction Method Background Image Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30 md:opacity-40 transition-all duration-1000">
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-10 transition-all duration-1000">
         <img
           key={currentActiveMethod?.heroImage || 'coffee_hero'}
           src={currentActiveMethod?.heroImage || '/pour_over_hero.jpg'}
           alt={currentActiveMethod?.name || 'Extraction Background'}
-          className="w-full h-full object-cover object-center filter blur-[2px] scale-105 transform transition-transform duration-1000 brightness-90 contrast-110"
+          className="w-full h-full object-cover object-center filter blur-[2px] scale-105 transform transition-transform duration-1000"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0E0906]/80 via-[#0E0906]/55 to-[#0E0906]/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/90 via-[#FAF7F2]/75 to-[#FAF7F2]/95" />
       </div>
       
       {/* 100% Bulletproof Sticky Top Header Container */}
-      <header className="sticky top-0 z-50 backdrop-blur-2xl transition-all duration-700 border-b shadow-2xl bg-[#160E09]/95 border-[#A66E38]/40 shadow-[0_10px_30px_rgba(166,110,56,0.15)]">
+      <header className="sticky top-0 z-50 backdrop-blur-xl transition-all duration-700 border-b border-[#ECE6DC] bg-[#FAF7F2]/95 shadow-xs">
         <Header
           onOpenJournal={() => setIsJournalOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
@@ -449,9 +452,24 @@ export default function App() {
           onOpenScanner={() => setIsScannerOpen(true)}
           onOpenWaterLab={() => setIsWaterLabOpen(true)}
           onOpenRoasterPortal={() => { setRoasterPrefillBarcode(''); setRoasterPrefillBean(null); setIsRoasterPortalOpen(true); }}
+          onOpenCafePortal={() => { setIsRoasterShowcaseView(false); setIsCafePortalView(true); }}
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
           onOpenRoasterShowcase={handleOpenRoasterShowcase}
           isRoasterShowcaseView={isRoasterShowcaseView}
+          currentView={isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : (currentStep > 1 ? 'brew_station' : 'discovery')}
+          onSelectView={(v) => {
+            if (v === 'discovery') {
+              setIsCafePortalView(false);
+              setIsRoasterShowcaseView(false);
+              setCurrentStep(1);
+              navigate('/');
+            } else if (v === 'brew_station') {
+              setIsCafePortalView(false);
+              setIsRoasterShowcaseView(false);
+              const el = document.getElementById('brew-atelier');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
           onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
           onOpenNews={handleOpenBrewNews}
           isMuted={isMuted}
@@ -459,8 +477,8 @@ export default function App() {
           currentUser={currentUser}
         />
         
-        {/* Step Progress Bar Pinned Inside Sticky Top Bar (hidden in Roaster Showcase) */}
-        {!isRoasterShowcaseView && (
+        {/* Step Progress Bar Pinned Inside Sticky Top Bar (hidden in Roaster Showcase or Cafe Portal) */}
+        {!isRoasterShowcaseView && !isCafePortalView && (
           <StepIndicator
             currentStep={currentStep}
             setCurrentStep={(stepNum) => {
@@ -481,7 +499,12 @@ export default function App() {
 
         <main className="mt-4 space-y-10">
 
-          {isRoasterShowcaseView ? (
+          {isCafePortalView ? (
+            <CafePartnerPortal
+              onClose={() => setIsCafePortalView(false)}
+              onNavigateToConsumer={() => setIsCafePortalView(false)}
+            />
+          ) : isRoasterShowcaseView ? (
             <RoasterProfilePage
               initialRoasterId={selectedRoasterSlug}
               onBackToApp={() => {
@@ -505,23 +528,50 @@ export default function App() {
             />
           ) : (
             <>
-              {/* STEP 01: METHOD SELECTOR */}
+              {/* STEP 01: CONSUMER DISCOVERY FEED + METHOD SELECTOR */}
               {currentStep === 1 && (
-            <MethodSelectorGrid
-              trackMode={trackMode}
-              setTrackMode={setTrackMode}
-              methods={methods}
-              activeMethod={currentActiveMethod}
-              setActiveMethod={handleSelectMethodFromGrid}
-              onNextStep={() => {
-                setCurrentStep(2);
-                if (currentActiveMethod) {
-                  navigate(`/methods/${currentActiveMethod.id}`);
-                }
-              }}
-              unitSystem={unitSystem}
-            />
-          )}
+                <div className="space-y-12">
+                  <ConsumerDiscoveryFeed
+                    onSelectBeanToBrew={handleApplyScannedRecipe}
+                    onNavigateToRoaster={(roasterSlug) => {
+                      setSelectedRoasterSlug(roasterSlug);
+                      setIsRoasterShowcaseView(true);
+                      navigate('/roasters');
+                    }}
+                    onOpenLocator={() => setIsLocalCoffeeOpen(true)}
+                    onStartBrewStation={() => {
+                      const el = document.getElementById('brew-atelier');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  />
+
+                  <div id="brew-atelier" className="pt-8 border-t border-[#ECE6DC]">
+                    <div className="mb-4">
+                      <span className="text-xs font-mono uppercase tracking-wider text-[#A8622D] font-semibold">
+                        Brewing Equipment Atelier
+                      </span>
+                      <h2 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
+                        Select Your Extraction Method
+                      </h2>
+                    </div>
+
+                    <MethodSelectorGrid
+                      trackMode={trackMode}
+                      setTrackMode={setTrackMode}
+                      methods={methods}
+                      activeMethod={currentActiveMethod}
+                      setActiveMethod={handleSelectMethodFromGrid}
+                      onNextStep={() => {
+                        setCurrentStep(2);
+                        if (currentActiveMethod) {
+                          navigate(`/methods/${currentActiveMethod.id}`);
+                        }
+                      }}
+                      unitSystem={unitSystem}
+                    />
+                  </div>
+                </div>
+              )}
 
           {/* STEP 02: PRECISION RATIO CALCULATOR & SCALER */}
           {currentStep === 2 && (

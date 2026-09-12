@@ -11,16 +11,14 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
   };
 
   return (
-    <footer className={`mt-14 py-6 px-4 sm:px-6 lg:px-8 border-t backdrop-blur-xl text-stone-400 transition-colors duration-500 ${
-      isCoffee ? 'bg-[#0E0906]/90 border-[#A66E38]/25' : 'bg-[#07130B]/90 border-sage-500/25'
-    }`}>
+    <footer className="mt-14 py-6 px-4 sm:px-6 lg:px-8 border-t backdrop-blur-xl transition-colors duration-500 bg-[#FAF7F2]/95 border-[#ECE6DC] text-[#766A62]">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono">
         
         {/* Minimal Copyright */}
-        <div className="text-stone-400 text-[11px] font-medium flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+        <div className="text-[#766A62] text-[11px] font-medium flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
           <span>© {new Date().getFullYear()} The Brew App. All rights reserved.</span>
-          <span className="hidden sm:inline text-stone-600">•</span>
-          <span className="text-stone-500">Digital Trail Labs LLC</span>
+          <span className="hidden sm:inline text-[#A89F91]">•</span>
+          <span className="text-[#A89F91]">Digital Trail Labs LLC</span>
         </div>
 
         {/* Action Group */}
@@ -28,7 +26,7 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
           {onOpenVideoAcademy && (
             <button
               onClick={onOpenVideoAcademy}
-              className="py-2 px-3.5 rounded-xl bg-red-600/15 hover:bg-red-600/25 text-red-400 hover:text-red-300 border border-red-500/30 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow"
+              className="py-2 px-3.5 rounded-xl bg-red-600/10 hover:bg-red-600/15 text-red-700 hover:text-red-800 border border-red-500/20 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow-xs"
             >
               <Tv className="w-3.5 h-3.5" />
               <span>Coffee Academy</span>
@@ -41,7 +39,7 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackEvent('youtube_channel_footer_click')}
-            className="py-2 px-3.5 rounded-xl bg-red-600/10 hover:bg-red-600/20 text-red-400 hover:text-red-300 border border-red-500/25 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow"
+            className="py-2 px-3.5 rounded-xl bg-red-600/10 hover:bg-red-600/15 text-red-700 hover:text-red-800 border border-red-500/20 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow-xs"
             title="Official The Brew App YouTube Channel (@TheBrewapp)"
           >
             <Tv className="w-3.5 h-3.5" />
@@ -52,7 +50,7 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
           {onOpenRoasterShowcase && (
             <button
               onClick={onOpenRoasterShowcase}
-              className="py-2 px-3.5 rounded-xl bg-amber-gold/15 hover:bg-amber-gold/25 text-amber-gold hover:text-amber-300 border border-amber-gold/30 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow"
+              className="py-2 px-3.5 rounded-xl bg-[#D69550]/15 hover:bg-[#D69550]/25 text-[#A25A24] border border-[#D69550]/30 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow-xs"
             >
               <Store className="w-3.5 h-3.5" />
               <span>Roaster Showcase</span>
@@ -62,7 +60,7 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
           {onOpenRoasterInfo && (
             <button
               onClick={onOpenRoasterInfo}
-              className="py-2 px-3.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-stone-300 hover:text-white border border-white/10 text-xs font-mono font-bold flex items-center gap-1.5 transition"
+              className="py-2 px-3.5 rounded-xl bg-[#ECE6DC] hover:bg-[#E2DACF] text-[#14110F] border border-[#D8CFC4] text-xs font-mono font-bold flex items-center gap-1.5 transition"
             >
               <span>Add Your Roastery</span>
             </button>
@@ -72,11 +70,7 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
           <a
             href={`mailto:${emailAddress}?subject=TheBrew.App%20Inquiry`}
             onClick={handleMailtoClick}
-            className={`py-2 px-4 rounded-xl text-xs font-extrabold tracking-wider uppercase flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all ${
-              isCoffee
-                ? 'btn-tactile-coffee text-[#140C08]'
-                : 'btn-tactile-tea text-white'
-            }`}
+            className="py-2 px-4 rounded-xl text-xs font-extrabold tracking-wider uppercase flex items-center gap-2 shadow-xs hover:scale-105 active:scale-95 transition-all bg-[#D69550] hover:bg-[#C48B56] text-white"
             title="Contact Founder HQ"
           >
             <Mail className="w-3.5 h-3.5" />
