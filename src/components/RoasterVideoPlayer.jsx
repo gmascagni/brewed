@@ -23,6 +23,7 @@ import {
   Compass,
   BarChart3
 } from 'lucide-react';
+import { getAssetUrl } from '../utils/assetUrl';
 
 const CHAPTERS = [
   {
@@ -216,7 +217,8 @@ export default function RoasterVideoPlayer({ onOpenLiveDemo = null, className = 
   };
 
   const handleCopyShareLink = () => {
-    const shareUrl = `${window.location.origin}/videos/roasters_and_cafes_partner_walkthrough.mp4`;
+    const videoPath = getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4');
+    const shareUrl = `${window.location.origin}${videoPath}`;
     navigator.clipboard.writeText(shareUrl).then(() => {
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2500);
@@ -265,7 +267,7 @@ export default function RoasterVideoPlayer({ onOpenLiveDemo = null, className = 
 
           {/* Direct MP4 Download Button for Social Media & Marketing */}
           <a
-            href="/videos/roasters_and_cafes_partner_walkthrough.mp4"
+            href={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4')}
             download="thebrew_roaster_and_cafe_partner_walkthrough_9x16.mp4"
             className="px-3 py-1.5 rounded-xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 transition flex items-center gap-1.5 text-xs font-mono font-bold shadow-md hover:scale-105 active:scale-95"
             title="Download Broadcast 1080x1920 9:16 MP4 for TikTok, Instagram Reels, and YouTube Shorts"
@@ -306,15 +308,15 @@ export default function RoasterVideoPlayer({ onOpenLiveDemo = null, className = 
             {/* Native HTML5 Video Element */}
             <video
               ref={videoRef}
-              src="/videos/roasters_and_cafes_partner_walkthrough.mp4"
+              src={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4')}
               playsInline
               preload="metadata"
               className="w-full h-full object-cover"
               onClick={handleTogglePlay}
             >
-              <source src="/videos/roasters_and_cafes_partner_walkthrough.mp4" type="video/mp4" />
-              <source src="/videos/roasters_and_cafes_partner_walkthrough.webm" type="video/webm" />
-              <source src="/videos/smart_bag_scan_demo.mp4" type="video/mp4" />
+              <source src={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4')} type="video/mp4" />
+              <source src={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.webm')} type="video/webm" />
+              <source src={getAssetUrl('/videos/smart_bag_scan_demo.mp4')} type="video/mp4" />
               Your browser does not support HTML5 video playback.
             </video>
 
@@ -442,7 +444,7 @@ export default function RoasterVideoPlayer({ onOpenLiveDemo = null, className = 
 
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <a
-                href="/videos/roasters_and_cafes_partner_walkthrough.mp4"
+                href={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4')}
                 download="thebrew_partner_walkthrough_short_9x16.mp4"
                 className="px-4 py-2 rounded-xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow transition hover:scale-105 active:scale-95"
               >

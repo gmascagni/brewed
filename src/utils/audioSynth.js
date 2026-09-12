@@ -1,4 +1,5 @@
 // Audio Chime & Barista Audio Synthesizer for The Brew App
+import { getAssetUrl } from './assetUrl';
 
 let sharedAudioCtx = null;
 let activeAudioElement = null;
@@ -62,7 +63,7 @@ export function playMechanicalClick(isMuted = false) {
   
   // 1. Direct HTML5 audio playback (immune to AudioContext suspension)
   try {
-    const audio = new Audio('/audio/timer/mechanical_click.wav');
+    const audio = new Audio(getAssetUrl('/audio/timer/mechanical_click.wav'));
     audio.volume = 0.9;
     const p = audio.play();
     if (p !== undefined) p.catch(() => {});
@@ -118,7 +119,7 @@ export function playClockTick(isMuted = false, tickNumber = 0) {
   if (!isSpeakingAnnouncement) {
     try {
       if (!tickAudioInstance) {
-        tickAudioInstance = new Audio('/audio/timer/clock_tick.wav');
+        tickAudioInstance = new Audio(getAssetUrl('/audio/timer/clock_tick.wav'));
       }
       tickAudioInstance.currentTime = 0;
       tickAudioInstance.volume = 0.85;
@@ -164,7 +165,7 @@ export function playTimerStartChime(isMuted = false) {
 
   // 1. Direct HTML5 audio playback (Guaranteed on mobile phone & computer speakers)
   try {
-    const audio = new Audio('/audio/timer/timer_chime.wav');
+    const audio = new Audio(getAssetUrl('/audio/timer/timer_chime.wav'));
     audio.volume = 1.0;
     const p = audio.play();
     if (p !== undefined) p.catch(() => {});
@@ -349,10 +350,10 @@ export function announcePhase(
   // Candidate audio URLs: method-specific instruction MP3 -> slug instruction MP3 -> phase name MP3
   const candidates = [];
   if (methodId && phaseIdx !== undefined && phaseIdx !== null) {
-    candidates.push(`/audio/timer/instructions/${methodId}_phase_${phaseIdx}.mp3`);
+    candidates.push(getAssetUrl(`/audio/timer/instructions/${methodId}_phase_${phaseIdx}.mp3`));
   }
-  candidates.push(`/audio/timer/instructions/${slug}.mp3`);
-  candidates.push(`/audio/timer/${slug}.mp3`);
+  candidates.push(getAssetUrl(`/audio/timer/instructions/${slug}.mp3`));
+  candidates.push(getAssetUrl(`/audio/timer/${slug}.mp3`));
 
   const tryPlayIndex = (idx) => {
     if (idx >= candidates.length) {

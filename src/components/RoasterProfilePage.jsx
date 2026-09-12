@@ -30,6 +30,7 @@ import {
 import { SHOWCASE_ROASTERS, getShowcaseRoaster, getAllShowcaseRoasters, normalizeRoasterKey, getRoasterShortName } from '../data/roasterShowcaseData';
 import { trackEvent } from '../utils/analytics';
 import { useAppOrchestrator } from '../context/AppOrchestratorContext';
+import { getAssetUrl } from '../utils/assetUrl';
 
 export default function RoasterProfilePage({
   initialRoasterId = 'methodical',
@@ -977,16 +978,43 @@ export default function RoasterProfilePage({
             </div>
             <div className="relative aspect-[9/16] w-full bg-black flex items-center justify-center">
               <video
-                src="/videos/smart_bag_scan_demo.mp4"
+                src={getAssetUrl('/videos/smart_bag_scan_demo.mp4')}
                 controls
                 autoPlay
                 playsInline
+                preload="metadata"
                 className="w-full h-full object-cover"
-              />
+              >
+                <source src={getAssetUrl('/videos/smart_bag_scan_demo.mp4')} type="video/mp4" />
+                <source src={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4')} type="video/mp4" />
+                <source src={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.webm')} type="video/webm" />
+                Your browser does not support HTML5 video playback.
+              </video>
             </div>
-            <div className="p-3.5 bg-black/60 text-center border-t border-white/10 space-y-1">
+            <div className="p-3.5 bg-black/60 text-center border-t border-white/10 space-y-2">
               <p className="text-xs text-stone-200 font-mono font-bold">Smart Bag Barcode Scan & Roaster Dial-In</p>
               <p className="text-[11px] text-amber-gold/80 font-mono">Camera Barcode Scanning • Multi-Phase Bloom Coaching</p>
+              <div className="pt-1 flex items-center justify-center gap-2">
+                <a
+                  href={getAssetUrl('/videos/smart_bag_scan_demo.mp4')}
+                  download="thebrew_smart_bag_scan_demo_9x16.mp4"
+                  className="px-3 py-1 rounded-xl bg-amber-gold/20 hover:bg-amber-gold/30 text-amber-gold border border-amber-gold/40 text-[10px] font-mono font-bold flex items-center gap-1 transition"
+                  title="Download MP4 Video"
+                >
+                  <Download className="w-3 h-3" />
+                  <span>Download MP4</span>
+                </a>
+                <a
+                  href={getAssetUrl('/videos/smart_bag_scan_demo.mp4')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-soft hover:text-white border border-white/10 text-[10px] font-mono font-bold flex items-center gap-1 transition"
+                  title="Open Video in New Tab"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span>Open Direct Link</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
