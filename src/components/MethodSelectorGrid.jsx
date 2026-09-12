@@ -17,6 +17,17 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
     <div className="space-y-8 animate-fade-in">
       {/* Step Header: Warm and welcoming cafe atmosphere */}
       <div className="p-6 sm:p-8 md:p-10 rounded-3xl relative overflow-hidden bg-gradient-to-br from-[#FFFDF9] via-[#FAF7F2] to-[#F5EFE8] border border-[#ECE6DC] shadow-sm">
+        {/* Transparent Background Image of Selected Brewer */}
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <img
+            key={activeMethod?.id || 'default_hero'}
+            src={activeMethod?.heroImage || '/pour_over_hero.jpg'}
+            alt={activeMethod?.name || 'Selected Brewer'}
+            className="w-full h-full object-cover object-center transform scale-105 filter saturate-110 contrast-105 transition-all duration-700 opacity-25 sm:opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FFFDF9]/92 via-[#FFFDF9]/82 to-[#FAF7F2]/70 backdrop-blur-[0.5px]" />
+        </div>
+
         <div className="relative z-10 max-w-3xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] text-xs font-sans font-semibold">
             <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
@@ -51,14 +62,26 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
             <button
               key={method.id}
               onClick={() => setActiveMethod(method)}
-              className={`p-6 sm:p-7 rounded-2xl border text-left transition-all duration-300 relative flex flex-col justify-between group shadow-sm hover:shadow-md cursor-pointer ${
+              className={`p-6 sm:p-7 rounded-2xl border text-left transition-all duration-300 relative flex flex-col justify-between group shadow-sm hover:shadow-md cursor-pointer overflow-hidden ${
                 isSelected
                   ? 'bg-[#FFFDF9] border-[#C88A4B] ring-2 ring-[#C88A4B]/25 text-[#14110F] -translate-y-1'
                   : 'bg-white border-[#ECE6DC] text-[#2A2421] hover:border-[#D69550] hover:bg-[#FAF7F2]'
               }`}
             >
+              {/* Transparent background watermark of the method on selected card */}
+              {isSelected && method.heroImage && (
+                <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-2xl">
+                  <img
+                    src={method.heroImage}
+                    alt={method.name}
+                    className="w-full h-full object-cover object-center opacity-20 filter saturate-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#FFFDF9] via-[#FFFDF9]/80 to-transparent" />
+                </div>
+              )}
+
               {/* Method Card Header */}
-              <div>
+              <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4">
                   <div className={`p-3 rounded-xl transition-all ${
                     isSelected
@@ -86,7 +109,7 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
               </div>
 
               {/* Specs Row */}
-              <div className={`pt-4 border-t ${isSelected ? 'border-[#ECD4BD]' : 'border-[#ECE6DC]'} space-y-2 text-xs font-sans`}>
+              <div className={`relative z-10 pt-4 border-t ${isSelected ? 'border-[#ECD4BD]' : 'border-[#ECE6DC]'} space-y-2 text-xs font-sans`}>
                 <div className="flex items-center justify-between">
                   <span className="text-[#766A62]">Ratio target:</span>
                   <span className="font-semibold text-[#14110F]">1 : {method.ratio}</span>

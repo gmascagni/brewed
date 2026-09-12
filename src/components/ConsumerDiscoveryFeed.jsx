@@ -34,6 +34,7 @@ const QUICK_BREWERS = [
     id: 'pour_over',
     name: 'Pour Over',
     fullName: 'Hario V60 Pour Over',
+    heroImage: '/pour_over_hero.jpg',
     ratio: 16.0,
     grind: 'Medium-Fine',
     grindTexture: 'Like table salt',
@@ -47,6 +48,7 @@ const QUICK_BREWERS = [
     id: 'french_press',
     name: 'French Press',
     fullName: 'Classic French Press',
+    heroImage: '/french_press.jpg',
     ratio: 15.0,
     grind: 'Coarse',
     grindTexture: 'Like coarse sea salt',
@@ -60,6 +62,7 @@ const QUICK_BREWERS = [
     id: 'aeropress',
     name: 'AeroPress',
     fullName: 'AeroPress Inverted',
+    heroImage: '/aeropress_hero.jpg',
     ratio: 14.0,
     grind: 'Fine-Medium',
     grindTexture: 'Slightly finer than sand',
@@ -73,6 +76,7 @@ const QUICK_BREWERS = [
     id: 'chemex',
     name: 'Chemex',
     fullName: 'Chemex 6-Cup Glass',
+    heroImage: '/chemex_hero.jpg',
     ratio: 16.5,
     grind: 'Medium-Coarse',
     grindTexture: 'Like kosher salt',
@@ -86,6 +90,7 @@ const QUICK_BREWERS = [
     id: 'moka_pot',
     name: 'Moka Pot',
     fullName: 'Stovetop Moka Express',
+    heroImage: '/moka_pot_hero.jpg',
     ratio: 10.0,
     grind: 'Fine',
     grindTexture: 'Finer than sand, coarser than espresso',
@@ -99,6 +104,7 @@ const QUICK_BREWERS = [
     id: 'cold_brew',
     name: 'Cold Brew',
     fullName: 'Smooth Cold Brew Pitcher',
+    heroImage: '/cold_brew_hero.jpg',
     ratio: 8.0,
     grind: 'Extra Coarse',
     grindTexture: 'Like raw sugar crystals',
@@ -192,131 +198,144 @@ export default function ConsumerDiscoveryFeed({
         </div>
 
         {/* Interactive Hero Quick-Start Calculator Box */}
-        <div className="p-6 sm:p-8 md:p-10 rounded-3xl bg-[#FFFDF9] border-2 border-[#ECD4BD] shadow-elevated space-y-7">
-          {/* Step A: Pick Brewer */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-sans font-bold text-[#14110F] flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-[#14110F] text-[#FAF7F2] flex items-center justify-center text-[11px]">1</span>
-                <span>Select your brewer:</span>
-              </label>
-              <span className="text-xs text-[#766A62] font-sans hidden sm:inline">
-                {activeBrewer.description}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-              {QUICK_BREWERS.map((brewer) => {
-                const isSelected = selectedBrewerId === brewer.id;
-                return (
-                  <button
-                    key={brewer.id}
-                    type="button"
-                    onClick={() => setSelectedBrewerId(brewer.id)}
-                    className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                      isSelected
-                        ? 'bg-[#14110F] text-[#FAF7F2] border-[#14110F] shadow-md ring-2 ring-[#C88A4B]/30 -translate-y-0.5'
-                        : 'bg-white text-[#2A2421] hover:text-[#14110F] hover:bg-[#FAF7F2] border-[#ECE6DC] hover:border-[#D69550]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-white/15 text-[#E8AF72]' : 'bg-[#FAF7F2] text-[#A8622D]'}`}>
-                        <Coffee className="w-4 h-4" />
-                      </div>
-                      {isSelected && (
-                        <Check className="w-3.5 h-3.5 text-[#E8AF72]" />
-                      )}
-                    </div>
-                    <div>
-                      <div className="font-sans font-bold text-xs">
-                        {brewer.name}
-                      </div>
-                      <div className={`text-[10px] font-sans ${isSelected ? 'text-[#C4B7AC]' : 'text-[#766A62]'}`}>
-                        1 : {brewer.ratio}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+        <div className="p-6 sm:p-8 md:p-10 rounded-3xl bg-[#FFFDF9] border-2 border-[#ECD4BD] shadow-elevated relative overflow-hidden transition-all duration-500">
+          {/* Transparent Background Image of Selected Brewer */}
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            <img
+              key={activeBrewer.id}
+              src={activeBrewer.heroImage}
+              alt={activeBrewer.name}
+              className="w-full h-full object-cover object-center transform scale-105 filter saturate-110 contrast-105 transition-all duration-700 opacity-30 sm:opacity-35"
+            />
+            {/* Soft warm gradient overlay: ensures crisp readability while revealing the brewer silhouette */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FFFDF9]/90 via-[#FFFDF9]/80 to-[#FAF7F2]/70 backdrop-blur-[0.5px]" />
           </div>
 
-          {/* Step B: Choose Cup Size */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-sans font-bold text-[#14110F] flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-[#14110F] text-[#FAF7F2] flex items-center justify-center text-[11px]">2</span>
-                <span>How much coffee are you making?</span>
-              </label>
-              <span className="text-xs text-[#766A62] font-sans">
-                Water volume: <strong className="text-[#14110F] font-semibold">{selectedWaterGrams}g</strong>
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: '1 Mug', grams: 300, desc: '10 oz (Single cup)' },
-                { label: '2 Mugs', grams: 600, desc: '20 oz (Two cups)' },
-                { label: 'Full Carafe', grams: 900, desc: '30 oz (Batch / Chemex)' }
-              ].map((size) => {
-                const isSelected = selectedWaterGrams === size.grams;
-                return (
-                  <button
-                    key={size.grams}
-                    type="button"
-                    onClick={() => setSelectedWaterGrams(size.grams)}
-                    className={`p-3.5 rounded-2xl border font-sans text-xs transition-all cursor-pointer text-center ${
-                      isSelected
-                        ? 'bg-[#C88A4B] text-white font-bold border-[#C88A4B] shadow-md'
-                        : 'bg-white text-[#5C524B] hover:text-[#14110F] hover:bg-[#FAF7F2] border-[#ECE6DC]'
-                    }`}
-                  >
-                    <div className="font-bold text-sm">{size.label}</div>
-                    <div className={`text-[11px] mt-0.5 ${isSelected ? 'text-white/90' : 'text-[#766A62]'}`}>
-                      {size.grams}g • {size.desc}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Step C: Live Recipe Results Readout */}
-          <div className="p-5 sm:p-6 rounded-2xl bg-[#FAF7F2] border border-[#ECD4BD] shadow-subtle">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div className="p-3 bg-white rounded-xl border border-[#ECE6DC]">
-                <span className="text-[11px] font-sans text-[#766A62] block">Ground Coffee</span>
-                <span className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
-                  {calculatedCoffeeGrams}g
+          <div className="relative z-10 space-y-7">
+            {/* Step A: Pick Brewer */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-sans font-bold text-[#14110F] flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-[#14110F] text-[#FAF7F2] flex items-center justify-center text-[11px]">1</span>
+                  <span>Select your brewer:</span>
+                </label>
+                <span className="text-xs text-[#766A62] font-sans hidden sm:inline">
+                  {activeBrewer.description}
                 </span>
-                <span className="text-[10px] text-[#A25A24] font-medium block mt-0.5">Scale dry dose</span>
               </div>
 
-              <div className="p-3 bg-white rounded-xl border border-[#ECE6DC]">
-                <span className="text-[11px] font-sans text-[#766A62] block">Hot Water</span>
-                <span className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
-                  {selectedWaterGrams}g
-                </span>
-                <span className="text-[10px] text-[#766A62] block mt-0.5">at {activeBrewer.tempF}°F ({activeBrewer.tempC}°C)</span>
-              </div>
-
-              <div className="p-3 bg-white rounded-xl border border-[#ECE6DC]">
-                <span className="text-[11px] font-sans text-[#766A62] block">Grind Texture</span>
-                <span className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F] truncate block">
-                  {activeBrewer.grind}
-                </span>
-                <span className="text-[10px] text-[#766A62] block mt-0.5">{activeBrewer.grindTexture}</span>
-              </div>
-
-              <div className="p-3 bg-white rounded-xl border border-[#ECE6DC]">
-                <span className="text-[11px] font-sans text-[#766A62] block">Target Brew Time</span>
-                <span className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
-                  {activeBrewer.time}
-                </span>
-                <span className="text-[10px] text-[#2F663C] font-semibold block mt-0.5">Balanced Sweetness</span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                {QUICK_BREWERS.map((brewer) => {
+                  const isSelected = selectedBrewerId === brewer.id;
+                  return (
+                    <button
+                      key={brewer.id}
+                      type="button"
+                      onClick={() => setSelectedBrewerId(brewer.id)}
+                      className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between backdrop-blur-xs ${
+                        isSelected
+                          ? 'bg-[#14110F] text-[#FAF7F2] border-[#14110F] shadow-md ring-2 ring-[#C88A4B]/30 -translate-y-0.5'
+                          : 'bg-white/80 text-[#2A2421] hover:text-[#14110F] hover:bg-white border-[#ECE6DC] hover:border-[#D69550]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className={`p-1.5 rounded-lg ${isSelected ? 'bg-white/15 text-[#E8AF72]' : 'bg-[#FAF7F2] text-[#A8622D]'}`}>
+                          <Coffee className="w-4 h-4" />
+                        </div>
+                        {isSelected && (
+                          <Check className="w-3.5 h-3.5 text-[#E8AF72]" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-sans font-bold text-xs">
+                          {brewer.name}
+                        </div>
+                        <div className={`text-[10px] font-sans ${isSelected ? 'text-[#C4B7AC]' : 'text-[#766A62]'}`}>
+                          1 : {brewer.ratio}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
-          </div>
+
+            {/* Step B: Choose Cup Size */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-sans font-bold text-[#14110F] flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-[#14110F] text-[#FAF7F2] flex items-center justify-center text-[11px]">2</span>
+                  <span>How much coffee are you making?</span>
+                </label>
+                <span className="text-xs text-[#766A62] font-sans">
+                  Water volume: <strong className="text-[#14110F] font-semibold">{selectedWaterGrams}g</strong>
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: '1 Mug', grams: 300, desc: '10 oz (Single cup)' },
+                  { label: '2 Mugs', grams: 600, desc: '20 oz (Two cups)' },
+                  { label: 'Full Carafe', grams: 900, desc: '30 oz (Batch / Chemex)' }
+                ].map((size) => {
+                  const isSelected = selectedWaterGrams === size.grams;
+                  return (
+                    <button
+                      key={size.grams}
+                      type="button"
+                      onClick={() => setSelectedWaterGrams(size.grams)}
+                      className={`p-3.5 rounded-2xl border font-sans text-xs transition-all cursor-pointer text-center backdrop-blur-xs ${
+                        isSelected
+                          ? 'bg-[#C88A4B] text-white font-bold border-[#C88A4B] shadow-md'
+                          : 'bg-white/85 text-[#5C524B] hover:text-[#14110F] hover:bg-white border-[#ECE6DC]'
+                      }`}
+                    >
+                      <div className="font-bold text-sm">{size.label}</div>
+                      <div className={`text-[11px] mt-0.5 ${isSelected ? 'text-white/90' : 'text-[#766A62]'}`}>
+                        {size.grams}g • {size.desc}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Step C: Live Recipe Results Readout */}
+            <div className="p-5 sm:p-6 rounded-2xl bg-[#FAF7F2]/85 backdrop-blur-sm border border-[#ECD4BD] shadow-subtle">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div className="p-3 bg-white/90 rounded-xl border border-[#ECE6DC] backdrop-blur-xs">
+                  <span className="text-[11px] font-sans text-[#766A62] block">Ground Coffee</span>
+                  <span className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
+                    {calculatedCoffeeGrams}g
+                  </span>
+                  <span className="text-[10px] text-[#A25A24] font-medium block mt-0.5">Scale dry dose</span>
+                </div>
+
+                <div className="p-3 bg-white/90 rounded-xl border border-[#ECE6DC] backdrop-blur-xs">
+                  <span className="text-[11px] font-sans text-[#766A62] block">Hot Water</span>
+                  <span className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
+                    {selectedWaterGrams}g
+                  </span>
+                  <span className="text-[10px] text-[#766A62] block mt-0.5">at {activeBrewer.tempF}°F ({activeBrewer.tempC}°C)</span>
+                </div>
+
+                <div className="p-3 bg-white/90 rounded-xl border border-[#ECE6DC] backdrop-blur-xs">
+                  <span className="text-[11px] font-sans text-[#766A62] block">Grind Texture</span>
+                  <span className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F] truncate block">
+                    {activeBrewer.grind}
+                  </span>
+                  <span className="text-[10px] text-[#766A62] block mt-0.5">{activeBrewer.grindTexture}</span>
+                </div>
+
+                <div className="p-3 bg-white/90 rounded-xl border border-[#ECE6DC] backdrop-blur-xs">
+                  <span className="text-[11px] font-sans text-[#766A62] block">Target Brew Time</span>
+                  <span className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
+                    {activeBrewer.time}
+                  </span>
+                  <span className="text-[10px] text-[#2F663C] font-semibold block mt-0.5">Balanced Sweetness</span>
+                </div>
+              </div>
+            </div>
 
           {/* Step D: Instant Action Buttons */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
@@ -336,7 +355,8 @@ export default function ConsumerDiscoveryFeed({
             </button>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* ========================================================================= */}
       {/* 2. CURATED BEANS FOR YOUR BREWER                                          */}
