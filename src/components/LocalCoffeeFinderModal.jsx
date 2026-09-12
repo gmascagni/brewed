@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MapPin, Navigation, Star, Search, Coffee, Compass, ExternalLink, X, Sparkles, Clock, AlertCircle, Map as MapIcon, Loader2, RefreshCw, Store, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { MapPin, Navigation, Star, Search, Coffee, Compass, ExternalLink, X, Sparkles, Clock, AlertCircle, Map as MapIcon, Loader2, RefreshCw, Store, CheckCircle2, ShieldCheck, ChevronLeft } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 import { recordTelemetryEvent } from '../utils/telemetry';
 
@@ -135,7 +135,7 @@ const OVERPASS_ENDPOINTS = [
   'https://overpass.kumi.systems/api/interpreter'
 ];
 
-export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
+export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal = true }) {
   if (!isOpen) return null;
 
   const [userLocation, setUserLocation] = useState({
@@ -673,35 +673,43 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
     }
   }, [selectedShopId, activeShop, filteredShops]);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-xl animate-fade-in">
-      <div role="dialog" aria-modal="true" aria-label="Local Coffee Finder" className="relative w-full max-w-6xl bg-[#120F0D] border-2 border-amber-gold/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-        
-        {/* Modal Header */}
-        <div className="p-5 md:p-6 bg-gradient-to-r from-amber-950/60 via-[#1A1613] to-espresso-950 border-b border-white/10 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 rounded-2xl bg-amber-gold text-espresso-950 shadow-lg shadow-amber-gold/20 flex items-center justify-center font-bold">
-              <Compass className="w-6 h-6 animate-spin-slow" />
-            </div>
-            <div>
-              <div className="inline-flex items-center space-x-2 text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold">
-                <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                <span>Live GPS Satellite Radar • Global Coffee Directory</span>
-              </div>
-              <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light">
-                Find Coffee Shops Near Me 📍
-              </h2>
-            </div>
+  const finderCard = (
+    <div 
+      role="dialog" 
+      aria-modal={isModal} 
+      aria-label="Local Coffee Finder" 
+      className={`relative w-full max-w-6xl bg-[#120F0D] border-2 border-amber-gold/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col ${
+        isModal ? 'max-h-[92vh]' : 'mx-auto min-h-[640px]'
+      }`}
+    >
+      {/* Modal / Card Header */}
+      <div className="p-5 md:p-6 bg-gradient-to-r from-amber-950/60 via-[#1A1613] to-espresso-950 border-b border-white/10 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="p-3 rounded-2xl bg-amber-gold text-espresso-950 shadow-lg shadow-amber-gold/20 flex items-center justify-center font-bold">
+            <Compass className="w-6 h-6 animate-spin-slow" />
           </div>
-
-          <button
-            onClick={onClose}
-            className="p-2.5 rounded-full bg-white/10 text-stone-300 hover:bg-white/20 hover:text-cream-light transition-all"
-            title="Close Finder"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div>
+            <div className="inline-flex items-center space-x-2 text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold">
+              <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+              <span>Live GPS Satellite Radar • Global Coffee Directory</span>
+            </div>
+            <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light">
+              Find Coffee Shops Near Me 📍
+            </h2>
+          </div>
         </div>
+
+        <button
+          onClick={onClose}
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white/10 text-stone-300 hover:bg-white/20 hover:text-cream-light transition-all text-xs font-mono font-bold border border-white/10"
+          title={isModal ? "Close Finder" : "Return to Brewing Station"}
+          aria-label={isModal ? "Close Finder" : "Return to Brewing Station"}
+        >
+          <ChevronLeft className="w-4 h-4 text-amber-gold" />
+          <span className="hidden sm:inline">Brew Station</span>
+          <X className="w-4 h-4 text-stone-400 hover:text-white" />
+        </button>
+      </div>
 
         {/* Filter & Live Search Controls Bar */}
         <div className="p-4 bg-[#181411] border-b border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -1035,7 +1043,20 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
 
         </div>
 
-      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {isModal ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-xl animate-fade-in">
+          {finderCard}
+        </div>
+      ) : (
+        <div className="w-full animate-fade-in">
+          {finderCard}
+        </div>
+      )}
 
       {/* Partner Placement & Onboarding Modal */}
       {isClaimModalOpen && (
@@ -1048,55 +1069,60 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
               <X className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-amber-gold mb-2">
-              <Sparkles className="w-4 h-4" />
-              <span>Partner Placement Program</span>
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="p-3 rounded-2xl bg-amber-gold/20 text-amber-gold border border-amber-gold/30">
+                <Store className="w-6 h-6" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-amber-gold font-bold">Partner Placement & Directory Listing</span>
+                <h3 className="font-serif text-2xl font-bold text-cream-light">Claim Your Cafe or Roastery</h3>
+              </div>
             </div>
 
-            <h3 className="font-serif text-2xl md:text-3xl font-bold text-cream-light mb-2">
-              Grow Your Specialty Foot-Traffic
-            </h3>
-            <p className="text-xs md:text-sm text-stone-300 mb-6 leading-relaxed">
-              Connect directly with home baristas and coffee connoisseurs searching for exceptional beans and espresso bars in your area.
+            <p className="text-xs text-stone-300 mb-6 leading-relaxed">
+              Connect your brick-and-mortar cafe or roastery to the TheBrew.App specialty coffee radar. Every shop gets a 100% free permanent listing. Upgrade to Local Spotlight for priority map placement.
             </p>
 
-            {/* Two Tier Comparison */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               
-              {/* Tier 1: 100% Free Forever */}
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
+              {/* Free Tier Card */}
+              <div className="p-4 rounded-2xl bg-white/[0.04] border border-white/10 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-sm text-cream-light font-sans">Free Partner</span>
-                    <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded">FREE</span>
+                    <span className="font-bold text-sm text-cream-light">Standard Listing</span>
+                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">Free Forever</span>
                   </div>
-                  <p className="text-[11px] text-stone-400 mb-3">Permanent listing for every specialty coffee shop.</p>
+                  <p className="text-[11px] text-stone-400 mb-3">Permanent placement in community coffee shop search.</p>
                   <ul className="text-[11px] text-stone-300 space-y-1.5">
-                    <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Real-time "On Bar Today" switcher</li>
-                    <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Espresso & grinder gear setup</li>
-                    <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Basic 7-day view metrics</li>
+                    <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Physical map pin & GPS navigation</li>
+                    <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Operating hours & phone contact</li>
+                    <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Espresso bar equipment specs</li>
+                    <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Organic search ranking</li>
                   </ul>
                 </div>
                 <button
                   type="button"
                   onClick={() => {
-                    alert('Free cafe listing active! You can now manage your bar setup in the Coffee Shop Portal.');
+                    alert('Standard Free Listing claimed! Your cafe coordinates have been scheduled for automated radar verification.');
                     setIsClaimModalOpen(false);
                   }}
                   className="mt-4 w-full py-2 rounded-xl bg-white/10 hover:bg-white/20 text-cream-light font-bold text-xs transition-colors"
                 >
-                  Claim Free Listing
+                  Claim Free Profile
                 </button>
               </div>
 
-              {/* Tier 2: Local Spotlight Partner */}
-              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-gold/50 flex flex-col justify-between relative overflow-hidden shadow-lg">
+              {/* Spotlight Partner Card */}
+              <div className="p-4 rounded-2xl bg-gradient-to-b from-amber-500/15 to-transparent border-2 border-amber-gold/50 flex flex-col justify-between relative overflow-hidden shadow-lg">
+                <div className="absolute top-0 right-0 px-2.5 py-0.5 bg-amber-gold text-espresso-950 text-[9px] font-mono font-extrabold uppercase tracking-wider rounded-bl-xl">
+                  Popular
+                </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-sm text-amber-gold font-sans">Local Spotlight</span>
-                    <span className="text-xs font-mono font-bold text-amber-gold bg-amber-gold/20 px-2 py-0.5 rounded">$19/mo</span>
+                    <span className="font-bold text-sm text-amber-gold font-serif">Local Spotlight</span>
+                    <span className="text-xs font-mono font-bold text-cream-light">$19 / mo</span>
                   </div>
-                  <p className="text-[11px] text-stone-400 mb-3">Maximum visibility & customer telemetry intelligence.</p>
+                  <p className="text-[11px] text-stone-300 mb-3">Maximum visibility for active specialty roasters & flagship cafes.</p>
                   <ul className="text-[11px] text-stone-200 space-y-1.5">
                     <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-amber-gold" /> Top-of-Radar Priority Pin</li>
                     <li className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-amber-gold" /> Verified PROMOTED PARTNER badge</li>
@@ -1125,6 +1151,6 @@ export default function LocalCoffeeFinderModal({ isOpen, onClose }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -39,10 +39,11 @@ export default function Header({
   onOpenRoasterShowcase,
   onOpenMobileTools,
   isRoasterShowcaseView = false,
+  isShopsView = false,
   onOpenVideoAcademy,
   onOpenNews,
   onSelectView,
-  currentView = 'discovery', // 'discovery' | 'brew_station' | 'roasters' | 'cafe_portal' | 'learn'
+  currentView = 'discovery', // 'discovery' | 'brew_station' | 'roasters' | 'cafe_portal' | 'learn' | 'recipes' | 'shops'
   isMuted = false,
   onToggleMute,
   currentUser 
@@ -126,39 +127,53 @@ export default function Header({
           <button
             type="button"
             onClick={() => onSelectView && onSelectView('brew_station')}
-            className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
-              (currentView === 'brew_station' || currentView === 'discovery') && !isRoasterShowcaseView
+            className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
+              (currentView === 'brew_station' || currentView === 'discovery') && !isRoasterShowcaseView && !isShopsView && currentView !== 'shops' && currentView !== 'recipes' && currentView !== 'learn'
                 ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                 : 'text-[#766A62] hover:text-[#14110F]'
             }`}
+            title="Interactive Precision Brewing Atelier & Timer"
           >
-            Brew
+            <span>Brew</span>
+            {(currentView === 'brew_station' || currentView === 'discovery') && !isRoasterShowcaseView && !isShopsView && currentView !== 'shops' && currentView !== 'recipes' && currentView !== 'learn' && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse" />
+            )}
           </button>
 
           {/* Primary 2: Recipes */}
           <button
             type="button"
             onClick={() => onSelectView ? onSelectView('recipes') : (onOpenCommunity && onOpenCommunity())}
-            className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
               currentView === 'recipes'
                 ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                 : 'text-[#766A62] hover:text-[#14110F]'
             }`}
             title="Open Recipe Vault & Custom Studio"
           >
-            Recipes
+            <span>Recipes</span>
+            {currentView === 'recipes' && (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse" />
+            )}
           </button>
 
           {/* Primary 3: Shops / Shop Local Coffee Radar */}
-          {onOpenLocalCoffee && (
+          {(onOpenLocalCoffee || onSelectView) && (
             <button
               type="button"
-              onClick={onOpenLocalCoffee}
-              className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold text-[#766A62] hover:text-[#14110F] transition-all whitespace-nowrap"
+              onClick={() => onSelectView ? onSelectView('shops') : (onOpenLocalCoffee && onOpenLocalCoffee())}
+              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
+                currentView === 'shops' || isShopsView
+                  ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                  : 'text-[#766A62] hover:text-[#14110F]'
+              }`}
               title="Shop Local Coffee & Roasters"
             >
               <Compass className="w-3.5 h-3.5 text-[#C88A4B]" />
               <span>Shop Local</span>
+              {(currentView === 'shops' || isShopsView) && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse" />
+              )}
             </button>
           )}
 
@@ -168,7 +183,7 @@ export default function Header({
               type="button"
               onClick={onOpenRoasterShowcase}
               className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
-                isRoasterShowcaseView
+                isRoasterShowcaseView || currentView === 'roasters'
                   ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                   : 'text-[#766A62] hover:text-[#14110F]'
               }`}
@@ -176,7 +191,7 @@ export default function Header({
             >
               <Store className="w-3.5 h-3.5 text-[#C88A4B]" />
               <span>Roasters</span>
-              {isRoasterShowcaseView && (
+              {(isRoasterShowcaseView || currentView === 'roasters') && (
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse" />
               )}
             </button>

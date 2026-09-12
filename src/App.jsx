@@ -124,6 +124,7 @@ export default function App() {
   const [isCafePortalView, setIsCafePortalView] = useState(false);
   const [isLearnView, setIsLearnView] = useState(false);
   const [isRecipesView, setIsRecipesView] = useState(false);
+  const [isShopsView, setIsShopsView] = useState(false);
   const [selectedRoasterSlug, setSelectedRoasterSlug] = useState('methodical');
   const [isVideoAcademyOpen, setIsVideoAcademyOpen] = useState(false);
   const [selectedAcademyVideoId, setSelectedAcademyVideoId] = useState(null);
@@ -324,6 +325,7 @@ export default function App() {
           : 'https://thebrew.app/guides/coffee-water-chemistry'
       );
     } else if (path.startsWith('/roasters') || path.startsWith('/roaster')) {
+      setIsShopsView(false);
       if (path === '/roasters/partner' || path === '/roasters/info') {
         setIsRoasterInfoOpen(true);
       } else {
@@ -339,6 +341,7 @@ export default function App() {
         'https://thebrew.app/roasters'
       );
     } else if (path.startsWith('/academy') || path.startsWith('/videos')) {
+      setIsShopsView(false);
       setIsVideoAcademyOpen(true);
       updatePageSeo(
         'Coffee Academy & Video Masterclasses | The Brew App',
@@ -349,6 +352,7 @@ export default function App() {
       setIsRoasterShowcaseView(false);
       setIsCafePortalView(false);
       setIsRecipesView(false);
+      setIsShopsView(false);
       setIsLearnView(true);
       updatePageSeo(
         'Specialty Coffee Learning Center & Extraction Science | TheBrew.App',
@@ -359,6 +363,7 @@ export default function App() {
       setIsRoasterShowcaseView(false);
       setIsCafePortalView(false);
       setIsLearnView(false);
+      setIsShopsView(false);
       setIsRecipesView(true);
       setIsCommunityOpen(false);
       updatePageSeo(
@@ -366,8 +371,21 @@ export default function App() {
         'Explore verified benchmark extraction guides from world champions and craft your own custom recipes saved locally on your device.',
         'https://thebrew.app/recipes'
       );
+    } else if (path.startsWith('/shops') || path.startsWith('/local')) {
+      setIsRoasterShowcaseView(false);
+      setIsCafePortalView(false);
+      setIsLearnView(false);
+      setIsRecipesView(false);
+      setIsShopsView(true);
+      setIsLocalCoffeeOpen(false);
+      updatePageSeo(
+        'Find Specialty Coffee Shops Near Me | TheBrew.App',
+        'Live GPS radar and directory for finding artisan coffee roasters, third-wave espresso bars, and specialty cafes near your physical location.',
+        'https://thebrew.app/shops'
+      );
     } else if (path.includes('smart-bag-scanner') || path.startsWith('/demo') || path.startsWith('/scanner') || path.startsWith('/scan')) {
       setIsRoasterShowcaseView(false);
+      setIsShopsView(false);
       setIsScannerOpen(true);
       updatePageSeo(
         'Smart Bag Barcode & QR Scanner Demo | The Brew App',
@@ -379,6 +397,7 @@ export default function App() {
       setIsCafePortalView(false);
       setIsLearnView(false);
       setIsRecipesView(false);
+      setIsShopsView(false);
       // Check for Smart Bag deep link query parameters or video parameter:
       const searchParams = new URLSearchParams(location.search);
       const videoParam = searchParams.get('video');
@@ -485,17 +504,25 @@ export default function App() {
           onOpenSearch={() => setIsSearchOpen(true)}
           onOpenProfile={() => setIsProfileOpen(true)}
           onOpenCommunity={() => setIsCommunityOpen(true)}
-          onOpenLocalCoffee={() => setIsLocalCoffeeOpen(true)}
+          onOpenLocalCoffee={() => {
+            setIsCafePortalView(false);
+            setIsRoasterShowcaseView(false);
+            setIsLearnView(false);
+            setIsRecipesView(false);
+            setIsShopsView(true);
+            navigate('/shops');
+          }}
           onOpenAuth={() => setIsAuthModalOpen(true)}
           onOpenScanner={() => setIsScannerOpen(true)}
           onOpenWaterLab={() => setIsWaterLabOpen(true)}
           onOpenRoasterPortal={() => { setRoasterPrefillBarcode(''); setRoasterPrefillBean(null); setIsRoasterPortalOpen(true); }}
-          onOpenCafePortal={() => { setIsRoasterShowcaseView(false); setIsCafePortalView(true); }}
+          onOpenCafePortal={() => { setIsRoasterShowcaseView(false); setIsShopsView(false); setIsCafePortalView(true); }}
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
           onOpenRoasterShowcase={handleOpenRoasterShowcase}
           onOpenMobileTools={() => setIsMobileToolsOpen(true)}
           isRoasterShowcaseView={isRoasterShowcaseView}
-          currentView={isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : isRecipesView ? 'recipes' : (currentStep > 1 ? 'brew_station' : 'discovery')}
+          isShopsView={isShopsView}
+          currentView={isShopsView ? 'shops' : isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : isRecipesView ? 'recipes' : (currentStep > 1 ? 'brew_station' : 'discovery')}
           onSelectView={(v) => {
             // Dismiss all open modals when navigating primary views
             setIsCommunityOpen(false);
@@ -512,6 +539,7 @@ export default function App() {
               setIsRoasterShowcaseView(false);
               setIsLearnView(false);
               setIsRecipesView(false);
+              setIsShopsView(false);
               setCurrentStep(1);
               navigate('/');
             } else if (v === 'brew_station') {
@@ -519,6 +547,7 @@ export default function App() {
               setIsRoasterShowcaseView(false);
               setIsLearnView(false);
               setIsRecipesView(false);
+              setIsShopsView(false);
               navigate('/');
               const el = document.getElementById('brew-atelier');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -526,12 +555,27 @@ export default function App() {
               setIsCafePortalView(false);
               setIsRoasterShowcaseView(false);
               setIsLearnView(false);
+              setIsShopsView(false);
               setIsRecipesView(true);
               navigate('/recipes');
+            } else if (v === 'shops') {
+              setIsCafePortalView(false);
+              setIsRoasterShowcaseView(false);
+              setIsLearnView(false);
+              setIsRecipesView(false);
+              setIsShopsView(true);
+              navigate('/shops');
+            } else if (v === 'roasters') {
+              setIsCafePortalView(false);
+              setIsLearnView(false);
+              setIsRecipesView(false);
+              setIsShopsView(false);
+              handleOpenRoasterShowcase();
             } else if (v === 'learn') {
               setIsCafePortalView(false);
               setIsRoasterShowcaseView(false);
               setIsRecipesView(false);
+              setIsShopsView(false);
               setIsLearnView(true);
               navigate('/learn');
             }
@@ -543,8 +587,8 @@ export default function App() {
           currentUser={currentUser}
         />
         
-        {/* Step Progress Bar Pinned Inside Sticky Top Bar (hidden in Roaster Showcase, Cafe Portal, Learn, or Recipes) */}
-        {!isRoasterShowcaseView && !isCafePortalView && !isLearnView && !isRecipesView && (
+        {/* Step Progress Bar Pinned Inside Sticky Top Bar (hidden in Roaster Showcase, Cafe Portal, Learn, Recipes, or Shops) */}
+        {!isRoasterShowcaseView && !isCafePortalView && !isLearnView && !isRecipesView && !isShopsView && (
           <StepIndicator
             currentStep={currentStep}
             setCurrentStep={(stepNum) => {
@@ -624,6 +668,18 @@ export default function App() {
                 }}
               />
             </div>
+          ) : isShopsView ? (
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 animate-fade-in w-full" id="local-coffee-shops-section" data-view="shops" role="region" aria-label="Specialty Coffee Shop & Roaster Radar">
+              <LocalCoffeeFinderModal
+                isModal={false}
+                isOpen={true}
+                onClose={() => {
+                  setIsShopsView(false);
+                  navigate('/');
+                }}
+                trackMode={trackMode}
+              />
+            </div>
           ) : (
             <>
               {/* STEP 01: CONSUMER DISCOVERY FEED + METHOD SELECTOR */}
@@ -636,7 +692,14 @@ export default function App() {
                       setIsRoasterShowcaseView(true);
                       navigate('/roasters');
                     }}
-                    onOpenLocator={() => setIsLocalCoffeeOpen(true)}
+                    onOpenLocator={() => {
+                      setIsCafePortalView(false);
+                      setIsRoasterShowcaseView(false);
+                      setIsLearnView(false);
+                      setIsRecipesView(false);
+                      setIsShopsView(true);
+                      navigate('/shops');
+                    }}
                     onStartBrewStation={() => {
                       const el = document.getElementById('brew-atelier');
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -959,7 +1022,8 @@ export default function App() {
 
         {/* Mobile Sticky 1-Thumb Bottom Navigation Bar */}
         <MobileBottomNav
-          currentView={isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : isRecipesView ? 'recipes' : (currentStep > 1 ? 'brew_station' : 'discovery')}
+          currentView={isShopsView ? 'shops' : isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : isRecipesView ? 'recipes' : (currentStep > 1 ? 'brew_station' : 'discovery')}
+          isShopsView={isShopsView}
           onSelectView={(v) => {
             // Dismiss all open modals when navigating primary views
             setIsCommunityOpen(false);
@@ -977,22 +1041,37 @@ export default function App() {
               setIsRoasterShowcaseView(false);
               setIsLearnView(false);
               setIsRecipesView(false);
+              setIsShopsView(false);
               setCurrentStep(1);
               navigate('/');
             } else if (v === 'recipes') {
               setIsCafePortalView(false);
               setIsRoasterShowcaseView(false);
               setIsLearnView(false);
+              setIsShopsView(false);
               setIsRecipesView(true);
               navigate('/recipes');
+            } else if (v === 'shops') {
+              setIsCafePortalView(false);
+              setIsRoasterShowcaseView(false);
+              setIsLearnView(false);
+              setIsRecipesView(false);
+              setIsShopsView(true);
+              navigate('/shops');
             }
           }}
           onOpenLocalCoffee={() => {
             setIsMobileToolsOpen(false);
-            setIsLocalCoffeeOpen(true);
+            setIsCafePortalView(false);
+            setIsRoasterShowcaseView(false);
+            setIsLearnView(false);
+            setIsRecipesView(false);
+            setIsShopsView(true);
+            navigate('/shops');
           }}
           onOpenRoasterShowcase={() => {
             setIsMobileToolsOpen(false);
+            setIsShopsView(false);
             handleOpenRoasterShowcase();
           }}
           onOpenTools={() => setIsMobileToolsOpen(true)}

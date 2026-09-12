@@ -10,14 +10,16 @@ import { hapticTap } from '../utils/haptics';
 
 export default function MobileBottomNav({
   currentView,
+  isShopsView = false,
   onSelectView,
   onOpenLocalCoffee,
   onOpenRoasterShowcase,
   onOpenTools,
   isToolsOpen
 }) {
-  const isBrew = currentView === 'brew_station' || currentView === 'discovery';
+  const isBrew = (currentView === 'brew_station' || currentView === 'discovery') && !isShopsView && currentView !== 'shops' && currentView !== 'recipes' && currentView !== 'roasters' && currentView !== 'learn';
   const isRecipes = currentView === 'recipes';
+  const isShops = currentView === 'shops' || isShopsView;
   const isRoasters = currentView === 'roasters';
 
   return (
@@ -77,13 +79,23 @@ export default function MobileBottomNav({
         type="button"
         onClick={() => {
           hapticTap();
-          if (onOpenLocalCoffee) onOpenLocalCoffee();
+          if (onSelectView) {
+            onSelectView('shops');
+          } else if (onOpenLocalCoffee) {
+            onOpenLocalCoffee();
+          }
         }}
-        className="flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target hover:text-[#14110F]"
+        className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target ${
+          isShops && !isToolsOpen
+            ? 'text-[#C88A4B] font-bold'
+            : 'hover:text-[#14110F]'
+        }`}
         title="Shop Local Specialty Coffee Radar"
         aria-label="Shop Local Specialty Coffee Radar"
       >
-        <div className="p-1 rounded-xl transition-all">
+        <div className={`p-1 rounded-xl transition-all ${
+          isShops && !isToolsOpen ? 'bg-[#FAF0E6]' : ''
+        }`}>
           <Compass className="w-5 h-5 text-[#C88A4B]" />
         </div>
         <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Local</span>

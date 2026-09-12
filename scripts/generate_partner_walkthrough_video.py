@@ -14,8 +14,10 @@ FFMPEG_EXE = imageio_ffmpeg.get_ffmpeg_exe()
 
 if sys.platform == "win32":
     try:
-        sys.stdout.reconfigure(encoding="utf-8")
-        sys.stderr.reconfigure(encoding="utf-8")
+        if hasattr(sys.stdout, "reconfigure"):
+            getattr(sys.stdout, "reconfigure")(encoding="utf-8")
+        if hasattr(sys.stderr, "reconfigure"):
+            getattr(sys.stderr, "reconfigure")(encoding="utf-8")
     except Exception:
         pass
 
@@ -134,7 +136,7 @@ def get_audio_duration(audio_path: Path) -> float:
         rate = wf.getframerate()
         return frames / float(rate)
 
-def draw_hud(draw: ImageDraw.Draw, card_type: str, progress: float, center_x: int, center_y: int):
+def draw_hud(draw: ImageDraw.ImageDraw, card_type: str, progress: float, center_x: int, center_y: int):
     if card_type == "hook":
         # Draw elegant dual-pillar badge for roasters & cafes
         w, h = 760, 240
@@ -341,7 +343,7 @@ def build_scene_clip(scene: dict, scene_idx: int) -> Path:
     duration = get_audio_duration(audio_path)
     print(f"-> Audio duration: {duration:.2f}s")
     
-    total_frames = int(math.ceil(duration * FPS))
+    total_frames = math.ceil(duration * FPS)
     print(f"-> Rendering {total_frames} frames @ {FPS} fps...")
     
     # Load background image
