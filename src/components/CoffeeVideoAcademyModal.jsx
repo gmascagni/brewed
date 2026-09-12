@@ -385,6 +385,17 @@ export default function CoffeeVideoAcademyModal({
                                 <Play className="w-2.5 h-2.5 fill-current" />
                                 <span>Watch</span>
                               </button>
+
+                              <a
+                                href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-1.5 rounded-lg bg-red-600/15 hover:bg-red-600/30 text-red-300 hover:text-white border border-red-500/30 transition flex items-center"
+                                title="Open video directly on YouTube"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
                             </div>
                           </div>
                         </div>
@@ -421,7 +432,7 @@ export default function CoffeeVideoAcademyModal({
                   className="px-4 py-2 rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] text-cream-light hover:text-amber-gold border border-white/15 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95 shadow"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>← Back to Masterclass Library ({COFFEE_VIDEOS.length} Videos)</span>
+                  <span>Back to Masterclass Library ({COFFEE_VIDEOS.length} Videos)</span>
                 </button>
 
                 <div className="flex items-center gap-2">
@@ -463,6 +474,16 @@ export default function CoffeeVideoAcademyModal({
                         <Eye className="w-3.5 h-3.5 text-amber-gold" />
                         {selectedVideo.views} views
                       </span>
+                      <a
+                        href={`https://www.youtube.com/watch?v=${selectedVideo.youtubeId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-600/20 hover:bg-red-600/30 text-red-300 hover:text-white text-[11px] font-mono font-bold border border-red-500/30 transition shadow-xs"
+                        title="Open this masterclass directly on YouTube"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Watch on YouTube</span>
+                      </a>
                     </div>
 
                     <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream-light leading-snug">
@@ -518,6 +539,17 @@ export default function CoffeeVideoAcademyModal({
                         >
                           {copiedLink ? <CheckCircle2 className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
                         </button>
+
+                        <a
+                          href={`https://www.youtube.com/watch?v=${selectedVideo.youtubeId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2.5 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-300 hover:text-white border border-red-500/30 transition flex items-center gap-1.5 font-mono text-xs font-bold shadow-sm"
+                          title="Open video directly on YouTube"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          <span className="hidden sm:inline">YouTube</span>
+                        </a>
                       </div>
                     </div>
                   )}
