@@ -1,9 +1,9 @@
 {
   "version": "1.5.0",
-  "buildId": "1.5.0-2312dff-mtxwtb9j",
-  "commit": "2312dff",
+  "buildId": "1.5.0-b828edd-mtxx1o7m",
+  "commit": "b828edd",
   "branch": "main",
-  "buildDate": "2026-09-12T04:53:16.999Z",
+  "buildDate": "2026-09-12T04:59:47.026Z",
   "environment": "production",
   "appName": "the-brew-app"
 }
