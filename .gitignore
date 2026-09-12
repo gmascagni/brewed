@@ -23,10 +23,13 @@ dist-ssr
 *.sln
 *.sw?
 
-# Python
+# Python & Virtual Environments
 __pycache__/
 *.py[cod]
 *$py.class
+.venv/
+temp_video_render/
 
 # GitHub Actions workflows (handled via GitHub web interface to bypass local PAT workflow scope limits)
 .github/
+
