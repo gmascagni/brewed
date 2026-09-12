@@ -442,12 +442,12 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
                   </div>
 
                   <div>
-                    <label className="block text-cream-soft/80 mb-1">City, State, Country</label>
+                    <label className="block text-cream-soft/80 mb-1">City, State</label>
                     <input
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      placeholder="e.g. Greenville, SC, USA"
+                      placeholder="e.g. Greenville, SC"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold"
                     />
                   </div>

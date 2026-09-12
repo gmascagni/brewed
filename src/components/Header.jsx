@@ -126,8 +126,12 @@ export default function Header({
           {/* Primary 2: Recipes */}
           <button
             type="button"
-            onClick={onOpenCommunity || onOpenJournal}
-            className="px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold text-[#766A62] hover:text-[#14110F] transition-all whitespace-nowrap"
+            onClick={() => onSelectView ? onSelectView('recipes') : (onOpenCommunity && onOpenCommunity())}
+            className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap ${
+              currentView === 'recipes'
+                ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                : 'text-[#766A62] hover:text-[#14110F]'
+            }`}
             title="Open Recipe Vault & Custom Studio"
           >
             Recipes

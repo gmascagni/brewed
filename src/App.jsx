@@ -28,6 +28,7 @@ import CoffeeVideoAcademyModal from './components/CoffeeVideoAcademyModal';
 import ConsumerDiscoveryFeed from './components/ConsumerDiscoveryFeed';
 import CafePartnerPortal from './components/CafePartnerPortal';
 import LearnSection from './components/LearnSection';
+import RecipeExplorer from './components/RecipeExplorer';
 import Footer from './components/Footer';
 import { AppOrchestratorProvider } from './context/AppOrchestratorContext';
 import { BREW_METHODS } from './data/brewData';
@@ -119,6 +120,7 @@ export default function App() {
   const [isRoasterShowcaseView, setIsRoasterShowcaseView] = useState(false);
   const [isCafePortalView, setIsCafePortalView] = useState(false);
   const [isLearnView, setIsLearnView] = useState(false);
+  const [isRecipesView, setIsRecipesView] = useState(false);
   const [selectedRoasterSlug, setSelectedRoasterSlug] = useState('methodical');
   const [isVideoAcademyOpen, setIsVideoAcademyOpen] = useState(false);
   const [selectedAcademyVideoId, setSelectedAcademyVideoId] = useState(null);
@@ -343,11 +345,23 @@ export default function App() {
     } else if (path.startsWith('/learn')) {
       setIsRoasterShowcaseView(false);
       setIsCafePortalView(false);
+      setIsRecipesView(false);
       setIsLearnView(true);
       updatePageSeo(
         'Specialty Coffee Learning Center & Extraction Science | TheBrew.App',
         'Master specialty coffee brewing: video masterclasses, extraction channeling diagnostics, SCA water mineral chemistry, and gear guides.',
         'https://thebrew.app/learn'
+      );
+    } else if (path.startsWith('/recipes') || path.startsWith('/recipe')) {
+      setIsRoasterShowcaseView(false);
+      setIsCafePortalView(false);
+      setIsLearnView(false);
+      setIsRecipesView(true);
+      setIsCommunityOpen(false);
+      updatePageSeo(
+        'Specialty Coffee Master Recipe Vault & Personal Studio | TheBrew.App',
+        'Explore verified benchmark extraction guides from world champions and craft your own custom recipes saved locally on your device.',
+        'https://thebrew.app/recipes'
       );
     } else if (path.includes('smart-bag-scanner') || path.startsWith('/demo') || path.startsWith('/scanner') || path.startsWith('/scan')) {
       setIsRoasterShowcaseView(false);
@@ -359,6 +373,9 @@ export default function App() {
       );
     } else if (path === '/' || path === '') {
       setIsRoasterShowcaseView(false);
+      setIsCafePortalView(false);
+      setIsLearnView(false);
+      setIsRecipesView(false);
       // Check for Smart Bag deep link query parameters or video parameter:
       const searchParams = new URLSearchParams(location.search);
       const videoParam = searchParams.get('video');
@@ -474,23 +491,43 @@ export default function App() {
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
           onOpenRoasterShowcase={handleOpenRoasterShowcase}
           isRoasterShowcaseView={isRoasterShowcaseView}
-          currentView={isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : (currentStep > 1 ? 'brew_station' : 'discovery')}
+          currentView={isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : isRecipesView ? 'recipes' : (currentStep > 1 ? 'brew_station' : 'discovery')}
           onSelectView={(v) => {
+            // Dismiss all open modals when navigating primary views
+            setIsCommunityOpen(false);
+            setIsRoasterPortalOpen(false);
+            setIsLocalCoffeeOpen(false);
+            setIsWaterLabOpen(false);
+            setIsVideoAcademyOpen(false);
+            setIsJournalOpen(false);
+            setIsProfileOpen(false);
+            setIsSearchOpen(false);
+
             if (v === 'discovery') {
               setIsCafePortalView(false);
               setIsRoasterShowcaseView(false);
               setIsLearnView(false);
+              setIsRecipesView(false);
               setCurrentStep(1);
               navigate('/');
             } else if (v === 'brew_station') {
               setIsCafePortalView(false);
               setIsRoasterShowcaseView(false);
               setIsLearnView(false);
+              setIsRecipesView(false);
+              navigate('/');
               const el = document.getElementById('brew-atelier');
               if (el) el.scrollIntoView({ behavior: 'smooth' });
+            } else if (v === 'recipes') {
+              setIsCafePortalView(false);
+              setIsRoasterShowcaseView(false);
+              setIsLearnView(false);
+              setIsRecipesView(true);
+              navigate('/recipes');
             } else if (v === 'learn') {
               setIsCafePortalView(false);
               setIsRoasterShowcaseView(false);
+              setIsRecipesView(false);
               setIsLearnView(true);
               navigate('/learn');
             }
@@ -502,8 +539,8 @@ export default function App() {
           currentUser={currentUser}
         />
         
-        {/* Step Progress Bar Pinned Inside Sticky Top Bar (hidden in Roaster Showcase, Cafe Portal, or Learn) */}
-        {!isRoasterShowcaseView && !isCafePortalView && !isLearnView && (
+        {/* Step Progress Bar Pinned Inside Sticky Top Bar (hidden in Roaster Showcase, Cafe Portal, Learn, or Recipes) */}
+        {!isRoasterShowcaseView && !isCafePortalView && !isLearnView && !isRecipesView && (
           <StepIndicator
             currentStep={currentStep}
             setCurrentStep={(stepNum) => {
@@ -559,6 +596,30 @@ export default function App() {
               setActiveVideo={setActiveVideo}
               onOpenWaterLab={() => setIsWaterLabOpen(true)}
             />
+          ) : isRecipesView ? (
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 animate-fade-in w-full" id="recipe-vault-section" data-view="recipes" role="region" aria-label="Master Recipe Vault & Personal Studio">
+              <RecipeExplorer
+                trackMode={trackMode}
+                onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
+                onSelectRecipe={(recipe) => {
+                  const allMethods = BREW_METHODS.coffee;
+                  const match = allMethods.find(m => m.id === recipe.methodId || m.id.includes(recipe.methodId)) || allMethods[0];
+                  setActiveMethod(match);
+                  if (recipe.ratio) setCustomRatio(recipe.ratio);
+                  const waterAmount = Number(recipe.waterGrams || (recipe.doseGrams ? Math.round(recipe.doseGrams * (recipe.ratio || 16)) : 320));
+                  setCustomWaterMl(waterAmount);
+                  setCupCount(1);
+                  setCupMl(waterAmount);
+                  setIsRecipesView(false);
+                  setCurrentStep(4);
+                  navigate(`/methods/${match.id}`);
+                  setTimeout(() => {
+                    const timerEl = document.getElementById('step-4') || document.querySelector('main');
+                    if (timerEl) timerEl.scrollIntoView({ behavior: 'smooth' });
+                  }, 150);
+                }}
+              />
+            </div>
           ) : (
             <>
               {/* STEP 01: CONSUMER DISCOVERY FEED + METHOD SELECTOR */}

@@ -541,6 +541,7 @@ const roasterContent = `
     <!-- 60-Second Video Walkthrough Embedded Player -->
     <div style="background: #000; border-radius: 20px; overflow: hidden; max-width: 360px; margin: 28px auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); border: 1px solid rgba(212, 140, 70, 0.4); text-align: center;">
       <video controls playsinline autoplay loop muted style="width: 100%; display: block; aspect-ratio: 9/16; object-fit: cover;">
+        <source src="/brewed/videos/smart_bag_scan_demo.mp4" type="video/mp4">
         <source src="/videos/smart_bag_scan_demo.mp4" type="video/mp4">
       </video>
       <div style="padding: 12px; font-size: 12px; color: #D4A373; font-family: monospace; background: #120A06;">
@@ -604,8 +605,8 @@ fs.writeFileSync(path.join(roasterRootDir, 'index.html'), roasterHtml);
 
 console.log('✓ Successfully prerendered /roasters with Article and FAQPage schemas!');
 
-// Prerender /demo/smart-bag-scanner, /scanner, and /academy
-['demo/smart-bag-scanner', 'scanner', 'scan', 'academy'].forEach((subPath) => {
+// Prerender /demo/smart-bag-scanner, /scanner, /academy, /recipes, and /learn
+['demo/smart-bag-scanner', 'scanner', 'scan', 'academy', 'recipes', 'learn'].forEach((subPath) => {
   const targetDistDir = path.join(distDir, ...subPath.split('/'));
   const targetRootDir = path.join(rootDir, ...subPath.split('/'));
   fs.mkdirSync(targetDistDir, { recursive: true });
@@ -613,5 +614,5 @@ console.log('✓ Successfully prerendered /roasters with Article and FAQPage sch
   fs.writeFileSync(path.join(targetDistDir, 'index.html'), templateHtml);
   fs.writeFileSync(path.join(targetRootDir, 'index.html'), templateHtml);
 });
-console.log('✓ Successfully prerendered /demo/smart-bag-scanner, /scanner, and /academy static routes!');
+console.log('✓ Successfully prerendered /demo/smart-bag-scanner, /scanner, /academy, /recipes, and /learn static routes!');
 

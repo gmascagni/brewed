@@ -657,20 +657,27 @@ class FullSiteQASuite:
     # =========================================================================
     async def test_uc_8_1_recipe_vault_modal(self, s, base):
         opened = await s.evaluate("""(() => {
-            const btn = Array.from(document.querySelectorAll('header button')).find(b => b.innerText.includes('Recipe Vault') || b.getAttribute('title')?.includes('Recipe Vault'));
+            const btn = Array.from(document.querySelectorAll('header button')).find(b => b.innerText.includes('Recipes') || b.innerText.includes('Recipe Vault') || b.getAttribute('title')?.includes('Recipe Vault'));
             if (btn) { btn.click(); return true; }
             return false;
         })()""")
         if not opened: raise AssertionError("Recipe Vault button not found")
         await asyncio.sleep(1)
 
-        mounted = await s.evaluate("""!!document.querySelector('[role="dialog"]')""")
-        if not mounted: raise AssertionError("Recipe Vault modal failed to mount")
+        mounted = await s.evaluate("""(() => {
+            return !!(document.querySelector('[data-view="recipes"]') || document.querySelector('#recipe-vault-section') || document.querySelector('[role="dialog"]') || document.body.innerText.includes('Master Recipe Vault'));
+        })()""")
+        if not mounted: raise AssertionError("Recipe Vault failed to mount")
 
-        # Close modal
+        # Navigate back to Brew station seamlessly without needing an 'X' button
         await s.evaluate("""(() => {
-            const closeBtn = document.querySelector('[role="dialog"] button');
-            if (closeBtn) closeBtn.click();
+            const brewBtn = Array.from(document.querySelectorAll('header button')).find(b => b.innerText.trim() === 'Brew');
+            if (brewBtn) {
+                brewBtn.click();
+            } else {
+                const closeBtn = document.querySelector('[role="dialog"] button');
+                if (closeBtn) closeBtn.click();
+            }
         })()""")
         await asyncio.sleep(0.5)
         return {"vault_mounted": True}

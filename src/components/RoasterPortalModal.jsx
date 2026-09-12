@@ -633,12 +633,12 @@ export default function RoasterPortalModal({
                   </div>
 
                   <div>
-                    <label className="block text-cream-soft/70 font-mono mb-1">Location (City, Country)</label>
+                    <label className="block text-cream-soft/70 font-mono mb-1">Location (City, State)</label>
                     <input
                       type="text"
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
-                      placeholder="e.g. Greenville, SC, USA"
+                      placeholder="e.g. Greenville, SC"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold"
                     />
                   </div>
