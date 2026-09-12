@@ -38,6 +38,7 @@ import { initGA, trackEvent } from './utils/analytics';
 import { recordTelemetryEvent } from './utils/telemetry';
 import { getMethodJsonLd, updatePageSeo } from './utils/seo';
 import { syncCloudCatalog } from './data/roasterRegistry';
+import { parseRecipePayload } from './utils/recipeParser';
 import { ChevronRight, ChevronLeft, Sparkles, Coffee } from 'lucide-react';
 
 const DEFAULT_LOCAL_PROFILES = [];
@@ -202,7 +203,15 @@ export default function App() {
     // 3. Resolve target brew method
     const targetMethodId = scannedBean.brewMethod || scannedBean.extraction?.method || 'pour_over';
     const allMethods = BREW_METHODS.coffee;
-    const targetMethod = allMethods.find(m => m.id === targetMethodId || m.id.includes(targetMethodId) || targetMethodId.includes(m.id)) || allMethods[0];
+    let targetMethod = allMethods.find(m => m.id === targetMethodId || m.id.includes(targetMethodId) || targetMethodId.includes(m.id)) || allMethods[0];
+
+    // If custom phases were provided in the recipe (e.g. roaster bloom specs), attach them
+    if (scannedBean.customPhases && scannedBean.customPhases.length > 0) {
+      targetMethod = {
+        ...targetMethod,
+        phases: scannedBean.customPhases
+      };
+    }
 
     setActiveMethod(targetMethod);
     setDialedInCoffee(scannedBean);
@@ -310,6 +319,19 @@ export default function App() {
   // Synchronize React Router URL with Active Method and Steps
   useEffect(() => {
     const path = location.pathname;
+
+    // Inbound Recipe Link Detection (?recipe=... or /r/<id> or direct query params)
+    const fullUrl = typeof window !== 'undefined' ? window.location.href : `${location.pathname}${location.search}${location.hash}`;
+    const inboundRecipe = parseRecipePayload(fullUrl);
+    if (inboundRecipe) {
+      handleApplyScannedRecipe(inboundRecipe);
+      updatePageSeo(
+        `${inboundRecipe.beanName} Recipe by ${inboundRecipe.roaster} | TheBrew.App`,
+        `Pre-filled specialty coffee brew recipe for ${inboundRecipe.beanName} roasted by ${inboundRecipe.roaster}. Ratio 1:${inboundRecipe.recommendedRatio}, ${inboundRecipe.dryDoseGrams}g coffee, ${inboundRecipe.waterGrams}g water.`,
+        `https://thebrew.app/r/${inboundRecipe.id}`
+      );
+      return;
+    }
 
     if (path.startsWith('/methods/')) {
       setIsRoasterShowcaseView(false);
@@ -740,6 +762,7 @@ export default function App() {
                       const el = document.getElementById('brew-atelier');
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
                     }}
+                    onOpenScanner={() => setIsScannerOpen(true)}
                   />
 
                   <div id="brew-atelier" className="pt-8 border-t border-[#ECE6DC]">
@@ -839,39 +862,56 @@ export default function App() {
           {currentStep === 4 && (
             <div id="step-4" className="animate-fade-in space-y-6">
               {dialedInCoffee && (
-                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 backdrop-blur-md shadow-lg">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                    <div>
-                      <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-amber-gold font-bold flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>Roaster Certified Dial-In Active</span>
-                      </div>
-                      <div className="text-sm sm:text-base font-serif font-bold text-cream-light">
-                        {dialedInCoffee.roaster} • {dialedInCoffee.beanName}
+                <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-md shadow-lg">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                      <div>
+                        <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-amber-gold font-bold flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          <span>{dialedInCoffee.isBagRecipe ? 'Bag Recipe QR Dial-In Active' : 'Roaster Certified Dial-In Active'}</span>
+                        </div>
+                        <div className="text-base sm:text-lg font-serif font-bold text-cream-light">
+                          {dialedInCoffee.roaster} • {dialedInCoffee.beanName}
+                        </div>
                       </div>
                     </div>
+
+                    {/* Roaster Tasting Notes & Advice */}
+                    {dialedInCoffee.tastingNotes && dialedInCoffee.tastingNotes.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                        <span className="text-[10px] font-mono text-cream-soft/60 uppercase">Roaster Notes:</span>
+                        {dialedInCoffee.tastingNotes.map((note, idx) => (
+                          <span key={idx} className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-200 border border-amber-500/30 text-[11px] font-sans font-medium">
+                            {note}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {dialedInCoffee.notes && (
+                      <p className="text-xs text-cream-soft/80 italic font-sans max-w-xl line-clamp-2">
+                        "{dialedInCoffee.notes}"
+                      </p>
+                    )}
                   </div>
-                  <div className="text-xs font-mono text-cream-soft bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2 self-start sm:self-auto">
-                    <span>1:{effectiveRatio}</span>
-                    <span>•</span>
-                    <span>{dryDoseGrams}g : {calculatedTotalWaterMl}g</span>
-                    {(dialedInCoffee.tempF || dialedInCoffee.extraction?.tempF) && (
-                      <>
-                        <span>•</span>
-                        <span className="text-amber-gold font-bold">
-                          {dialedInCoffee.tempF || dialedInCoffee.extraction?.tempF}°F
-                        </span>
-                      </>
-                    )}
-                    {(dialedInCoffee.recommendedGrind || dialedInCoffee.extraction?.grind) && (
-                      <>
-                        <span>•</span>
-                        <span className="text-cream-light font-bold">
-                          {dialedInCoffee.recommendedGrind || dialedInCoffee.extraction?.grind}
-                        </span>
-                      </>
-                    )}
+
+                  <div className="text-xs font-mono text-cream-soft bg-black/40 p-3 rounded-xl border border-white/10 flex flex-wrap sm:flex-col sm:items-end gap-2 self-start sm:self-center shrink-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-amber-gold font-bold">1:{effectiveRatio}</span>
+                      <span>•</span>
+                      <span className="text-cream-light font-bold">{dryDoseGrams}g : {calculatedTotalWaterMl}g</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[11px] text-cream-soft/80">
+                      {(dialedInCoffee.tempF || dialedInCoffee.extraction?.tempF) && (
+                        <span>{dialedInCoffee.tempF || dialedInCoffee.extraction?.tempF}°F</span>
+                      )}
+                      {(dialedInCoffee.recommendedGrind || dialedInCoffee.extraction?.grind) && (
+                        <>
+                          <span>•</span>
+                          <span>{dialedInCoffee.recommendedGrind || dialedInCoffee.extraction?.grind}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

@@ -29,117 +29,9 @@ import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 import { createCoffeeProfile } from '../models/coffeeProfile';
 import { hapticScan } from '../utils/haptics';
 
-// Verified catalog of real specialty coffee roasters, beans, and extraction parameters
-export const VERIFIED_BEAN_CATALOG = [
-  {
-    id: "sku_onyx_southern_weather",
-    upc: "850012345012",
-    qrPatterns: ["onyxcoffeelab.com/products/southern-weather", "onyx/southern-weather"],
-    roaster: "Onyx Coffee Lab",
-    beanName: "Southern Weather",
-    origin: "Colombia & Ethiopia",
-    process: "Washed",
-    elevation: "1,850 - 2,000 MASL",
-    roastLevel: "Medium-Light",
-    tastingNotes: ["Milk Chocolate", "Plum", "Candied Walnuts", "Citrus Sparkle"],
-    recommendedRatio: 16,
-    recommendedGrind: "Medium-Fine",
-    tempC: 93,
-    tempF: 200,
-    brewMethod: "pour_over",
-    notes: "Onyx flagship blend. High sweetness, balanced citric acidity, juicy lingering finish."
-  },
-  {
-    id: "sku_onyx_tropical_weather",
-    upc: "850012345029",
-    qrPatterns: ["onyxcoffeelab.com/products/tropical-weather", "onyx/tropical-weather"],
-    roaster: "Onyx Coffee Lab",
-    beanName: "Tropical Weather",
-    origin: "Ethiopia (Worka Sakaro & Chelchele)",
-    process: "Washed & Natural Blend",
-    elevation: "2,000 - 2,200 MASL",
-    roastLevel: "Light",
-    tastingNotes: ["Mango", "Passionfruit", "Floral Jasmine", "Honey Sweetness"],
-    recommendedRatio: 16.5,
-    recommendedGrind: "Medium",
-    tempC: 94,
-    tempF: 202,
-    brewMethod: "pour_over",
-    notes: "Vibrant fruit bomb. 50% natural anaerobic and 50% traditional washed process."
-  },
-  {
-    id: "sku_sey_huila_colombia",
-    upc: "850098765011",
-    qrPatterns: ["seycoffee.com/products", "sey/huila"],
-    roaster: "Sey Coffee",
-    beanName: "Finca El Paraiso - Pink Bourbon",
-    origin: "Huila, Colombia",
-    process: "Double Fermentation Washed",
-    elevation: "1,950 MASL",
-    roastLevel: "Nordic Ultra-Light",
-    tastingNotes: ["Pink Grapefruit", "White Tea", "Honeysuckle", "Crisp Apple"],
-    recommendedRatio: 17,
-    recommendedGrind: "Medium-Fine",
-    tempC: 96,
-    tempF: 205,
-    brewMethod: "classic_pour_over",
-    notes: "Nordic roast profile requiring near-boiling soft water and high extraction yield."
-  },
-  {
-    id: "sku_proud_mary_ghost_rider",
-    upc: "935412300101",
-    qrPatterns: ["proudmarycoffee.com", "proudmary/ghost-rider"],
-    roaster: "Proud Mary Coffee",
-    beanName: "Ghost Rider Espresso Blend",
-    origin: "Brazil & Ethiopia",
-    process: "Natural & Honey",
-    elevation: "1,200 - 1,900 MASL",
-    roastLevel: "Medium",
-    tastingNotes: ["Dark Chocolate", "Berry Jam", "Caramel Fudge", "Rich Crema"],
-    recommendedRatio: 2, // 1:2 espresso
-    recommendedGrind: "Fine",
-    tempC: 93,
-    tempF: 199,
-    brewMethod: "espresso",
-    notes: "Award-winning dynamic espresso blend optimized for silky flat whites or rich straight shots."
-  },
-  {
-    id: "sku_counter_culture_hologram",
-    upc: "040232456712",
-    qrPatterns: ["counterculturecoffee.com/shop/coffee/hologram", "counterculture/hologram"],
-    roaster: "Counter Culture",
-    beanName: "Hologram",
-    origin: "Ethiopia & Colombia",
-    process: "Natural & Washed",
-    elevation: "1,600 - 2,100 MASL",
-    roastLevel: "Medium",
-    tastingNotes: ["Blueberry", "Dark Chocolate", "Pastry Crust", "Syrupy Body"],
-    recommendedRatio: 15.5,
-    recommendedGrind: "Medium",
-    tempC: 93,
-    tempF: 200,
-    brewMethod: "aeropress",
-    notes: "Fruit-forward modern blend highlighting natural processed Ethiopian sweetness."
-  },
-  {
-    id: "sku_stumptown_hair_bender",
-    upc: "852864002014",
-    qrPatterns: ["stumptowncoffee.com/products/hair-bender", "stumptown/hair-bender"],
-    roaster: "Stumptown Coffee Roasters",
-    beanName: "Hair Bender",
-    origin: "Indonesia, Latin America & Africa",
-    process: "Washed & Wet-Hulled",
-    elevation: "1,400 - 1,900 MASL",
-    roastLevel: "Medium-Dark",
-    tastingNotes: ["Sweet Cherry", "Bitter Dark Chocolate", "Toffee", "Fudge"],
-    recommendedRatio: 15,
-    recommendedGrind: "Medium-Coarse",
-    tempC: 92,
-    tempF: 198,
-    brewMethod: "french_press",
-    notes: "Stumptown's historic complex blend. High body, deep clarity, excellent in immersion brewers."
-  }
-];
+import { VERIFIED_BEAN_CATALOG } from '../data/verifiedBeans';
+export { VERIFIED_BEAN_CATALOG };
+import { parseRecipePayload } from '../utils/recipeParser';
 
 export default function BarcodeScannerModal({
   isOpen,
@@ -392,6 +284,15 @@ export default function BarcodeScannerModal({
     setUncatalogedResult(null);
 
     const cleanVal = rawValue.trim();
+
+    // 0. Check if raw payload or URL is a Bag Recipe JSON / URL
+    const recipeMatch = parseRecipePayload(cleanVal);
+    if (recipeMatch) {
+      setMatchedBean(recipeMatch);
+      setIsScanning(false);
+      setIsLookingUp(false);
+      return;
+    }
 
     // 1. Search in local and built-in verified Roaster Registry
     const allRegistered = getRegisteredCoffees(VERIFIED_BEAN_CATALOG);
@@ -831,20 +732,42 @@ export default function BarcodeScannerModal({
             <div className="flex items-center gap-1.5 overflow-x-auto py-1">
               <span className="text-[10px] text-cream-soft/60 font-mono uppercase">Quick Presets:</span>
               <button
+                type="button"
+                onClick={() => handleCodeDetected(JSON.stringify({
+                  v: 1,
+                  roaster: "Stumptown",
+                  coffee: "Hair Bender",
+                  roast: "medium",
+                  brewer: "pour-over",
+                  ratio: 16,
+                  dose: 18.8,
+                  water: 300,
+                  temp_f: 205,
+                  grind: "Medium-Fine",
+                  total_time_sec: 210,
+                  bloom_water: 60,
+                  bloom_time_sec: 45,
+                  notes: "Milk chocolate, sweet orange. 45-second bloom recommended."
+                }), "qr_code")}
+                className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-[11px] font-mono text-amber-gold border border-amber-500/40 shrink-0 font-bold"
+              >
+                ⚡ Stumptown Recipe QR
+              </button>
+              <button
                 onClick={() => handleCodeDetected("850012345012", "upc_a")}
-                className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10"
+                className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
               >
                 Onyx Southern
               </button>
               <button
                 onClick={() => handleCodeDetected("850098765011", "upc_a")}
-                className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10"
+                className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
               >
                 Sey Pink Bourbon
               </button>
               <button
                 onClick={() => handleCodeDetected("935412300101", "upc_a")}
-                className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10"
+                className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
               >
                 Proud Mary Ghost
               </button>
@@ -1062,7 +985,7 @@ export default function BarcodeScannerModal({
                   onClick={handleApplyToDialIn}
                   className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-gold/20 transition active:scale-95 hover:scale-105"
                 >
-                  <span>Load into Dial-In Station</span>
+                  <span>{matchedBean.isBagRecipe ? 'Brew This Bag Recipe' : 'Load into Dial-In Station'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

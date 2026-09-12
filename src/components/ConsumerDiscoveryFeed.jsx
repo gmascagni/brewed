@@ -12,7 +12,8 @@ import {
   Flame,
   Check,
   HelpCircle,
-  Compass
+  Compass,
+  Camera
 } from 'lucide-react';
 import BeanCard from './BeanCard';
 import TastingNoteBadge from './TastingNoteBadge';
@@ -121,7 +122,8 @@ export default function ConsumerDiscoveryFeed({
   onLaunchDirectBrew,
   onNavigateToRoaster,
   onOpenLocator,
-  onStartBrewStation
+  onStartBrewStation,
+  onOpenScanner
 }) {
   // Quick Calculator State
   const [selectedBrewerId, setSelectedBrewerId] = useState('pour_over');
@@ -177,6 +179,15 @@ export default function ConsumerDiscoveryFeed({
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onOpenScanner}
+              className="py-2.5 px-4 rounded-xl bg-white hover:bg-[#FAF7F2] text-[#2A2421] font-sans font-semibold text-xs border border-[#ECE6DC] hover:border-[#D69550] flex items-center gap-1.5 shadow-subtle active:scale-95 transition-all cursor-pointer"
+            >
+              <Camera className="w-3.5 h-3.5 text-[#C88A4B]" />
+              <span>Scan Bag Recipe</span>
+            </button>
+
             <button
               type="button"
               onClick={onStartBrewStation}
