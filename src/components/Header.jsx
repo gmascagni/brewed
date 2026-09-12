@@ -57,7 +57,7 @@ export default function Header({
   }, []);
 
   return (
-    <div className="px-4 lg:px-8 py-3 transition-colors duration-400 bg-white/80 backdrop-blur-md border-b border-[#ECE6DC] text-[#14110F]">
+    <div className="relative z-40 px-4 lg:px-8 py-3 transition-colors duration-400 bg-white/95 backdrop-blur-md border-b border-[#ECE6DC] text-[#14110F]">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         
         {/* 1. Left: Editorial Logo & Brand Title */}
@@ -193,7 +193,7 @@ export default function Header({
           )}
 
           {/* B2B Partner Portals Dropdown Hub */}
-          <div className="relative" ref={partnerMenuRef}>
+          <div className="relative z-50" ref={partnerMenuRef}>
             <button
               type="button"
               onClick={() => setIsPartnerMenuOpen(!isPartnerMenuOpen)}
@@ -206,7 +206,7 @@ export default function Header({
             </button>
 
             {isPartnerMenuOpen && (
-              <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#ECE6DC] shadow-elevated p-2 z-50 animate-fade-in space-y-1">
+              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-white border border-[#ECE6DC] shadow-2xl p-2.5 z-50 animate-fade-in space-y-1">
                 <div className="px-3 py-1.5 border-b border-[#ECE6DC] mb-1">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#766A62]">
                     B2B Operational Portals

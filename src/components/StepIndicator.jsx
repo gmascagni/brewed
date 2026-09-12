@@ -12,7 +12,7 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
   ];
 
   return (
-    <nav className="w-full py-2 px-2 sm:px-4 lg:px-8 transition-colors duration-400 border-t border-b bg-[#FAF7F2] border-[#ECE6DC]">
+    <nav className="w-full py-2 px-2 sm:px-4 lg:px-8 transition-colors duration-400 border-t border-b bg-[#FAF7F2] border-[#ECE6DC] relative z-10">
       <div className="max-w-7xl mx-auto flex items-center justify-between relative gap-1 sm:gap-3">
         
         {/* Background Connecting Timeline Line */}
@@ -24,7 +24,7 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
           const isCompleted = currentStep > step.id;
 
           return (
-            <div key={step.id} className="relative z-10 flex-1 flex justify-center min-w-0">
+            <div key={step.id} className="relative z-1 flex-1 flex justify-center min-w-0">
               <button
                 onClick={() => setCurrentStep(step.id)}
                 className={`w-full group flex items-center justify-center sm:justify-start space-x-1 sm:space-x-2 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border transition-all duration-200 active:scale-95 ${
