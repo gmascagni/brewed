@@ -12,7 +12,6 @@ import {
   Tag, 
   Layers,
   Coffee,
-  Leaf,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
@@ -42,7 +41,6 @@ function sanitizeNewsText(str) {
 }
 
 export default function WorldNewsSection({ trackMode }) {
-  const isCoffee = trackMode === 'coffee';
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,7 +62,6 @@ export default function WorldNewsSection({ trackMode }) {
       const matchesCategory = 
         selectedCategory === 'all' ||
         (selectedCategory === 'coffee' && item.category === 'coffee') ||
-        (selectedCategory === 'tea' && item.category === 'tea') ||
         (selectedCategory === 'origin' && (item.tag.toLowerCase().includes('origin') || item.tag.toLowerCase().includes('farming') || item.tag.toLowerCase().includes('harvest'))) ||
         (selectedCategory === 'competition' && (item.tag.toLowerCase().includes('competition') || item.tag.toLowerCase().includes('events')));
 
@@ -93,11 +90,7 @@ export default function WorldNewsSection({ trackMode }) {
   return (
     <section 
       id="world-news" 
-      className={`mt-14 p-6 sm:p-8 md:p-10 rounded-3xl transition-all duration-700 shadow-2xl border ${
-        isCoffee 
-          ? 'glass-panel-coffee border-[#A66E38]/35' 
-          : 'glass-panel-tea border-sage-500/35'
-      }`}
+      className="mt-14 p-6 sm:p-8 md:p-10 rounded-3xl transition-all duration-700 shadow-2xl border glass-panel-coffee border-[#A66E38]/35"
     >
       {/* Section Header */}
       <div className={`flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all ${
@@ -117,7 +110,7 @@ export default function WorldNewsSection({ trackMode }) {
           </h3>
           
           <p className="text-xs sm:text-sm text-cream-soft/80 mt-2 max-w-2xl leading-relaxed">
-            Curated briefings, harvest dispatches, competition highlights, and market analytics pulled directly from Daily Coffee News, World Tea Press, and trade publications.
+            Curated briefings, harvest dispatches, competition highlights, and market analytics pulled directly from Daily Coffee News, Perfect Daily Grind, and specialty coffee trade publications.
           </p>
         </div>
 
@@ -143,9 +136,7 @@ export default function WorldNewsSection({ trackMode }) {
             onClick={() => setIsExpanded((prev) => !prev)}
             className={`px-5 sm:px-6 py-3.5 rounded-2xl text-xs font-mono font-extrabold uppercase tracking-wider flex items-center gap-2 shadow-xl transition-all active:scale-95 whitespace-nowrap ${
               isExpanded
-                ? isCoffee 
-                  ? 'btn-tactile-coffee text-[#140C08]' 
-                  : 'btn-tactile-tea text-white'
+                ? 'btn-tactile-coffee text-[#140C08]'
                 : 'bg-white/[0.08] text-cream-light hover:bg-white/[0.15] border border-white/[0.12]'
             }`}
             title={isExpanded ? 'Collapse Brew News section' : 'Expand Brew News section'}
@@ -178,7 +169,6 @@ export default function WorldNewsSection({ trackMode }) {
                 }`}
               >
                 {cat.id === 'coffee' && <Coffee className="w-3.5 h-3.5" />}
-                {cat.id === 'tea' && <Leaf className="w-3.5 h-3.5" />}
                 {cat.id === 'all' && <Layers className="w-3.5 h-3.5" />}
                 <span>{cat.label}</span>
               </button>
@@ -212,8 +202,6 @@ export default function WorldNewsSection({ trackMode }) {
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredNews.length > 0 ? (
           filteredNews.map((article) => {
-            const isTeaArticle = article.category === 'tea';
-
             return (
               <article
                 key={article.id}
@@ -224,11 +212,7 @@ export default function WorldNewsSection({ trackMode }) {
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                     <div className="flex items-center gap-2">
                       {/* Source Badge */}
-                      <span className={`px-2.5 py-1 rounded-xl text-[10px] font-mono font-extrabold uppercase tracking-wider border shadow-sm ${
-                        isTeaArticle
-                          ? 'bg-sage-500/20 text-sage-300 border-sage-500/40'
-                          : 'bg-amber-500/20 text-amber-gold border-amber-400/40'
-                      }`}>
+                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-mono font-extrabold uppercase tracking-wider border shadow-sm bg-amber-500/20 text-amber-gold border-amber-400/40">
                         {article.source}
                       </span>
 
