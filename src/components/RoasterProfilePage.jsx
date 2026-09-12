@@ -352,15 +352,15 @@ export default function RoasterProfilePage({
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold bg-amber-950/80 px-2 py-0.5 rounded border border-amber-gold/30">
-                    60-Second Video Demo
+                    Partner Brand Onboarding
                   </span>
                   <span className="text-[11px] font-mono text-cream-soft/70">Packaging Barcode Scan & V60 Timer</span>
                 </div>
                 <h3 className="font-serif text-base sm:text-lg font-bold text-cream-light leading-snug">
-                  Watch How Smart Bag Scanning Works for {roaster.shortName || roaster.name}
+                  Watch How Roasters & Cafes Onboard Their Brand with Smart Bag Scanning
                 </h3>
                 <p className="text-xs text-cream-soft/80 font-sans max-w-xl">
-                  See how smartphone camera bag scanning automatically loads the roaster's golden ratio, water temperature, and synchronized multi-phase timer.
+                  See how specialty roasters and cafes onboard their brand into The Brew App ecosystem, create 300 DPI thermal labels, and guide customer brewing with zero app friction.
                 </p>
               </div>
             </div>
@@ -370,7 +370,7 @@ export default function RoasterProfilePage({
               className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition shrink-0 self-stretch md:self-auto justify-center"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
-              <span>Watch Video (60s)</span>
+              <span>Watch Walkthrough</span>
             </button>
           </div>
 
@@ -418,10 +418,10 @@ export default function RoasterProfilePage({
               type="button"
               onClick={() => setIsVideoModalOpen(true)}
               className="px-5 py-3 rounded-2xl bg-[#2A1810] hover:bg-[#3D2216] text-amber-gold border border-amber-gold/50 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-950/40 hover:scale-105 active:scale-95 transition"
-              title="Watch 60s Smart Bag Walkthrough Video & Live V60 Dial-In"
+              title="Watch Smart Bag & Partner Brand Onboarding Walkthrough"
             >
               <Play className="w-3.5 h-3.5 fill-current text-amber-gold" />
-              <span>Watch Video (60s)</span>
+              <span>Watch Walkthrough</span>
             </button>
 
             <div className="text-xs font-mono text-cream-soft/60 hidden lg:block ml-2">
@@ -965,7 +965,7 @@ export default function RoasterProfilePage({
             <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40">
               <div className="flex items-center gap-2">
                 <Play className="w-4 h-4 text-amber-gold fill-current" />
-                <span className="font-mono text-xs font-bold text-amber-gold uppercase tracking-wider">Smart Bag Dial-In Walkthrough</span>
+                <span className="font-mono text-xs font-bold text-amber-gold uppercase tracking-wider">Smart Bag & Partner Brand Onboarding</span>
               </div>
               <button 
                 type="button"
@@ -992,8 +992,8 @@ export default function RoasterProfilePage({
               </video>
             </div>
             <div className="p-3.5 bg-black/60 text-center border-t border-white/10 space-y-2">
-              <p className="text-xs text-stone-200 font-mono font-bold">Smart Bag Barcode Scan & Roaster Dial-In</p>
-              <p className="text-[11px] text-amber-gold/80 font-mono">Camera Barcode Scanning • Multi-Phase Bloom Coaching</p>
+              <p className="text-xs text-stone-200 font-mono font-bold">How Roasters & Cafes Onboard Their Brand</p>
+              <p className="text-[11px] text-amber-gold/80 font-mono">300 DPI Thermal Smart Labels • Live Camera Scan & Slurry Timer</p>
               <div className="pt-1 flex items-center justify-center gap-2">
                 <a
                   href={getAssetUrl('/videos/smart_bag_scan_demo.mp4')}

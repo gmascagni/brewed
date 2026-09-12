@@ -206,11 +206,11 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-gold animate-pulse" />
                 <h4 className="font-serif text-lg sm:text-xl font-bold text-cream-light">
-                  Watch: The 20-Second Smart Bag Experience
+                  Watch: Partner Brand Onboarding & Smart Bag Walkthrough
                 </h4>
               </div>
               <span className="text-xs font-mono text-cream-soft/70">
-                From Printer to Dialed-In Cup
+                From Thermal Printer to Dialed-In Cup
               </span>
             </div>
 
@@ -233,30 +233,36 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-3">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-gold font-mono font-bold text-sm">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-gold flex items-center justify-center font-mono font-bold text-sm">
                   1
                 </div>
-                <h5 className="font-serif font-bold text-cream-light">Submit Roastery & Labels</h5>
+                <h5 className="font-serif font-bold text-cream-light text-base">
+                  Onboard Your Roastery
+                </h5>
                 <p className="text-xs text-cream-soft/80 leading-relaxed">
-                  Send your coffee varieties, origins, harvest processing, and existing retail bag UPC/EAN barcodes via the form below or directly to HQ.
+                  Enter your roastery profile, brand logo, and upload your current retail coffee catalog with signature dial-in recipes.
                 </p>
               </div>
 
               <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-3">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-gold font-mono font-bold text-sm">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-gold flex items-center justify-center font-mono font-bold text-sm">
                   2
                 </div>
-                <h5 className="font-serif font-bold text-cream-light">Set Barista Dial-In Recipes</h5>
+                <h5 className="font-serif font-bold text-cream-light text-base">
+                  Generate Thermal Stickers
+                </h5>
                 <p className="text-xs text-cream-soft/80 leading-relaxed">
-                  Define your recommended brew method (e.g. V60 or Kalita), golden ratio, water temperature, grind size, and bloom cadence for each roast lot.
+                  Export 300 DPI high-contrast thermal labels with embedded QR codes ready for standard Dymo or Zebra roll printers.
                 </p>
               </div>
 
               <div className="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-3">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-300 font-mono font-bold text-sm">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-gold flex items-center justify-center font-mono font-bold text-sm">
                   3
                 </div>
-                <h5 className="font-serif font-bold text-cream-light">Instant Camera Recognition</h5>
+                <h5 className="font-serif font-bold text-cream-light text-base">
+                  Instant Customer Dial-In
+                </h5>
                 <p className="text-xs text-cream-soft/80 leading-relaxed">
                   HQ ingests your profiles into the verified database. Any home barista scanning your bag barcode or Smart Bag sticker gets your certified recipe.
                 </p>
@@ -269,9 +275,9 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
             <div className="p-4 rounded-xl bg-white/[0.04] border border-white/10 flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <span className="font-bold text-cream-light block">Zero-Cost Program</span>
+                <span className="font-bold text-cream-light block">Direct Brand Onboarding</span>
                 <span className="text-cream-soft/70 block mt-0.5">
-                  100% free for independent specialty roasters. We believe great coffee deserves precise extraction.
+                  Direct onboarding for independent specialty roasters. We believe great coffee deserves precise extraction.
                 </span>
               </div>
             </div>

@@ -30,19 +30,19 @@ const CHAPTERS = [
     step: 1,
     id: 'hook',
     startTime: 0,
-    endTime: 16.1,
+    endTime: 18.0,
     badge: '1. PARTNER ECOSYSTEM',
     title: 'Dual-Sided Specialty Coffee Platform',
     subtitle: 'Connecting artisan roasters, specialty cafes, and home baristas with zero app friction.',
     detail: 'Eliminates bitter or sour guesswork after retail purchase with verified recipes and local cafe radar.',
     icon: Sparkles,
-    tags: ['100% Free Partner Tier', 'Roasters & Cafes', 'Zero App Friction']
+    tags: ['Partner Ecosystem', 'Roasters & Cafes', 'Zero App Friction']
   },
   {
     step: 2,
     id: 'roaster_studio',
-    startTime: 16.1,
-    endTime: 31.4,
+    startTime: 18.0,
+    endTime: 40.2,
     badge: '2. ROASTER STUDIO',
     title: '300 DPI Thermal Labels & QR Studio',
     subtitle: 'Generate high-contrast vector QR & barcode stickers for Dymo and Zebra thermal roll printers.',
@@ -53,45 +53,45 @@ const CHAPTERS = [
   {
     step: 3,
     id: 'scan_timer',
-    startTime: 31.4,
-    endTime: 46.0,
+    startTime: 40.2,
+    endTime: 58.2,
     badge: '3. SMART BAG SCAN',
     title: 'Point & Shoot Optical Scan & Timer',
     subtitle: 'Customer scans bag with native phone camera. Exact ratio, temp, and live timer load instantly.',
-    detail: 'No App Store download required. Mechanical clockwork ticking and step-by-step pour coaching.',
+    detail: 'No App Store download required. Synchronized slurry timer and step-by-step pour guidance.',
     icon: Camera,
-    tags: ['Instant Mobile Web', 'Ratio 1:16.5', 'Live Slurry Timer']
+    tags: ['Instant Mobile Web', 'Golden Ratio 1:16.5', 'Live Slurry Timer']
   },
   {
     step: 4,
     id: 'cafe_portal',
-    startTime: 46.0,
-    endTime: 62.0,
+    startTime: 58.2,
+    endTime: 76.9,
     badge: '4. COFFEE SHOP PORTAL',
     title: 'Live Menu Switcher & Local Radar',
-    subtitle: '5-second "On Bar Today" rotation switcher, precision equipment showcase, and local radar discovery.',
+    subtitle: 'Fast "On Bar Today" rotation switcher, precision equipment showcase, and local radar discovery.',
     detail: 'Attracts local coffee lovers, drives walk-in foot-traffic, and promotes community cupping events.',
     icon: Coffee,
-    tags: ['On Bar Today Switcher', 'Local Coffee Radar', 'Commercial Gear Showcase']
+    tags: ['On Bar Today Switcher', 'Local Coffee Radar', 'Specialty Cafe Showcase']
   },
   {
     step: 5,
     id: 'telemetry_cta',
-    startTime: 62.0,
-    endTime: 76.2,
-    badge: '5. MARKET TELEMETRY',
-    title: 'Partner Intelligence & Free Profile',
-    subtitle: 'Track real customer brew method telemetry, extraction curves, and claim your free partner profile.',
-    detail: 'Free packaging studio, live menu switcher, and verified market analytics for independent coffee businesses.',
+    startTime: 76.9,
+    endTime: 92.2,
+    badge: '5. BRAND ONBOARDING',
+    title: 'Partner Intelligence & Brand Onboarding',
+    subtitle: 'Track genuine customer brew method telemetry, extraction curves, and onboard your brand.',
+    detail: 'Packaging studio, live menu switcher, and verified customer telemetry for specialty coffee businesses.',
     icon: BarChart3,
-    tags: ['Customer Telemetry', 'Roaster Analytics', 'Free Forever']
+    tags: ['Customer Telemetry', 'Roaster Analytics', 'Brand Onboarding']
   }
 ];
 
 export default function RoasterVideoPlayer({ onOpenLiveDemo = null, className = '' }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(76.2);
+  const [duration, setDuration] = useState(92.2);
   const [progress, setProgress] = useState(0); // 0 to 100%
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
