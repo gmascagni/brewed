@@ -27,3 +27,6 @@ dist-ssr
 __pycache__/
 *.py[cod]
 *$py.class
+
+# GitHub Actions workflows (handled via GitHub web interface to bypass local PAT workflow scope limits)
+.github/
