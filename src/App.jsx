@@ -320,9 +320,10 @@ export default function App() {
   useEffect(() => {
     const path = location.pathname;
 
-    // Inbound Recipe Link Detection (?recipe=... or /r/<id> or direct query params)
+    // Inbound Recipe Link Detection (?recipe=... or /r/<id> or direct query params on home)
+    const isRoasterRoute = path.startsWith('/roasters') || path.startsWith('/roaster');
     const fullUrl = typeof window !== 'undefined' ? window.location.href : `${location.pathname}${location.search}${location.hash}`;
-    const inboundRecipe = parseRecipePayload(fullUrl);
+    const inboundRecipe = !isRoasterRoute ? parseRecipePayload(fullUrl) : null;
     if (inboundRecipe) {
       handleApplyScannedRecipe(inboundRecipe);
       updatePageSeo(

@@ -435,7 +435,7 @@ export const SHOWCASE_ROASTERS = [
   }
 ];
 
-import { getCustomRoasters, getCustomRoasterCoffees } from './roasterRegistry.js';
+import { getCustomRoasters, getCustomRoasterCoffees, saveCustomRoasterProfile, saveRoasterCoffee } from './roasterRegistry.js';
 
 function formatCustomRoasterAsShowcase(custom, coffees = []) {
   const name = custom.name || custom.roaster || 'Specialty Roastery';
@@ -696,6 +696,15 @@ export function getAllShowcaseRoasters() {
   return roastersList;
 }
 
+export function slugToTitle(slug) {
+  if (!slug) return 'Specialty Roaster';
+  return slug
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export function getShowcaseRoaster(idOrSlug = 'methodical') {
   const all = getAllShowcaseRoasters();
   if (!idOrSlug) return all[0];
@@ -710,5 +719,65 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
     );
   });
 
-  return matched || all[0];
+  if (matched) return matched;
+
+  // If not in pre-defined or cached roasters, dynamically synthesize on-the-fly from slug & URL parameters
+  if (idOrSlug && idOrSlug !== 'methodical' && idOrSlug !== 'showcase' && idOrSlug !== 'partner' && idOrSlug !== 'info') {
+    let urlParams = null;
+    if (typeof window !== 'undefined' && window.location && window.location.search) {
+      try {
+        urlParams = new URLSearchParams(window.location.search);
+      } catch {}
+    }
+
+    const formattedName = (urlParams?.get('roaster') || slugToTitle(idOrSlug)).trim();
+    const beanName = urlParams?.get('bean');
+
+    const synthesizedCoffee = beanName ? [{
+      id: urlParams.get('coffeeId') || `coffee_${Date.now()}`,
+      roaster: formattedName,
+      beanName,
+      origin: urlParams.get('origin') || 'Specialty Single Origin',
+      process: urlParams.get('process') || 'Washed',
+      varietal: urlParams.get('varietal') || 'Specialty Lot',
+      elevation: urlParams.get('elevation') || '1,800+ MASL',
+      roastLevel: urlParams.get('roast') || 'Light-Medium',
+      cuppingScore: 88.0,
+      tastingNotes: urlParams.get('notes') ? urlParams.get('notes').split(',').map((s) => s.trim()).filter(Boolean) : ['Clean', 'Sweet', 'Balanced'],
+      brewMethod: urlParams.get('method') || 'pour_over',
+      recommendedRatio: parseFloat(urlParams.get('ratio')) || 16.5,
+      tempF: parseInt(urlParams.get('tempF') || '202', 10),
+      recommendedGrind: urlParams.get('grind') || 'Medium-Fine',
+      brewTime: urlParams.get('time') || '3m 15s',
+      upc: urlParams.get('upc') || '',
+      customUrl: urlParams.get('url') || ''
+    }] : [];
+
+    const customProfile = {
+      id: idOrSlug,
+      slug: idOrSlug,
+      name: formattedName,
+      location: urlParams?.get('location') || 'Artisan Small-Batch Roastery',
+      website: urlParams?.get('website') || urlParams?.get('url') || 'https://thebrew.app'
+    };
+
+    const synthesized = formatCustomRoasterAsShowcase(customProfile, synthesizedCoffee);
+    synthesized.shortName = getRoasterShortName(synthesized.name);
+
+    // Cache locally so subsequent clicks and actions retain this synthesized profile
+    try {
+      if (typeof window !== 'undefined') {
+        saveCustomRoasterProfile(customProfile);
+        if (synthesizedCoffee.length > 0) {
+          saveRoasterCoffee(synthesizedCoffee[0]);
+        }
+      }
+    } catch (err) {
+      console.warn('Could not auto-cache on-the-fly roaster:', err);
+    }
+
+    return synthesized;
+  }
+
+  return all[0];
 }

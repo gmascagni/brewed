@@ -42,9 +42,26 @@ export default function RoasterProfilePage({
   onOpenRoasterInfo
 }) {
   const [activeRoasterId, setActiveRoasterId] = useState(initialRoasterId);
-  const [activeTab, setActiveTab] = useState('coffees'); // 'coffees' | 'story' | 'water' | 'cafes' | 'walkthrough'
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('video') || window.location.hash === '#video') {
+          return 'walkthrough';
+        }
+      } catch {}
+    }
+    return 'coffees';
+  });
   const [copiedLink, setCopiedLink] = useState(false);
-  const [scannedBeanName, setScannedBeanName] = useState('');
+  const [scannedBeanName, setScannedBeanName] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return new URLSearchParams(window.location.search).get('bean') || '';
+      } catch {}
+    }
+    return '';
+  });
   const [savedToJournalId, setSavedToJournalId] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
@@ -140,11 +157,52 @@ export default function RoasterProfilePage({
     }
   };
 
-  const scannedCoffee = scannedBeanName && roaster.coffees ? roaster.coffees.find(
+  const scannedCoffee = scannedBeanName && roaster?.coffees ? roaster.coffees.find(
     (c) => c.beanName.toLowerCase() === scannedBeanName.toLowerCase() ||
            c.beanName.toLowerCase().includes(scannedBeanName.toLowerCase()) ||
            scannedBeanName.toLowerCase().includes(c.beanName.toLowerCase())
   ) : null;
+
+  const synthesizedFromUrl = React.useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const bean = params.get('bean');
+      if (!bean) return null;
+      const ratio = parseFloat(params.get('ratio')) || 16.5;
+      const dose = 18.0;
+      const tempF = parseInt(params.get('tempF') || '202', 10);
+      const method = params.get('method') || 'pour_over';
+      return {
+        id: params.get('coffeeId') || `url_scanned_${Date.now()}`,
+        beanName: bean,
+        origin: params.get('origin') || 'Specialty Single Origin',
+        process: params.get('process') || 'Washed',
+        varietal: params.get('varietal') || 'Specialty Lot',
+        elevation: params.get('elevation') || '1,800+ MASL',
+        roastLevel: params.get('roast') || 'Light-Medium',
+        cuppingScore: 88.0,
+        tastingNotes: params.get('notes') ? params.get('notes').split(',').map(s => s.trim()) : ['Clean', 'Sweet', 'Vibrant'],
+        description: `Dialed-in recipe from ${roaster?.name || 'Specialty Roaster'}. Optimized for ${(method || 'pour_over').replace(/_/g, ' ')}.`,
+        brewMethod: method,
+        recommendedRatio: ratio,
+        dryDoseGrams: dose,
+        waterGrams: Math.round(dose * ratio),
+        tempF,
+        tempC: Math.round(((tempF - 32) * 5) / 9),
+        recommendedGrind: params.get('grind') || 'Medium-Fine',
+        brewTime: params.get('time') || '3m 15s',
+        upc: params.get('upc') || '',
+        price: '$22.00',
+        directUrl: params.get('url') || roaster?.shopUrl || 'https://thebrew.app',
+        badge: 'Smart Bag Scanned'
+      };
+    } catch {
+      return null;
+    }
+  }, [roaster?.name, roaster?.shopUrl]);
+
+  const activeScannedCoffee = scannedCoffee || synthesizedFromUrl;
 
   return (
     <div className="min-h-screen bg-[#0A0604] text-cream-light selection:bg-amber-gold selection:text-espresso-950 font-sans pb-24 relative overflow-hidden">
@@ -524,7 +582,7 @@ export default function RoasterProfilePage({
           <div className="space-y-8 animate-fade-in">
             
             {/* Scanned Bag Notification Banner (rendered when arriving from a bag barcode scan) */}
-            {scannedCoffee && (
+            {activeScannedCoffee && (
               <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-950/60 via-black/80 to-amber-950/40 border-2 border-emerald-500/60 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in">
                 <div className="flex items-start sm:items-center gap-3.5">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
@@ -540,10 +598,10 @@ export default function RoasterProfilePage({
                       </span>
                     </div>
                     <h4 className="font-serif text-lg sm:text-xl font-bold text-cream-light mt-0.5">
-                      {scannedCoffee.beanName}
+                      {activeScannedCoffee.beanName}
                     </h4>
                     <p className="text-xs text-cream-soft font-sans">
-                      Roaster golden ratio 1:{scannedCoffee.recommendedRatio} • {scannedCoffee.tempF}°F • {scannedCoffee.recommendedGrind} grind
+                      Roaster golden ratio 1:{activeScannedCoffee.recommendedRatio || 16.5} • {activeScannedCoffee.tempF || 202}°F • {activeScannedCoffee.recommendedGrind || 'Medium-Fine'} grind
                     </p>
                   </div>
                 </div>
@@ -551,7 +609,7 @@ export default function RoasterProfilePage({
                 <div className="flex items-center gap-2.5 shrink-0">
                   <button
                     onClick={() => {
-                      const payload = { ...scannedCoffee, roaster: roaster.name };
+                      const payload = { ...activeScannedCoffee, roaster: roaster?.name || 'Specialty Roaster' };
                       if (onBrewCoffee) {
                         onBrewCoffee(payload);
                       }
@@ -565,11 +623,11 @@ export default function RoasterProfilePage({
                     <span>Start Brew Timer</span>
                   </button>
                   <button
-                    onClick={() => handleSaveToJournal(scannedCoffee)}
+                    onClick={() => handleSaveToJournal(activeScannedCoffee)}
                     className="p-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-cream-light transition"
                     title="Save this bag to your personal coffee cellar"
                   >
-                    <Bookmark className={`w-4 h-4 ${savedToJournalId === scannedCoffee.id ? 'text-amber-gold fill-amber-gold' : 'text-cream-soft'}`} />
+                    <Bookmark className={`w-4 h-4 ${savedToJournalId === activeScannedCoffee.id ? 'text-amber-gold fill-amber-gold' : 'text-cream-soft'}`} />
                   </button>
                 </div>
               </div>
@@ -594,8 +652,8 @@ export default function RoasterProfilePage({
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {roaster.coffees.map((coffee) => {
-                const isThisCoffeeScanned = scannedCoffee && scannedCoffee.id === coffee.id;
+              {(roaster?.coffees || []).map((coffee) => {
+                const isThisCoffeeScanned = activeScannedCoffee && activeScannedCoffee.id === coffee.id;
                 return (
                   <div
                     key={coffee.id}
@@ -613,11 +671,11 @@ export default function RoasterProfilePage({
                             ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/50'
                             : 'bg-amber-500/20 text-amber-gold border-amber-500/30'
                         }`}>
-                          {isThisCoffeeScanned ? '✨ Scanned from Your Bag' : `${coffee.badge} • Roaster Spec`}
+                          {isThisCoffeeScanned ? '✨ Scanned from Your Bag' : `${coffee.badge || 'Roaster Spec'} • Dial-In Ready`}
                         </span>
                         <span className="font-mono text-[11px] text-emerald-400 font-bold flex items-center gap-1">
                           <Award className="w-3.5 h-3.5" />
-                          <span>SCA {coffee.cuppingScore}</span>
+                          <span>SCA {coffee.cuppingScore || 87.5}</span>
                         </span>
                       </div>
 
@@ -626,17 +684,17 @@ export default function RoasterProfilePage({
                           {coffee.beanName}
                         </h4>
                         <p className="text-xs font-mono text-cream-soft/70 mt-1">
-                          {coffee.origin}
+                          {coffee.origin || 'Specialty Origin'}
                         </p>
                       </div>
 
                       <p className="text-xs text-cream-soft font-sans leading-relaxed">
-                        {coffee.description}
+                        {coffee.description || `Artisan craft roast by ${roaster?.name || 'Specialty Roastery'}.`}
                       </p>
 
                       {/* Tasting Notes Chips */}
                       <div className="flex flex-wrap gap-1.5">
-                        {coffee.tastingNotes.map((note, i) => (
+                        {(coffee.tastingNotes || []).map((note, i) => (
                           <span
                             key={i}
                             className="px-2.5 py-0.5 rounded-lg bg-white/[0.05] border border-white/10 text-[11px] font-mono text-cream-light"
@@ -650,15 +708,15 @@ export default function RoasterProfilePage({
                       <div className="p-3.5 rounded-2xl bg-[#140C08] border border-white/5 space-y-1.5 text-xs font-mono">
                         <div className="flex justify-between text-cream-soft">
                           <span>Process:</span>
-                          <span className="text-cream-light font-bold">{coffee.process}</span>
+                          <span className="text-cream-light font-bold">{coffee.process || 'Washed'}</span>
                         </div>
                         <div className="flex justify-between text-cream-soft">
                           <span>Varietal:</span>
-                          <span className="text-cream-light">{coffee.varietal}</span>
+                          <span className="text-cream-light">{coffee.varietal || 'Specialty Lot'}</span>
                         </div>
                         <div className="flex justify-between text-cream-soft">
                           <span>Elevation:</span>
-                          <span className="text-amber-gold">{coffee.elevation}</span>
+                          <span className="text-amber-gold">{coffee.elevation || '1,800+ MASL'}</span>
                         </div>
                       </div>
 
@@ -666,27 +724,27 @@ export default function RoasterProfilePage({
                       <div className="p-4 rounded-2xl bg-amber-500/[0.08] border border-amber-500/25 space-y-2">
                         <div className="flex items-center justify-between text-[11px] font-mono text-amber-gold font-bold uppercase tracking-wider">
                           <span>Dial-In Parameters:</span>
-                          <span className="capitalize">{coffee.brewMethod.replace(/_/g, ' ')}</span>
+                          <span className="capitalize">{(coffee.brewMethod || 'pour_over').replace(/_/g, ' ')}</span>
                         </div>
 
                         <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
                           <div className="p-2 rounded-xl bg-black/40 border border-white/5">
                             <span className="text-[10px] text-cream-soft/60 block">Ratio</span>
-                            <strong className="text-cream-light font-bold">1:{coffee.recommendedRatio}</strong>
+                            <strong className="text-cream-light font-bold">1:{coffee.recommendedRatio || 16.5}</strong>
                           </div>
                           <div className="p-2 rounded-xl bg-black/40 border border-white/5">
                             <span className="text-[10px] text-cream-soft/60 block">Water Temp</span>
-                            <strong className="text-amber-gold font-bold">{coffee.tempF}°F</strong>
+                            <strong className="text-amber-gold font-bold">{coffee.tempF || 202}°F</strong>
                           </div>
                           <div className="p-2 rounded-xl bg-black/40 border border-white/5">
                             <span className="text-[10px] text-cream-soft/60 block">Time</span>
-                            <strong className="text-cream-light font-bold">{coffee.brewTime}</strong>
+                            <strong className="text-cream-light font-bold">{coffee.brewTime || '3m 15s'}</strong>
                           </div>
                         </div>
 
                         <div className="text-[11px] font-mono text-cream-soft/80 flex items-center justify-between pt-1">
                           <span>Grind Setting:</span>
-                          <span className="text-cream-light font-bold">{coffee.recommendedGrind}</span>
+                          <span className="text-cream-light font-bold">{coffee.recommendedGrind || 'Medium-Fine'}</span>
                         </div>
                       </div>
                     </div>
@@ -699,7 +757,7 @@ export default function RoasterProfilePage({
                         onClick={() => {
                           const payload = {
                             ...coffee,
-                            roaster: roaster.name
+                            roaster: roaster?.name || 'Specialty Roastery'
                           };
                           if (onBrewCoffee) {
                             onBrewCoffee(payload);
@@ -711,7 +769,7 @@ export default function RoasterProfilePage({
                         className="w-full py-3 rounded-xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition hover:scale-[1.02] active:scale-[0.98]"
                       >
                         <Coffee className="w-4 h-4" />
-                        <span>Dial-In & Brew ({coffee.dryDoseGrams}g : {coffee.waterGrams}g)</span>
+                        <span>Dial-In & Brew ({coffee.dryDoseGrams || 18}g : {coffee.waterGrams || Math.round(18 * (coffee.recommendedRatio || 16.5))}g)</span>
                       </button>
 
                       {/* Secondary Customer Actions: Reorder from Roaster & Save to Cellar */}
@@ -771,17 +829,17 @@ export default function RoasterProfilePage({
               </div>
 
               <div className="space-y-4 font-serif text-base sm:text-lg text-cream-soft leading-relaxed">
-                {roaster.originStory.map((paragraph, i) => (
+                {(roaster?.originStory || []).map((paragraph, i) => (
                   <p key={i}>{paragraph}</p>
                 ))}
               </div>
 
               <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
                 <div className="text-cream-soft/80">
-                  Founding Team: <strong className="text-cream-light">{roaster.founders?.length ? roaster.founders.join(' • ') : roaster.name}</strong>
+                  Founding Team: <strong className="text-cream-light">{roaster?.founders?.length ? roaster.founders.join(' • ') : (roaster?.name || 'Artisan Roasters')}</strong>
                 </div>
                 <div className="text-amber-gold">
-                  Headquartered in {roaster.city}, {roaster.state}
+                  Headquartered in {roaster?.city || 'Artisan'}, {roaster?.state || 'USA'}
                 </div>
               </div>
             </div>
@@ -803,18 +861,18 @@ export default function RoasterProfilePage({
               </div>
 
               <p className="font-sans text-sm text-cream-soft/90 leading-relaxed">
-                {roaster.roastingPhilosophy}
+                {roaster?.roastingPhilosophy || 'We calibrate each roast profile to preserve origin terroir and sweetness.'}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1">
                   <span className="text-[11px] font-mono uppercase text-cream-soft/70 block">Production Equipment</span>
-                  <span className="font-serif text-base font-bold text-cream-light block">{roaster.roasterMachines}</span>
+                  <span className="font-serif text-base font-bold text-cream-light block">{roaster?.roasterMachines || 'Artisan Roasters'}</span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1">
                   <span className="text-[11px] font-mono uppercase text-cream-soft/70 block">Sourcing Ethics</span>
-                  <span className="font-serif text-base font-bold text-cream-light block">{roaster.sourcingPhilosophy}</span>
+                  <span className="font-serif text-base font-bold text-cream-light block">{roaster?.sourcingPhilosophy || 'Ethical Direct-Trade Sourcing'}</span>
                 </div>
               </div>
             </div>
@@ -839,17 +897,24 @@ export default function RoasterProfilePage({
                       Roaster-Approved Mineral Profile
                     </span>
                     <h3 className="font-serif text-2xl font-bold text-cream-light">
-                      {roaster.name} Cupping Room Water Specification
+                      {roaster?.name || 'Specialty Roastery'} Cupping Room Water Specification
                     </h3>
                   </div>
                 </div>
 
                 <button
                   onClick={() => {
+                    const waterSpec = roaster?.recommendedWater || {
+                      targetTds: 140,
+                      gh: 70,
+                      kh: 30,
+                      ph: 7.0,
+                      philosophy: 'Balanced mineral water spec for specialty coffee extraction.'
+                    };
                     if (orchestrator) {
-                      orchestrator.water(roaster.recommendedWater);
+                      orchestrator.water(waterSpec);
                     } else if (onOpenWaterLabWithProfile) {
-                      onOpenWaterLabWithProfile(roaster.recommendedWater);
+                      onOpenWaterLabWithProfile(waterSpec);
                     }
                   }}
                   className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg transition"
@@ -860,32 +925,32 @@ export default function RoasterProfilePage({
               </div>
 
               <p className="text-sm text-cream-soft font-sans leading-relaxed">
-                {roaster.recommendedWater.philosophy}
+                {roaster?.recommendedWater?.philosophy || 'Balanced mineral water with 2:1 magnesium-to-calcium ratio for vibrant sweetness and clean finish.'}
               </p>
 
               {/* Water Targets Metric Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
                 <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
                   <span className="text-[10px] uppercase text-cyan-400/80 block">Target TDS</span>
-                  <span className="text-2xl font-bold text-cream-light">{roaster.recommendedWater.targetTds}</span>
+                  <span className="text-2xl font-bold text-cream-light">{roaster?.recommendedWater?.targetTds || 140}</span>
                   <span className="text-[10px] text-cream-soft/60 block">PPM</span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
                   <span className="text-[10px] uppercase text-cyan-400/80 block">Hardness (GH)</span>
-                  <span className="text-2xl font-bold text-amber-gold">{roaster.recommendedWater.gh}</span>
+                  <span className="text-2xl font-bold text-amber-gold">{roaster?.recommendedWater?.gh || 70}</span>
                   <span className="text-[10px] text-cream-soft/60 block">PPM CaCO3</span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
                   <span className="text-[10px] uppercase text-cyan-400/80 block">Buffer (KH)</span>
-                  <span className="text-2xl font-bold text-emerald-400">{roaster.recommendedWater.kh}</span>
+                  <span className="text-2xl font-bold text-emerald-400">{roaster?.recommendedWater?.kh || 30}</span>
                   <span className="text-[10px] text-cream-soft/60 block">PPM CaCO3</span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
                   <span className="text-[10px] uppercase text-cyan-400/80 block">Target pH</span>
-                  <span className="text-2xl font-bold text-cyan-300">{roaster.recommendedWater.ph}</span>
+                  <span className="text-2xl font-bold text-cyan-300">{roaster?.recommendedWater?.ph || 7.0}</span>
                   <span className="text-[10px] text-cream-soft/60 block">Neutral Balanced</span>
                 </div>
               </div>
@@ -896,7 +961,7 @@ export default function RoasterProfilePage({
                   Recommended Bottled Water Pairing:
                 </div>
                 <p className="text-cream-soft font-sans">
-                  {roaster.recommendedWater.bottledWaterPairing}
+                  {roaster?.recommendedWater?.bottledWaterPairing || 'Crystal Geyser or Volvic Natural Spring Water'}
                 </p>
               </div>
 
@@ -911,7 +976,7 @@ export default function RoasterProfilePage({
         {activeTab === 'cafes' && (
           <div className="space-y-6 animate-fade-in max-w-4xl">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {roaster.cafes.map((cafe, i) => (
+              {(roaster?.cafes || []).map((cafe, i) => (
                 <div
                   key={i}
                   className="p-6 rounded-3xl bg-black/40 border border-white/10 space-y-4 shadow-lg flex flex-col justify-between"

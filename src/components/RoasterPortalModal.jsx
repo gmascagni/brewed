@@ -498,7 +498,60 @@ export default function RoasterPortalModal({
     }
   };
 
+  const ensureDraftSaved = () => {
+    const trimmedRoaster = (selectedCoffeeForSticker?.roaster || roasterName || '').trim();
+    const trimmedBean = (selectedCoffeeForSticker?.beanName || beanName || '').trim();
+    if (!trimmedRoaster && !trimmedBean) return null;
+
+    const rName = trimmedRoaster || 'Specialty Roastery';
+    const bName = trimmedBean || 'Single Origin Lot';
+    const slug = rName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+    const coffeeRecord = selectedCoffeeForSticker || {
+      id: `roaster_${Date.now()}`,
+      roaster: rName,
+      location: location.trim() || 'Artisan Small Batch',
+      website: website.trim() || 'https://thebrew.app',
+      logoImage: logoImage || '',
+      beanName: bName,
+      origin: origin.trim() || 'Single Origin',
+      varietal: varietal.trim() || 'Specialty Lot',
+      process: process || 'Washed',
+      elevation: elevation || '1,800+ MASL',
+      roastLevel: roastLevel || 'Light-Medium',
+      tastingNotes: tastingNotesInput ? tastingNotesInput.split(',').map(s => s.trim()).filter(Boolean) : ['Floral', 'Fruit', 'Balanced'],
+      brewMethod: brewMethod || 'pour_over',
+      recommendedRatio: Number(recommendedRatio) || 16.5,
+      tempF: Number(tempF) || 202,
+      tempC: Math.round(((Number(tempF || 202) - 32) * 5) / 9),
+      recommendedGrind: recommendedGrind.trim() || 'Medium-Fine',
+      brewTime: brewTime.trim() || '3m 15s',
+      upc: upc.trim() || `LOT-${Date.now().toString().slice(-6)}`,
+      customUrl: customUrl.trim(),
+      notes: roasterNotes.trim() || `Dialed-in recipe from ${rName}.`
+    };
+
+    try {
+      saveCustomRoasterProfile({
+        name: rName,
+        slug,
+        location: location.trim(),
+        website: website.trim(),
+        logoImage: logoImage || '',
+        backgroundImage: logoImage || ''
+      });
+      saveRoasterCoffee(coffeeRecord);
+      const updated = getCustomRoasterCoffees();
+      setRegisteredCoffees(updated);
+      setSelectedCoffeeForSticker(coffeeRecord);
+    } catch (e) {
+      console.warn('Auto-save draft on test link error:', e);
+    }
+    return coffeeRecord;
+  };
+
   const handleOpenLinkInNewTab = () => {
+    ensureDraftSaved();
     const targetUrl = getResolvedTargetUrl();
     if (targetUrl) {
       window.open(targetUrl, '_blank', 'noopener,noreferrer');
@@ -506,6 +559,7 @@ export default function RoasterPortalModal({
   };
 
   const handleNavigateToPortfolio = () => {
+    ensureDraftSaved();
     const rName = selectedCoffeeForSticker?.roaster || roasterName || 'methodical';
     const slug = rName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     onClose();
@@ -1178,7 +1232,7 @@ export default function RoasterPortalModal({
                       <div>
                         <span className="text-stone-500 block text-[8px] uppercase">Method</span>
                         <span className="font-bold text-stone-800 capitalize">
-                          {(selectedCoffeeForSticker?.brewMethod || brewMethod).replace(/_/g, ' ')}
+                          {(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ')}
                         </span>
                       </div>
                     </div>
@@ -1252,7 +1306,7 @@ export default function RoasterPortalModal({
                       <div>
                         <span className="text-cream-soft/60 block text-[8px] uppercase">Method</span>
                         <span className="font-bold text-cream-light capitalize">
-                          {(selectedCoffeeForSticker?.brewMethod || brewMethod).replace(/_/g, ' ')}
+                          {(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ')}
                         </span>
                       </div>
                     </div>
@@ -1527,7 +1581,7 @@ export default function RoasterPortalModal({
                           <span>•</span>
                           <span>{c.tempF}°F</span>
                           <span>•</span>
-                          <span className="capitalize">{c.brewMethod.replace(/_/g, ' ')}</span>
+                          <span className="capitalize">{(c.brewMethod || 'pour_over').replace(/_/g, ' ')}</span>
                         </div>
                       </div>
 
