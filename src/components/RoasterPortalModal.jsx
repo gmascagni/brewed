@@ -54,7 +54,7 @@ export default function RoasterPortalModal({
   prefilledBean = null,
   onSelectBeanToBrew
 }) {
-  const [activeTab, setActiveTab] = useState('onboard'); // 'onboard' | 'sticker' | 'catalog'
+  const [activeTab, setActiveTab] = useState(() => (prefilledBarcode || prefilledBean ? 'onboard' : 'video')); // 'video' | 'onboard' | 'sticker' | 'catalog' | 'telemetry'
   const [qrLayout, setQrLayout] = useState('thermal'); // 'thermal' | 'badge' | 'minimal'
   const [qrColor, setQrColor] = useState('black'); // 'black' | 'espresso' | 'gold'
   const [qrEcc, setQrEcc] = useState('H'); // 'H' (30%) | 'Q' (25%) | 'M' (15%) | 'L' (7%)
@@ -604,11 +604,23 @@ export default function RoasterPortalModal({
           </button>
         </div>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation - Step 1 Walkthrough Video is First */}
         <div 
           className="flex items-center gap-2 px-4 sm:px-6 py-3 border-b border-white/10 bg-black/20 overflow-x-auto overflow-y-hidden no-scrollbar text-xs font-mono shrink-0 select-none [&::-webkit-scrollbar]:hidden"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
+          <button
+            onClick={() => setActiveTab('video')}
+            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
+              activeTab === 'video'
+                ? 'bg-amber-gold text-espresso-950 shadow'
+                : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+            }`}
+          >
+            <Play className="w-3.5 h-3.5 shrink-0" />
+            <span>1. Walkthrough Video (How It Works)</span>
+          </button>
+
           <button
             onClick={() => setActiveTab('onboard')}
             className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
@@ -618,7 +630,7 @@ export default function RoasterPortalModal({
             }`}
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>1. Onboard Coffee & Recipe</span>
+            <span>2. Onboard Coffee & Recipe</span>
           </button>
 
           <button
@@ -630,7 +642,7 @@ export default function RoasterPortalModal({
             }`}
           >
             <QrCode className="w-3.5 h-3.5 shrink-0" />
-            <span>2. Smart Bag QR Studio</span>
+            <span>3. Smart Bag QR Studio</span>
           </button>
 
           <button
@@ -642,19 +654,7 @@ export default function RoasterPortalModal({
             }`}
           >
             <Store className="w-3.5 h-3.5 shrink-0" />
-            <span>3. Registered Coffees ({registeredCoffees.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('video')}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
-              activeTab === 'video'
-                ? 'bg-amber-gold text-espresso-950 shadow'
-                : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-            }`}
-          >
-            <Play className="w-3.5 h-3.5 shrink-0" />
-            <span>4. Walkthrough Video</span>
+            <span>4. Registered Coffees ({registeredCoffees.length})</span>
           </button>
 
           <button
@@ -1642,13 +1642,22 @@ export default function RoasterPortalModal({
                     Watch the 4-step workflow: thermal printing the QR sticker, affixing to retail packaging, customer optical scan, and instant dial-in recipe load.
                   </p>
                 </div>
-                <button
-                  onClick={() => setActiveTab('sticker')}
-                  className="px-4 py-2 rounded-xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-bold text-xs flex items-center gap-1.5 shadow transition"
-                >
-                  <QrCode className="w-3.5 h-3.5" />
-                  <span>Open Smart Bag QR Studio</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setActiveTab('onboard')}
+                    className="px-4 py-2 rounded-xl bg-amber-gold hover:bg-amber-300 text-espresso-950 font-bold text-xs flex items-center gap-1.5 shadow transition"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>2. Start Onboarding Recipe</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('sticker')}
+                    className="px-3.5 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-bold text-xs flex items-center gap-1.5 border border-white/10 shadow transition"
+                  >
+                    <QrCode className="w-3.5 h-3.5 text-amber-gold" />
+                    <span>QR Studio</span>
+                  </button>
+                </div>
               </div>
 
               <RoasterVideoPlayer

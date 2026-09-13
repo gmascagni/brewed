@@ -407,8 +407,13 @@ export default function App() {
       } else {
         setIsRoasterShowcaseView(true);
         const parts = path.split('/').filter(Boolean);
+        const searchParams = new URLSearchParams(location.search);
+        const querySlug = searchParams.get('roaster') || searchParams.get('slug');
         if (parts.length > 1 && !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(parts[1].toLowerCase())) {
           setSelectedRoasterSlug(parts[1]);
+        } else if (querySlug) {
+          const formattedSlug = querySlug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+          setSelectedRoasterSlug(formattedSlug);
         } else {
           setSelectedRoasterSlug('methodical');
         }

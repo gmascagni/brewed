@@ -15,9 +15,37 @@ if (!fs.existsSync(distDir)) {
 
 const templateHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
 
-// Copy 404.html for GitHub Pages SPA routing fallback
-fs.writeFileSync(path.join(distDir, '404.html'), templateHtml);
-fs.writeFileSync(path.join(rootDir, '404.html'), templateHtml);
+const spa404Html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>The Brew App: The Art of Extraction</title>
+    <script type="text/javascript">
+      // GitHub Pages Single Page App Redirect
+      // Preserves deep subpaths, roaster slugs, and query parameters on GitHub Pages static hosting
+      var pathSegmentsToKeep = window.location.pathname.startsWith('/brewed') ? 1 : 0;
+      var l = window.location;
+      var repoBase = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
+      var routePath = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~');
+      var search = l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '';
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        repoBase + '/?/' + routePath + search + l.hash
+      );
+    </script>
+  </head>
+  <body style="background: #0A0604; color: #E7E5E4; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+    <div style="text-align: center; padding: 24px;">
+      <div style="width: 36px; height: 36px; border: 3px solid #D4A373; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
+      <p style="font-family: monospace; font-size: 13px; color: #D4A373; letter-spacing: 0.05em;">Connecting to Roaster Portfolio...</p>
+    </div>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+  </body>
+</html>`;
+
+fs.writeFileSync(path.join(distDir, '404.html'), spa404Html);
+fs.writeFileSync(path.join(rootDir, '404.html'), spa404Html);
+
 
 const allMethods = BREW_METHODS.coffee || [];
 

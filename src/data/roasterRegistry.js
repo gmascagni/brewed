@@ -284,11 +284,27 @@ export async function syncCloudCatalog() {
 }
 
 /**
+ * Resolves the appropriate base URL for Smart Bag deep links.
+ * Automatically detects whether running under a subpath like /brewed on GitHub Pages,
+ * on a custom domain (thebrew.app), or on localhost.
+ */
+export function getSmartBagBaseUrl() {
+  if (typeof window !== 'undefined') {
+    const origin = window.location.origin;
+    if (window.location.pathname.startsWith('/brewed')) {
+      return `${origin}/brewed`;
+    }
+    return origin;
+  }
+  return 'https://thebrew.app';
+}
+
+/**
  * Generate a deep-link URL for a coffee profile that opens the Roaster's Portfolio page with dial-in parameters
  */
 export function generateSmartBagUrl(coffee, baseUrl) {
-  const origin = baseUrl || (typeof window !== 'undefined' ? window.location.origin : 'https://thebrew.app');
-  if (!coffee) return `${origin}/roasters`;
+  const base = baseUrl || getSmartBagBaseUrl();
+  if (!coffee) return `${base}/roasters`;
 
   const roasterSlug = String(coffee.roaster || 'methodical')
     .toLowerCase()
@@ -296,6 +312,7 @@ export function generateSmartBagUrl(coffee, baseUrl) {
     .replace(/^-+|-+$/g, '');
 
   const params = new URLSearchParams();
+  if (coffee.roaster) params.set('roaster', coffee.roaster);
   if (coffee.beanName) params.set('bean', coffee.beanName);
   if (coffee.id) params.set('coffeeId', coffee.id);
   if (coffee.brewMethod) params.set('method', coffee.brewMethod);
@@ -303,9 +320,19 @@ export function generateSmartBagUrl(coffee, baseUrl) {
   if (coffee.tempF) params.set('tempF', coffee.tempF.toString());
   if (coffee.recommendedGrind) params.set('grind', coffee.recommendedGrind);
   if (coffee.upc) params.set('upc', coffee.upc);
+  if (coffee.origin) params.set('origin', coffee.origin);
+  if (coffee.process) params.set('process', coffee.process);
+  if (coffee.elevation) params.set('elevation', coffee.elevation);
+  if (coffee.roastLevel) params.set('roast', coffee.roastLevel);
+  if (coffee.tastingNotes && Array.isArray(coffee.tastingNotes) && coffee.tastingNotes.length > 0) {
+    params.set('notes', coffee.tastingNotes.join(', '));
+  } else if (coffee.notes) {
+    params.set('notes', coffee.notes);
+  }
 
-  return `${origin}/roasters/${roasterSlug}?${params.toString()}`;
+  return `${base}/roasters/${roasterSlug}?${params.toString()}`;
 }
+
 
 /**
  * Generate a high-resolution QR code Data URL for printing packaging stickers

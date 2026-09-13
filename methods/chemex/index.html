@@ -61,7 +61,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/brewed/static/index-BcmCYMa7.js"></script>
+    <!-- GitHub Pages Single Page App (SPA) route restoration -->
+    <script type="text/javascript">
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+    <script type="module" crossorigin src="/brewed/static/index-DqMW5D_J.js"></script>
     <link rel="stylesheet" crossorigin href="/brewed/static/index-BUUckFRG.css">
     <script id="json-ld-structured-data" type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to Brew Chemex Glass Brewer","description":"Ultra-clean, elegant pour over extraction utilizing thick bonded paper filters to filter out all sediment and bitter oils for exceptional clarity.","totalTime":"PT4M","supply":[{"@type":"HowToSupply","name":"Specialty Single-Origin Coffee"},{"@type":"HowToSupply","name":"Hot Water (201°F / 94°C)"}],"tool":[{"@type":"HowToTool","name":"Chemex Glass Brewer"},{"@type":"HowToTool","name":"Precision Gram Scale & Multi-Phase Timer"}],"step":[{"@type":"HowToStep","position":1,"name":"Bloom Phase","text":"Saturate grounds with 3x coffee weight. Allow heavy bloom for 45 seconds."},{"@type":"HowToStep","position":2,"name":"Slow Spiral Pulse Pour","text":"Pour in slow steady spirals avoiding the outer glass filter rim."},{"@type":"HowToStep","position":3,"name":"Final Drawdown & Filter Lift","text":"Allow complete drawdown through thick paper filter. Lift filter and discard."}]}</script>
   </head>

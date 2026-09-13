@@ -284,6 +284,7 @@ export default function BarcodeScannerModal({
     setUncatalogedResult(null);
 
     const cleanVal = rawValue.trim();
+    const isSmartBagUrl = cleanVal.includes('bean=') || cleanVal.includes('recipe=') || (cleanVal.includes('/roasters/') && cleanVal.includes('?'));
 
     // 0. Check if raw payload or URL is a Bag Recipe JSON / URL
     const recipeMatch = parseRecipePayload(cleanVal);
@@ -299,7 +300,7 @@ export default function BarcodeScannerModal({
     const matched = allRegistered.find((bean) => {
       if (bean.upc === cleanVal) return true;
       if (bean.qrPatterns && bean.qrPatterns.some(p => cleanVal.toLowerCase().includes(p.toLowerCase()))) return true;
-      if (cleanVal.includes('thebrew.app') && cleanVal.includes('bean=')) {
+      if (isSmartBagUrl) {
         try {
           const urlObj = new URL(cleanVal.startsWith('http') ? cleanVal : `https://${cleanVal}`);
           const beanName = urlObj.searchParams.get('bean');
@@ -333,25 +334,33 @@ export default function BarcodeScannerModal({
     setIsLookingUp(false);
 
     // 3. Check if the scanned code is a direct The Brew App Smart Bag URL
-    if (cleanVal.includes('thebrew.app') && cleanVal.includes('bean=')) {
+    if (isSmartBagUrl) {
       try {
         const urlObj = new URL(cleanVal.startsWith('http') ? cleanVal : `https://${cleanVal}`);
+        let roasterFromPath = '';
+        if (urlObj.pathname.includes('/roasters/')) {
+          const slugPart = urlObj.pathname.split('/roasters/')[1].split('/')[0];
+          if (slugPart && !['showcase', 'partner', 'info', 'registered', 'roasters', 'roaster'].includes(slugPart.toLowerCase())) {
+            roasterFromPath = slugPart.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          }
+        }
+        const roasterTitle = urlObj.searchParams.get('roaster') || roasterFromPath || 'Specialty Roaster';
         const parsedBean = {
           id: `smart_bag_${Date.now()}`,
           upc: urlObj.searchParams.get('upc') || cleanVal,
-          roaster: urlObj.searchParams.get('roaster') || 'Specialty Roaster',
+          roaster: roasterTitle,
           beanName: urlObj.searchParams.get('bean') || 'Smart Bag Lot',
           origin: urlObj.searchParams.get('origin') || 'Specialty Lot',
-          process: 'Specialty Process',
-          elevation: '1,800+ MASL',
-          roastLevel: 'Light-Medium',
-          tastingNotes: ['Artisan Selected', 'Balanced Profile'],
+          process: urlObj.searchParams.get('process') || 'Specialty Process',
+          elevation: urlObj.searchParams.get('elevation') || '1,800+ MASL',
+          roastLevel: urlObj.searchParams.get('roast') || 'Light-Medium',
+          tastingNotes: urlObj.searchParams.get('notes') ? urlObj.searchParams.get('notes').split(',').map(s => s.trim()) : ['Artisan Selected', 'Balanced Profile'],
           recommendedRatio: parseFloat(urlObj.searchParams.get('ratio')) || 16.5,
           recommendedGrind: urlObj.searchParams.get('grind') || 'Medium-Fine',
           tempF: parseInt(urlObj.searchParams.get('tempF')) || 202,
           tempC: Math.round(((parseInt(urlObj.searchParams.get('tempF') || '202') - 32) * 5) / 9),
           brewMethod: urlObj.searchParams.get('method') || 'pour_over',
-          notes: `Smart Bag packaging QR scanned. Dialed in by ${urlObj.searchParams.get('roaster') || 'the Roaster'}.`
+          notes: `Smart Bag packaging QR scanned. Dialed in by ${roasterTitle}.`
         };
         setMatchedBean(parsedBean);
         setIsScanning(false);
@@ -361,47 +370,51 @@ export default function BarcodeScannerModal({
       }
     }
 
-    // 3. Genuine real-time lookup against Open Food Facts API
-    setIsLookingUp(true);
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3500);
-      const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(cleanVal)}.json`, {
-        signal: controller.signal,
-        headers: { 'User-Agent': 'TheBrewApp/1.4.4 (contact@thebrew.app)' }
-      });
-      clearTimeout(timeoutId);
+    // 4. Genuine real-time lookup against Open Food Facts API (only for numeric / SKU barcodes, never URLs)
+    const isWebUrl = cleanVal.startsWith('http://') || cleanVal.startsWith('https://') || cleanVal.includes('/') || cleanVal.includes('?');
+    if (!isWebUrl) {
+      setIsLookingUp(true);
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(cleanVal)}.json`, {
+          signal: controller.signal,
+          headers: { 'User-Agent': 'TheBrewApp/1.4.4 (contact@thebrew.app)' }
+        });
+        clearTimeout(timeoutId);
 
-      if (res.ok) {
-        const offData = await res.json();
-        if (offData.status === 1 && offData.product) {
-          const p = offData.product;
-          setMatchedBean({
-            id: `off_${cleanVal}`,
-            upc: cleanVal,
-            roaster: p.brands || p.brand_owner || 'Retail Coffee Roaster',
-            beanName: p.product_name || p.generic_name || 'Retail Whole Bean Coffee',
-            origin: p.origins || p.countries || 'Commercial Origin',
-            process: 'Commercial / Specialty',
-            elevation: 'Unspecified',
-            roastLevel: 'Medium',
-            tastingNotes: ['Retail Roasted', 'Balanced Body'],
-            recommendedRatio: 16,
-            recommendedGrind: 'Medium',
-            tempC: 93,
-            tempF: 200,
-            brewMethod: 'pour_over',
-            isOffMatch: true,
-            notes: `Verified retail product found on Open Food Facts (${p.product_name || 'Coffee'}). Note: Retail packaging barcodes do not specify barista extraction ratios or water temperatures. Set custom dial-in below.`
-          });
-          setIsLookingUp(false);
-          setIsScanning(false);
-          return;
+        if (res.ok) {
+          const offData = await res.json();
+          if (offData.status === 1 && offData.product) {
+            const p = offData.product;
+            setMatchedBean({
+              id: `off_${cleanVal}`,
+              upc: cleanVal,
+              roaster: p.brands || p.brand_owner || 'Retail Coffee Roaster',
+              beanName: p.product_name || p.generic_name || 'Retail Whole Bean Coffee',
+              origin: p.origins || p.countries || 'Commercial Origin',
+              process: 'Commercial / Specialty',
+              elevation: 'Unspecified',
+              roastLevel: 'Medium',
+              tastingNotes: ['Retail Roasted', 'Balanced Body'],
+              recommendedRatio: 16,
+              recommendedGrind: 'Medium',
+              tempC: 93,
+              tempF: 200,
+              brewMethod: 'pour_over',
+              isOffMatch: true,
+              notes: `Verified retail product found on Open Food Facts (${p.product_name || 'Coffee'}). Note: Retail packaging barcodes do not specify barista extraction ratios or water temperatures. Set custom dial-in below.`
+            });
+            setIsLookingUp(false);
+            setIsScanning(false);
+            return;
+          }
         }
+      } catch (err) {
+        console.warn('Open Food Facts lookup failed or timed out:', err);
       }
-    } catch (err) {
-      console.warn('Open Food Facts lookup failed or timed out:', err);
     }
+
 
     // 4. Truly uncataloged: Absolutely NO fake data generated (Rule [user_global])
     setIsLookingUp(false);

@@ -229,9 +229,17 @@ export function parseRecipePayload(input) {
 
         // B. Direct query parameters
         if (params.has('coffee') || params.has('roaster') || params.has('bean')) {
+          let pathRoaster = null;
+          if (raw.includes('/roasters/')) {
+            const slugPart = raw.split('/roasters/')[1].split(/[?#]/)[0];
+            if (slugPart && !['showcase', 'partner', 'info', 'registered', 'roasters', 'roaster'].includes(slugPart.toLowerCase())) {
+              pathRoaster = slugPart.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            }
+          }
+
           const queryData = {
             v: parseInt(params.get('v') || '1', 10),
-            roaster: params.get('roaster'),
+            roaster: params.get('roaster') || pathRoaster || 'Specialty Roaster',
             coffee: params.get('coffee') || params.get('bean'),
             roast: params.get('roast'),
             brewer: params.get('brewer') || params.get('method'),
@@ -243,6 +251,9 @@ export function parseRecipePayload(input) {
             total_time_sec: parseInt(params.get('total_time_sec') || params.get('time_sec') || '210', 10),
             bloom_water: parseInt(params.get('bloom_water') || '60', 10),
             bloom_time_sec: parseInt(params.get('bloom_time_sec') || '45', 10),
+            origin: params.get('origin'),
+            process: params.get('process'),
+            elevation: params.get('elevation'),
             notes: params.get('notes')
           };
           return normalizeRecipeBean(queryData);
