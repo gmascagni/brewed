@@ -17,8 +17,23 @@ import {
   Zap,
   BookOpen,
   Sliders,
-  Award
+  Award,
+  ExternalLink,
+  Star,
+  ShoppingBag
 } from 'lucide-react';
+import { PRODUCTS_DATA, AMAZON_AFFILIATE_TAG } from '../data/productsData';
+import { trackEvent } from '../utils/analytics';
+import { getAssetUrl } from '../utils/assetUrl';
+
+// Map of brew methods to authentic Amazon affiliate equipment
+const METHOD_PRODUCT_MAP = {
+  french_press: 'bodum_french_press',
+  aeropress: 'aeropress_original',
+  pour_over: 'v60_dripper_kit',
+  chemex: 'chemex_8cup',
+  moka_pot: 'bialetti_moka_express'
+};
 
 // 8 Beginner Brew Method Profiles with Pros, Cons, and Quick Specs
 const NOOB_BREW_METHODS = [
@@ -214,6 +229,68 @@ const NOOB_BREW_METHODS = [
   }
 ];
 
+/**
+ * Reusable Product Recommendation Callout with Direct Amazon ASIN Link
+ */
+function NoobProductCallout({ productId, label = "Recommended Gear", whyNoobsLoveIt }) {
+  const product = PRODUCTS_DATA.find(p => p.id === productId);
+  if (!product) return null;
+
+  return (
+    <div className="mt-3 p-3.5 sm:p-4 rounded-2xl bg-[#FFFDF9] border border-[#ECD4BD] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs hover:border-[#D69550] transition-colors">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="w-14 h-14 rounded-xl overflow-hidden bg-white border border-[#ECE6DC] shrink-0 p-1 flex items-center justify-center shadow-xs">
+          <img
+            src={getAssetUrl(product.image)}
+            alt={product.name}
+            loading="lazy"
+            className="w-full h-full object-contain"
+          />
+        </div>
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5 text-[10px] font-sans font-bold text-[#A25A24] uppercase tracking-wider">
+            <Sparkles className="w-3 h-3 text-[#C88A4B]" />
+            <span>{label}</span>
+          </div>
+          <h5 className="font-editorial text-sm font-bold text-[#14110F] truncate">
+            {product.name}
+          </h5>
+          <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs">
+            <span className="font-sans font-bold text-[#2A2421]">{product.priceRange}</span>
+            <span className="text-[#ECE6DC]">•</span>
+            <span className="flex items-center gap-1 text-[#A25A24] font-semibold text-[11px]">
+              <Star className="w-3 h-3 fill-current text-amber-500" />
+              <span>{product.rating}</span>
+            </span>
+            {whyNoobsLoveIt && (
+              <span className="text-[11px] text-[#766A62] hidden md:inline truncate">
+                • {whyNoobsLoveIt}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <a
+        href={product.amazonUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => {
+          trackEvent('amazon_click', {
+            product_id: product.id,
+            product_name: product.name,
+            source: 'coffee_noob_guide'
+          });
+        }}
+        className="px-3.5 py-2 rounded-xl bg-[#2A2421] hover:bg-[#14110F] text-white text-xs font-sans font-bold flex items-center justify-center gap-1.5 shrink-0 shadow-xs transition active:scale-95 cursor-pointer self-stretch sm:self-auto"
+      >
+        <span>View on Amazon</span>
+        <ExternalLink className="w-3.5 h-3.5 text-[#D69550]" />
+      </a>
+    </div>
+  );
+}
+
 export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }) {
   const [activeTab, setActiveTab] = useState('pillars');
   const [selectedMethodId, setSelectedMethodId] = useState('french_press');
@@ -287,6 +364,19 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
             >
               4. Tomorrow Morning Checklist
             </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('gear')}
+              className={`px-4 py-2 rounded-xl text-xs font-sans font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'gear'
+                  ? 'bg-[#2A2421] text-white shadow-sm'
+                  : 'bg-white text-[#5C524B] hover:bg-[#FAF0E6] border border-[#ECE6DC]'
+              }`}
+            >
+              <ShoppingBag className="w-3.5 h-3.5 text-[#C88A4B]" />
+              <span>5. Recommended Gear</span>
+            </button>
           </div>
         </div>
       </div>
@@ -310,111 +400,143 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Rule 1: Fresh Whole Beans */}
-            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
-                  1
-                </span>
-                <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-sans font-semibold border border-emerald-200">
-                  Most Important
-                </span>
-              </div>
-              <h4 className="font-editorial text-xl font-bold text-[#14110F]">
-                Fresh Whole Beans (Never Stale Pre-Ground)
-              </h4>
-              <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
-                Coffee beans are food. The moment beans are ground, their cellular walls shatter, and more than 60% of their delicate floral and fruit aromas oxidize and evaporate within <strong>15 minutes</strong>.
-              </p>
-              <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
-                <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#2F663C]" />
-                  <span>The Noob Rule: Check the "Roasted On" Date</span>
+            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+                    1
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-sans font-semibold border border-emerald-200">
+                    Most Important
+                  </span>
+                </div>
+                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+                  Fresh Whole Beans (Never Stale Pre-Ground)
+                </h4>
+                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
+                  Coffee beans are food. The moment beans are ground, their cellular walls shatter, and more than 60% of their delicate floral and fruit aromas oxidize and evaporate within <strong>15 minutes</strong>.
                 </p>
-                <p>
-                  Avoid grocery bags with vague "Best By" dates six months away. Look for bags stamped with a <strong>"Roasted On"</strong> date within the last <strong>7 to 30 days</strong>. That is when coffee is at its sweet, vibrant peak.
-                </p>
+                <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
+                  <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2F663C]" />
+                    <span>The Noob Rule: Check the "Roasted On" Date</span>
+                  </p>
+                  <p>
+                    Avoid grocery bags with vague "Best By" dates six months away. Look for bags stamped with a <strong>"Roasted On"</strong> date within the last <strong>7 to 30 days</strong>. That is when coffee is at its sweet, vibrant peak.
+                  </p>
+                </div>
               </div>
+
+              <NoobProductCallout
+                productId="stumptown_hair_bender"
+                label="Recommended Starter Whole Bean"
+                whyNoobsLoveIt="Balanced sweet cherry, dark chocolate & toffee notes"
+              />
             </div>
 
             {/* Rule 2: Burr Grinder */}
-            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
-                  2
-                </span>
-                <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-[11px] font-sans font-semibold border border-amber-200">
-                  Game-Changing Gear
-                </span>
-              </div>
-              <h4 className="font-editorial text-xl font-bold text-[#14110F]">
-                A Burr Grinder (Ditch the Whirling Blade)
-              </h4>
-              <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
-                Spinning blade choppers smash beans unevenly into giant boulders and micro-dust. When hot water hits this mess, the dust over-extracts (tasting bitter & ashy) while boulders under-extract (tasting sour & grassy) in the exact same cup.
-              </p>
-              <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
-                <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#2F663C]" />
-                  <span>The Noob Rule: Conical Burrs Crush Uniformly</span>
+            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+                    2
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-[11px] font-sans font-semibold border border-amber-200">
+                    Game-Changing Gear
+                  </span>
+                </div>
+                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+                  A Burr Grinder (Ditch the Whirling Blade)
+                </h4>
+                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
+                  Spinning blade choppers smash beans unevenly into giant boulders and micro-dust. When hot water hits this mess, the dust over-extracts (tasting bitter & ashy) while boulders under-extract (tasting sour & grassy) in the exact same cup.
                 </p>
-                <p>
-                  A burr grinder passes beans between two rotating textured plates, grinding every particle to the exact same uniform size. A $40–$60 manual burr grinder (like Timemore) beats a $300 coffee maker every day.
-                </p>
+                <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
+                  <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2F663C]" />
+                    <span>The Noob Rule: Conical Burrs Crush Uniformly</span>
+                  </p>
+                  <p>
+                    A burr grinder passes beans between two rotating textured plates, grinding every particle to the exact same uniform size. A burr grinder will upgrade your coffee quality more than any other tool.
+                  </p>
+                </div>
               </div>
+
+              <NoobProductCallout
+                productId="baratza_encore"
+                label="Recommended Burr Grinder"
+                whyNoobsLoveIt="European conical alloy burrs, 40 precision grind settings"
+              />
             </div>
 
             {/* Rule 3: The Golden Ratio */}
-            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
-                  3
-                </span>
-                <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-800 text-[11px] font-sans font-semibold border border-blue-200">
-                  Instant Consistency
-                </span>
-              </div>
-              <h4 className="font-editorial text-xl font-bold text-[#14110F]">
-                The Golden Ratio (Weigh in Grams, Don't Guess with Spoons)
-              </h4>
-              <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
-                Coffee density changes drastically by roast. A scoop of dark roast weighs much less than a scoop of dense light roast! Measuring with random spoons guarantees unpredictable, erratic coffee every morning.
-              </p>
-              <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
-                <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
-                  <Scale className="w-3.5 h-3.5 text-[#A25A24]" />
-                  <span>The Magic Ratio: 1:16 (1g Coffee per 16g Water)</span>
+            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+                    3
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-800 text-[11px] font-sans font-semibold border border-blue-200">
+                    Instant Consistency
+                  </span>
+                </div>
+                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+                  The Golden Ratio (Weigh in Grams, Don't Guess with Spoons)
+                </h4>
+                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
+                  Coffee density changes drastically by roast. A scoop of dark roast weighs much less than a scoop of dense light roast! Measuring with random spoons guarantees unpredictable, erratic coffee every morning.
                 </p>
-                <p>
-                  Put your mug on a simple $12 kitchen scale. <strong>18 grams of coffee + 300 grams (mL) of water</strong> makes one delicious, perfectly balanced morning mug.
-                </p>
+                <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
+                  <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
+                    <Scale className="w-3.5 h-3.5 text-[#A25A24]" />
+                    <span>The Magic Ratio: 1:16 (1g Coffee per 16g Water)</span>
+                  </p>
+                  <p>
+                    Put your mug on a simple digital scale. <strong>18 grams of coffee + 300 grams (mL) of water</strong> makes one delicious, perfectly balanced morning mug.
+                  </p>
+                </div>
               </div>
+
+              <NoobProductCallout
+                productId="timemore_black_mirror"
+                label="Recommended Precision Scale"
+                whyNoobsLoveIt="0.1g fast accuracy sensor with automatic brew timer"
+              />
             </div>
 
             {/* Rule 4: Water Temperature */}
-            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
-                  4
-                </span>
-                <span className="px-2.5 py-1 rounded-full bg-orange-50 text-orange-800 text-[11px] font-sans font-semibold border border-orange-200">
-                  Thermal Control
-                </span>
-              </div>
-              <h4 className="font-editorial text-xl font-bold text-[#14110F]">
-                Water Temperature (The 195°F – 205°F Sweet Spot)
-              </h4>
-              <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
-                Water too cool (under 195°F / 90°C) cannot dissolve the sweet caramelized sugars in coffee, resulting in weak, sour cups. Rolling boiling water (212°F / 100°C) can scorch darker roasts and pull out bitter wood fibers.
-              </p>
-              <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
-                <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5 text-[#A25A24]" />
-                  <span>The Noob Rule: The 30-Second Rest</span>
+            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+                    4
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full bg-orange-50 text-orange-800 text-[11px] font-sans font-semibold border border-orange-200">
+                    Thermal Control
+                  </span>
+                </div>
+                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+                  Water Temperature (The 195°F – 205°F Sweet Spot)
+                </h4>
+                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
+                  Water too cool (under 195°F / 90°C) cannot dissolve the sweet caramelized sugars in coffee, resulting in weak, sour cups. Rolling boiling water (212°F / 100°C) can scorch darker roasts and pull out bitter wood fibers.
                 </p>
-                <p>
-                  No thermometer? Bring your kettle to a full boil, take it off the heat, and wait <strong>30 to 45 seconds</strong>. The water naturally drops to the ideal 200°F extraction range.
-                </p>
+                <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
+                  <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
+                    <Flame className="w-3.5 h-3.5 text-[#A25A24]" />
+                    <span>The Noob Rule: The 30-Second Rest</span>
+                  </p>
+                  <p>
+                    No thermometer? Bring your kettle to a full boil, take it off the heat, and wait <strong>30 to 45 seconds</strong>. The water naturally drops to the ideal 200°F extraction range.
+                  </p>
+                </div>
               </div>
+
+              <NoobProductCallout
+                productId="fellow_stagg_ekg"
+                label="Recommended Gooseneck Kettle"
+                whyNoobsLoveIt="Exact 1° PID temperature hold & counterbalanced spout"
+              />
             </div>
 
             {/* Rule 5: The Bloom */}
@@ -465,7 +587,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
               </h3>
             </div>
             <span className="text-xs font-sans text-[#766A62]">
-              Click any brewer below to inspect its detailed breakdown.
+              Click any brewer below to inspect its breakdown and gear recommendations.
             </span>
           </div>
 
@@ -566,6 +688,27 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
               </div>
             </div>
 
+            {/* Recommended Hardware Callout */}
+            {METHOD_PRODUCT_MAP[selectedMethod.id] && (
+              <div className="pt-2">
+                <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider block mb-1">
+                  Tested & Recommended Equipment:
+                </span>
+                <NoobProductCallout
+                  productId={METHOD_PRODUCT_MAP[selectedMethod.id]}
+                  label={`Recommended ${selectedMethod.name}`}
+                  whyNoobsLoveIt="Durable construction, proven extraction consistency, barista benchmark"
+                />
+                {selectedMethod.id === 'pour_over' && (
+                  <NoobProductCallout
+                    productId="v60_paper_filters"
+                    label="Essential V60 Filters"
+                    whyNoobsLoveIt="Japanese oxygen-bleached tabbed paper filters for clean cup"
+                  />
+                )}
+              </div>
+            )}
+
             {/* Action Bar */}
             {onSelectMethodToBrew && (
               <div className="pt-2 flex items-center justify-end">
@@ -599,7 +742,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
               <button
                 type="button"
                 onClick={onOpenWaterLab}
-                className="text-xs font-sans font-semibold text-[#A25A24] hover:underline hidden sm:inline"
+                className="text-xs font-sans font-semibold text-[#A25A24] hover:underline hidden sm:inline cursor-pointer"
               >
                 Launch Advanced Mineral Lab →
               </button>
@@ -689,6 +832,25 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                     If white chalk coats your kettle, your water is too hard. Mix 50% distilled water with 50% filtered tap water, or buy a gallon of spring water (like Crystal Geyser) for a night-and-day taste improvement.
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* In-Line Water Products */}
+            <div className="pt-2">
+              <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider block mb-1">
+                Recommended Water Minerals & Precision Kettles:
+              </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <NoobProductCallout
+                  productId="third_wave_water"
+                  label="Water Chemistry Packets"
+                  whyNoobsLoveIt="Add 1 packet to a gallon of distilled water for cafe-spec minerals"
+                />
+                <NoobProductCallout
+                  productId="fellow_stagg_ekg"
+                  label="Precision Electric Gooseneck"
+                  whyNoobsLoveIt="Exact 1-degree temperature control and slow counterbalanced pour"
+                />
               </div>
             </div>
           </div>
@@ -808,6 +970,167 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 5: RECOMMENDED NOOB GEAR & STARTER KITS (Amazon Affiliate Links)      */}
+      {/* ========================================================================= */}
+      {activeTab === 'gear' && (
+        <div className="space-y-8 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#ECE6DC] pb-4 gap-3">
+            <div>
+              <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider">Buyer's Field Guide</span>
+              <h3 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
+                The Coffee Noob Starter Gear & Affiliate Picks
+              </h3>
+            </div>
+            <span className="text-xs font-sans text-[#766A62]">
+              Handpicked tools tested for real extraction consistency.
+            </span>
+          </div>
+
+          {/* Transparent Affiliate Disclosure Banner */}
+          <div className="p-4 rounded-2xl bg-[#FFFDF9] border border-[#ECD4BD] flex items-start gap-3 shadow-xs">
+            <ShieldCheck className="w-5 h-5 text-[#C88A4B] shrink-0 mt-0.5" />
+            <div className="text-xs font-sans text-[#5C524B] leading-relaxed">
+              <strong className="text-[#14110F] block mb-0.5">Amazon Associate Disclosure & Transparency:</strong>
+              As an Amazon Associate, TheBrew.App earns from qualifying purchases made through these links at zero extra cost to you. We do not accept paid manufacturer placements — every item here is independently selected because it genuinely improves home brewing.
+            </div>
+          </div>
+
+          {/* Two Clear Starter Paths */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Path A */}
+            <div className="p-6 rounded-3xl bg-white border-2 border-[#ECD4BD] shadow-card space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-sans font-bold border border-emerald-200">
+                  Option 1: The Budget Sweet Spot
+                </span>
+                <span className="font-sans font-bold text-sm text-[#A25A24]">~$75 – $95 Total</span>
+              </div>
+              <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+                The "Zero-Stress" Starter Kit
+              </h4>
+              <p className="font-sans text-xs text-[#5C524B] leading-relaxed">
+                Maximum flavor upgrade per dollar. An immersion brewer that is virtually impossible to mess up, paired with a precision scale and fresh whole beans.
+              </p>
+              <div className="space-y-3 pt-2">
+                <NoobProductCallout
+                  productId="aeropress_original"
+                  label="The Brewer"
+                  whyNoobsLoveIt="Smooth, zero-bitterness cup in 60 seconds"
+                />
+                <NoobProductCallout
+                  productId="timemore_black_mirror"
+                  label="The Scale"
+                  whyNoobsLoveIt="0.1g accuracy with auto-timer"
+                />
+                <NoobProductCallout
+                  productId="stumptown_hair_bender"
+                  label="The Beans"
+                  whyNoobsLoveIt="Rich chocolate, sweet cherry & toffee"
+                />
+              </div>
+            </div>
+
+            {/* Path B */}
+            <div className="p-6 rounded-3xl bg-white border-2 border-[#ECD4BD] shadow-card space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-sans font-bold border border-amber-200">
+                  Option 2: The Enthusiast Path
+                </span>
+                <span className="font-sans font-bold text-sm text-[#A25A24]">~$220 – $280 Total</span>
+              </div>
+              <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+                The "Home Barista Lab" Kit
+              </h4>
+              <p className="font-sans text-xs text-[#5C524B] leading-relaxed">
+                The exact core kit used by specialty cafe baristas at home. A conical burr grinder for uniform particle distribution and the clarity champion V60.
+              </p>
+              <div className="space-y-3 pt-2">
+                <NoobProductCallout
+                  productId="baratza_encore"
+                  label="The Burr Grinder"
+                  whyNoobsLoveIt="40 precision grind settings"
+                />
+                <NoobProductCallout
+                  productId="v60_dripper_kit"
+                  label="The Pour-Over"
+                  whyNoobsLoveIt="Iconic 60° spiral cone"
+                />
+                <NoobProductCallout
+                  productId="third_wave_water"
+                  label="The Water Minerals"
+                  whyNoobsLoveIt="SCA-certified magnesium & calcium"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Full Catalog of Tested Products */}
+          <div className="space-y-4 pt-4">
+            <h4 className="font-editorial text-2xl font-bold text-[#14110F]">
+              All Recommended Equipment by Category
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {PRODUCTS_DATA.filter(p => p.track === 'coffee').map(product => (
+                <div key={product.id} className="p-5 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#FAF7F2] p-2 flex items-center justify-center border border-[#ECE6DC]">
+                      <img
+                        src={getAssetUrl(product.image)}
+                        alt={product.name}
+                        loading="lazy"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div>
+                      {product.badge && (
+                        <span className="px-2 py-0.5 rounded-md bg-[#FAF0E6] text-[#A25A24] text-[10px] font-sans font-bold uppercase tracking-wider inline-block mb-1">
+                          {product.badge}
+                        </span>
+                      )}
+                      <h5 className="font-editorial text-base font-bold text-[#14110F] line-clamp-2">
+                        {product.name}
+                      </h5>
+                      <div className="flex items-center gap-2 mt-1 text-xs">
+                        <span className="font-sans font-bold text-[#2A2421]">{product.priceRange}</span>
+                        <span className="text-[#ECE6DC]">•</span>
+                        <span className="flex items-center gap-1 text-[#A25A24] font-semibold text-[11px]">
+                          <Star className="w-3 h-3 fill-current text-amber-500" />
+                          <span>{product.rating}</span>
+                          <span className="text-[#766A62] font-normal">({product.reviewsCount.toLocaleString()})</span>
+                        </span>
+                      </div>
+                    </div>
+                    <p className="font-sans text-xs text-[#5C524B] line-clamp-3 leading-relaxed">
+                      {product.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 mt-3 border-t border-[#ECE6DC]">
+                    <a
+                      href={product.amazonUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => {
+                        trackEvent('amazon_click', {
+                          product_id: product.id,
+                          product_name: product.name,
+                          source: 'coffee_noob_catalog'
+                        });
+                      }}
+                      className="w-full py-2.5 px-4 rounded-xl bg-[#2A2421] hover:bg-[#14110F] text-white text-xs font-sans font-bold flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                    >
+                      <span>Check Price on Amazon</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-[#D69550]" />
+                    </a>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
