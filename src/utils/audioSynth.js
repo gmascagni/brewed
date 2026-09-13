@@ -36,6 +36,11 @@ export function unlockAudio() {
   if (ctx && ctx.state === 'suspended') {
     ctx.resume().catch(() => {});
   }
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.resume();
+    } catch (e) {}
+  }
 }
 
 /**
@@ -218,12 +223,81 @@ export function playTimerStartChime(isMuted = false) {
 }
 
 /**
+ * Lookup map of pre-rendered studio instruction audio files and their hardcoded duration in seconds.
+ * Extracted from /audio/timer/instructions/manifest.json.
+ * If an active phase's durationSec does not match the pre-rendered audio, the MP3 must NOT be played,
+ * as doing so would cause the audio voice to announce an incorrect duration (e.g. 45s when timer is 55s).
+ */
+export const INSTRUCTION_AUDIO_DURATIONS = {
+  classic_pour_over_0: 45,
+  classic_pour_over_1: 45,
+  classic_pour_over_2: 45,
+  classic_pour_over_3: 60,
+  pour_over_0: 45,
+  pour_over_1: 60,
+  pour_over_2: 75,
+  chemex_0: 45,
+  chemex_1: 90,
+  chemex_2: 105,
+  french_press_0: 240,
+  french_press_1: 30,
+  french_press_2: 300,
+  drip_brewer_0: 30,
+  drip_brewer_1: 180,
+  drip_brewer_2: 60,
+  moka_pot_0: 30,
+  moka_pot_1: 180,
+  moka_pot_2: 45,
+  espresso_0: 8,
+  espresso_1: 25,
+  aeropress_0: 60,
+  aeropress_1: 30,
+  aeropress_2: 30,
+  darjeeling_tea_0: 15,
+  darjeeling_tea_1: 180,
+  darjeeling_tea_2: 30,
+  chai_masala_0: 240,
+  chai_masala_1: 120,
+  chai_masala_2: 30,
+  english_breakfast_0: 15,
+  english_breakfast_1: 240,
+  english_breakfast_2: 30,
+  earl_grey_0: 15,
+  earl_grey_1: 210,
+  earl_grey_2: 30,
+  green_tea_0: 15,
+  green_tea_1: 120,
+  green_tea_2: 90,
+  matcha_tea_0: 20,
+  matcha_tea_1: 15,
+  matcha_tea_2: 45,
+  oolong_tea_0: 10,
+  oolong_tea_1: 45,
+  oolong_tea_2: 60,
+  ceylon_tea_0: 15,
+  ceylon_tea_1: 210,
+  ceylon_tea_2: 30,
+  white_tea_0: 15,
+  white_tea_1: 180,
+  white_tea_2: 30,
+  turmeric_tea_0: 15,
+  turmeric_tea_1: 300,
+  turmeric_tea_2: 30
+};
+
+let activeSpeechTimeout = null;
+
+/**
  * Stop any active voice announcement or audio element
  */
 export function stopSpeechAnnouncement() {
   if (announcementTimeout) {
     clearTimeout(announcementTimeout);
     announcementTimeout = null;
+  }
+  if (activeSpeechTimeout) {
+    clearTimeout(activeSpeechTimeout);
+    activeSpeechTimeout = null;
   }
   isSpeakingAnnouncement = false;
   if (activeAudioElement) {
@@ -244,9 +318,11 @@ export function stopSpeechAnnouncement() {
 /**
  * Announce phase name, duration, and the Active Extraction Instruction clearly.
  * Prioritizes pre-rendered studio British female voice MP3s (/audio/timer/instructions/<method>_phase_<idx>.mp3)
- * with robust, resilient fallback to Web Speech API.
+ * ONLY when durationSec matches the recorded duration in the audio file.
+ * When durationSec is scaled (e.g. 55s bloom for large doses, 35s for small doses) or custom,
+ * dynamically synthesizes using Web Speech API to guarantee voice matches the visual timer countdown 100%.
  * NEVER blocks timer countdown or UI execution.
- * Example: "Bloom Phase, 45 seconds. Saturate grounds evenly with 3x coffee weight in circular motion. Let coffee bloom and de-gas."
+ * Example: "Bloom Phase, 55 seconds. Saturate grounds evenly with 165g water..."
  */
 export function announcePhase(
   phaseName = 'Bloom Phase', 
@@ -273,6 +349,10 @@ export function announcePhase(
   const safeFinish = () => {
     if (!finished) {
       finished = true;
+      if (activeSpeechTimeout) {
+        clearTimeout(activeSpeechTimeout);
+        activeSpeechTimeout = null;
+      }
       isSpeakingAnnouncement = false;
       activeAudioElement = null;
       activeSpeechUtterance = null;
@@ -280,7 +360,7 @@ export function announcePhase(
     }
   };
 
-  // Format duration text
+  // Format duration text dynamically
   let durText;
   if (durationSec >= 60 && durationSec % 60 === 0) {
     const mins = Math.floor(durationSec / 60);
@@ -296,10 +376,17 @@ export function announcePhase(
 
   isSpeakingAnnouncement = true;
 
-  // Fallback Web Speech Synthesizer implementation
+  // Check if there is an exact matching pre-recorded studio instruction MP3
+  const instructionKey = (methodId && phaseIdx !== undefined && phaseIdx !== null)
+    ? `${methodId}_${phaseIdx}`
+    : '';
+  const recordedDuration = instructionKey ? INSTRUCTION_AUDIO_DURATIONS[instructionKey] : undefined;
+  const isExactDurationMatch = (recordedDuration !== undefined) && (Number(durationSec) === Number(recordedDuration));
+
+  // Fallback Web Speech Synthesizer implementation for scaled/custom durations
   const fallbackToSpeech = () => {
     if (!('speechSynthesis' in window)) {
-      safeFinish();
+      playTitleAudioOnly();
       return;
     }
 
@@ -330,56 +417,38 @@ export function announcePhase(
 
       // Timeout scaled by length of spoken text (allows long instructions to finish)
       const maxMs = Math.max(6000, textToSpeak.length * 90);
-      setTimeout(safeFinish, maxMs);
+      activeSpeechTimeout = setTimeout(safeFinish, maxMs);
 
       activeSpeechUtterance = utterance;
 
       if (window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
         setTimeout(() => {
-          try { window.speechSynthesis.speak(utterance); } catch { safeFinish(); }
+          try { window.speechSynthesis.speak(utterance); } catch { playTitleAudioOnly(); }
         }, 50);
       } else {
         window.speechSynthesis.speak(utterance);
       }
     } catch (e) {
-      safeFinish();
+      playTitleAudioOnly();
     }
   };
 
-  // Candidate audio URLs: method-specific instruction MP3 -> slug instruction MP3 -> phase name MP3
-  const candidates = [];
-  if (methodId && phaseIdx !== undefined && phaseIdx !== null) {
-    candidates.push(getAssetUrl(`/audio/timer/instructions/${methodId}_phase_${phaseIdx}.mp3`));
-  }
-  candidates.push(getAssetUrl(`/audio/timer/instructions/${slug}.mp3`));
-  candidates.push(getAssetUrl(`/audio/timer/${slug}.mp3`));
-
-  const tryPlayIndex = (idx) => {
-    if (idx >= candidates.length) {
-      fallbackToSpeech();
-      return;
-    }
-
+  const playTitleAudioOnly = () => {
+    // Only play title MP3 if available (e.g. /audio/timer/bloom_phase.mp3), which has no duration numbers
+    const titleUrl = getAssetUrl(`/audio/timer/${slug}.mp3`);
     try {
-      const audio = new Audio(candidates[idx]);
+      const audio = new Audio(titleUrl);
       audio.volume = 1.0;
       activeAudioElement = audio;
-
       audio.onended = safeFinish;
-      audio.onerror = () => {
-        tryPlayIndex(idx + 1);
-      };
-
+      audio.onerror = safeFinish;
       const playPromise = audio.play();
       if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn('[AudioSynth] Candidate failed, trying next fallback:', candidates[idx], err);
-          tryPlayIndex(idx + 1);
-        });
+        playPromise.catch(safeFinish);
       }
     } catch (err) {
-      tryPlayIndex(idx + 1);
+      safeFinish();
     }
   };
 
@@ -387,7 +456,35 @@ export function announcePhase(
   // then speaks the Active Extraction Instruction clearly over speakers without audio engine collisions.
   announcementTimeout = setTimeout(() => {
     announcementTimeout = null;
-    tryPlayIndex(0);
+
+    if (isExactDurationMatch) {
+      // The studio MP3 matches the countdown timer duration down to the second!
+      const candidateUrl = getAssetUrl(`/audio/timer/instructions/${methodId}_phase_${phaseIdx}.mp3`);
+      try {
+        const audio = new Audio(candidateUrl);
+        audio.volume = 1.0;
+        activeAudioElement = audio;
+
+        audio.onended = safeFinish;
+        audio.onerror = () => {
+          fallbackToSpeech();
+        };
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            console.warn('[AudioSynth] Studio instruction MP3 failed, falling back to speech:', err);
+            fallbackToSpeech();
+          });
+        }
+      } catch (err) {
+        fallbackToSpeech();
+      }
+    } else {
+      // Dynamic duration (e.g. 55s bloom for large doses, 35s for small doses, custom roaster recipes).
+      // Speak the exact duration dynamically so voice matches the countdown timer 100%!
+      fallbackToSpeech();
+    }
   }, 280);
 }
 

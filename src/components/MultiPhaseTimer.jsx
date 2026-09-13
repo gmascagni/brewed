@@ -80,6 +80,14 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     phasesRef.current = phases;
   }, [phases]);
 
+  // Keep timeLeft in sync when not running and phases duration changes (e.g. dose scaling)
+  useEffect(() => {
+    if (!isRunning && remainingAtPauseRef.current === null) {
+      const activeDuration = phases[currentPhaseIndex]?.durationSec || 60;
+      setTimeLeft(activeDuration);
+    }
+  }, [phases, currentPhaseIndex, isRunning]);
+
   useEffect(() => {
     if (isMuted !== undefined) {
       setLocalMuted(isMuted);
