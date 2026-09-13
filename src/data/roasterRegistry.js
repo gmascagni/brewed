@@ -337,6 +337,11 @@ export async function syncCloudCatalog() {
  */
 export function getSmartBagBaseUrl() {
   if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    // When running on localhost or local network, use the production public URL so smartphones scanning the screen can connect
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.')) {
+      return 'https://thebrew.app';
+    }
     const origin = window.location.origin;
     if (window.location.pathname.startsWith('/brewed')) {
       return `${origin}/brewed`;
@@ -350,8 +355,8 @@ export function getSmartBagBaseUrl() {
  * Generate a deep-link URL for a coffee profile that opens the Roaster's Portfolio page with dial-in parameters
  */
 export function generateSmartBagUrl(coffee, baseUrl) {
-  const base = baseUrl || getSmartBagBaseUrl();
-  if (!coffee) return `${base}/roasters`;
+  const base = (baseUrl || getSmartBagBaseUrl()).replace(/\/+$/, '');
+  if (!coffee) return `${base}/roasters/`;
 
   const roasterSlug = String(coffee.roaster || 'methodical')
     .toLowerCase()
@@ -359,7 +364,8 @@ export function generateSmartBagUrl(coffee, baseUrl) {
     .replace(/^-+|-+$/g, '');
 
   const params = new URLSearchParams();
-  if (coffee.roaster) params.set('roaster', coffee.roaster);
+  params.set('roaster', roasterSlug);
+  if (coffee.roaster && coffee.roaster !== roasterSlug) params.set('roasterName', coffee.roaster);
   if (coffee.beanName) params.set('bean', coffee.beanName);
   if (coffee.id) params.set('coffeeId', coffee.id);
   if (coffee.brewMethod) params.set('method', coffee.brewMethod);
@@ -377,7 +383,11 @@ export function generateSmartBagUrl(coffee, baseUrl) {
     params.set('notes', coffee.notes);
   }
 
-  return `${base}/roasters/${roasterSlug}?${params.toString()}`;
+  // Use the physical directory /roasters/ with query parameters.
+  // This guarantees that static web servers (GitHub Pages, Cloudflare, S3)
+  // immediately return HTTP 200 OK because roasters/index.html is a real physical file.
+  // This prevents 404 errors on smartphone cameras and third-party QR scanner apps.
+  return `${base}/roasters/?${params.toString()}`;
 }
 
 

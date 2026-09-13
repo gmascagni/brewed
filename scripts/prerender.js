@@ -14,6 +14,7 @@ if (!fs.existsSync(distDir)) {
 }
 
 const templateHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
+const devTemplateHtml = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf-8');
 
 const spa404Html = `<!doctype html>
 <html lang="en">
@@ -26,8 +27,23 @@ const spa404Html = `<!doctype html>
       var pathSegmentsToKeep = window.location.pathname.startsWith('/brewed') ? 1 : 0;
       var l = window.location;
       var repoBase = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
-      var routePath = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~');
+      var rawRoute = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/');
+      var routePath = rawRoute.replace(/&/g, '~and~');
       var search = l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '';
+
+      // Direct roasters route recovery: redirect to physical /roasters/ folder with query parameter
+      if (rawRoute.indexOf('roasters/') === 0) {
+        var roasterSlug = rawRoute.split('/')[1] || '';
+        if (roasterSlug && !['showcase', 'partner', 'info', 'registered'].includes(roasterSlug.toLowerCase())) {
+          var queryPrefix = l.search ? l.search + '&roaster=' + encodeURIComponent(roasterSlug) : '?roaster=' + encodeURIComponent(roasterSlug);
+          l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            repoBase + '/roasters/' + queryPrefix + l.hash
+          );
+          return;
+        }
+      }
+
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
         repoBase + '/?/' + routePath + search + l.hash
@@ -626,12 +642,27 @@ roasterHtml = roasterHtml.replace(/<meta name="twitter:url" content=".*?" \/>/i,
 
 const roasterJsonLdTag = `<script id="json-ld-structured-data" type="application/ld+json">${JSON.stringify(roasterJsonLd)}</script>`;
 roasterHtml = roasterHtml.replace('</head>', `  ${roasterJsonLdTag}\n  </head>`);
-roasterHtml = roasterHtml.replace('<div id="root"></div>', `<div id="root">${roasterContent}</div>`);
 
+// In roasters/index.html, preserve <div id="root"></div> so React boots the Roaster Showcase and parses ?roaster= and ?bean=
 fs.writeFileSync(path.join(roasterDistDir, 'index.html'), roasterHtml);
-fs.writeFileSync(path.join(roasterRootDir, 'index.html'), roasterHtml);
+fs.writeFileSync(path.join(roasterRootDir, 'index.html'), devTemplateHtml);
 
-console.log('✓ Successfully prerendered /roasters with Article and FAQPage schemas!');
+// In roasters/partner and roasters/info, prerender the static B2B content
+const partnerHtml = roasterHtml.replace('<div id="root"></div>', `<div id="root">${roasterContent}</div>`);
+const partnerDistDir = path.join(roasterDistDir, 'partner');
+const partnerRootDir = path.join(roasterRootDir, 'partner');
+const infoDistDir = path.join(roasterDistDir, 'info');
+const infoRootDir = path.join(roasterRootDir, 'info');
+fs.mkdirSync(partnerDistDir, { recursive: true });
+fs.mkdirSync(partnerRootDir, { recursive: true });
+fs.mkdirSync(infoDistDir, { recursive: true });
+fs.mkdirSync(infoRootDir, { recursive: true });
+fs.writeFileSync(path.join(partnerDistDir, 'index.html'), partnerHtml);
+fs.writeFileSync(path.join(partnerRootDir, 'index.html'), devTemplateHtml);
+fs.writeFileSync(path.join(infoDistDir, 'index.html'), partnerHtml);
+fs.writeFileSync(path.join(infoRootDir, 'index.html'), devTemplateHtml);
+
+console.log('✓ Successfully prerendered /roasters, /roasters/partner, and /roasters/info!');
 
 // Prerender /demo/smart-bag-scanner, /scanner, /academy, /recipes, /learn, /shops, /local, and roaster routes
 [
@@ -649,14 +680,46 @@ console.log('✓ Successfully prerendered /roasters with Article and FAQPage sch
   'roasters/onyx-coffee-lab',
   'roasters/black-and-white',
   'roasters/black-white',
-  'roasters/black-white-roasters'
+  'roasters/black-white-roasters',
+  'roasters/brookmill',
+  'roasters/brookmill-roaster',
+  'roasters/brookmill-roasters',
+  'roasters/brookmill-coffee',
+  'roasters/brookmill-coffee-roasters',
+  'roasters/counter-culture',
+  'roasters/counter-culture-coffee',
+  'roasters/stumptown',
+  'roasters/stumptown-coffee-roasters',
+  'roasters/heart',
+  'roasters/proud-mary'
 ].forEach((subPath) => {
   const targetDistDir = path.join(distDir, ...subPath.split('/'));
   const targetRootDir = path.join(rootDir, ...subPath.split('/'));
   fs.mkdirSync(targetDistDir, { recursive: true });
   fs.mkdirSync(targetRootDir, { recursive: true });
   fs.writeFileSync(path.join(targetDistDir, 'index.html'), templateHtml);
-  fs.writeFileSync(path.join(targetRootDir, 'index.html'), templateHtml);
+  fs.writeFileSync(path.join(targetRootDir, 'index.html'), devTemplateHtml);
 });
 console.log('✓ Successfully prerendered /demo/smart-bag-scanner, /scanner, /academy, /recipes, /learn, /shops, and roaster showcase routes!');
+
+// Mirror /static and all prerendered directories into /brewed for GitHub Pages subpath compatibility
+const brewedDir = path.join(distDir, 'brewed');
+fs.mkdirSync(brewedDir, { recursive: true });
+
+const distStatic = path.join(distDir, 'static');
+const brewedStatic = path.join(brewedDir, 'static');
+if (fs.existsSync(distStatic)) {
+  fs.cpSync(distStatic, brewedStatic, { recursive: true });
+}
+
+const distRoasters = path.join(distDir, 'roasters');
+const brewedRoasters = path.join(brewedDir, 'roasters');
+if (fs.existsSync(distRoasters)) {
+  fs.cpSync(distRoasters, brewedRoasters, { recursive: true });
+}
+
+fs.writeFileSync(path.join(distDir, 'CNAME'), 'thebrew.app\n');
+fs.writeFileSync(path.join(rootDir, 'CNAME'), 'thebrew.app\n');
+fs.writeFileSync(path.join(rootDir, 'public', 'CNAME'), 'thebrew.app\n');
+console.log('✓ Successfully mirrored assets to /brewed and generated CNAME for thebrew.app!');
 

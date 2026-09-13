@@ -134,7 +134,8 @@ export default function App() {
   const [isRoasterShowcaseView, setIsRoasterShowcaseView] = useState(() => {
     if (typeof window !== 'undefined') {
       const p = window.location.pathname.replace(/^\/brewed/, '');
-      return p.startsWith('/roasters') || p.startsWith('/roaster');
+      const search = window.location.search || '';
+      return p.startsWith('/roasters') || p.startsWith('/roaster') || search.includes('roaster=') || search.includes('slug=');
     }
     return false;
   });
@@ -150,6 +151,11 @@ export default function App() {
         if (parts.length > 1 && !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(parts[1].toLowerCase())) {
           return parts[1];
         }
+      }
+      const searchParams = new URLSearchParams(window.location.search);
+      const querySlug = searchParams.get('roaster') || searchParams.get('slug');
+      if (querySlug) {
+        return querySlug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
       }
     }
     return 'methodical';
@@ -407,7 +413,7 @@ export default function App() {
           ? 'https://thebrew.app/guides/water-chemistry-gh-kh'
           : 'https://thebrew.app/guides/coffee-water-chemistry'
       );
-    } else if (path.startsWith('/roasters') || path.startsWith('/roaster')) {
+    } else if (path.startsWith('/roasters') || path.startsWith('/roaster') || (typeof window !== 'undefined' && (window.location.pathname.includes('/roasters') || window.location.search.includes('roaster=')))) {
       setIsShopsView(false);
       setIsCafePortalView(false);
       setIsLearnView(false);
@@ -416,8 +422,9 @@ export default function App() {
         setIsRoasterInfoOpen(true);
       } else {
         setIsRoasterShowcaseView(true);
-        const parts = path.split('/').filter(Boolean);
-        const searchParams = new URLSearchParams(location.search);
+        const fullPath = (typeof window !== 'undefined' ? window.location.pathname : path).replace(/^\/brewed/, '');
+        const parts = fullPath.split('/').filter(Boolean);
+        const searchParams = new URLSearchParams(location.search || (typeof window !== 'undefined' ? window.location.search : ''));
         const querySlug = searchParams.get('roaster') || searchParams.get('slug');
         if (parts.length > 1 && !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(parts[1].toLowerCase())) {
           setSelectedRoasterSlug(parts[1]);
