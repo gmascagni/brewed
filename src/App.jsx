@@ -115,12 +115,15 @@ export default function App() {
   const [isRecipeBuilderOpen, setIsRecipeBuilderOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authInitialRole, setAuthInitialRole] = useState('user');
+  const [authInitialMode, setAuthInitialMode] = useState('signup');
 
   const handleOpenAuth = (roleOrConfig = 'user') => {
     if (typeof roleOrConfig === 'object' && roleOrConfig !== null) {
       setAuthInitialRole(roleOrConfig.role || 'user');
+      setAuthInitialMode(roleOrConfig.mode || 'signup');
     } else {
       setAuthInitialRole(roleOrConfig || 'user');
+      setAuthInitialMode('signup');
     }
     setIsAuthModalOpen(true);
   };
@@ -616,7 +619,7 @@ export default function App() {
             setIsShopsView(true);
             navigate('/shops');
           }}
-          onOpenAuth={() => setIsAuthModalOpen(true)}
+          onOpenAuth={handleOpenAuth}
           onOpenScanner={() => setIsScannerOpen(true)}
           onOpenWaterLab={() => setIsWaterLabOpen(true)}
           onOpenRoasterPortal={() => { setRoasterPrefillBarcode(''); setRoasterPrefillBean(null); setIsRoasterPortalOpen(true); }}
@@ -1032,7 +1035,7 @@ export default function App() {
             onClose={() => setIsCommunityOpen(false)}
             trackMode={trackMode}
             currentUser={currentUser}
-            onOpenAuth={() => setIsAuthModalOpen(true)}
+            onOpenAuth={handleOpenAuth}
             onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
             onSelectRecipe={(recipe) => {
               const allMethods = BREW_METHODS.coffee;
@@ -1051,7 +1054,7 @@ export default function App() {
             onClose={() => setIsProfileOpen(false)}
             trackMode={trackMode}
             currentUser={currentUser}
-            onOpenAuth={() => setIsAuthModalOpen(true)}
+            onOpenAuth={handleOpenAuth}
             onLogout={() => setCurrentUser(null)}
           />
 
@@ -1069,6 +1072,7 @@ export default function App() {
             currentUser={currentUser}
             usersList={usersList}
             initialRole={authInitialRole}
+            initialMode={authInitialMode}
             onSaveProfile={(updatedUser) => {
               setCurrentUser(updatedUser);
               setUsersList([updatedUser, ...usersList.filter((u) => u.username !== updatedUser.username)]);
@@ -1224,7 +1228,7 @@ export default function App() {
           onOpenRoasterPortal={() => { setRoasterPrefillBarcode(''); setRoasterPrefillBean(null); setIsRoasterPortalOpen(true); }}
           onOpenCafePortal={() => { setIsRoasterShowcaseView(false); setIsCafePortalView(true); }}
           onOpenProfile={() => setIsProfileOpen(true)}
-          onOpenAuth={() => setIsAuthModalOpen(true)}
+          onOpenAuth={handleOpenAuth}
           isMuted={isMuted}
           onToggleMute={() => setIsMuted(!isMuted)}
           currentUser={currentUser}

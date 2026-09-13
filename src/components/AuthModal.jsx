@@ -6,11 +6,20 @@ import { getAssetUrl } from '../utils/assetUrl';
 import { registerRoasterAccount, signInRoasterAccount } from '../services/firebase';
 import { saveCustomRoasterProfile } from '../data/roasterRegistry';
 
-export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile, onLogout, usersList = [], initialRole = 'user' }) {
+export default function AuthModal({
+  isOpen,
+  onClose,
+  currentUser,
+  onSaveProfile,
+  onLogout,
+  usersList = [],
+  initialRole = 'user',
+  initialMode = 'signup'
+}) {
   if (!isOpen) return null;
 
-  const [mode, setMode] = useState(currentUser ? 'edit' : usersList.length > 0 ? 'login' : 'signup'); // 'login' | 'signup' | 'edit'
-  const [accountType, setAccountType] = useState(currentUser?.role === 'roaster' || initialRole === 'roaster' ? 'roaster' : 'user');
+  const [mode, setMode] = useState(() => initialMode || (currentUser ? 'edit' : usersList.length > 0 ? 'login' : 'signup')); // 'login' | 'signup' | 'edit'
+  const [accountType, setAccountType] = useState(() => currentUser?.role === 'roaster' || initialRole === 'roaster' ? 'roaster' : 'user');
   const [email, setEmail] = useState(currentUser?.email || '');
   const [roasterName, setRoasterName] = useState(currentUser?.roasterName || '');
   const [password, setPassword] = useState('');
@@ -27,10 +36,29 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
   }, [avatar]);
 
   useEffect(() => {
-    if (initialRole === 'roaster' && !currentUser) {
-      setAccountType('roaster');
+    if (isOpen) {
+      if (initialMode) {
+        setMode(initialMode);
+      } else if (currentUser) {
+        setMode('edit');
+      } else if (usersList.length > 0) {
+        setMode('login');
+      } else {
+        setMode('signup');
+      }
+
+      if (initialRole === 'roaster' || currentUser?.role === 'roaster') {
+        setAccountType('roaster');
+        if (!avatar || avatar === AVATAR_PRESETS[0].url) {
+          setAvatar('/avatar_roast_master_emblem.jpg');
+        }
+      } else {
+        setAccountType(currentUser?.role || 'user');
+      }
+
+      setErrorMessage('');
     }
-  }, [initialRole, currentUser]);
+  }, [isOpen, initialMode, initialRole, currentUser]);
 
   const handleExportFullBackup = () => {
     try {
@@ -273,7 +301,7 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
       <div role="dialog" aria-modal="true" aria-label="Account Authorization" className="relative max-w-md w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] text-cream-light">
         
         {/* Modal Close Button */}
@@ -287,22 +315,24 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
         {/* Header Tabs */}
         <div className="flex items-center space-x-2 text-xs font-mono font-extrabold uppercase tracking-widest text-amber-gold mb-2">
           <Sparkles className="w-4 h-4 animate-pulse" />
-          <span>Local Barista Profile & Data Studio</span>
+          <span>{accountType === 'roaster' ? 'Verified Specialty Roaster Studio' : 'Local Barista Profile & Data Studio'}</span>
         </div>
 
         <h3 className="font-serif text-2xl font-bold text-cream-light mb-1">
           {mode === 'backup'
             ? 'Backup & Cross-Device Transfer'
             : mode === 'edit'
-            ? 'Manage Your Profile'
+            ? (accountType === 'roaster' ? 'Manage Roastery Profile' : 'Manage Your Profile')
             : mode === 'signup'
-            ? 'Create Local Barista Profile'
-            : 'Select Active Profile'}
+            ? (accountType === 'roaster' ? 'Create Verified Roaster Account' : 'Create Local Barista Profile')
+            : (accountType === 'roaster' ? 'Sign In to Roastery Account' : 'Select Active Profile')}
         </h3>
 
         <p className="text-xs text-stone-400 mb-4 leading-relaxed">
           {mode === 'backup'
             ? 'Export your full brewing journal, custom recipes, and profile to a portable JSON file, or restore from another phone or device.'
+            : accountType === 'roaster'
+            ? 'Authenticated roasters own their dialed-in extraction profiles, custom water chemistry recipes, and packaging smart barcodes.'
             : "Profiles, tasting notes, and custom recipes are saved directly in your browser's local storage. Zero servers, 100% private."}
         </p>
 
@@ -327,35 +357,35 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
 
         {/* Mode Switcher Pills */}
         <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-black/50 border border-white/10 mb-4 text-xs font-bold overflow-x-auto">
-          {usersList.length > 0 && (
+          {(accountType === 'roaster' || usersList.length > 0) && (
             <button
               type="button"
               onClick={() => { setMode('login'); setErrorMessage(''); }}
-              className={`flex-1 py-2 px-2.5 rounded-xl transition-all whitespace-nowrap ${mode === 'login' ? 'bg-amber-gold text-espresso-950 shadow' : 'text-stone-400 hover:text-cream-light'}`}
+              className={`flex-1 py-2 px-2.5 rounded-xl transition-all whitespace-nowrap ${mode === 'login' ? 'bg-amber-gold text-espresso-950 shadow font-extrabold' : 'text-stone-400 hover:text-cream-light'}`}
             >
-              Select Profile
+              {accountType === 'roaster' ? 'Sign In' : 'Select Profile'}
             </button>
           )}
           <button
             type="button"
             onClick={() => { setMode('signup'); setErrorMessage(''); }}
-            className={`flex-1 py-2 px-2.5 rounded-xl transition-all whitespace-nowrap ${mode === 'signup' ? 'bg-amber-gold text-espresso-950 shadow' : 'text-stone-400 hover:text-cream-light'}`}
+            className={`flex-1 py-2 px-2.5 rounded-xl transition-all whitespace-nowrap ${mode === 'signup' ? 'bg-amber-gold text-espresso-950 shadow font-extrabold' : 'text-stone-400 hover:text-cream-light'}`}
           >
-            Create Profile
+            {accountType === 'roaster' ? 'Create Account' : 'Create Profile'}
           </button>
           {currentUser && (
             <button
               type="button"
               onClick={() => { setMode('edit'); setErrorMessage(''); }}
-              className={`flex-1 py-2 px-2.5 rounded-xl transition-all whitespace-nowrap ${mode === 'edit' ? 'bg-amber-gold text-espresso-950 shadow' : 'text-stone-400 hover:text-cream-light'}`}
+              className={`flex-1 py-2 px-2.5 rounded-xl transition-all whitespace-nowrap ${mode === 'edit' ? 'bg-amber-gold text-espresso-950 shadow font-extrabold' : 'text-stone-400 hover:text-cream-light'}`}
             >
-              Edit Profile
+              {accountType === 'roaster' ? 'Edit Roastery' : 'Edit Profile'}
             </button>
           )}
           <button
             type="button"
             onClick={() => { setMode('backup'); setErrorMessage(''); }}
-            className={`flex-1 py-2 px-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${mode === 'backup' ? 'bg-amber-gold text-espresso-950 shadow' : 'text-stone-400 hover:text-cream-light'}`}
+            className={`flex-1 py-2 px-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${mode === 'backup' ? 'bg-amber-gold text-espresso-950 shadow font-extrabold' : 'text-stone-400 hover:text-cream-light'}`}
           >
             <RefreshCw className="w-3 h-3" />
             <span>Backup & Sync</span>
@@ -431,37 +461,49 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
         ) : (
           <>
             {/* Existing Profile Quick Pick (in Select mode) */}
-            {mode === 'login' && usersList.length > 0 && (
-              <div className="space-y-2 mb-4">
-                <label className="block text-stone-400 font-bold uppercase tracking-wider text-[10px]">Saved Local Profiles:</label>
-                <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
-                  {usersList.map((u) => (
-                    <button
-                      key={u.username}
-                      type="button"
-                      onClick={() => {
-                        onSaveProfile(u);
-                        trackEvent('user_login', { username: u.username });
-                        onClose();
-                      }}
-                      className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all ${
-                        currentUser?.username === u.username
-                          ? 'bg-amber-gold/20 border-amber-gold text-cream-light'
-                          : 'bg-black/40 border-white/10 text-stone-300 hover:bg-white/10'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-2.5">
-                        <img src={u.avatar || AVATAR_PRESETS[0].url} alt={u.displayName} className="w-7 h-7 rounded-full object-cover border border-amber-gold/40" />
-                        <div>
-                          <div className="font-bold text-xs text-cream-light">{u.displayName}</div>
-                          <div className="font-mono text-[10px] text-stone-400">{u.username}</div>
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-mono text-amber-gold font-bold">Use Profile →</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {mode === 'login' && (
+              (() => {
+                const relevantUsers = accountType === 'roaster'
+                  ? usersList.filter((u) => u.role === 'roaster' || u.isVerifiedRoaster)
+                  : usersList.filter((u) => u.role !== 'roaster');
+
+                if (relevantUsers.length === 0) return null;
+
+                return (
+                  <div className="space-y-2 mb-4">
+                    <label className="block text-stone-400 font-bold uppercase tracking-wider text-[10px]">
+                      {accountType === 'roaster' ? 'Saved Roastery Accounts:' : 'Saved Local Profiles:'}
+                    </label>
+                    <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                      {relevantUsers.map((u) => (
+                        <button
+                          key={u.username || u.email}
+                          type="button"
+                          onClick={() => {
+                            onSaveProfile(u);
+                            trackEvent(accountType === 'roaster' ? 'roaster_login' : 'user_login', { username: u.username });
+                            onClose();
+                          }}
+                          className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all ${
+                            currentUser?.username === u.username || currentUser?.email === u.email
+                              ? 'bg-amber-gold/20 border-amber-gold text-cream-light'
+                              : 'bg-black/40 border-white/10 text-stone-300 hover:bg-white/10'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-2.5">
+                            <img src={u.avatar || AVATAR_PRESETS[0].url} alt={u.displayName} className="w-7 h-7 rounded-full object-cover border border-amber-gold/40" />
+                            <div>
+                              <div className="font-bold text-xs text-cream-light">{u.roasterName || u.displayName}</div>
+                              <div className="font-mono text-[10px] text-stone-400">{u.email || u.username}</div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-mono text-amber-gold font-bold">Use Profile →</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()
             )}
 
             {/* Account Type Selector (Home Barista vs Specialty Roaster) */}
