@@ -23,12 +23,20 @@ export function getRegisteredCoffees(builtinCatalog = []) {
 }
 
 /**
- * Get only custom coffees registered via the Roaster Portal
+ * Get only custom coffees registered via the Roaster Portal.
+ * Optionally filtered by ownerEmail for authenticated roaster multi-tenant security.
  */
-export function getCustomRoasterCoffees() {
+export function getCustomRoasterCoffees(filterOwnerEmail = null) {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const list = raw ? JSON.parse(raw) : [];
+    if (filterOwnerEmail) {
+      const cleanEmail = String(filterOwnerEmail).trim().toLowerCase();
+      return list.filter(
+        (c) => c.ownerEmail && String(c.ownerEmail).trim().toLowerCase() === cleanEmail
+      );
+    }
+    return list;
   } catch (err) {
     console.warn('Error reading custom roaster coffees:', err);
     return [];
@@ -36,18 +44,39 @@ export function getCustomRoasterCoffees() {
 }
 
 /**
- * Save or update a coffee in the Roaster Registry
+ * Save or update a coffee in the Roaster Registry.
+ * Enforces ownership: only the authenticated roaster can create or modify recipes for their brand.
  */
-export function saveRoasterCoffee(coffee) {
+export function saveRoasterCoffee(coffee, currentUser = null) {
   if (!coffee || !coffee.beanName) {
     throw new Error('Bean name is required to register a coffee profile.');
   }
 
   const existing = getCustomRoasterCoffees();
   const id = coffee.id || `roaster_${Date.now()}`;
+  const existingCoffee = existing.find((c) => c.id === id);
+
+  const ownerEmail = currentUser?.email 
+    ? String(currentUser.email).trim().toLowerCase() 
+    : coffee.ownerEmail 
+    ? String(coffee.ownerEmail).trim().toLowerCase() 
+    : null;
+
+  const ownerUid = currentUser?.uid || currentUser?.username || coffee.ownerUid || null;
+
+  // Authorization Guard: Prevent tampering with another roaster's recipe
+  if (existingCoffee && existingCoffee.ownerEmail && ownerEmail) {
+    if (existingCoffee.ownerEmail.toLowerCase() !== ownerEmail.toLowerCase()) {
+      throw new Error(`Unauthorized: This recipe is registered to "${existingCoffee.ownerEmail}". Only the owner can modify it.`);
+    }
+  }
+
   const record = {
     ...coffee,
     id,
+    ownerEmail: ownerEmail || existingCoffee?.ownerEmail || null,
+    ownerUid: ownerUid || existingCoffee?.ownerUid || null,
+    roasterSlug: normalizeRoasterKey(coffee.roaster),
     updatedAt: new Date().toISOString(),
     isCustom: true
   };
@@ -90,10 +119,19 @@ export function saveRoasterCoffee(coffee) {
 }
 
 /**
- * Delete a custom coffee from the Roaster Registry
+ * Delete a custom coffee from the Roaster Registry.
+ * Enforces ownership: only the authenticated owner can delete their registered coffee.
  */
-export function deleteRoasterCoffee(id) {
+export function deleteRoasterCoffee(id, currentUser = null) {
   const existing = getCustomRoasterCoffees();
+  const target = existing.find((c) => c.id === id);
+
+  if (target && target.ownerEmail && currentUser?.email) {
+    if (target.ownerEmail.toLowerCase() !== String(currentUser.email).trim().toLowerCase()) {
+      throw new Error(`Unauthorized: This coffee is owned by "${target.ownerEmail}". You cannot delete another roaster's coffee.`);
+    }
+  }
+
   const filtered = existing.filter((c) => c.id !== id);
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
@@ -128,17 +166,26 @@ export function getCustomRoasters() {
 /**
  * Save or update a custom roaster profile (including uploaded logoImage)
  */
-export function saveCustomRoasterProfile(profile) {
+export function saveCustomRoasterProfile(profile, currentUser = null) {
   if (!profile || !profile.name) return null;
   const existing = getCustomRoasters();
   const slug = String(profile.slug || profile.name || 'specialty-roaster')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+
+  const ownerEmail = currentUser?.email 
+    ? String(currentUser.email).trim().toLowerCase() 
+    : profile.ownerEmail 
+    ? String(profile.ownerEmail).trim().toLowerCase() 
+    : null;
+
   const record = {
     ...profile,
     id: slug,
     slug,
+    ownerEmail,
+    ownerUid: currentUser?.uid || currentUser?.username || profile.ownerUid || null,
     updatedAt: new Date().toISOString()
   };
   const filtered = existing.filter((r) => r.id !== slug && r.slug !== slug);

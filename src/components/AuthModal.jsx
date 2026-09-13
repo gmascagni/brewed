@@ -1,24 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Mail, Sparkles, CheckCircle2, Edit3, Image, LogOut, AlertCircle, Shield, Download, Upload, Smartphone, RefreshCw, Coffee, Flame, Award } from 'lucide-react';
+import { X, User, Mail, Sparkles, CheckCircle2, Edit3, Image, LogOut, AlertCircle, Shield, Download, Upload, Smartphone, RefreshCw, Coffee, Flame, Award, Store, Lock } from 'lucide-react';
 import { AVATAR_PRESETS } from '../data/avatarPresets';
 import { trackEvent } from '../utils/analytics';
 import { getAssetUrl } from '../utils/assetUrl';
+import { registerRoasterAccount, signInRoasterAccount } from '../services/firebase';
+import { saveCustomRoasterProfile } from '../data/roasterRegistry';
 
-export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile, onLogout, usersList = [] }) {
+export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile, onLogout, usersList = [], initialRole = 'user' }) {
   if (!isOpen) return null;
 
   const [mode, setMode] = useState(currentUser ? 'edit' : usersList.length > 0 ? 'login' : 'signup'); // 'login' | 'signup' | 'edit'
+  const [accountType, setAccountType] = useState(currentUser?.role === 'roaster' || initialRole === 'roaster' ? 'roaster' : 'user');
   const [email, setEmail] = useState(currentUser?.email || '');
+  const [roasterName, setRoasterName] = useState(currentUser?.roasterName || '');
+  const [password, setPassword] = useState('');
   const [username, setUsername] = useState(currentUser?.username || '');
   const [displayName, setDisplayName] = useState(currentUser?.displayName || '');
   const [bio, setBio] = useState(currentUser?.bio || '');
-  const [avatar, setAvatar] = useState((currentUser?.avatar && currentUser.avatar !== '/') ? currentUser.avatar : AVATAR_PRESETS[0].url);
+  const [avatar, setAvatar] = useState((currentUser?.avatar && currentUser.avatar !== '/') ? currentUser.avatar : (currentUser?.role === 'roaster' || initialRole === 'roaster') ? '/avatar_roast_master_emblem.jpg' : AVATAR_PRESETS[0].url);
   const [activeAvatarFailed, setActiveAvatarFailed] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setActiveAvatarFailed(false);
   }, [avatar]);
+
+  useEffect(() => {
+    if (initialRole === 'roaster' && !currentUser) {
+      setAccountType('roaster');
+    }
+  }, [initialRole, currentUser]);
 
   const handleExportFullBackup = () => {
     try {
@@ -84,7 +96,117 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
       return;
     }
 
-    // SWITCH / SELECT PROFILE MODE
+    // SPECIALTY ROASTER AUTHENTICATION (Firebase + Registry)
+    if (accountType === 'roaster') {
+      if (!cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+        setErrorMessage('Please enter a valid email address.');
+        return;
+      }
+
+      if (mode === 'signup') {
+        if (!roasterName.trim()) {
+          setErrorMessage('Please enter your Roastery / Brand Name.');
+          return;
+        }
+        if (!password || password.length < 6) {
+          setErrorMessage('Please set a secure password (minimum 6 characters).');
+          return;
+        }
+
+        setIsSubmitting(true);
+        (async () => {
+          try {
+            const roasterUser = await registerRoasterAccount({
+              email: cleanEmail,
+              password,
+              roasterName: roasterName.trim(),
+              displayName: displayName.trim() || roasterName.trim()
+            });
+
+            // Register the custom roaster profile in registry
+            saveCustomRoasterProfile({
+              name: roasterName.trim(),
+              slug: roasterUser.roasterSlug,
+              email: cleanEmail,
+              location: '',
+              story: bio.trim() || `Specialty coffee roaster crafted with precision. Verified brand profile on The Brew App.`,
+              logo: avatar || '/avatar_roast_master_emblem.jpg',
+              ownerEmail: cleanEmail,
+              ownerUid: roasterUser.uid
+            }, roasterUser);
+
+            onSaveProfile(roasterUser);
+            trackEvent('roaster_signup', { email: cleanEmail, roasterName: roasterName.trim() });
+            onClose();
+          } catch (err) {
+            console.error('Roaster registration error:', err);
+            setErrorMessage(err.message || 'Could not register roaster account. Please try again.');
+          } finally {
+            setIsSubmitting(false);
+          }
+        })();
+        return;
+      }
+
+      if (mode === 'login') {
+        if (!password) {
+          setErrorMessage('Please enter your roaster account password.');
+          return;
+        }
+
+        setIsSubmitting(true);
+        (async () => {
+          try {
+            const roasterUser = await signInRoasterAccount({
+              email: cleanEmail,
+              password
+            });
+
+            onSaveProfile(roasterUser);
+            trackEvent('roaster_login', { email: cleanEmail, roasterName: roasterUser.roasterName });
+            onClose();
+          } catch (err) {
+            console.error('Roaster signin error:', err);
+            setErrorMessage(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password'
+              ? 'Invalid roaster email or password. Please verify your credentials.'
+              : err.message || 'Authentication failed.');
+          } finally {
+            setIsSubmitting(false);
+          }
+        })();
+        return;
+      }
+
+      if (mode === 'edit') {
+        const updatedUserObj = {
+          ...currentUser,
+          email: cleanEmail,
+          roasterName: roasterName.trim() || currentUser.roasterName,
+          displayName: displayName.trim() || roasterName.trim() || cleanEmail.split('@')[0],
+          bio: bio.trim() || currentUser.bio,
+          avatar: avatar || currentUser.avatar || '/avatar_roast_master_emblem.jpg',
+          role: 'roaster',
+          isVerifiedRoaster: true
+        };
+
+        saveCustomRoasterProfile({
+          name: updatedUserObj.roasterName,
+          slug: updatedUserObj.roasterSlug || updatedUserObj.roasterName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          email: cleanEmail,
+          story: updatedUserObj.bio,
+          logo: updatedUserObj.avatar,
+          ownerEmail: cleanEmail,
+          ownerUid: updatedUserObj.uid
+        }, updatedUserObj);
+
+        onSaveProfile(updatedUserObj);
+        trackEvent('update_roaster_profile', { roasterName: updatedUserObj.roasterName });
+        onClose();
+        return;
+      }
+    }
+
+    // SWITCH / SELECT PROFILE MODE (HOME BARISTA)
     if (mode === 'login') {
       const existingUser = usersList.find(
         (u) => u.email.toLowerCase() === cleanEmail || u.username.toLowerCase() === `@${cleanEmail.replace('@', '')}`
@@ -101,7 +223,7 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
       return;
     }
 
-    // CREATE PROFILE MODE
+    // CREATE PROFILE MODE (HOME BARISTA)
     if (mode === 'signup') {
       const cleanHandle = username.trim().startsWith('@') ? username.trim() : `@${username.trim() || cleanEmail.split('@')[0]}`;
       const duplicateUser = usersList.find(
@@ -130,7 +252,7 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
       return;
     }
 
-    // EDIT PROFILE MODE
+    // EDIT PROFILE MODE (HOME BARISTA)
     if (mode === 'edit') {
       const cleanHandle = username.trim().startsWith('@') ? username.trim() : `@${username.trim() || cleanEmail.split('@')[0]}`;
 
@@ -342,113 +464,238 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
               </div>
             )}
 
-            <form onSubmit={handleAuthSubmit} className="space-y-4 text-xs">
-          
-          <div>
-            <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Email / Identifier</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="yourname@domain.com"
-              className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
-            />
-          </div>
+            {/* Account Type Selector (Home Barista vs Specialty Roaster) */}
+            {mode !== 'edit' ? (
+              <div className="mb-4">
+                <label className="block text-stone-400 font-bold uppercase tracking-wider text-[10px] mb-1.5">
+                  Select Account Type:
+                </label>
+                <div className="grid grid-cols-2 gap-2 p-1 rounded-2xl bg-black/60 border border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountType('user');
+                      setErrorMessage('');
+                    }}
+                    className={`py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold transition-all ${
+                      accountType === 'user'
+                        ? 'bg-amber-gold text-espresso-950 shadow-md font-extrabold'
+                        : 'text-stone-400 hover:text-cream-light'
+                    }`}
+                  >
+                    <Coffee className="w-3.5 h-3.5" />
+                    <span>Home Barista</span>
+                  </button>
 
-          {(mode === 'signup' || mode === 'edit') && (
-            <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountType('roaster');
+                      setErrorMessage('');
+                    }}
+                    className={`py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold transition-all ${
+                      accountType === 'roaster'
+                        ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-espresso-950 shadow-md font-extrabold'
+                        : 'text-stone-400 hover:text-cream-light'
+                    }`}
+                  >
+                    <Store className="w-3.5 h-3.5" />
+                    <span>Specialty Roaster</span>
+                  </button>
+                </div>
+                <div className="mt-1.5 px-1 text-[11px] text-stone-400 font-mono">
+                  {accountType === 'roaster'
+                    ? '🛡️ Verified Roaster Account: Authenticate to own recipes, publish brand water specs, and print packaging smart barcodes.'
+                    : '☕ Home Barista: On-device local storage for logging brews, journal entries, and custom ratios.'}
+                </div>
+              </div>
+            ) : (
+              <div className="mb-3 px-3 py-2 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between text-xs">
+                <span className="text-stone-400 font-mono">Account Category:</span>
+                <span className="font-bold text-amber-gold uppercase tracking-wider font-mono flex items-center gap-1.5">
+                  {accountType === 'roaster' ? (
+                    <>
+                      <Store className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Specialty Coffee Roaster</span>
+                    </>
+                  ) : (
+                    <>
+                      <Coffee className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Home Barista</span>
+                    </>
+                  )}
+                </span>
+              </div>
+            )}
+
+            <form onSubmit={handleAuthSubmit} className="space-y-4 text-xs">
+              {/* ROASTERY BRAND NAME (For Roaster accounts) */}
+              {accountType === 'roaster' && (mode === 'signup' || mode === 'edit') && (
+                <div>
+                  <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">
+                    Roastery / Brand Name <span className="text-amber-gold">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={roasterName}
+                    onChange={(e) => setRoasterName(e.target.value)}
+                    placeholder="E.g., Brookmill Coffee Roasters"
+                    className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light font-bold focus:outline-none focus:border-amber-gold"
+                  />
+                </div>
+              )}
+
+              {/* EMAIL FIELD */}
               <div>
-                <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Display Name</label>
+                <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">
+                  {accountType === 'roaster' ? 'Roaster Work / Brand Email' : 'Email / Identifier'} <span className="text-amber-gold">*</span>
+                </label>
                 <input
-                  type="text"
+                  type="email"
                   required
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="E.g., Sarah Parker"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={accountType === 'roaster' ? "roaster@yourbrand.com or roaster@gmail.com" : "yourname@domain.com"}
                   className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
                 />
+                {accountType === 'roaster' && (
+                  <p className="mt-1 text-[10px] text-stone-400 font-mono">
+                    Accepts any authentic email domain (Gmail, Outlook, custom domain, etc.). Your recipe rights and packaging barcodes will be bound to this address.
+                  </p>
+                )}
               </div>
 
-              <div>
-                <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Username Handle</label>
-                <input
-                  type="text"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="E.g., @sarah_brews"
-                  className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light font-mono focus:outline-none focus:border-amber-gold"
-                />
-              </div>
-
-              {/* Profile Picture Avatar Library Picker */}
-              <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-cream-light uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                    <Image className="w-4 h-4 text-amber-gold" />
-                    <span>Choose Profile Icon Avatar</span>
-                  </span>
-                  <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-amber-gold flex items-center justify-center bg-black/40 shadow-sm shrink-0">
-                    {!activeAvatarFailed && avatar && avatar !== '/' ? (
-                      <img
-                        src={getAssetUrl(avatar)}
-                        alt="Active Avatar"
-                        onError={() => setActiveAvatarFailed(true)}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <User className="w-5 h-5 text-amber-gold" />
-                    )}
+              {/* PASSWORD FIELD (For Roaster signup & login) */}
+              {accountType === 'roaster' && (mode === 'signup' || mode === 'login') && (
+                <div>
+                  <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
+                    <span>Account Password <span className="text-amber-gold">*</span></span>
+                    <span className="text-[10px] font-mono text-stone-400">Min 6 chars</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full p-3 pr-10 rounded-xl bg-black/50 border border-white/10 text-cream-light font-mono focus:outline-none focus:border-amber-gold"
+                    />
+                    <Lock className="w-4 h-4 text-stone-500 absolute right-3 top-3.5" />
                   </div>
                 </div>
+              )}
 
-                {/* Grid of Preset Avatars */}
-                <div className="grid grid-cols-5 gap-2 pt-1">
-                  {AVATAR_PRESETS.map((preset) => {
-                    const isSelected =
-                      avatar === preset.url ||
-                      avatar === getAssetUrl(preset.url) ||
-                      (avatar && preset.url && avatar.endsWith(preset.url.replace(/^\//, ''))) ||
-                      avatar === preset.id;
-                    return (
-                      <PresetAvatarItem
-                        key={preset.id}
-                        preset={preset}
-                        isSelected={isSelected}
-                        onSelect={(url) => {
-                          setAvatar(url);
-                          setActiveAvatarFailed(false);
-                        }}
+              {/* BARISTA PROFILE FIELDS (Only for Home Barista or Roaster display info) */}
+              {(mode === 'signup' || mode === 'edit') && (
+                <>
+                  <div>
+                    <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">
+                      {accountType === 'roaster' ? 'Head Roaster / Contact Name' : 'Display Name'}
+                    </label>
+                    <input
+                      type="text"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      placeholder={accountType === 'roaster' ? "E.g., Master Roaster Alex" : "E.g., Sarah Parker"}
+                      className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
+                    />
+                  </div>
+
+                  {accountType !== 'roaster' && (
+                    <div>
+                      <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Username Handle</label>
+                      <input
+                        type="text"
+                        required
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="E.g., @sarah_brews"
+                        className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light font-mono focus:outline-none focus:border-amber-gold"
                       />
-                    );
-                  })}
-                </div>
-              </div>
+                    </div>
+                  )}
 
-              <div>
-                <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">Bio / Favorite Brews</label>
-                <textarea
-                  rows="2"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="Share your favorite brew method, origins, or gear setup..."
-                  className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
-                ></textarea>
-              </div>
+                  {/* Profile Picture Avatar Library Picker */}
+                  <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-cream-light uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                        <Image className="w-4 h-4 text-amber-gold" />
+                        <span>{accountType === 'roaster' ? 'Roastery Brand Badge / Avatar' : 'Choose Profile Icon Avatar'}</span>
+                      </span>
+                      <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-amber-gold flex items-center justify-center bg-black/40 shadow-sm shrink-0">
+                        {!activeAvatarFailed && avatar && avatar !== '/' ? (
+                          <img
+                            src={getAssetUrl(avatar)}
+                            alt="Active Avatar"
+                            onError={() => setActiveAvatarFailed(true)}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-5 h-5 text-amber-gold" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Grid of Preset Avatars */}
+                    <div className="grid grid-cols-5 gap-2 pt-1">
+                      {AVATAR_PRESETS.map((preset) => {
+                        const isSelected =
+                          avatar === preset.url ||
+                          avatar === getAssetUrl(preset.url) ||
+                          (avatar && preset.url && avatar.endsWith(preset.url.replace(/^\//, ''))) ||
+                          avatar === preset.id;
+                        return (
+                          <PresetAvatarItem
+                            key={preset.id}
+                            preset={preset}
+                            isSelected={isSelected}
+                            onSelect={(url) => {
+                              setAvatar(url);
+                              setActiveAvatarFailed(false);
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">
+                      {accountType === 'roaster' ? 'Roastery Story & Origin Philosophy' : 'Bio / Favorite Brews'}
+                    </label>
+                    <textarea
+                      rows="2"
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      placeholder={accountType === 'roaster' ? "Tell coffee lovers about your sourcing, roast philosophy, and tasting standards..." : "Share your favorite brew method, origins, or gear setup..."}
+                      className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
+                    ></textarea>
+                  </div>
+                </>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full mt-4 py-4 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Authenticating Roaster...</span>
+                  </>
+                ) : (
+                  accountType === 'roaster'
+                    ? (mode === 'signup' ? 'Create Verified Roaster Account' : mode === 'login' ? 'Sign In as Roaster' : 'Save Roaster Profile')
+                    : (mode === 'edit' ? 'Save Profile Changes' : mode === 'signup' ? 'Save Profile to Device' : 'Use Profile')
+                )}
+              </button>
+
+            </form>
             </>
-          )}
-
-          <button
-            type="submit"
-            className="w-full mt-4 py-4 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider shadow-xl active:scale-95 transition-all"
-          >
-            {mode === 'edit' ? 'Save Profile Changes' : mode === 'signup' ? 'Save Profile to Device' : 'Use Profile'}
-          </button>
-
-        </form>
-        </>
-        )}
+            )}
 
       </div>
     </div>

@@ -24,7 +24,8 @@ import {
   Share2,
   Compass,
   Play,
-  AlertCircle
+  AlertCircle,
+  Lock
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import QRCode from 'qrcode';
@@ -52,8 +53,14 @@ export default function RoasterPortalModal({
   onClose,
   prefilledBarcode = '',
   prefilledBean = null,
-  onSelectBeanToBrew
+  onSelectBeanToBrew,
+  currentUser = null,
+  onOpenAuth = null
 }) {
+  const isRoasterAuthenticated = Boolean(
+    currentUser && (currentUser.role === 'roaster' || currentUser.isVerifiedRoaster) && currentUser.email
+  );
+
   const [activeTab, setActiveTab] = useState(() => (prefilledBarcode || prefilledBean ? 'onboard' : 'video')); // 'video' | 'onboard' | 'sticker' | 'catalog' | 'telemetry'
   const [qrLayout, setQrLayout] = useState('thermal'); // 'thermal' | 'badge' | 'minimal'
   const [qrColor, setQrColor] = useState('black'); // 'black' | 'espresso' | 'gold'
@@ -188,10 +195,10 @@ export default function RoasterPortalModal({
 
   const stickerRef = useRef(null);
 
-  // Load custom registered coffees from registry on open
+  // Load custom registered coffees from registry on open (filtered to authenticated roaster)
   useEffect(() => {
     if (isOpen) {
-      const list = getCustomRoasterCoffees();
+      const list = isRoasterAuthenticated ? getCustomRoasterCoffees(currentUser?.email) : [];
       setRegisteredCoffees(list);
       if (prefilledBean) {
         if (prefilledBean.roaster) setRoasterName(prefilledBean.roaster);
@@ -214,7 +221,14 @@ export default function RoasterPortalModal({
         setSelectedCoffeeForSticker(list[0]);
       }
     }
-  }, [isOpen, prefilledBarcode, prefilledBean]);
+  }, [isOpen, prefilledBarcode, prefilledBean, isRoasterAuthenticated, currentUser]);
+
+  // Pre-fill roastery brand name from authenticated roaster account
+  useEffect(() => {
+    if (currentUser?.roasterName && !roasterName) {
+      setRoasterName(currentUser.roasterName);
+    }
+  }, [currentUser]);
 
   // Live mini QR preview in Onboarding form (Card 4)
   useEffect(() => {
@@ -338,6 +352,8 @@ export default function RoasterPortalModal({
 
     const newCoffee = {
       id: `roaster_${Date.now()}`,
+      ownerEmail: currentUser?.email || '',
+      ownerUid: currentUser?.uid || '',
       roaster: trimmedRoaster,
       location: location.trim(),
       website: normalizedWebsite,
@@ -360,18 +376,21 @@ export default function RoasterPortalModal({
       notes: roasterNotes.trim() || `Dialed-in recipe from ${trimmedRoaster}. Optimized for ${String(brewMethod || 'pour_over').replace(/_/g, ' ')}.`
     };
 
-    saveRoasterCoffee(newCoffee);
+    saveRoasterCoffee(newCoffee, currentUser);
 
     // Save custom roaster profile with uploaded logoImage for RoasterProfilePage background
     saveCustomRoasterProfile({
       name: trimmedRoaster,
+      slug: trimmedRoaster.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
       location: location.trim(),
       website: normalizedWebsite,
       logoImage: logoImage || '',
-      backgroundImage: logoImage || ''
-    });
+      backgroundImage: logoImage || '',
+      ownerEmail: currentUser?.email || '',
+      ownerUid: currentUser?.uid || ''
+    }, currentUser);
 
-    const updated = getCustomRoasterCoffees();
+    const updated = getCustomRoasterCoffees(currentUser?.email);
     setRegisteredCoffees(updated);
     setSelectedCoffeeForSticker(newCoffee);
     setActiveTab('sticker');
@@ -385,8 +404,8 @@ export default function RoasterPortalModal({
   };
 
   const handleDelete = (id) => {
-    if (confirm('Remove this coffee from your local Roaster Registry?')) {
-      const remaining = deleteRoasterCoffee(id);
+    if (confirm('Remove this coffee from your Roaster Registry?')) {
+      const remaining = deleteRoasterCoffee(id, currentUser);
       setRegisteredCoffees(remaining);
       if (selectedCoffeeForSticker?.id === id) {
         setSelectedCoffeeForSticker(remaining[0] || null);
@@ -441,11 +460,26 @@ export default function RoasterPortalModal({
     setTimeout(() => setCopySuccess(false), 2500);
   };
 
+  const checkBarcodeOwnership = () => {
+    if (!isRoasterAuthenticated) {
+      alert('Authentication Required: Only verified roasters can generate barcodes for coffee packaging.');
+      if (onOpenAuth) onOpenAuth({ role: 'roaster', mode: 'login' });
+      return false;
+    }
+    if (selectedCoffeeForSticker?.ownerEmail && selectedCoffeeForSticker.ownerEmail !== currentUser?.email) {
+      alert(`Authorization Protected: You are signed in as ${currentUser?.email}, but this coffee belongs to ${selectedCoffeeForSticker.ownerEmail}. Only the verified brand owner can generate packaging barcodes for this coffee.`);
+      return false;
+    }
+    return true;
+  };
+
   const handlePrintSticker = () => {
+    if (!checkBarcodeOwnership()) return;
     window.print();
   };
 
   const handleDownloadFullStickerPng = async () => {
+    if (!checkBarcodeOwnership()) return;
     const coffee = selectedCoffeeForSticker || {
       roaster: roasterName || 'Specialty Roaster',
       location: location || 'Artisan Small Batch',
@@ -460,7 +494,9 @@ export default function RoasterPortalModal({
       tempF: Number(tempF) || 202,
       recommendedGrind: recommendedGrind || 'Medium-Fine',
       upc: upc || 'LOT-2026-CERTIFIED',
-      customUrl: customUrl.trim()
+      customUrl: customUrl.trim(),
+      ownerEmail: currentUser?.email || '',
+      ownerUid: currentUser?.uid || ''
     };
 
     if (orchestrator) {
@@ -471,10 +507,13 @@ export default function RoasterPortalModal({
   };
 
   const handleDownloadQrPng = async () => {
+    if (!checkBarcodeOwnership()) return;
     const coffee = selectedCoffeeForSticker || {
       roaster: roasterName || 'Specialty Roaster',
       beanName: beanName || 'Single Origin Lot',
-      customUrl: customUrl.trim()
+      customUrl: customUrl.trim(),
+      ownerEmail: currentUser?.email || '',
+      ownerUid: currentUser?.uid || ''
     };
 
     if (orchestrator) {
@@ -485,10 +524,13 @@ export default function RoasterPortalModal({
   };
 
   const handleDownloadQrSvg = async () => {
+    if (!checkBarcodeOwnership()) return;
     const coffee = selectedCoffeeForSticker || {
       roaster: roasterName || 'Specialty Roaster',
       beanName: beanName || 'Single Origin Lot',
-      customUrl: customUrl.trim()
+      customUrl: customUrl.trim(),
+      ownerEmail: currentUser?.email || '',
+      ownerUid: currentUser?.uid || ''
     };
 
     if (orchestrator) {
@@ -509,6 +551,8 @@ export default function RoasterPortalModal({
 
     const coffeeRecord = selectedCoffeeForSticker || {
       id: `roaster_${Date.now()}`,
+      ownerEmail: currentUser?.email || '',
+      ownerUid: currentUser?.uid || '',
       roaster: rName,
       location: location.trim() || 'Artisan Small Batch',
       website: website.trim() || 'https://thebrew.app',
@@ -538,10 +582,12 @@ export default function RoasterPortalModal({
         location: location.trim(),
         website: website.trim(),
         logoImage: logoImage || '',
-        backgroundImage: logoImage || ''
-      });
-      saveRoasterCoffee(coffeeRecord);
-      const updated = getCustomRoasterCoffees();
+        backgroundImage: logoImage || '',
+        ownerEmail: currentUser?.email || '',
+        ownerUid: currentUser?.uid || ''
+      }, currentUser);
+      saveRoasterCoffee(coffeeRecord, currentUser);
+      const updated = getCustomRoasterCoffees(currentUser?.email);
       setRegisteredCoffees(updated);
       setSelectedCoffeeForSticker(coffeeRecord);
     } catch (e) {
@@ -623,7 +669,7 @@ export default function RoasterPortalModal({
 
           <button
             onClick={() => setActiveTab('onboard')}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
+            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 ${
               activeTab === 'onboard'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
@@ -631,11 +677,12 @@ export default function RoasterPortalModal({
           >
             <Plus className="w-3.5 h-3.5" />
             <span>2. Onboard Coffee & Recipe</span>
+            {!isRoasterAuthenticated && <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />}
           </button>
 
           <button
             onClick={() => setActiveTab('sticker')}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
+            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 ${
               activeTab === 'sticker'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
@@ -643,11 +690,12 @@ export default function RoasterPortalModal({
           >
             <QrCode className="w-3.5 h-3.5 shrink-0" />
             <span>3. Smart Bag QR Studio</span>
+            {!isRoasterAuthenticated && <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />}
           </button>
 
           <button
             onClick={() => setActiveTab('catalog')}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
+            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 ${
               activeTab === 'catalog'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
@@ -655,11 +703,12 @@ export default function RoasterPortalModal({
           >
             <Store className="w-3.5 h-3.5 shrink-0" />
             <span>4. Registered Coffees ({registeredCoffees.length})</span>
+            {!isRoasterAuthenticated && <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />}
           </button>
 
           <button
             onClick={() => setActiveTab('telemetry')}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 ${
+            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 ${
               activeTab === 'telemetry'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
@@ -667,6 +716,7 @@ export default function RoasterPortalModal({
           >
             <Sparkles className="w-3.5 h-3.5 shrink-0" />
             <span>5. Telemetry & Analytics</span>
+            {!isRoasterAuthenticated && <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />}
           </button>
         </div>
 
@@ -681,8 +731,31 @@ export default function RoasterPortalModal({
             </div>
           )}
 
-          {/* TAB 1: ONBOARD FORM */}
-          {activeTab === 'onboard' && (
+          {/* Verified Roaster Active Banner */}
+          {isRoasterAuthenticated && (
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-emerald-500/10 to-transparent border border-amber-gold/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-mono">
+              <div className="flex items-center gap-2 text-cream-light">
+                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>
+                  Authenticated Roaster: <strong className="text-amber-gold">{currentUser.roasterName || currentUser.displayName}</strong> ({currentUser.email})
+                </span>
+              </div>
+              <span className="text-[10px] px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                🛡️ Verified Brand Owner
+              </span>
+            </div>
+          )}
+
+          {/* Unauthenticated Roaster Gate for Protected Tabs */}
+          {activeTab !== 'video' && !isRoasterAuthenticated && (
+            <RoasterAuthGate
+              onOpenAuth={onOpenAuth}
+              onReturnToVideo={() => setActiveTab('video')}
+            />
+          )}
+
+          {/* TAB 1: ONBOARD FORM (Gated to authenticated roasters) */}
+          {isRoasterAuthenticated && activeTab === 'onboard' && (
             <form onSubmit={handleSaveCoffee} noValidate className="space-y-6">
               
               {/* Form Validation Warning */}
@@ -1031,8 +1104,8 @@ export default function RoasterPortalModal({
             </form>
           )}
 
-          {/* TAB 2: SMART BAG QR STUDIO */}
-          {activeTab === 'sticker' && (
+          {/* TAB 2: SMART BAG QR STUDIO (Gated to authenticated roasters) */}
+          {isRoasterAuthenticated && activeTab === 'sticker' && (
             <div className="space-y-6">
               
               {/* Studio Control Header */}
@@ -1512,8 +1585,8 @@ export default function RoasterPortalModal({
             </div>
           )}
 
-          {/* TAB 3: REGISTERED COFFEES CATALOG */}
-          {activeTab === 'catalog' && (
+          {/* TAB 3: REGISTERED COFFEES CATALOG (Gated to authenticated roasters) */}
+          {isRoasterAuthenticated && activeTab === 'catalog' && (
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-black/30 border border-white/10 text-xs">
                 <div>
@@ -1521,7 +1594,7 @@ export default function RoasterPortalModal({
                     Roastery Coffee Registry
                   </span>
                   <p className="text-cream-soft/80 text-xs mt-0.5">
-                    {registeredCoffees.length} custom coffees registered in your local environment.
+                    {registeredCoffees.length} coffee lots registered under {currentUser?.email || 'your account'}.
                   </p>
                 </div>
 
@@ -1643,7 +1716,13 @@ export default function RoasterPortalModal({
                   </p>
                 </div>
                 <button
-                  onClick={() => setActiveTab('onboard')}
+                  onClick={() => {
+                    if (!isRoasterAuthenticated && onOpenAuth) {
+                      onOpenAuth({ role: 'roaster', mode: 'signup' });
+                    } else {
+                      setActiveTab('onboard');
+                    }
+                  }}
                   className="px-4 py-2 rounded-xl bg-amber-gold hover:bg-amber-300 text-espresso-950 font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -1652,13 +1731,19 @@ export default function RoasterPortalModal({
               </div>
 
               <RoasterVideoPlayer
-                onStartOnboarding={() => setActiveTab('onboard')}
+                onStartOnboarding={() => {
+                  if (!isRoasterAuthenticated && onOpenAuth) {
+                    onOpenAuth({ role: 'roaster', mode: 'signup' });
+                  } else {
+                    setActiveTab('onboard');
+                  }
+                }}
               />
             </div>
           )}
 
           {/* TAB 5: TELEMETRY & CONSUMER EXTRACTION ANALYTICS */}
-          {activeTab === 'telemetry' && (() => {
+          {isRoasterAuthenticated && activeTab === 'telemetry' && (() => {
             const telemetry = getRoasterTelemetry(activeRoasterKey || 'methodical');
             const totalMethods = Object.values(telemetry.methodsUsed || {}).reduce((a, b) => a + b, 0) || 1;
             return (
@@ -1816,6 +1901,73 @@ export default function RoasterPortalModal({
           })()}
 
         </div>
+      </div>
+    </div>
+  );
+}
+
+function RoasterAuthGate({ onOpenAuth, onReturnToVideo }) {
+  return (
+    <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-b from-[#1E140F] to-[#120B08] border-2 border-amber-gold/40 text-center space-y-6 shadow-2xl animate-fade-in my-6 max-w-2xl mx-auto">
+      <div className="w-16 h-16 mx-auto rounded-3xl bg-amber-500/20 border-2 border-amber-gold flex items-center justify-center text-amber-gold shadow-lg shadow-amber-500/10">
+        <Store className="w-8 h-8" />
+      </div>
+
+      <div className="space-y-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-gold/20 text-amber-gold text-xs font-mono font-bold uppercase tracking-widest border border-amber-gold/40">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Verified Roaster Identity Required</span>
+        </div>
+        <h3 className="font-serif text-2xl sm:text-3xl font-bold text-cream-light">
+          Authenticate Your Roastery Account
+        </h3>
+        <p className="text-sm text-stone-300 max-w-lg mx-auto leading-relaxed">
+          To protect intellectual property and recipe integrity, every recipe, water specification, brew profile, and retail packaging barcode strictly belongs to the authenticated roaster.
+        </p>
+      </div>
+
+      <div className="p-5 rounded-2xl bg-black/50 border border-white/10 text-left space-y-3 max-w-lg mx-auto text-xs font-mono text-stone-300">
+        <div className="flex items-start gap-2.5">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+          <span><strong>Authentic Email Authentication:</strong> Register using any email address you own (e.g., @gmail.com, @yourroastery.com, etc.).</span>
+        </div>
+        <div className="flex items-start gap-2.5">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+          <span><strong>Exclusive Recipe & Water Control:</strong> Dial-in recipes, grinder microns, and water specs remain strictly owned by your roastery.</span>
+        </div>
+        <div className="flex items-start gap-2.5">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+          <span><strong>Authorized Packaging Barcodes:</strong> Only verified brand owners can generate packaging barcodes, vector SVGs, and thermal stickers.</span>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+        <button
+          type="button"
+          onClick={() => onOpenAuth && onOpenAuth({ role: 'roaster', mode: 'signup' })}
+          className="w-full sm:w-auto px-6 py-3.5 rounded-2xl btn-tactile-amber text-espresso-950 font-extrabold text-xs uppercase tracking-wider shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <Store className="w-4 h-4" />
+          <span>Create Verified Roaster Account</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onOpenAuth && onOpenAuth({ role: 'roaster', mode: 'login' })}
+          className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-cream-light font-bold text-xs uppercase tracking-wider border border-white/10 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span>Sign In as Existing Roaster</span>
+        </button>
+      </div>
+
+      <div>
+        <button
+          type="button"
+          onClick={onReturnToVideo}
+          className="text-xs text-stone-400 hover:text-amber-gold transition underline font-mono cursor-pointer"
+        >
+          ← Return to Educational Walkthrough Video
+        </button>
       </div>
     </div>
   );

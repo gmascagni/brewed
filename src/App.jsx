@@ -114,6 +114,16 @@ export default function App() {
   const [isCommunityOpen, setIsCommunityOpen] = useState(false);
   const [isRecipeBuilderOpen, setIsRecipeBuilderOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authInitialRole, setAuthInitialRole] = useState('user');
+
+  const handleOpenAuth = (roleOrConfig = 'user') => {
+    if (typeof roleOrConfig === 'object' && roleOrConfig !== null) {
+      setAuthInitialRole(roleOrConfig.role || 'user');
+    } else {
+      setAuthInitialRole(roleOrConfig || 'user');
+    }
+    setIsAuthModalOpen(true);
+  };
   const [isLocalCoffeeOpen, setIsLocalCoffeeOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isWaterLabOpen, setIsWaterLabOpen] = useState(false);
@@ -718,6 +728,8 @@ export default function App() {
               onOpenRoasterInfo={() => {
                 setIsRoasterInfoOpen(true);
               }}
+              currentUser={currentUser}
+              onOpenAuth={handleOpenAuth}
             />
           ) : isLearnView ? (
             <LearnSection
@@ -1045,6 +1057,7 @@ export default function App() {
             onClose={() => setIsAuthModalOpen(false)}
             currentUser={currentUser}
             usersList={usersList}
+            initialRole={authInitialRole}
             onSaveProfile={(updatedUser) => {
               setCurrentUser(updatedUser);
               setUsersList([updatedUser, ...usersList.filter((u) => u.username !== updatedUser.username)]);
@@ -1099,6 +1112,8 @@ export default function App() {
             prefilledBarcode={roasterPrefillBarcode}
             prefilledBean={roasterPrefillBean}
             onSelectBeanToBrew={handleApplyScannedRecipe}
+            currentUser={currentUser}
+            onOpenAuth={handleOpenAuth}
           />
 
           {/* Coffee Water Chemistry Lab Modal */}
