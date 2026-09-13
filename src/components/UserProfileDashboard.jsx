@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, User, Flame, Award, Sparkles, Coffee, Leaf, Shield, CheckCircle2, Bookmark, Edit3, LogOut, HelpCircle, ChevronDown, ChevronUp, Target } from 'lucide-react';
 import { BADGES_DATA } from '../data/badgesData';
+import { getAssetUrl } from '../utils/assetUrl';
 
 export default function UserProfileDashboard({ isOpen, onClose, trackMode, currentUser, onOpenAuth, onLogout }) {
   if (!isOpen) return null;
 
   const [showInstructions, setShowInstructions] = useState(false);
+  const [userAvatarFailed, setUserAvatarFailed] = useState(false);
   const isCoffee = trackMode === 'coffee';
+
+  useEffect(() => {
+    setUserAvatarFailed(false);
+  }, [currentUser?.avatar]);
 
   // 1. Read actual brew logs from device's private journal
   const journalLogs = (() => {
@@ -98,10 +104,11 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
 
         {/* User Header Profile Card */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 mb-8 pb-6 border-b border-white/10">
-          {profile?.avatar && profile.avatar !== '/' ? (
+          {profile?.avatar && profile.avatar !== '/' && !userAvatarFailed ? (
             <img
-              src={profile.avatar}
+              src={getAssetUrl(profile.avatar)}
               alt={profile.displayName}
+              onError={() => setUserAvatarFailed(true)}
               className="w-20 h-20 rounded-full object-cover border-2 border-amber-gold shadow-xl"
             />
           ) : (

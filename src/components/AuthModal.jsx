@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { X, User, Mail, Sparkles, CheckCircle2, Edit3, Image, LogOut, AlertCircle, Shield, Download, Upload, Smartphone, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, User, Mail, Sparkles, CheckCircle2, Edit3, Image, LogOut, AlertCircle, Shield, Download, Upload, Smartphone, RefreshCw, Coffee, Flame, Award } from 'lucide-react';
 import { AVATAR_PRESETS } from '../data/avatarPresets';
 import { trackEvent } from '../utils/analytics';
+import { getAssetUrl } from '../utils/assetUrl';
 
 export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile, onLogout, usersList = [] }) {
   if (!isOpen) return null;
@@ -12,7 +13,12 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
   const [displayName, setDisplayName] = useState(currentUser?.displayName || '');
   const [bio, setBio] = useState(currentUser?.bio || '');
   const [avatar, setAvatar] = useState((currentUser?.avatar && currentUser.avatar !== '/') ? currentUser.avatar : AVATAR_PRESETS[0].url);
+  const [activeAvatarFailed, setActiveAvatarFailed] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    setActiveAvatarFailed(false);
+  }, [avatar]);
 
   const handleExportFullBackup = () => {
     try {
@@ -383,30 +389,38 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
                     <Image className="w-4 h-4 text-amber-gold" />
                     <span>Choose Profile Icon Avatar</span>
                   </span>
-                  <img src={avatar} alt="Active Avatar" className="w-9 h-9 rounded-full object-cover border-2 border-amber-gold" />
+                  <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-amber-gold flex items-center justify-center bg-black/40 shadow-sm shrink-0">
+                    {!activeAvatarFailed && avatar && avatar !== '/' ? (
+                      <img
+                        src={getAssetUrl(avatar)}
+                        alt="Active Avatar"
+                        onError={() => setActiveAvatarFailed(true)}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-5 h-5 text-amber-gold" />
+                    )}
+                  </div>
                 </div>
 
                 {/* Grid of Preset Avatars */}
-                <div className="grid grid-cols-4 gap-2 pt-1">
+                <div className="grid grid-cols-5 gap-2 pt-1">
                   {AVATAR_PRESETS.map((preset) => {
-                    const isSelected = avatar === preset.url;
+                    const isSelected =
+                      avatar === preset.url ||
+                      avatar === getAssetUrl(preset.url) ||
+                      (avatar && preset.url && avatar.endsWith(preset.url.replace(/^\//, ''))) ||
+                      avatar === preset.id;
                     return (
-                      <button
+                      <PresetAvatarItem
                         key={preset.id}
-                        type="button"
-                        onClick={() => setAvatar(preset.url)}
-                        className={`relative rounded-xl overflow-hidden border-2 transition-all p-0.5 group ${
-                          isSelected ? 'border-amber-gold ring-2 ring-amber-gold/50 scale-105' : 'border-white/10 opacity-70 hover:opacity-100'
-                        }`}
-                        title={preset.label}
-                      >
-                        <img src={preset.url} alt={preset.label} className="w-full h-12 rounded-lg object-cover" />
-                        {isSelected && (
-                          <div className="absolute inset-0 bg-amber-gold/30 flex items-center justify-center">
-                            <CheckCircle2 className="w-4 h-4 text-espresso-950 fill-amber-gold" />
-                          </div>
-                        )}
-                      </button>
+                        preset={preset}
+                        isSelected={isSelected}
+                        onSelect={(url) => {
+                          setAvatar(url);
+                          setActiveAvatarFailed(false);
+                        }}
+                      />
                     );
                   })}
                 </div>
@@ -438,5 +452,50 @@ export default function AuthModal({ isOpen, onClose, currentUser, onSaveProfile,
 
       </div>
     </div>
+  );
+}
+
+function PresetAvatarItem({ preset, isSelected, onSelect }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const resolvedUrl = getAssetUrl(preset.url);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(preset.url)}
+      className={`relative rounded-xl overflow-hidden border-2 transition-all p-0.5 group aspect-square flex flex-col items-center justify-center ${
+        isSelected
+          ? 'border-amber-gold ring-2 ring-amber-gold/50 scale-105 shadow-md shadow-amber-gold/20'
+          : 'border-white/10 opacity-80 hover:opacity-100 hover:border-white/30'
+      }`}
+      title={preset.label}
+    >
+      {!imgFailed ? (
+        <img
+          src={resolvedUrl}
+          alt={preset.label}
+          onError={() => setImgFailed(true)}
+          className="w-full h-full rounded-lg object-cover"
+          loading="lazy"
+        />
+      ) : (
+        <div className="w-full h-full rounded-lg bg-gradient-to-br from-[#241710] to-[#120B08] flex flex-col items-center justify-center p-1 text-center">
+          {preset.iconType === 'coffee' ? (
+            <Coffee className="w-5 h-5 text-amber-gold" />
+          ) : preset.iconType === 'flame' ? (
+            <Flame className="w-5 h-5 text-amber-gold" />
+          ) : preset.iconType === 'award' ? (
+            <Award className="w-5 h-5 text-amber-gold" />
+          ) : (
+            <User className="w-5 h-5 text-amber-gold" />
+          )}
+        </div>
+      )}
+      {isSelected && (
+        <div className="absolute inset-0 bg-amber-gold/25 flex items-center justify-center rounded-lg pointer-events-none">
+          <CheckCircle2 className="w-5 h-5 text-espresso-950 fill-amber-gold drop-shadow" />
+        </div>
+      )}
+    </button>
   );
 }

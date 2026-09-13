@@ -5,30 +5,35 @@ export const AVATAR_PRESETS = [
     id: 'avatar_cartoon_female_barista',
     label: 'Female Barista Cartoon Icon',
     category: 'coffee',
+    iconType: 'user',
     url: '/avatar_cartoon_female_barista.jpg'
   },
   {
     id: 'avatar_cartoon_male_barista',
     label: 'Male Barista Cartoon Icon',
     category: 'coffee',
+    iconType: 'user',
     url: '/avatar_cartoon_male_barista.jpg'
   },
   {
     id: 'avatar_cartoon_coffee_mug',
     label: 'Coffee Mug Cartoon Icon',
     category: 'coffee',
+    iconType: 'coffee',
     url: '/avatar_cartoon_coffee_mug.jpg'
   },
   {
     id: 'avatar_roast_beans',
     label: 'Roast Master Emblem',
     category: 'coffee',
+    iconType: 'flame',
     url: '/avatar_roast_beans.jpg'
   },
   {
     id: 'avatar_barista',
     label: 'Barista Master Icon',
     category: 'coffee',
+    iconType: 'award',
     url: '/avatar_barista.jpg'
   }
 ];
