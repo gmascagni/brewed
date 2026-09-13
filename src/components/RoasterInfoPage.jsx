@@ -255,7 +255,7 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
             </div>
 
             <RoasterVideoPlayer
-              onOpenLiveDemo={() => {
+              onStartOnboarding={() => {
                 if (onOpenStudio) {
                   onClose();
                   onOpenStudio();

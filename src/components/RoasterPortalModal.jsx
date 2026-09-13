@@ -1642,26 +1642,17 @@ export default function RoasterPortalModal({
                     Watch the 4-step workflow: thermal printing the QR sticker, affixing to retail packaging, customer optical scan, and instant dial-in recipe load.
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setActiveTab('onboard')}
-                    className="px-4 py-2 rounded-xl bg-amber-gold hover:bg-amber-300 text-espresso-950 font-bold text-xs flex items-center gap-1.5 shadow transition"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>2. Start Onboarding Recipe</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('sticker')}
-                    className="px-3.5 py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-bold text-xs flex items-center gap-1.5 border border-white/10 shadow transition"
-                  >
-                    <QrCode className="w-3.5 h-3.5 text-amber-gold" />
-                    <span>QR Studio</span>
-                  </button>
-                </div>
+                <button
+                  onClick={() => setActiveTab('onboard')}
+                  className="px-4 py-2 rounded-xl bg-amber-gold hover:bg-amber-300 text-espresso-950 font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>2. Start Onboarding Recipe</span>
+                </button>
               </div>
 
               <RoasterVideoPlayer
-                onOpenLiveDemo={() => setActiveTab('sticker')}
+                onStartOnboarding={() => setActiveTab('onboard')}
               />
             </div>
           )}

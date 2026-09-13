@@ -5,7 +5,6 @@ import {
   RotateCcw,
   Volume2,
   VolumeX,
-  Download,
   Maximize2,
   Minimize2,
   CheckCircle2,
@@ -19,9 +18,9 @@ import {
   ChevronRight,
   Share2,
   Check,
-  Film,
   Compass,
-  BarChart3
+  BarChart3,
+  ArrowRight
 } from 'lucide-react';
 import { getAssetUrl } from '../utils/assetUrl';
 
@@ -88,7 +87,7 @@ const CHAPTERS = [
   }
 ];
 
-export default function RoasterVideoPlayer({ onOpenLiveDemo = null, className = '' }) {
+export default function RoasterVideoPlayer({ onOpenLiveDemo = null, onStartOnboarding = null, className = '' }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(92.2);
@@ -217,34 +216,39 @@ export default function RoasterVideoPlayer({ onOpenLiveDemo = null, className = 
   };
 
   const handleCopyShareLink = () => {
-    const videoPath = getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4');
-    const shareUrl = `${window.location.origin}${videoPath}`;
-    navigator.clipboard.writeText(shareUrl).then(() => {
+    const shareUrl = typeof window !== 'undefined' 
+      ? `${window.location.origin}${window.location.pathname.startsWith('/brewed') ? '/brewed' : ''}/roasters?video=true`
+      : 'https://thebrew.app/roasters?video=true';
+
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(shareUrl);
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2500);
-    }).catch(() => {});
+    }
   };
 
-  const formatTime = (seconds) => {
-    if (isNaN(seconds) || seconds < 0) return '0:00';
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
+  // Helper formatting mm:ss
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
+
+
 
   return (
     <div
       ref={containerRef}
-      className={`relative rounded-3xl bg-espresso-950/95 border border-[#A66E38]/40 shadow-2xl overflow-hidden flex flex-col text-cream-light ${className}`}
+      className={`relative w-full rounded-3xl overflow-hidden bg-espresso-950 border border-amber-gold/30 shadow-2xl transition-all ${className}`}
     >
       {/* Top Header Bar */}
-      <div className="flex flex-wrap items-center justify-between px-5 py-3.5 bg-black/60 border-b border-white/10 z-10 backdrop-blur-md gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 bg-black/90 border-b border-white/10">
         <div className="flex items-center gap-2.5">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-gold">
+          <span className="font-mono text-xs font-bold text-cream-light uppercase tracking-wider">
             Roaster & Cafe Partner Walkthrough
           </span>
-          <span className="px-2 py-0.5 rounded-md bg-amber-gold/20 text-amber-gold text-[10px] font-mono font-bold border border-amber-gold/40">
+          <span className="px-2 py-0.5 rounded-full bg-amber-gold/15 text-amber-gold font-mono text-[10px] font-bold border border-amber-gold/30">
             9:16 Social Ready (1080x1920)
           </span>
         </div>
@@ -264,17 +268,6 @@ export default function RoasterVideoPlayer({ onOpenLiveDemo = null, className = 
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             <span className="hidden md:inline">{isMuted ? 'Muted' : 'Audio On'}</span>
           </button>
-
-          {/* Direct MP4 Download Button for Social Media & Marketing */}
-          <a
-            href={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4')}
-            download="thebrew_roaster_and_cafe_partner_walkthrough_9x16.mp4"
-            className="px-3 py-1.5 rounded-xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 transition flex items-center gap-1.5 text-xs font-mono font-bold shadow-md hover:scale-105 active:scale-95"
-            title="Download Broadcast 1080x1920 9:16 MP4 for TikTok, Instagram Reels, and YouTube Shorts"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download MP4 (Social)</span>
-          </a>
 
           {/* Copy Share Link */}
           <button
@@ -424,55 +417,27 @@ export default function RoasterVideoPlayer({ onOpenLiveDemo = null, className = 
             </div>
           </div>
 
-          {/* Social Media & Marketing Campaign Pack Box */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-[#2A1810] to-[#1E110A] border border-amber-gold/40 shadow-lg space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <Film className="w-4 h-4 text-amber-gold" />
-                <span className="text-xs font-mono font-bold text-amber-gold uppercase tracking-wider">
-                  Social Media & Marketing Campaign Asset
-                </span>
+          {/* Action Step for Roaster Onboarding */}
+          {onStartOnboarding && (
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+              <div className="space-y-0.5">
+                <div className="font-serif text-sm font-bold text-cream-light">
+                  Ready to onboard your coffee?
+                </div>
+                <p className="text-xs text-cream-soft">
+                  Move to Step 2 to register bean origin, roast profile, and dial-in brew recipe.
+                </p>
               </div>
-              <span className="text-[10px] font-mono text-cream-soft/60">
-                1080x1920 • 30 FPS • Broadcast Audio
-              </span>
-            </div>
-
-            <p className="text-xs text-cream-soft/80 leading-relaxed">
-              This video is pre-rendered in native 9:16 vertical orientation, optimized for immediate posting on Instagram Reels, TikTok, YouTube Shorts, and partner pitch campaigns.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <a
-                href={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4')}
-                download="thebrew_partner_walkthrough_short_9x16.mp4"
-                className="px-4 py-2 rounded-xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow transition hover:scale-105 active:scale-95"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download MP4 File</span>
-              </a>
-
               <button
                 type="button"
-                onClick={handleCopyShareLink}
-                className="px-3 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-cream-light font-mono text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+                onClick={onStartOnboarding}
+                className="px-4 py-2.5 rounded-xl bg-amber-gold hover:bg-amber-300 text-espresso-950 font-bold text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
               >
-                {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5 text-amber-gold" />}
-                <span>{copiedLink ? 'Link Copied!' : 'Copy Direct URL'}</span>
+                <span>2. Start Onboarding Recipe</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
-
-              {onOpenLiveDemo && (
-                <button
-                  type="button"
-                  onClick={onOpenLiveDemo}
-                  className="px-3 py-2 rounded-xl bg-[#2F663C] hover:bg-[#255230] text-emerald-100 font-mono text-xs font-bold flex items-center gap-1.5 shadow transition cursor-pointer"
-                >
-                  <QrCode className="w-3.5 h-3.5" />
-                  <span>Launch Label Studio</span>
-                </button>
-              )}
             </div>
-          </div>
+          )}
 
         </div>
       </div>
