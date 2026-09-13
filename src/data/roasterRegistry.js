@@ -338,9 +338,9 @@ export async function syncCloudCatalog() {
 export function getSmartBagBaseUrl() {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    // When running on localhost or local network, use the active public URL so smartphones scanning the screen can connect
+    // When running on localhost or local network, use the official custom domain so smartphones scanning the screen can connect
     if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.')) {
-      return 'https://gmascagni.github.io/brewed';
+      return 'https://thebrew.app';
     }
     const origin = window.location.origin;
     if (window.location.pathname.startsWith('/brewed')) {
@@ -348,7 +348,7 @@ export function getSmartBagBaseUrl() {
     }
     return origin;
   }
-  return 'https://gmascagni.github.io/brewed';
+  return 'https://thebrew.app';
 }
 
 /**
