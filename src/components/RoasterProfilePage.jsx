@@ -22,7 +22,6 @@ import {
   ArrowLeft,
   Share2,
   Check,
-  Download,
   Bookmark,
   Play,
   X
@@ -1168,15 +1167,6 @@ export default function RoasterProfilePage({
               <p className="text-xs text-stone-200 font-mono font-bold">How Roasters & Cafes Onboard Their Brand</p>
               <p className="text-[11px] text-amber-gold/80 font-mono">300 DPI Thermal Smart Labels • Live Camera Scan & Slurry Timer</p>
               <div className="pt-1 flex items-center justify-center gap-2">
-                <a
-                  href={getAssetUrl('/videos/smart_bag_scan_demo.mp4')}
-                  download="thebrew_smart_bag_scan_demo_9x16.mp4"
-                  className="px-3 py-1 rounded-xl bg-amber-gold/20 hover:bg-amber-gold/30 text-amber-gold border border-amber-gold/40 text-[10px] font-mono font-bold flex items-center gap-1 transition"
-                  title="Download MP4 Video"
-                >
-                  <Download className="w-3 h-3" />
-                  <span>Download MP4</span>
-                </a>
                 <a
                   href={getAssetUrl('/videos/smart_bag_scan_demo.mp4')}
                   target="_blank"
