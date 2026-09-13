@@ -9,6 +9,7 @@
  */
 
 import { VERIFIED_BEAN_CATALOG } from '../data/verifiedBeans.js';
+import { getBloomScalingMetrics } from './bloomScaling.js';
 
 /**
  * Normalizes brewer name string to matching method ID
@@ -94,8 +95,10 @@ export function normalizeRecipeBean(data) {
   
   const grind = data.grind || 'Medium-Fine';
   const totalTimeSec = parseInt(data.total_time_sec || data.timeSec || '210', 10);
-  const bloomWater = parseInt(data.bloom_water || '60', 10);
-  const bloomTimeSec = parseInt(data.bloom_time_sec || '45', 10);
+  
+  const bloomMetrics = getBloomScalingMetrics(dose);
+  const bloomWater = parseInt(data.bloom_water, 10) || bloomMetrics.targetWaterGrams;
+  const bloomTimeSec = parseInt(data.bloom_time_sec, 10) || bloomMetrics.durationSec;
   
   const rawNotes = data.notes || `${coffee} dialed in for ${String(brewMethod || 'pour_over').replace(/_/g, ' ')}.`;
   const tastingNotes = Array.isArray(data.tasting_notes || data.tastingNotes) 
@@ -117,7 +120,7 @@ export function normalizeRecipeBean(data) {
       durationSec: bloomTimeSec,
       waterGrams: bloomWater,
       waterMultiplier: Number((bloomWater / dose).toFixed(1)),
-      instruction: `Saturate grounds evenly with ${bloomWater}g water in circular motion. Let coffee bloom and de-gas for ${bloomTimeSec}s.`
+      instruction: `Saturate grounds evenly with ${bloomWater}g water (${bloomMetrics.waterRangeStr}). Let coffee bloom and de-gas for ${bloomTimeSec}s.`
     },
     {
       name: 'Main Pour',

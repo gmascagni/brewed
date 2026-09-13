@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft, BookOpen, Thermometer } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft, BookOpen, Thermometer, Scale } from 'lucide-react';
 import { 
   playTimerStartChime, 
   announcePhase, 
@@ -14,6 +14,7 @@ import {
 } from '../utils/audioSynth';
 import { requestScreenWakeLock, releaseScreenWakeLock } from '../utils/wakeLock';
 import { hapticStart, hapticPhaseChange, hapticComplete, hapticTap } from '../utils/haptics';
+import { getBloomScalingMetrics, BLOOM_SCALING_TABLE } from '../utils/bloomScaling';
 import V60ProTipModal from './V60ProTipModal';
 
 export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, unitSystem = 'imperial', isMuted, setIsMuted, onPrevStep, onOpenJournal }) {
@@ -27,7 +28,30 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   ];
 
   const rawPhases = activeMethod?.phases && activeMethod.phases.length > 0 ? activeMethod.phases : defaultPhases;
-  const phases = rawPhases;
+
+  // The Two Scaling Variables: Small Dose (12–15g), Standard Dose (20–30g), Large Dose (45–60g+)
+  const effectiveDose = Math.max(8, Number(dryDoseGrams) || 18);
+  const bloomMetrics = getBloomScalingMetrics(effectiveDose);
+
+  // Scaled dynamic phases based on active dose
+  const phases = useMemo(() => {
+    return rawPhases.map((phase, idx) => {
+      const isBloom = idx === 0 || (phase.name && phase.name.toLowerCase().includes('bloom'));
+      if (isBloom && isCoffee) {
+        return {
+          ...phase,
+          durationSec: bloomMetrics.durationSec,
+          waterGrams: bloomMetrics.targetWaterGrams,
+          waterRangeStr: bloomMetrics.waterRangeStr,
+          timeRangeStr: bloomMetrics.bloomTimeRange,
+          tierName: bloomMetrics.tierName,
+          doseRange: bloomMetrics.doseRange,
+          instruction: `Saturate grounds evenly with ${bloomMetrics.targetWaterGrams}g water (${bloomMetrics.waterRangeStr}). Let coffee bloom and de-gas for ${bloomMetrics.durationSec}s.`
+        };
+      }
+      return phase;
+    });
+  }, [rawPhases, effectiveDose, isCoffee, bloomMetrics]);
 
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(phases[0]?.durationSec || 60);
@@ -93,7 +117,23 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   const activePhase = phases[currentPhaseIndex] || phases[0] || defaultPhases[0];
   const totalPhaseTime = activePhase?.durationSec || 60;
 
-  // Reset timer when method or track mode changes
+  const isBloomPhase = (currentPhaseIndex === 0 || activePhase?.name?.toLowerCase().includes('bloom')) && isCoffee;
+
+  const targetPhaseWaterMl = (() => {
+    if (!isCoffee) return null;
+    if (isBloomPhase) {
+      return bloomMetrics.targetWaterGrams;
+    }
+    if (activePhase?.waterGrams) {
+      return activePhase.waterGrams;
+    }
+    if (activePhase?.waterMultiplier && effectiveDose) {
+      return Math.round(effectiveDose * (activeMethod?.ratio || 16) * (activePhase.waterMultiplier || 1));
+    }
+    return null;
+  })();
+
+  // Reset timer when method, track mode, or dry dose changes
   useEffect(() => {
     stopCompletionChime();
     stopSpeechAnnouncement();
@@ -107,7 +147,7 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     setIsRunning(false);
     setIsAnnouncing(false);
     setIsCompleted(false);
-  }, [activeMethod?.id, trackMode]);
+  }, [activeMethod?.id, trackMode, dryDoseGrams]);
 
   // Release wake lock safely on unmount
   useEffect(() => {
@@ -400,9 +440,6 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     ? ((totalPhaseTime - timeLeft) / totalPhaseTime) * circumference
     : 0;
 
-  const targetPhaseWaterMl = (dryDoseGrams > 0 && activePhase?.waterMultiplier) 
-    ? Math.round(dryDoseGrams * activePhase.waterMultiplier) 
-    : null;
 
   const [isProTipOpen, setIsProTipOpen] = useState(false);
 
@@ -601,6 +638,61 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
               </div>
             )}
           </div>
+
+          {/* The Two Scaling Variables Indicator (Bloom Phase) */}
+          {isBloomPhase && (
+            <div className="p-4 rounded-3xl bg-[#A66E38]/15 border border-[#A66E38]/40 text-xs font-mono space-y-3 shadow-md text-left">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 font-bold text-amber-gold uppercase tracking-wider text-[11px]">
+                  <Scale className="w-4 h-4 text-amber-gold" />
+                  <span>The Two Scaling Variables (Bloom Phase)</span>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold uppercase">
+                  {bloomMetrics.tierName} ({effectiveDose}g)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-left">
+                <div className="p-3 rounded-2xl bg-black/50 border border-white/10 space-y-1">
+                  <span className="text-[10px] text-stone-400 uppercase tracking-wide block font-semibold">1. Bloom Water Weight</span>
+                  <span className="text-cream-light font-bold text-base block font-mono">~{bloomMetrics.targetWaterGrams}g</span>
+                  <span className="text-amber-gold/90 text-[10px] block font-mono">{bloomMetrics.waterRangeStr}</span>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-black/50 border border-white/10 space-y-1">
+                  <span className="text-[10px] text-stone-400 uppercase tracking-wide block font-semibold">2. Bloom Time</span>
+                  <span className="text-cream-light font-bold text-base block font-mono">{bloomMetrics.durationSec}s</span>
+                  <span className="text-amber-gold/90 text-[10px] block font-mono">{bloomMetrics.bloomTimeRange}</span>
+                </div>
+              </div>
+
+              {/* Benchmark Reference Grid */}
+              <div className="pt-2 border-t border-white/10 grid grid-cols-3 gap-1.5 text-[9px] text-stone-400 text-center font-mono">
+                <div className={`p-1.5 rounded-xl border transition ${bloomMetrics.tier === 'small' ? 'bg-amber-500/20 text-amber-200 font-bold border-amber-500/40 shadow-sm' : 'bg-black/30 border-white/5 opacity-70'}`}>
+                  <div>Small (12–15g)</div>
+                  <div className="text-[8.5px] mt-0.5">35–45g • 30–40s</div>
+                </div>
+                <div className={`p-1.5 rounded-xl border transition ${bloomMetrics.tier === 'standard' ? 'bg-amber-500/20 text-amber-200 font-bold border-amber-500/40 shadow-sm' : 'bg-black/30 border-white/5 opacity-70'}`}>
+                  <div>Standard (20–30g)</div>
+                  <div className="text-[8.5px] mt-0.5">60–90g • 40–45s</div>
+                </div>
+                <div className={`p-1.5 rounded-xl border transition ${bloomMetrics.tier === 'large' ? 'bg-amber-500/20 text-amber-200 font-bold border-amber-500/40 shadow-sm' : 'bg-black/30 border-white/5 opacity-70'}`}>
+                  <div>Large (45–60g+)</div>
+                  <div className="text-[8.5px] mt-0.5">135–180g • 45–60+s</div>
+                </div>
+              </div>
+
+              {/* View Full Scaling Guide Button */}
+              <button
+                type="button"
+                onClick={() => setIsProTipOpen(true)}
+                className="w-full py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95"
+              >
+                <span>View Full V60 Technique & Scaling Guide</span>
+                <span>↗</span>
+              </button>
+            </div>
+          )}
 
           {/* Target Water Pour & Water Temp Indicator */}
           {(targetPhaseWaterMl || activeMethod?.tempC || activeMethod?.tempF) && (

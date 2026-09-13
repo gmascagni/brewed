@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Sparkles, Droplets, Thermometer, Sliders, Clock, CheckCircle2 } from 'lucide-react';
+import { X, Sparkles, Droplets, Thermometer, Sliders, Clock, CheckCircle2, Scale } from 'lucide-react';
 
 export default function V60ProTipModal({ isOpen, onClose }) {
   if (!isOpen) return null;
@@ -152,7 +152,44 @@ export default function V60ProTipModal({ isOpen, onClose }) {
           </p>
         </div>
 
-        {/* 4. Troubleshooting & Dialing-In Guide */}
+        {/* 4. The Two Scaling Variables (Bloom Phase) */}
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs mb-6">
+          <div className="font-bold text-amber-gold mb-2 flex items-center gap-1.5 uppercase tracking-wider text-[11px] font-mono">
+            <Scale className="w-4 h-4 text-amber-gold" />
+            <span>The Two Scaling Variables (Bloom Phase)</span>
+          </div>
+          <p className="text-stone-300 text-[11px] mb-3 leading-relaxed">
+            Bloom water saturation and dwell duration scale systematically with dry dose to ensure thorough de-gassing without premature channeling:
+          </p>
+          <div className="overflow-x-auto rounded-xl border border-white/10 bg-black/60 shadow-inner">
+            <table className="w-full text-left font-mono text-[11px]">
+              <thead className="bg-white/10 text-stone-300 border-b border-white/10">
+                <tr>
+                  <th className="p-2.5 font-bold uppercase tracking-wider text-[10px]">Variable</th>
+                  <th className="p-2.5 font-bold uppercase tracking-wider text-[10px] text-amber-300">Small Dose (12–15g)</th>
+                  <th className="p-2.5 font-bold uppercase tracking-wider text-[10px] text-amber-400">Standard Dose (20–30g)</th>
+                  <th className="p-2.5 font-bold uppercase tracking-wider text-[10px] text-amber-200">Large Dose (45–60g+)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 text-stone-200">
+                <tr>
+                  <td className="p-2.5 font-bold text-cream-light">Bloom Water Weight</td>
+                  <td className="p-2.5 text-amber-gold font-bold">35–45g <span className="text-[10px] text-stone-400 font-normal">(2.5–3×)</span></td>
+                  <td className="p-2.5 text-amber-gold font-bold">60–90g <span className="text-[10px] text-stone-400 font-normal">(2.5–3×)</span></td>
+                  <td className="p-2.5 text-amber-gold font-bold">135–180g <span className="text-[10px] text-stone-400 font-normal">(2.5–3×)</span></td>
+                </tr>
+                <tr>
+                  <td className="p-2.5 font-bold text-cream-light">Bloom Time</td>
+                  <td className="p-2.5 text-cyan-300 font-bold">30–40 seconds</td>
+                  <td className="p-2.5 text-cyan-300 font-bold">40–45 seconds</td>
+                  <td className="p-2.5 text-cyan-300 font-bold">45–60+ seconds</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 5. Troubleshooting & Dialing-In Guide */}
         <div className="p-4 rounded-2xl bg-black/60 border border-white/10 text-xs">
           <div className="font-bold text-cream-light mb-2 flex items-center gap-1.5 uppercase tracking-wider text-[11px] font-mono">
             <Sliders className="w-4 h-4 text-cyan-400" />
