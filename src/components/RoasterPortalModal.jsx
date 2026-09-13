@@ -84,6 +84,33 @@ export default function RoasterPortalModal({
   const [saveToast, setSaveToast] = useState(null);
   const modalBodyRef = useRef(null);
 
+  const handleWebsiteChange = (e) => {
+    let val = e.target.value;
+    val = val.replace(/^(https?):\/+([^\/])/i, '$1://$2');
+    val = val.replace(/^(https?):\/{3,}$/i, '$1://');
+    if (val === 'https:/' && (website === 'https:' || website === '')) {
+      val = 'https://';
+    } else if (val === 'http:/' && (website === 'http:' || website === '')) {
+      val = 'http://';
+    }
+    setWebsite(val);
+  };
+
+  const handleWebsiteBlur = () => {
+    if (!website) return;
+    let s = website.trim();
+    if (/^https?:\/*$/i.test(s)) {
+      setWebsite('');
+      return;
+    }
+    s = s.replace(/^(https?):\/+([^\/])/i, '$1://$2');
+    s = s.replace(/^(https?):\/{3,}/i, '$1://');
+    if (!/^https?:\/\//i.test(s)) {
+      s = `https://${s}`;
+    }
+    setWebsite(s);
+  };
+
   const handleLogoUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -646,12 +673,21 @@ export default function RoasterPortalModal({
                   <div>
                     <label className="block text-cream-soft/70 font-mono mb-1">Website / Store URL</label>
                     <input
-                      type="url"
+                      type="text"
+                      inputMode="url"
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck="false"
+                      style={{ fontVariantLigatures: 'none' }}
                       value={website}
-                      onChange={(e) => setWebsite(e.target.value)}
+                      onChange={handleWebsiteChange}
+                      onBlur={handleWebsiteBlur}
                       placeholder="https://methodicalcoffee.com"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold"
                     />
+                    <span className="block mt-1 text-[10px] text-cream-soft/50 font-mono">
+                      Tip: Enter bare domain (e.g. methodicalcoffee.com) or full https:// URL
+                    </span>
                   </div>
                 </div>
 

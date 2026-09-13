@@ -24,6 +24,21 @@ import {
 import { trackEvent } from '../utils/analytics';
 import RoasterVideoPlayer from './RoasterVideoPlayer';
 
+// Normalizes website URLs so single-slash typos (e.g. https:/domain) or missing protocol are gracefully fixed
+const cleanWebsiteUrl = (val) => {
+  let s = (val || '').trim();
+  if (!s || /^https?:\/*$/i.test(s)) return '';
+  // Fix single-slash after protocol (e.g. https:/brand.com -> https://brand.com)
+  s = s.replace(/^(https?):\/+([^\/])/i, '$1://$2');
+  // Collapse 3+ slashes down to 2
+  s = s.replace(/^(https?):\/{3,}/i, '$1://');
+  // If bare domain entered without protocol, prepend https://
+  if (!/^https?:\/\//i.test(s)) {
+    s = `https://${s}`;
+  }
+  return s;
+};
+
 export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +74,30 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
     } catch {}
   };
 
+  const handleWebsiteChange = (e) => {
+    let val = e.target.value;
+    // Auto-fix single slash typo after http: or https:
+    val = val.replace(/^(https?):\/+([^\/])/i, '$1://$2');
+    val = val.replace(/^(https?):\/{3,}$/i, '$1://');
+
+    // Auto-complete second slash when typing forward so a user never gets stuck on https:/
+    if (val === 'https:/' && (formData.website === 'https:' || formData.website === '')) {
+      val = 'https://';
+    } else if (val === 'http:/' && (formData.website === 'http:' || formData.website === '')) {
+      val = 'http://';
+    }
+
+    setFormData(prev => ({ ...prev, website: val }));
+  };
+
+  const handleWebsiteBlur = () => {
+    if (!formData.website) return;
+    const normalized = cleanWebsiteUrl(formData.website);
+    setFormData(prev => ({ ...prev, website: normalized }));
+  };
+
   const handleOpenGmail = () => {
+    const normalizedWebsite = cleanWebsiteUrl(formData.website);
     const subject = encodeURIComponent(`Roastery Label Ingestion Request: ${formData.roasteryName || 'Specialty Coffee Brand'}`);
     const body = encodeURIComponent(
       `Hello Brew App HQ,\n\n` +
@@ -67,7 +105,7 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
       `Roastery Brand: ${formData.roasteryName}\n` +
       `Contact Name: ${formData.contactName}\n` +
       `Email: ${formData.email}\n` +
-      `Website: ${formData.website}\n` +
+      `Website: ${normalizedWebsite}\n` +
       `Location: ${formData.location}\n` +
       `Number of Retail Coffees: ${formData.coffeeCount}\n` +
       `Sample Retail Barcodes (UPC/EAN): ${formData.sampleBarcodes}\n\n` +
@@ -92,6 +130,8 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
     let liveSuccess = false;
     const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
+    const normalizedWebsite = cleanWebsiteUrl(formData.website);
+
     if (isLocalhost) {
       try {
         const res = await fetch('http://127.0.0.1:8000/api/roaster-inquiry', {
@@ -101,7 +141,7 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
             roastery_name: formData.roasteryName,
             contact_name: formData.contactName,
             email: formData.email,
-            website: formData.website,
+            website: normalizedWebsite,
             location: formData.location,
             coffee_count: formData.coffeeCount,
             sample_barcodes: formData.sampleBarcodes,
@@ -129,7 +169,7 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
         `Roastery Brand: ${formData.roasteryName}\n` +
         `Contact Name: ${formData.contactName}\n` +
         `Email: ${formData.email}\n` +
-        `Website: ${formData.website}\n` +
+        `Website: ${normalizedWebsite}\n` +
         `Location: ${formData.location}\n` +
         `Number of Retail Coffees: ${formData.coffeeCount}\n` +
         `Sample Retail Barcodes (UPC/EAN): ${formData.sampleBarcodes}\n\n` +
@@ -439,12 +479,21 @@ export default function RoasterInfoPage({ isOpen, onClose, onOpenStudio }) {
                   <div>
                     <label className="block text-cream-soft/80 mb-1">Roastery Website / Webshop</label>
                     <input
-                      type="url"
+                      type="text"
+                      inputMode="url"
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck="false"
+                      style={{ fontVariantLigatures: 'none' }}
                       value={formData.website}
-                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                      onChange={handleWebsiteChange}
+                      onBlur={handleWebsiteBlur}
                       placeholder="https://yourbrand.com"
                       className="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold"
                     />
+                    <span className="block mt-1 text-[10px] text-cream-soft/50 font-mono">
+                      Tip: Enter your domain (e.g. yourbrand.com) or full https:// URL
+                    </span>
                   </div>
 
                   <div>
