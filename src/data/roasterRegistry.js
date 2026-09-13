@@ -331,23 +331,11 @@ export async function syncCloudCatalog() {
 }
 
 /**
- * Resolves the appropriate base URL for Smart Bag deep links.
- * Automatically detects whether running under a subpath like /brewed on GitHub Pages,
- * on a custom domain (thebrew.app), or on localhost.
+ * Resolves the canonical base URL for Smart Bag deep links and packaging QR codes.
+ * Always returns https://thebrew.app so that physical packaging stickers printed for coffee bags
+ * consistently encode the official custom domain and never fail with 404 errors on smartphone scanners.
  */
 export function getSmartBagBaseUrl() {
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    // When running on localhost or local network, use the official custom domain so smartphones scanning the screen can connect
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.')) {
-      return 'https://thebrew.app';
-    }
-    const origin = window.location.origin;
-    if (window.location.pathname.startsWith('/brewed')) {
-      return `${origin}/brewed`;
-    }
-    return origin;
-  }
   return 'https://thebrew.app';
 }
 

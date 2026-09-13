@@ -483,7 +483,7 @@ export default function App() {
         'Live GPS radar and directory for finding artisan coffee roasters, third-wave espresso bars, and specialty cafes near your physical location.',
         'https://thebrew.app/shops'
       );
-    } else if (path.includes('smart-bag-scanner') || path.startsWith('/demo') || path.startsWith('/scanner') || path.startsWith('/scan')) {
+    } else if (path.includes('smart-bag-scanner') || path.startsWith('/demo') || path.startsWith('/scanner') || path.startsWith('/scan') || location.search.includes('scanner=') || location.search.includes('scan=')) {
       setIsRoasterShowcaseView(false);
       setIsShopsView(false);
       setIsScannerOpen(true);

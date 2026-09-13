@@ -109,5 +109,42 @@ export const VERIFIED_BEAN_CATALOG = [
     tempF: 198,
     brewMethod: "french_press",
     notes: "Stumptown's historic complex blend. High body, deep clarity, excellent in immersion brewers."
+  },
+  {
+    id: "sku_brookmill_caffe_choco",
+    upc: "LOT-749038",
+    qrPatterns: ["brookmill", "caffe choco", "caffe  choco", "caffee choco", "roasters/brookmill", "roasters/brookmill-roaster", "LOT-749038"],
+    roaster: "Brookmill Roaster",
+    beanName: "Caffe Choco / 13",
+    origin: "Specialty Single Origin & Craft Blend",
+    process: "Washed & Honey Process",
+    elevation: "1,750 - 1,950 MASL",
+    roastLevel: "Medium Roast",
+    tastingNotes: ["Dark Chocolate", "Cocoa Nibs", "Sweet Caramel", "Velvety Body"],
+    recommendedRatio: 16.5,
+    recommendedGrind: "Medium-Fine",
+    tempC: 94,
+    tempF: 202,
+    brewMethod: "pour_over",
+    notes: "Brookmill Roaster craft lot dialed in for precision pour over extraction. Golden 1:16.5 ratio at 202°F."
+  },
+  {
+    id: "sku_brookmill_belly_warmer",
+    upc: "LOT-749039",
+    qrPatterns: ["brookmill", "belly warmer", "roasters/brookmill", "roasters/brookmill-roaster", "LOT-749039"],
+    roaster: "Brookmill Roaster",
+    beanName: "Belly Warmer / 13",
+    origin: "Central & South American Specialty Lots",
+    process: "Washed & Natural",
+    elevation: "1,600 - 1,850 MASL",
+    roastLevel: "Medium-Dark Roast",
+    tastingNotes: ["Toasted Hazelnut", "Molasses", "Baking Spices", "Rich Cocoa"],
+    recommendedRatio: 16.0,
+    recommendedGrind: "Medium",
+    tempC: 93,
+    tempF: 200,
+    brewMethod: "pour_over",
+    notes: "Comforting artisan cup with warming spice aromatics, toasted hazelnut, and deep molasses finish."
   }
 ];
+

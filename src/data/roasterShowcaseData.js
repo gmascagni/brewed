@@ -432,10 +432,128 @@ export const SHOWCASE_ROASTERS = [
         badge: 'Everyday Espresso'
       }
     ]
+  },
+
+  {
+    id: 'brookmill-roaster',
+    slug: 'brookmill-roaster',
+    aliases: ['brookmill', 'brookmill-roasters', 'brookmill-roaster-alpharetta'],
+    name: 'Brookmill Roaster',
+    shortName: 'Brookmill',
+    isDemoExample: false,
+    tagline: 'Artisan Small-Batch Roasting & Precision Dial-In Labs',
+    founded: '2020',
+    city: 'Alpharetta',
+    state: 'Georgia',
+    country: 'USA',
+    website: 'https://thebrew.app/roasters/brookmill-roaster',
+    shopUrl: 'https://thebrew.app/roasters/brookmill-roaster',
+    brandColor: '#8C5A32',
+    accentColor: '#D4A373',
+    roasterMachines: 'San Franciscan Drum Roaster & Precision Convection Profiling',
+    sourcingPhilosophy: 'Ethically Sourced Single-Origin & Micro-Lot Direct Trade',
+    carbonFootprint: 'High-Efficiency Micro-Batch Drum Roasting',
+    monogram: 'B',
+    emblemSubtitle: 'ALPHARETTA, GA • ARTISAN ROASTERY',
+    stats: [
+      { label: 'Active Craft Lots', value: '6 Lots' },
+      { label: 'Roast Technology', value: 'San Franciscan Drum' },
+      { label: 'Dial-In Standard', value: 'Golden Ratio 1:16.5' },
+      { label: 'Average Cup Score', value: '88.0+ SCA' }
+    ],
+    originStory: [
+      "Brookmill Roaster is an artisan craft roastery based in Alpharetta, Georgia, dedicated to precision small-batch coffee roasting and scientific dial-in excellence.",
+      "Every single lot is meticulously profiled on our San Franciscan drum roasters to unlock deep aromatic sweetness, clean acidity, and rich confectionery finishes. Every physical bag packaged in our roastery features our certified Smart Bag dial-in specifications, providing home baristas with the exact extraction ratio, water temperature, and grind size to brew the ideal cup."
+    ],
+    roastingPhilosophy:
+      "We believe roasting is the bridge between the farmer's craft and the barista's cup. By balancing gentle conduction with precise airflow, we caramelize natural sugars without imparting charred or bitter astringency, highlighting vibrant terroir and silky chocolate body.",
+    cafes: [
+      {
+        name: 'Brookmill Roastery & Dial-In Lab',
+        address: 'Alpharetta, GA 30009',
+        description: 'Our primary roasting facility, QA cupping lab, and precision dial-in bar.',
+        hours: 'Mon–Sat: 7am – 4pm'
+      }
+    ],
+    recommendedWater: {
+      targetTds: 140,
+      gh: 70,
+      kh: 30,
+      ph: 7.0,
+      philosophy: 'Balanced mineral water with a 2:1 magnesium-to-calcium ratio accentuating dark cocoa sweetness and velvety mouthfeel.',
+      lotusFormula: { calcium: 2, magnesium: 4, buffer: 1 },
+      diyFormula: { epsomMl: 15.0, bakingSodaMl: 5.5 },
+      bottledWaterPairing: 'Crystal Geyser or Volvic Natural Spring Water'
+    },
+    coffees: [
+      {
+        id: 'brookmill_caffe_choco',
+        beanName: 'Caffe Choco / 13',
+        origin: 'Specialty Single Origin & Craft Lot',
+        process: 'Washed & Honey Process',
+        varietal: 'Bourbon & Caturra',
+        elevation: '1,750 – 1,950 MASL',
+        roastLevel: 'Medium Roast',
+        cuppingScore: 88.5,
+        harvestYear: '2025/2026 Micro-Batch',
+        tastingNotes: ['Dark Chocolate', 'Cocoa Nibs', 'Sweet Caramel', 'Velvety Body'],
+        description: 'Brookmill signature roast featuring intense notes of artisan dark chocolate, warm cocoa nibs, and rich caramelized brown sugar. Dialed in to perfection at 1:16.5 and 202°F.',
+        brewMethod: 'pour_over',
+        recommendedRatio: 16.5,
+        dryDoseGrams: 18.8,
+        waterGrams: 310,
+        tempF: 202,
+        tempC: 94.4,
+        recommendedGrind: 'Medium-Fine (650µm)',
+        brewTime: '3m 30s',
+        pourSchedule: [
+          { phase: 'Bloom', time: '0:00 - 0:45', water: '60g', note: 'Even saturation, gentle de-gas' },
+          { phase: 'Main Pour', time: '0:45 - 2:15', water: '188g', note: 'Concentric spiral pours' },
+          { phase: 'Drawdown', time: '2:15 - 3:30', water: '62g', note: 'Gentle swirl, clean flat-bed drawdown' }
+        ],
+        upc: 'LOT-749038',
+        price: '$21.00',
+        bagSize: '12 oz (340g)',
+        directUrl: 'https://thebrew.app/roasters/brookmill-roaster',
+        badge: 'Signature Craft Roast'
+      },
+      {
+        id: 'brookmill_belly_warmer',
+        beanName: 'Belly Warmer / 13',
+        origin: 'Central & South American Specialty Lots',
+        process: 'Washed & Natural',
+        varietal: 'Catuai & Typica',
+        elevation: '1,600 – 1,850 MASL',
+        roastLevel: 'Medium-Dark Roast',
+        cuppingScore: 87.5,
+        harvestYear: 'Current Fresh Crop',
+        tastingNotes: ['Toasted Hazelnut', 'Molasses', 'Baking Spices', 'Rich Cocoa'],
+        description: 'A comforting, full-bodied artisan cup with warming spice aromatics, toasted hazelnut, and deep molasses finish.',
+        brewMethod: 'pour_over',
+        recommendedRatio: 16.0,
+        dryDoseGrams: 19.0,
+        waterGrams: 304,
+        tempF: 200,
+        tempC: 93.3,
+        recommendedGrind: 'Medium (750µm)',
+        brewTime: '3m 15s',
+        pourSchedule: [
+          { phase: 'Bloom', time: '0:00 - 0:40', water: '58g', note: 'Thorough saturation' },
+          { phase: 'Body Pour', time: '0:40 - 2:00', water: '150g', note: 'Steady center pour' },
+          { phase: 'Final Pour', time: '2:00 - 3:15', water: '96g', note: 'Gentle edge rinse' }
+        ],
+        upc: 'LOT-749039',
+        price: '$20.00',
+        bagSize: '12 oz (340g)',
+        directUrl: 'https://thebrew.app/roasters/brookmill-roaster',
+        badge: 'Comfort Blend'
+      }
+    ]
   }
 ];
 
 import { getCustomRoasters, getCustomRoasterCoffees, saveCustomRoasterProfile, saveRoasterCoffee } from './roasterRegistry.js';
+
 
 function formatCustomRoasterAsShowcase(custom, coffees = []) {
   const name = custom.name || custom.roaster || 'Specialty Roastery';
@@ -555,7 +673,9 @@ export function normalizeRoasterKey(input) {
     'b&w': 'black-white',
     'bandw': 'black-white',
     'mth': 'methodical',
-    'onx': 'onyx'
+    'onx': 'onyx',
+    'brookmill': 'brookmill-roaster',
+    'brookmill-roasters': 'brookmill-roaster'
   };
   if (KNOWN_ALIASES[clean]) return KNOWN_ALIASES[clean];
 
@@ -716,7 +836,8 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
     return (
       normalizeRoasterKey(r.id) === targetKey ||
       normalizeRoasterKey(r.slug) === targetKey ||
-      normalizeRoasterKey(r.name) === targetKey
+      normalizeRoasterKey(r.name) === targetKey ||
+      (r.aliases && r.aliases.some(a => normalizeRoasterKey(a) === targetKey))
     );
   });
 

@@ -120,11 +120,120 @@ export default function BarcodeScannerModal({
     setCameraActive(false);
   };
 
-  // Real-time Barcode & QR Code Scanning Loop (cross-browser compatible)
+  /**
+   * Multi-pass high-reliability barcode and QR decoder
+   * Evaluates center crops, full frames, horizontal mirror flips (for webcams),
+   * and high-contrast thresholding to ensure packaging QR codes decode reliably.
+   */
+  const scanCanvasMultiPass = async (canvas, ctx, width, height) => {
+    if (!canvas || !ctx || width <= 0 || height <= 0) return null;
+
+    // Pass 1: Center 50% reticle crop with jsQR (fastest & highest resolution)
+    try {
+      const cx = Math.floor(width * 0.25);
+      const cy = Math.floor(height * 0.25);
+      const cw = Math.floor(width * 0.5);
+      const ch = Math.floor(height * 0.5);
+      const imgData = ctx.getImageData(cx, cy, cw, ch);
+      const qr = jsQR(imgData.data, cw, ch);
+      if (qr && qr.data && qr.data.trim()) {
+        return { text: qr.data.trim(), format: 'qr_code' };
+      }
+    } catch (e) {}
+
+    // Pass 2: Center 75% crop with jsQR
+    try {
+      const cx = Math.floor(width * 0.125);
+      const cy = Math.floor(height * 0.125);
+      const cw = Math.floor(width * 0.75);
+      const ch = Math.floor(height * 0.75);
+      const imgData = ctx.getImageData(cx, cy, cw, ch);
+      const qr = jsQR(imgData.data, cw, ch);
+      if (qr && qr.data && qr.data.trim()) {
+        return { text: qr.data.trim(), format: 'qr_code' };
+      }
+    } catch (e) {}
+
+    // Pass 3: Full-frame with jsQR
+    try {
+      const imgData = ctx.getImageData(0, 0, width, height);
+      const qr = jsQR(imgData.data, width, height);
+      if (qr && qr.data && qr.data.trim()) {
+        return { text: qr.data.trim(), format: 'qr_code' };
+      }
+    } catch (e) {}
+
+    // Pass 4: Horizontally Mirrored pass (fixes flipped desktop/laptop webcams)
+    try {
+      const mirrorCanvas = document.createElement('canvas');
+      mirrorCanvas.width = width;
+      mirrorCanvas.height = height;
+      const mctx = mirrorCanvas.getContext('2d');
+      mctx.translate(width, 0);
+      mctx.scale(-1, 1);
+      mctx.drawImage(canvas, 0, 0);
+      const mData = mctx.getImageData(0, 0, width, height);
+      const qr = jsQR(mData.data, width, height);
+      if (qr && qr.data && qr.data.trim()) {
+        return { text: qr.data.trim(), format: 'qr_code' };
+      }
+    } catch (e) {}
+
+    // Pass 5: Contrast-enhanced binarization pass (for low-contrast or glare-prone thermal stickers)
+    try {
+      const imgData = ctx.getImageData(0, 0, width, height);
+      const d = imgData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const v = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        const stretched = v < 128 ? Math.max(0, v * 0.6) : Math.min(255, v * 1.4);
+        d[i] = stretched;
+        d[i + 1] = stretched;
+        d[i + 2] = stretched;
+      }
+      const qr = jsQR(d, width, height);
+      if (qr && qr.data && qr.data.trim()) {
+        return { text: qr.data.trim(), format: 'qr_code' };
+      }
+    } catch (e) {}
+
+    // Pass 6: ZXing Multi-Format Reader (for 1D UPC-A/EAN retail barcodes)
+    try {
+      const codeReader = new BrowserMultiFormatReader();
+      const zResult = await codeReader.decodeFromCanvas(canvas);
+      if (zResult && zResult.getText()) {
+        return {
+          text: zResult.getText().trim(),
+          format: zResult.getBarcodeFormat ? zResult.getBarcodeFormat().toString() : 'barcode'
+        };
+      }
+    } catch (e) {}
+
+    // Pass 7: Native BarcodeDetector (if supported by browser)
+    if ('BarcodeDetector' in window) {
+      try {
+        const barcodeDetector = new window.BarcodeDetector({
+          formats: ['qr_code', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39']
+        });
+        const barcodes = await barcodeDetector.detect(canvas);
+        if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+          return {
+            text: barcodes[0].rawValue.trim(),
+            format: barcodes[0].format || 'barcode'
+          };
+        }
+      } catch (e) {}
+    }
+
+    return null;
+  };
+
+  // Real-time Barcode & QR Code Scanning Loop (continuous live video scanning)
   const startScanLoop = () => {
     if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
 
     let isTickBusy = false;
+    const offscreenCanvas = document.createElement('canvas');
+    const offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
     const codeReader = new BrowserMultiFormatReader();
 
     scanIntervalRef.current = setInterval(async () => {
@@ -132,44 +241,69 @@ export default function BarcodeScannerModal({
 
       isTickBusy = true;
       try {
-        // 1. Native BarcodeDetector API (Chrome, Edge, Safari Technology Preview, Android)
+        const video = videoRef.current;
+        const vw = video.videoWidth || 640;
+        const vh = video.videoHeight || 480;
+
+        // Downsample video frame for high-speed continuous scanning without lag
+        const targetW = Math.min(vw, 720);
+        const targetH = Math.round((vh / vw) * targetW);
+        offscreenCanvas.width = targetW;
+        offscreenCanvas.height = targetH;
+        offscreenCtx.drawImage(video, 0, 0, targetW, targetH);
+
+        // 1. Ultra-fast Center Crop jsQR check (target reticle box, ~2-4ms)
+        const cx = Math.floor(targetW * 0.2);
+        const cy = Math.floor(targetH * 0.2);
+        const cw = Math.floor(targetW * 0.6);
+        const ch = Math.floor(targetH * 0.6);
+        const centerData = offscreenCtx.getImageData(cx, cy, cw, ch);
+        let qr = jsQR(centerData.data, cw, ch);
+
+        // 2. Full frame jsQR check if center crop was off-target
+        if (!qr || !qr.data) {
+          const fullData = offscreenCtx.getImageData(0, 0, targetW, targetH);
+          qr = jsQR(fullData.data, targetW, targetH);
+        }
+
+        if (qr && qr.data && qr.data.trim()) {
+          handleCodeDetected(qr.data.trim(), 'qr_code');
+          isTickBusy = false;
+          return;
+        }
+
+        // 3. Fallback to native BarcodeDetector / ZXing for 1D retail UPC barcodes
         if ('BarcodeDetector' in window) {
           try {
             const barcodeDetector = new window.BarcodeDetector({
-              formats: ['qr_code', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39']
+              formats: ['qr_code', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128']
             });
-            const barcodes = await barcodeDetector.detect(videoRef.current);
-            if (barcodes && barcodes.length > 0) {
-              const codeVal = barcodes[0].rawValue;
-              handleCodeDetected(codeVal, barcodes[0].format);
+            const barcodes = await barcodeDetector.detect(video);
+            if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+              handleCodeDetected(barcodes[0].rawValue.trim(), barcodes[0].format);
               isTickBusy = false;
               return;
             }
-          } catch (e) {
-            // Fall through to ZXing
-          }
+          } catch (e) {}
         }
 
-        // 2. ZXing BrowserMultiFormatReader for browsers without native BarcodeDetector (Firefox, desktop Safari, standard Chrome Windows)
         try {
-          const zResult = await codeReader.decodeFromVideoElement(videoRef.current);
+          const zResult = await codeReader.decodeFromVideoElement(video);
           if (zResult && zResult.getText()) {
-            handleCodeDetected(zResult.getText(), zResult.getBarcodeFormat ? zResult.getBarcodeFormat().toString() : 'barcode');
+            handleCodeDetected(zResult.getText().trim(), zResult.getBarcodeFormat ? zResult.getBarcodeFormat().toString() : 'barcode');
             isTickBusy = false;
             return;
           }
-        } catch (zErr) {
-          // Normal when no barcode in current video frame
-        }
+        } catch (zErr) {}
       } catch (e) {
         // Suppress continuous tick errors
       } finally {
         isTickBusy = false;
       }
-    }, 700);
+    }, 380);
   };
 
-  // High-Resolution Snapshot Capture and Barcode Decoding
+  // High-Resolution Snapshot Capture and Multi-Pass Barcode & QR Decoding
   const captureSnapshotAndScan = async () => {
     if (!videoRef.current || videoRef.current.readyState < 2) {
       setScanNotice({
@@ -191,63 +325,25 @@ export default function BarcodeScannerModal({
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
       ctx.drawImage(video, 0, 0, width, height);
 
-      const snapshotUrl = canvas.toDataURL('image/jpeg', 0.9);
+      const snapshotUrl = canvas.toDataURL('image/jpeg', 0.92);
       setCapturedSnapshot(snapshotUrl);
       setIsSnapshotScanning(true);
       setScanNotice(null);
 
-      let detectedText = null;
-      let detectedFormat = 'code';
-
-      // Method 1: ZXing Multi-Format Reader
-      try {
-        const codeReader = new BrowserMultiFormatReader();
-        const zResult = await codeReader.decodeFromCanvas(canvas);
-        if (zResult && zResult.getText()) {
-          detectedText = zResult.getText();
-          detectedFormat = zResult.getBarcodeFormat ? zResult.getBarcodeFormat().toString() : 'barcode';
-        }
-      } catch (err) {
-        // Continue to method 2
-      }
-
-      // Method 2: Native BarcodeDetector (if supported)
-      if (!detectedText && 'BarcodeDetector' in window) {
-        try {
-          const barcodeDetector = new window.BarcodeDetector({
-            formats: ['qr_code', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39']
-          });
-          const barcodes = await barcodeDetector.detect(canvas);
-          if (barcodes && barcodes.length > 0) {
-            detectedText = barcodes[0].rawValue;
-            detectedFormat = barcodes[0].format;
-          }
-        } catch (err) {}
-      }
-
-      // Method 3: Fast Dedicated jsQR Decoder
-      if (!detectedText) {
-        try {
-          const imgData = ctx.getImageData(0, 0, width, height);
-          const qrCode = jsQR(imgData.data, width, height);
-          if (qrCode && qrCode.data) {
-            detectedText = qrCode.data;
-            detectedFormat = 'qr_code';
-          }
-        } catch (err) {}
-      }
+      // Execute comprehensive multi-pass decoding pipeline
+      const decoded = await scanCanvasMultiPass(canvas, ctx, width, height);
 
       setIsSnapshotScanning(false);
 
-      if (detectedText) {
-        handleCodeDetected(detectedText, detectedFormat);
+      if (decoded && decoded.text) {
+        handleCodeDetected(decoded.text, decoded.format);
       } else {
         setScanNotice({
           type: 'no_code_found',
-          message: 'Snapshot captured, but no clear barcode or QR code was detected in this angle.'
+          message: 'Photo captured, but no clear barcode or QR code was detected in this angle. Hold the bag 6–10 inches from the camera with good lighting, or upload a photo directly.'
         });
       }
     } catch (err) {
@@ -439,58 +535,24 @@ export default function BarcodeScannerModal({
 
       const img = new Image();
       img.onload = async () => {
-        let detectedText = null;
-        let detectedFormat = 'code';
+        const width = img.naturalWidth || img.width;
+        const height = img.naturalHeight || img.height;
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
 
-        // 1. ZXing decoding on image element
-        try {
-          const codeReader = new BrowserMultiFormatReader();
-          const zResult = await codeReader.decodeFromImageElement(img);
-          if (zResult && zResult.getText()) {
-            detectedText = zResult.getText();
-            detectedFormat = zResult.getBarcodeFormat ? zResult.getBarcodeFormat().toString() : 'barcode';
-          }
-        } catch (err) {}
-
-        // 2. Native BarcodeDetector (if available)
-        if (!detectedText && 'BarcodeDetector' in window) {
-          try {
-            const barcodeDetector = new window.BarcodeDetector({
-              formats: ['qr_code', 'ean_13', 'ean_8', 'upc_a', 'code_128']
-            });
-            const barcodes = await barcodeDetector.detect(img);
-            if (barcodes && barcodes.length > 0) {
-              detectedText = barcodes[0].rawValue;
-              detectedFormat = barcodes[0].format;
-            }
-          } catch (err) {}
-        }
-
-        // 3. Dedicated jsQR via canvas
-        if (!detectedText) {
-          try {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.naturalWidth || img.width;
-            canvas.height = img.naturalHeight || img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const qrResult = jsQR(imgData.data, canvas.width, canvas.height);
-            if (qrResult && qrResult.data) {
-              detectedText = qrResult.data;
-              detectedFormat = 'qr_code';
-            }
-          } catch (err) {}
-        }
+        const decoded = await scanCanvasMultiPass(canvas, ctx, width, height);
 
         setIsSnapshotScanning(false);
 
-        if (detectedText) {
-          handleCodeDetected(detectedText, detectedFormat);
+        if (decoded && decoded.text) {
+          handleCodeDetected(decoded.text, decoded.format);
         } else {
           setScanNotice({
             type: 'no_code_found',
-            message: 'Uploaded photo analyzed, but no readable barcode or QR code was detected in the image.'
+            message: 'Uploaded photo analyzed, but no readable barcode or QR code was detected. Please ensure the code is clearly visible and well lit.'
           });
         }
       };
@@ -982,7 +1044,25 @@ export default function BarcodeScannerModal({
                   <span>Roaster Studio</span>
                 </button>
 
-                {/* 3. Log to Brew Cellar */}
+                {/* 3. View Roaster Profile */}
+                {matchedBean.roaster && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const slug = String(matchedBean.roaster).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                      window.history.pushState(null, '', `/roasters/${slug}`);
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                      onClose();
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-amber-gold border border-amber-500/30 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95"
+                    title="Open Roaster Showcase Portfolio Page"
+                  >
+                    <Store className="w-4 h-4 text-amber-gold" />
+                    <span>View Roaster Page</span>
+                  </button>
+                )}
+
+                {/* 4. Log to Brew Cellar */}
                 <button
                   type="button"
                   onClick={handleSaveToCellar}
