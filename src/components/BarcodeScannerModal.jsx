@@ -122,31 +122,54 @@ export default function BarcodeScannerModal({
 
   /**
    * Multi-pass high-reliability barcode and QR decoder
-   * Evaluates center crops, full frames, horizontal mirror flips (for webcams),
-   * and high-contrast thresholding to ensure packaging QR codes decode reliably.
+   * Normalizes canvas dimensions to max 640px to prevent CPU bottlenecks,
+   * yields execution between passes, and checks multiple crops & formats.
    */
-  const scanCanvasMultiPass = async (canvas, ctx, width, height) => {
-    if (!canvas || !ctx || width <= 0 || height <= 0) return null;
+  const scanCanvasMultiPass = async (sourceCanvas, sourceCtx, width, height) => {
+    if (!sourceCanvas || !sourceCtx || width <= 0 || height <= 0) return null;
+
+    // Downscale large camera/photo frames to max 640px to prevent main-thread freezing
+    let canvas = sourceCanvas;
+    let ctx = sourceCtx;
+    let w = width;
+    let h = height;
+    const maxDim = 640;
+
+    if (Math.max(width, height) > maxDim) {
+      const scale = maxDim / Math.max(width, height);
+      w = Math.round(width * scale);
+      h = Math.round(height * scale);
+      canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(sourceCanvas, 0, 0, w, h);
+    }
+
+    // Micro-yield helper to let browser UI stay responsive
+    const yieldEventLoop = () => new Promise(resolve => setTimeout(resolve, 0));
 
     // Pass 1: Center 50% reticle crop with jsQR (fastest & highest resolution)
     try {
-      const cx = Math.floor(width * 0.25);
-      const cy = Math.floor(height * 0.25);
-      const cw = Math.floor(width * 0.5);
-      const ch = Math.floor(height * 0.5);
+      const cx = Math.floor(w * 0.25);
+      const cy = Math.floor(h * 0.25);
+      const cw = Math.floor(w * 0.5);
+      const ch = Math.floor(h * 0.5);
       const imgData = ctx.getImageData(cx, cy, cw, ch);
       const qr = jsQR(imgData.data, cw, ch);
       if (qr && qr.data && qr.data.trim()) {
         return { text: qr.data.trim(), format: 'qr_code' };
       }
     } catch (e) {}
+
+    await yieldEventLoop();
 
     // Pass 2: Center 75% crop with jsQR
     try {
-      const cx = Math.floor(width * 0.125);
-      const cy = Math.floor(height * 0.125);
-      const cw = Math.floor(width * 0.75);
-      const ch = Math.floor(height * 0.75);
+      const cx = Math.floor(w * 0.125);
+      const cy = Math.floor(h * 0.125);
+      const cw = Math.floor(w * 0.75);
+      const ch = Math.floor(h * 0.75);
       const imgData = ctx.getImageData(cx, cy, cw, ch);
       const qr = jsQR(imgData.data, cw, ch);
       if (qr && qr.data && qr.data.trim()) {
@@ -154,34 +177,40 @@ export default function BarcodeScannerModal({
       }
     } catch (e) {}
 
+    await yieldEventLoop();
+
     // Pass 3: Full-frame with jsQR
     try {
-      const imgData = ctx.getImageData(0, 0, width, height);
-      const qr = jsQR(imgData.data, width, height);
+      const imgData = ctx.getImageData(0, 0, w, h);
+      const qr = jsQR(imgData.data, w, h);
       if (qr && qr.data && qr.data.trim()) {
         return { text: qr.data.trim(), format: 'qr_code' };
       }
     } catch (e) {}
+
+    await yieldEventLoop();
 
     // Pass 4: Horizontally Mirrored pass (fixes flipped desktop/laptop webcams)
     try {
       const mirrorCanvas = document.createElement('canvas');
-      mirrorCanvas.width = width;
-      mirrorCanvas.height = height;
+      mirrorCanvas.width = w;
+      mirrorCanvas.height = h;
       const mctx = mirrorCanvas.getContext('2d');
-      mctx.translate(width, 0);
+      mctx.translate(w, 0);
       mctx.scale(-1, 1);
       mctx.drawImage(canvas, 0, 0);
-      const mData = mctx.getImageData(0, 0, width, height);
-      const qr = jsQR(mData.data, width, height);
+      const mData = mctx.getImageData(0, 0, w, h);
+      const qr = jsQR(mData.data, w, h);
       if (qr && qr.data && qr.data.trim()) {
         return { text: qr.data.trim(), format: 'qr_code' };
       }
     } catch (e) {}
 
+    await yieldEventLoop();
+
     // Pass 5: Contrast-enhanced binarization pass (for low-contrast or glare-prone thermal stickers)
     try {
-      const imgData = ctx.getImageData(0, 0, width, height);
+      const imgData = ctx.getImageData(0, 0, w, h);
       const d = imgData.data;
       for (let i = 0; i < d.length; i += 4) {
         const v = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
@@ -190,11 +219,13 @@ export default function BarcodeScannerModal({
         d[i + 1] = stretched;
         d[i + 2] = stretched;
       }
-      const qr = jsQR(d, width, height);
+      const qr = jsQR(d, w, h);
       if (qr && qr.data && qr.data.trim()) {
         return { text: qr.data.trim(), format: 'qr_code' };
       }
     } catch (e) {}
+
+    await yieldEventLoop();
 
     // Pass 6: ZXing Multi-Format Reader (for 1D UPC-A/EAN retail barcodes)
     try {
@@ -207,6 +238,8 @@ export default function BarcodeScannerModal({
         };
       }
     } catch (e) {}
+
+    await yieldEventLoop();
 
     // Pass 7: Native BarcodeDetector (if supported by browser)
     if ('BarcodeDetector' in window) {
@@ -245,8 +278,8 @@ export default function BarcodeScannerModal({
         const vw = video.videoWidth || 640;
         const vh = video.videoHeight || 480;
 
-        // Downsample video frame for high-speed continuous scanning without lag
-        const targetW = Math.min(vw, 720);
+        // Downsample video frame for high-speed continuous scanning without lag (max 540px)
+        const targetW = Math.min(vw, 540);
         const targetH = Math.round((vh / vw) * targetW);
         offscreenCanvas.width = targetW;
         offscreenCanvas.height = targetH;
@@ -278,7 +311,7 @@ export default function BarcodeScannerModal({
             const barcodeDetector = new window.BarcodeDetector({
               formats: ['qr_code', 'ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128']
             });
-            const barcodes = await barcodeDetector.detect(video);
+            const barcodes = await barcodeDetector.detect(offscreenCanvas);
             if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
               handleCodeDetected(barcodes[0].rawValue.trim(), barcodes[0].format);
               isTickBusy = false;
@@ -288,7 +321,7 @@ export default function BarcodeScannerModal({
         }
 
         try {
-          const zResult = await codeReader.decodeFromVideoElement(video);
+          const zResult = await codeReader.decodeFromCanvas(offscreenCanvas);
           if (zResult && zResult.getText()) {
             handleCodeDetected(zResult.getText().trim(), zResult.getBarcodeFormat ? zResult.getBarcodeFormat().toString() : 'barcode');
             isTickBusy = false;

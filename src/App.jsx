@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import StepIndicator from './components/StepIndicator';
@@ -233,10 +233,12 @@ export default function App() {
     setCupCount(1);
     setCupMl(waterAmount);
 
-    // 3. Resolve target brew method
+    // 3. Resolve target brew method (prioritize exact ID before fuzzy substring match)
     const targetMethodId = scannedBean.brewMethod || scannedBean.extraction?.method || 'pour_over';
     const allMethods = BREW_METHODS.coffee;
-    let targetMethod = allMethods.find(m => m.id === targetMethodId || m.id.includes(targetMethodId) || targetMethodId.includes(m.id)) || allMethods[0];
+    let targetMethod = allMethods.find(m => m.id === targetMethodId) ||
+                       allMethods.find(m => m.id.includes(targetMethodId) || targetMethodId.includes(m.id)) ||
+                       allMethods[0];
 
     // If custom phases were provided in the recipe (e.g. roaster bloom specs), attach them
     if (scannedBean.customPhases && scannedBean.customPhases.length > 0) {
@@ -246,7 +248,7 @@ export default function App() {
       };
     }
 
-    setActiveMethod(targetMethod);
+    setActiveMethod(prev => prev?.id === targetMethod.id ? { ...prev, ...targetMethod } : targetMethod);
     setDialedInCoffee(scannedBean);
 
     // 4. Advance straight to Step 4 (Guided Brew Timer) and navigate URL
@@ -277,11 +279,13 @@ export default function App() {
   // Handler for Quick-Start Direct Brew from Hero Calculator
   const handleLaunchDirectBrew = ({ methodId, waterGrams, ratio }) => {
     const allMethods = BREW_METHODS.coffee;
-    const targetMethod = allMethods.find(m => m.id === methodId || m.id.includes(methodId) || methodId.includes(m.id)) || allMethods[0];
+    const targetMethod = allMethods.find(m => m.id === methodId) ||
+                         allMethods.find(m => m.id.includes(methodId) || methodId.includes(m.id)) ||
+                         allMethods[0];
     const finalRatio = Number(ratio || targetMethod.ratio || 16);
     const finalWater = Number(waterGrams || 300);
 
-    setActiveMethod(targetMethod);
+    setActiveMethod(prev => prev?.id === targetMethod.id ? prev : targetMethod);
     setCustomRatio(finalRatio);
     setCustomWaterMl(finalWater);
     setCupCount(1);
@@ -341,6 +345,7 @@ export default function App() {
   // Masterclass & Split Screen State
   const [isSplitScreen, setIsSplitScreen] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
+  const lastInboundUrlRef = useRef('');
 
   // Initialize Analytics on mount
   useEffect(() => {
@@ -358,7 +363,8 @@ export default function App() {
     const isRoasterRoute = path.startsWith('/roasters') || path.startsWith('/roaster');
     const fullUrl = typeof window !== 'undefined' ? window.location.href : `${location.pathname}${location.search}${location.hash}`;
     const inboundRecipe = !isRoasterRoute ? parseRecipePayload(fullUrl) : null;
-    if (inboundRecipe) {
+    if (inboundRecipe && lastInboundUrlRef.current !== fullUrl) {
+      lastInboundUrlRef.current = fullUrl;
       handleApplyScannedRecipe(inboundRecipe);
       updatePageSeo(
         `${inboundRecipe.beanName} Recipe by ${inboundRecipe.roaster} | TheBrew.App`,
@@ -375,10 +381,8 @@ export default function App() {
       const found = allMethods.find(m => m.id === methodId);
 
       if (found) {
-        setActiveMethod(found);
-        if (currentStep === 1) {
-          setCurrentStep(2);
-        }
+        setActiveMethod(prev => (prev?.id === found.id ? prev : found));
+        setCurrentStep(prev => (prev === 1 ? 2 : prev));
 
         // Update Dynamic SEO & JSON-LD Structured Data
         updatePageSeo(

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Store,
   MapPin,
@@ -110,8 +110,8 @@ export default function RoasterProfilePage({
     orchestrator = useAppOrchestrator();
   } catch {}
 
-  const roaster = getShowcaseRoaster(activeRoasterId);
-  const allRoasters = getAllShowcaseRoasters();
+  const roaster = useMemo(() => getShowcaseRoaster(activeRoasterId), [activeRoasterId]);
+  const allRoasters = useMemo(() => getAllShowcaseRoasters(), []);
   const qrCodeMap = useCoffeeLabelQrCodes(roaster?.coffees, roaster);
 
   const handleToggleCardFlip = (coffeeId) => {
@@ -1652,47 +1652,92 @@ export default function RoasterProfilePage({
   );
 }
 
+// Module-level permanent memory cache for packaging QR data URLs
+const ROASTER_LABEL_QR_CACHE = new Map();
+
 /**
- * Hook to asynchronously generate and cache crisp scannable QR codes for all coffees
+ * Hook to asynchronously generate and cache crisp scannable QR codes for all coffees.
+ * Uses a stable string cacheKey and in-memory cache to eliminate redundant canvas rendering and prevent infinite re-renders.
  */
 function useCoffeeLabelQrCodes(coffees = [], roaster = null) {
-  const [qrMap, setQrMap] = useState({});
+  const [qrMap, setQrMap] = useState(() => {
+    const initial = {};
+    if (Array.isArray(coffees)) {
+      for (const c of coffees) {
+        if (!c || !c.id) continue;
+        if (ROASTER_LABEL_QR_CACHE.has(c.id)) {
+          initial[c.id] = ROASTER_LABEL_QR_CACHE.get(c.id);
+        }
+      }
+    }
+    return initial;
+  });
+
+  const cacheKey = useMemo(() => {
+    const ids = Array.isArray(coffees) ? coffees.map(c => c?.id).filter(Boolean).join(',') : '';
+    return `${ids}:::${roaster?.name || ''}`;
+  }, [coffees, roaster?.name]);
 
   useEffect(() => {
     let isCancelled = false;
-    async function generateAll() {
-      const map = {};
-      const list = Array.isArray(coffees) ? coffees : [];
-      for (const coffee of list) {
-        if (!coffee || !coffee.id) continue;
+    const list = Array.isArray(coffees) ? coffees : [];
+    
+    // Check which coffees actually need QR generation
+    const uncached = list.filter(c => c && c.id && !ROASTER_LABEL_QR_CACHE.has(c.id));
+    if (uncached.length === 0) {
+      const fullMap = {};
+      list.forEach(c => {
+        if (c && c.id && ROASTER_LABEL_QR_CACHE.has(c.id)) {
+          fullMap[c.id] = ROASTER_LABEL_QR_CACHE.get(c.id);
+        }
+      });
+      setQrMap(prev => {
+        const hasDiff = list.some(c => c?.id && !prev[c.id]);
+        return hasDiff ? fullMap : prev;
+      });
+      return;
+    }
+
+    async function generateUncached() {
+      for (const coffee of uncached) {
+        if (isCancelled || !coffee || !coffee.id) continue;
         try {
           const url = generateSmartBagUrl({
             ...coffee,
             roaster: roaster?.name || coffee.roaster || 'Specialty Roaster'
           });
           const dataUrl = await QRCode.toDataURL(url, {
-            errorCorrectionLevel: 'H',
+            errorCorrectionLevel: 'M',
             margin: 1,
-            width: 360,
+            width: 256,
             color: {
               dark: '#000000',
               light: '#FFFFFF'
             }
           });
-          map[coffee.id] = { qrDataUrl: dataUrl, url };
+          ROASTER_LABEL_QR_CACHE.set(coffee.id, { qrDataUrl: dataUrl, url });
         } catch (err) {
           console.warn('Failed to generate packaging QR for coffee:', coffee.id, err);
         }
       }
+
       if (!isCancelled) {
-        setQrMap(map);
+        const fullMap = {};
+        list.forEach(c => {
+          if (c && c.id && ROASTER_LABEL_QR_CACHE.has(c.id)) {
+            fullMap[c.id] = ROASTER_LABEL_QR_CACHE.get(c.id);
+          }
+        });
+        setQrMap(fullMap);
       }
     }
-    generateAll();
+
+    generateUncached();
+
     return () => {
       isCancelled = true;
     };
-  }, [coffees, roaster?.name]);
+  }, [cacheKey]);
 
   return qrMap;
 }

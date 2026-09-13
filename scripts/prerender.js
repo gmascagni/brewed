@@ -24,8 +24,23 @@ const spa404Html = `<!doctype html>
     <script type="text/javascript">
       // GitHub Pages Single Page App Redirect
       // Preserves deep subpaths, roaster slugs, and query parameters on GitHub Pages static hosting
-      var pathSegmentsToKeep = window.location.pathname.startsWith('/brewed') ? 1 : 0;
       var l = window.location;
+
+      // Do not redirect static assets or media (prevents executing 404 HTML as JS module)
+      if (/\\.(js|css|png|jpg|jpeg|svg|webp|json|woff2|ico|wav|mp3)$/i.test(l.pathname)) {
+        return;
+      }
+
+      // Loop prevention: avoid endless redirection cycles
+      var redirectKey = 'thebrew_last_404_url';
+      var lastRedirect = sessionStorage.getItem(redirectKey);
+      if (lastRedirect === l.href) {
+        sessionStorage.removeItem(redirectKey);
+        return;
+      }
+      sessionStorage.setItem(redirectKey, l.href);
+
+      var pathSegmentsToKeep = l.pathname.startsWith('/brewed') ? 1 : 0;
       var repoBase = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
       var rawRoute = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/');
       var routePath = rawRoute.replace(/&/g, '~and~');
@@ -645,7 +660,7 @@ roasterHtml = roasterHtml.replace('</head>', `  ${roasterJsonLdTag}\n  </head>`)
 
 // In roasters/index.html, preserve <div id="root"></div> so React boots the Roaster Showcase and parses ?roaster= and ?bean=
 fs.writeFileSync(path.join(roasterDistDir, 'index.html'), roasterHtml);
-fs.writeFileSync(path.join(roasterRootDir, 'index.html'), devTemplateHtml);
+fs.writeFileSync(path.join(roasterRootDir, 'index.html'), roasterHtml);
 
 // In roasters/partner and roasters/info, prerender the static B2B content
 const partnerHtml = roasterHtml.replace('<div id="root"></div>', `<div id="root">${roasterContent}</div>`);
@@ -658,9 +673,9 @@ fs.mkdirSync(partnerRootDir, { recursive: true });
 fs.mkdirSync(infoDistDir, { recursive: true });
 fs.mkdirSync(infoRootDir, { recursive: true });
 fs.writeFileSync(path.join(partnerDistDir, 'index.html'), partnerHtml);
-fs.writeFileSync(path.join(partnerRootDir, 'index.html'), devTemplateHtml);
+fs.writeFileSync(path.join(partnerRootDir, 'index.html'), partnerHtml);
 fs.writeFileSync(path.join(infoDistDir, 'index.html'), partnerHtml);
-fs.writeFileSync(path.join(infoRootDir, 'index.html'), devTemplateHtml);
+fs.writeFileSync(path.join(infoRootDir, 'index.html'), partnerHtml);
 
 console.log('✓ Successfully prerendered /roasters, /roasters/partner, and /roasters/info!');
 
@@ -698,7 +713,7 @@ console.log('✓ Successfully prerendered /roasters, /roasters/partner, and /roa
   fs.mkdirSync(targetDistDir, { recursive: true });
   fs.mkdirSync(targetRootDir, { recursive: true });
   fs.writeFileSync(path.join(targetDistDir, 'index.html'), templateHtml);
-  fs.writeFileSync(path.join(targetRootDir, 'index.html'), devTemplateHtml);
+  fs.writeFileSync(path.join(targetRootDir, 'index.html'), templateHtml);
 });
 console.log('✓ Successfully prerendered /demo/smart-bag-scanner, /scanner, /academy, /recipes, /learn, /shops, and roaster showcase routes!');
 
