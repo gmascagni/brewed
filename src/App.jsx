@@ -121,12 +121,29 @@ export default function App() {
   const [isRoasterInfoOpen, setIsRoasterInfoOpen] = useState(false);
   const [roasterPrefillBarcode, setRoasterPrefillBarcode] = useState('');
   const [roasterPrefillBean, setRoasterPrefillBean] = useState(null);
-  const [isRoasterShowcaseView, setIsRoasterShowcaseView] = useState(false);
+  const [isRoasterShowcaseView, setIsRoasterShowcaseView] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname.replace(/^\/brewed/, '');
+      return p.startsWith('/roasters') || p.startsWith('/roaster');
+    }
+    return false;
+  });
   const [isCafePortalView, setIsCafePortalView] = useState(false);
   const [isLearnView, setIsLearnView] = useState(false);
   const [isRecipesView, setIsRecipesView] = useState(false);
   const [isShopsView, setIsShopsView] = useState(false);
-  const [selectedRoasterSlug, setSelectedRoasterSlug] = useState('methodical');
+  const [selectedRoasterSlug, setSelectedRoasterSlug] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname.replace(/^\/brewed/, '');
+      if (p.startsWith('/roasters') || p.startsWith('/roaster')) {
+        const parts = p.split('/').filter(Boolean);
+        if (parts.length > 1 && !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(parts[1].toLowerCase())) {
+          return parts[1];
+        }
+      }
+    }
+    return 'methodical';
+  });
   const [isVideoAcademyOpen, setIsVideoAcademyOpen] = useState(false);
   const [selectedAcademyVideoId, setSelectedAcademyVideoId] = useState(null);
   const [dialedInCoffee, setDialedInCoffee] = useState(null);
@@ -277,7 +294,7 @@ export default function App() {
         id: Date.now().toString(),
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         trackMode: 'coffee',
-        methodName: scannedBean.brewMethod ? scannedBean.brewMethod.replace(/_/g, ' ') : 'Pour Over',
+        methodName: String(scannedBean.brewMethod || 'pour_over').replace(/_/g, ' '),
         beanName: scannedBean.beanName,
         roaster: scannedBean.roaster,
         doseStr: '18.0 g',
@@ -318,7 +335,8 @@ export default function App() {
 
   // Synchronize React Router URL with Active Method and Steps
   useEffect(() => {
-    const path = location.pathname;
+    const rawPath = location.pathname;
+    const path = rawPath.startsWith('/brewed') ? (rawPath.replace(/^\/brewed/, '') || '/') : rawPath;
 
     // Inbound Recipe Link Detection (?recipe=... or /r/<id> or direct query params on home)
     const isRoasterRoute = path.startsWith('/roasters') || path.startsWith('/roaster');
@@ -389,8 +407,10 @@ export default function App() {
       } else {
         setIsRoasterShowcaseView(true);
         const parts = path.split('/').filter(Boolean);
-        if (parts.length > 1 && parts[1] !== 'showcase' && parts[1] !== 'partner' && parts[1] !== 'info') {
+        if (parts.length > 1 && !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(parts[1].toLowerCase())) {
           setSelectedRoasterSlug(parts[1]);
+        } else {
+          setSelectedRoasterSlug('methodical');
         }
       }
       updatePageSeo(
@@ -755,7 +775,7 @@ export default function App() {
                     onNavigateToRoaster={(roasterSlug) => {
                       setSelectedRoasterSlug(roasterSlug);
                       setIsRoasterShowcaseView(true);
-                      navigate('/roasters');
+                      navigate(`/roasters/${roasterSlug}`);
                     }}
                     onOpenLocator={() => {
                       setIsCafePortalView(false);

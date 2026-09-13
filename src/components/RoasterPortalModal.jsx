@@ -357,7 +357,7 @@ export default function RoasterPortalModal({
       brewTime: brewTime.trim() || '3m 15s',
       upc: upc.trim() || `LOT-${Date.now().toString().slice(-6)}`,
       customUrl: normalizedCustomUrl,
-      notes: roasterNotes.trim() || `Dialed-in recipe from ${trimmedRoaster}. Optimized for ${brewMethod.replace(/_/g, ' ')}.`
+      notes: roasterNotes.trim() || `Dialed-in recipe from ${trimmedRoaster}. Optimized for ${String(brewMethod || 'pour_over').replace(/_/g, ' ')}.`
     };
 
     saveRoasterCoffee(newCoffee);
@@ -1736,7 +1736,7 @@ export default function RoasterPortalModal({
                   <div className="space-y-3 text-xs font-mono">
                     {Object.entries(telemetry.methodsUsed || {}).map(([method, count]) => {
                       const pct = Math.round((count / totalMethods) * 100);
-                      const mName = method.replace(/_/g, ' ').toUpperCase();
+                      const mName = String(method || 'pour_over').replace(/_/g, ' ').toUpperCase();
                       return (
                         <div key={method} className="space-y-1">
                           <div className="flex justify-between text-stone-300">

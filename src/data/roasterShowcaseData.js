@@ -439,7 +439,7 @@ import { getCustomRoasters, getCustomRoasterCoffees, saveCustomRoasterProfile, s
 
 function formatCustomRoasterAsShowcase(custom, coffees = []) {
   const name = custom.name || custom.roaster || 'Specialty Roastery';
-  const slug = (custom.slug || custom.id || name)
+  const slug = String(custom.slug || custom.id || name || 'specialty-roastery')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
@@ -465,7 +465,7 @@ function formatCustomRoasterAsShowcase(custom, coffees = []) {
       cuppingScore: c.cuppingScore || 87.5,
       harvestYear: 'Current Fresh Crop',
       tastingNotes: Array.isArray(c.tastingNotes) ? c.tastingNotes : ['Sweet', 'Balanced', 'Clean'],
-      description: c.notes || `Artisan craft roast by ${name}. Optimized for ${c.brewMethod ? c.brewMethod.replace(/_/g, ' ') : 'pour over'}.`,
+      description: c.notes || `Artisan craft roast by ${name}. Optimized for ${String(c.brewMethod || 'pour_over').replace(/_/g, ' ')}.`,
       brewMethod: c.brewMethod || 'pour_over',
       recommendedRatio: ratio,
       dryDoseGrams: dose,
@@ -568,7 +568,7 @@ export function normalizeRoasterKey(input) {
   clean = clean.replace(/\band\b/g, ' ').replace(/\s+/g, ' ').trim();
 
   const suffixPattern = /\b(coffee|roasters|roaster|roastery|lab|company|co)\b$/;
-  while (suffixPattern.test(clean)) {
+  while (suffixPattern.test(clean) && !/^(coffee|roasters|roaster|roastery|lab|company|co)$/.test(clean)) {
     clean = clean.replace(suffixPattern, '').trim();
   }
 
@@ -585,17 +585,13 @@ export function getRoasterShortName(name) {
   if (/^black\s*(&|and)\s*white/i.test(clean)) {
     return 'Black & White';
   }
-  const stripped = clean
+  return clean
     .replace(/\s+(Coffee|Roasters|Roastery|Lab|Company|Co\.|Roast\s+Lab|Boutique).*$/i, '')
-    .trim();
-  if (stripped.length > 0 && stripped.length <= 18) {
-    return stripped;
-  }
-  return clean.split(' ')[0] || clean;
+    .trim() || clean;
 }
 
 /**
- * Deduplicate an array of coffee items by ID, UPC, and composite (roaster + beanName).
+ * Deduplicate coffees by matching bean name or upc.
  */
 export function deduplicateCoffees(coffees = []) {
   const seenIds = new Set();
@@ -709,7 +705,12 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
   const all = getAllShowcaseRoasters();
   if (!idOrSlug) return all[0];
 
-  const targetKey = normalizeRoasterKey(idOrSlug);
+  const rawSlug = String(idOrSlug).trim().toLowerCase().replace(/^\/+|\/+$/g, '');
+  if (!rawSlug || ['roasters', 'roaster', 'registered', 'showcase', 'partner', 'info'].includes(rawSlug)) {
+    return all[0];
+  }
+
+  const targetKey = normalizeRoasterKey(rawSlug);
 
   const matched = all.find((r) => {
     return (
@@ -722,7 +723,7 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
   if (matched) return matched;
 
   // If not in pre-defined or cached roasters, dynamically synthesize on-the-fly from slug & URL parameters
-  if (idOrSlug && idOrSlug !== 'methodical' && idOrSlug !== 'showcase' && idOrSlug !== 'partner' && idOrSlug !== 'info') {
+  if (rawSlug && rawSlug !== 'methodical') {
     let urlParams = null;
     if (typeof window !== 'undefined' && window.location && window.location.search) {
       try {
@@ -730,7 +731,7 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
       } catch {}
     }
 
-    const formattedName = (urlParams?.get('roaster') || slugToTitle(idOrSlug)).trim();
+    const formattedName = (urlParams?.get('roaster') || slugToTitle(rawSlug)).trim();
     const beanName = urlParams?.get('bean');
 
     const synthesizedCoffee = beanName ? [{

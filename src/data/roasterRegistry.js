@@ -131,7 +131,7 @@ export function getCustomRoasters() {
 export function saveCustomRoasterProfile(profile) {
   if (!profile || !profile.name) return null;
   const existing = getCustomRoasters();
-  const slug = (profile.slug || profile.name)
+  const slug = String(profile.slug || profile.name || 'specialty-roaster')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
@@ -290,7 +290,7 @@ export function generateSmartBagUrl(coffee, baseUrl) {
   const origin = baseUrl || (typeof window !== 'undefined' ? window.location.origin : 'https://thebrew.app');
   if (!coffee) return `${origin}/roasters`;
 
-  const roasterSlug = (coffee.roaster || 'roasters')
+  const roasterSlug = String(coffee.roaster || 'methodical')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');

@@ -136,7 +136,7 @@ export default function RoasterProfilePage({
         id: Date.now().toString(),
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         trackMode: 'coffee',
-        methodName: coffee.brewMethod ? coffee.brewMethod.replace(/_/g, ' ') : 'Pour Over',
+        methodName: String(coffee?.brewMethod || 'pour_over').replace(/_/g, ' '),
         beanName: coffee.beanName,
         roaster: roaster.name,
         doseStr: `${coffee.dryDoseGrams || 18} g`,
@@ -183,7 +183,7 @@ export default function RoasterProfilePage({
         roastLevel: params.get('roast') || 'Light-Medium',
         cuppingScore: 88.0,
         tastingNotes: params.get('notes') ? params.get('notes').split(',').map(s => s.trim()) : ['Clean', 'Sweet', 'Vibrant'],
-        description: `Dialed-in recipe from ${roaster?.name || 'Specialty Roaster'}. Optimized for ${(method || 'pour_over').replace(/_/g, ' ')}.`,
+        description: `Dialed-in recipe from ${roaster?.name || 'Specialty Roaster'}. Optimized for ${String(method || 'pour_over').replace(/_/g, ' ')}.`,
         brewMethod: method,
         recommendedRatio: ratio,
         dryDoseGrams: dose,
@@ -724,7 +724,7 @@ export default function RoasterProfilePage({
                       <div className="p-4 rounded-2xl bg-amber-500/[0.08] border border-amber-500/25 space-y-2">
                         <div className="flex items-center justify-between text-[11px] font-mono text-amber-gold font-bold uppercase tracking-wider">
                           <span>Dial-In Parameters:</span>
-                          <span className="capitalize">{(coffee.brewMethod || 'pour_over').replace(/_/g, ' ')}</span>
+                          <span className="capitalize">{String(coffee?.brewMethod || 'pour_over').replace(/_/g, ' ')}</span>
                         </div>
 
                         <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">

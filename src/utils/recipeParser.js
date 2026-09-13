@@ -97,7 +97,7 @@ export function normalizeRecipeBean(data) {
   const bloomWater = parseInt(data.bloom_water || '60', 10);
   const bloomTimeSec = parseInt(data.bloom_time_sec || '45', 10);
   
-  const rawNotes = data.notes || `${coffee} dialed in for ${brewMethod.replace(/_/g, ' ')}.`;
+  const rawNotes = data.notes || `${coffee} dialed in for ${String(brewMethod || 'pour_over').replace(/_/g, ' ')}.`;
   const tastingNotes = Array.isArray(data.tasting_notes || data.tastingNotes) 
     ? (data.tasting_notes || data.tastingNotes)
     : extractTastingNotes(rawNotes);
@@ -258,8 +258,8 @@ export function parseRecipePayload(input) {
     const slug = raw.split('/r/')[1].split(/[?#]/)[0].toLowerCase().trim();
     if (slug) {
       const match = VERIFIED_BEAN_CATALOG.find(b => {
-        const idMatch = b.id.toLowerCase().includes(slug) || slug.includes(b.id.toLowerCase());
-        const nameMatch = b.beanName.toLowerCase().replace(/[\s_-]+/g, '').includes(slug.replace(/[\s_-]+/g, ''));
+        const idMatch = b && b.id && slug ? (b.id.toLowerCase().includes(slug) || slug.includes(b.id.toLowerCase())) : false;
+        const nameMatch = b && b.beanName && slug ? b.beanName.toLowerCase().replace(/[\s_-]+/g, '').includes(slug.replace(/[\s_-]+/g, '')) : false;
         return idMatch || nameMatch;
       });
       if (match) {

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * The Brew App — Shared Packaging & Asset Pipeline Service
  * 
  * Centralized engine for generating all physical packaging assets:
@@ -160,7 +160,7 @@ export async function generateCompositeStickerCanvas(rawCoffee = {}) {
   ctx.fillText('BREW METHOD', 100 + colW * 2, colY);
   ctx.fillStyle = '#1C1917';
   ctx.font = 'bold 28px -apple-system, sans-serif';
-  ctx.fillText((coffee.extraction.method || 'pour_over').replace(/_/g, ' '), 100 + colW * 2, colY + 42);
+  ctx.fillText(String(coffee?.extraction?.method || 'pour_over').replace(/_/g, ' '), 100 + colW * 2, colY + 42);
 
   // Col 4: Grind
   ctx.fillStyle = '#78716C';

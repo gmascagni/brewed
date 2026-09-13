@@ -324,7 +324,7 @@ export default function CoffeeVideoAcademyModal({
 
                           {/* Category Chip */}
                           <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-sm text-[10px] font-mono text-amber-gold uppercase tracking-wider font-bold border border-amber-gold/30">
-                            {video.recipeSync?.methodName || video.category.replace('_', ' ')}
+                            {video.recipeSync?.methodName || (video.category ? video.category.replace('_', ' ') : 'Brew Guide')}
                           </div>
                         </div>
 
