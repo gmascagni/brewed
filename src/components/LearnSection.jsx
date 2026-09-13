@@ -1,5 +1,6 @@
 import React from 'react';
 import { BookOpen, GraduationCap, Wrench, Newspaper, Sparkles, ShoppingBag, FlaskConical } from 'lucide-react';
+import CoffeeNoobGuide from './CoffeeNoobGuide';
 import MasterclassHub from './MasterclassHub';
 import DiagnosticsDrawer from './DiagnosticsDrawer';
 import KnowledgeBaseDrawer from './KnowledgeBaseDrawer';
@@ -11,7 +12,8 @@ export default function LearnSection({
   activeMethod,
   activeVideo,
   setActiveVideo,
-  onOpenWaterLab
+  onOpenWaterLab,
+  onSelectMethodToBrew
 }) {
   return (
     <div className="space-y-12 animate-fade-in">
@@ -32,26 +34,43 @@ export default function LearnSection({
           </p>
 
           <div className="flex flex-wrap items-center gap-3 text-xs font-mono font-medium text-[#766A62]">
+            <a
+              href="#coffee-noob-section"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] hover:bg-[#F5E2CF] transition-colors shadow-xs font-bold"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
+              <span>🌱 Coffee Noob (Start Here)</span>
+            </a>
+
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#ECE6DC] shadow-xs">
               <BookOpen className="w-3.5 h-3.5 text-[#C88A4B]" />
-              Terroir & Processing Atlas
+              <span>Terroir & Processing Atlas</span>
             </span>
+
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#ECE6DC] shadow-xs">
               <Wrench className="w-3.5 h-3.5 text-[#2F663C]" />
-              Extraction Diagnostics
+              <span>Extraction Diagnostics</span>
             </span>
+
             {onOpenWaterLab && (
               <button
+                type="button"
                 onClick={onOpenWaterLab}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] hover:bg-[#F5E2CF] transition-colors shadow-xs"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] hover:bg-[#F5E2CF] transition-colors shadow-xs cursor-pointer"
               >
                 <FlaskConical className="w-3.5 h-3.5" />
-                Launch Water Chemistry Lab ↗
+                <span>Launch Water Chemistry Lab ↗</span>
               </button>
             )}
           </div>
         </div>
       </div>
+
+      {/* 0. Coffee Noob Section: Beginner's Field Guide */}
+      <CoffeeNoobGuide 
+        onOpenWaterLab={onOpenWaterLab} 
+        onSelectMethodToBrew={onSelectMethodToBrew} 
+      />
 
       {/* 1. Collapsible Video Masterclasses Drawer */}
       <MasterclassHub

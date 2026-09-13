@@ -700,6 +700,12 @@ export default function App() {
               activeVideo={activeVideo}
               setActiveVideo={setActiveVideo}
               onOpenWaterLab={() => setIsWaterLabOpen(true)}
+              onSelectMethodToBrew={(methodId) => {
+                const allMethods = BREW_METHODS.coffee;
+                const match = allMethods.find(m => m.id === methodId || m.id.includes(methodId)) || allMethods[0];
+                handleSelectMethodFromGrid(match);
+                setIsLearnView(false);
+              }}
             />
           ) : isRecipesView ? (
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 animate-fade-in w-full" id="recipe-vault-section" data-view="recipes" role="region" aria-label="Master Recipe Vault & Personal Studio">
