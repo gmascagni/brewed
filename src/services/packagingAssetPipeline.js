@@ -181,6 +181,206 @@ export async function generateCompositeStickerCanvas(rawCoffee = {}) {
 }
 
 /**
+ * Generates a 300-DPI composite label for Brother QL-600 (DK-1209, 1.1" x 2.4" / 29mm x 62mm).
+ * 
+ * @param {Object} rawCoffee - Coffee profile or raw bean object
+ * @returns {Promise<HTMLCanvasElement>}
+ */
+export async function generateBrotherQlStickerCanvas(rawCoffee = {}) {
+  const coffee = createCoffeeProfile(rawCoffee);
+  const targetUrl = coffee.packaging?.customUrl?.trim() || generateSmartBagUrl(coffee);
+
+  // 1440 x 660 px (2x high-resolution rendering of 720 x 330 at 300 DPI)
+  const canvas = document.createElement('canvas');
+  canvas.width = 1440;
+  canvas.height = 660;
+  const ctx = canvas.getContext('2d');
+
+  // 1. Clean white thermal label background
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, 1440, 660);
+
+  // 2. Outer thermal die-cut boundary
+  ctx.strokeStyle = '#1C1917';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(16, 16, 1408, 628);
+
+  // 3. Inner hairline frame
+  ctx.strokeStyle = '#E7E5E4';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(26, 26, 1388, 608);
+
+  // LEFT COLUMN: ROASTERY & RECIPE METADATA (Width: ~880px)
+  const leftX = 48;
+
+  // Header Subtitle
+  ctx.fillStyle = '#78716C';
+  ctx.font = 'bold 18px monospace, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('SPECIALTY COFFEE • SMART BAG CERTIFIED', leftX, 64);
+
+  // Roaster Brand Title
+  ctx.fillStyle = '#1C1917';
+  ctx.font = 'bold 42px Georgia, "Times New Roman", serif';
+  const roasterText = coffee.roaster || 'Specialty Roaster';
+  ctx.fillText(roasterText.length > 28 ? `${roasterText.slice(0, 26)}…` : roasterText, leftX, 114);
+
+  // Bean Name
+  ctx.fillStyle = '#0C0A09';
+  ctx.font = 'bold 36px Georgia, serif';
+  const beanText = coffee.beanName || 'Single Origin Lot';
+  ctx.fillText(beanText.length > 32 ? `${beanText.slice(0, 30)}…` : beanText, leftX, 162);
+
+  // Terroir & Roast Details
+  ctx.fillStyle = '#57534E';
+  ctx.font = '500 22px -apple-system, sans-serif';
+  const roastPill = (coffee.roastLevel || 'LIGHT').toUpperCase();
+  const originLine = `${roastPill} • ${coffee.origin || 'Single Origin'} • ${coffee.process || 'Washed'}`;
+  ctx.fillText(originLine, leftX, 200);
+
+  // Tasting Notes
+  const notesStr = (coffee.tastingNotes || []).slice(0, 3).join(', ');
+  if (notesStr) {
+    ctx.fillStyle = '#92400E';
+    ctx.font = 'italic 22px Georgia, serif';
+    ctx.fillText(`Notes: ${notesStr}`, leftX, 236);
+  }
+
+  // Divider Line
+  ctx.strokeStyle = '#E7E5E4';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(leftX, 258);
+  ctx.lineTo(870, 258);
+  ctx.stroke();
+
+  // Extraction Specification Box (Left Side, Bottom)
+  const boxY = 276;
+  const boxH = 290;
+  ctx.fillStyle = '#F5F5F4';
+  ctx.fillRect(leftX, boxY, 822, boxH);
+  ctx.strokeStyle = '#D6D3D1';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(leftX, boxY, 822, boxH);
+
+  // Subheader
+  ctx.fillStyle = '#78716C';
+  ctx.font = 'bold 18px monospace, sans-serif';
+  ctx.fillText('BARISTA DIAL-IN SPECIFICATIONS', leftX + 24, boxY + 36);
+
+  // Grid of 4 Parameters
+  const colW = 774 / 4;
+  const pY = boxY + 85;
+
+  // Col 1: Ratio
+  ctx.fillStyle = '#78716C';
+  ctx.font = 'bold 16px monospace, sans-serif';
+  ctx.fillText('RATIO', leftX + 24, pY);
+  ctx.fillStyle = '#92400E';
+  ctx.font = 'bold 36px monospace, sans-serif';
+  ctx.fillText(`1:${coffee.extraction?.ratio || '16'}`, leftX + 24, pY + 44);
+
+  // Col 2: Temp
+  ctx.fillStyle = '#78716C';
+  ctx.font = 'bold 16px monospace, sans-serif';
+  ctx.fillText('TEMP', leftX + 24 + colW, pY);
+  ctx.fillStyle = '#1C1917';
+  ctx.font = 'bold 36px monospace, sans-serif';
+  ctx.fillText(`${coffee.extraction?.tempF || '202'}°F`, leftX + 24 + colW, pY + 44);
+
+  // Col 3: Method
+  ctx.fillStyle = '#78716C';
+  ctx.font = 'bold 16px monospace, sans-serif';
+  ctx.fillText('METHOD', leftX + 24 + colW * 2, pY);
+  ctx.fillStyle = '#1C1917';
+  ctx.font = 'bold 24px -apple-system, sans-serif';
+  const methodStr = String(coffee?.extraction?.method || 'pour_over').replace(/_/g, ' ');
+  ctx.fillText(methodStr.length > 12 ? `${methodStr.slice(0, 10)}…` : methodStr, leftX + 24 + colW * 2, pY + 42);
+
+  // Col 4: Grind
+  ctx.fillStyle = '#78716C';
+  ctx.font = 'bold 16px monospace, sans-serif';
+  ctx.fillText('GRIND', leftX + 24 + colW * 3, pY);
+  ctx.fillStyle = '#1C1917';
+  ctx.font = 'bold 22px -apple-system, sans-serif';
+  const grindStr = (coffee.extraction?.grind || 'Med-Fine').split('(')[0].trim();
+  ctx.fillText(grindStr, leftX + 24 + colW * 3, pY + 42);
+
+  // Micro Advice Line inside box
+  ctx.fillStyle = '#57534E';
+  ctx.font = 'italic 18px Georgia, serif';
+  ctx.fillText('Scan QR for animated multi-phase timer & dynamic dose scaling.', leftX + 24, boxY + 220);
+
+  // Footer Tagline
+  ctx.fillStyle = '#78716C';
+  ctx.font = 'bold 18px monospace, sans-serif';
+  ctx.fillText('thebrew.app dial-in', leftX, 608);
+  ctx.textAlign = 'right';
+  ctx.fillText(`LOT: ${coffee.packaging?.upc || 'CERTIFIED-LOT'}`, 870, 608);
+
+  // RIGHT COLUMN: PROMINENT QR CODE & CALLOUT (Width: ~500px)
+  const qrCenter = 1145;
+
+  // "SCAN ME FOR RECIPE" Banner
+  const bannerY = 48;
+  const bannerH = 56;
+  const bannerW = 440;
+  const bannerX = qrCenter - (bannerW / 2);
+  ctx.fillStyle = '#1C1917';
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(bannerX, bannerY, bannerW, bannerH, 28);
+    ctx.fill();
+  } else {
+    ctx.fillRect(bannerX, bannerY, bannerW, bannerH);
+  }
+
+  ctx.fillStyle = '#F59E0B'; // Amber Gold
+  ctx.font = 'bold 22px monospace, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('✨ SCAN FOR RECIPE ✨', qrCenter, bannerY + 36);
+
+  // Centered High-Res QR Code (440 x 440 px)
+  const qrCanvas = document.createElement('canvas');
+  await QRCode.toCanvas(qrCanvas, targetUrl, {
+    width: 440,
+    margin: 1,
+    errorCorrectionLevel: 'H',
+    color: { dark: '#000000', light: '#FFFFFF' }
+  });
+  ctx.drawImage(qrCanvas, qrCenter - 220, 120, 440, 440);
+
+  // Subtitle below QR
+  ctx.fillStyle = '#78716C';
+  ctx.font = 'bold 18px monospace, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('AIM PHONE CAMERA TO BREW', qrCenter, 592);
+  ctx.fillStyle = '#A8A29E';
+  ctx.font = '15px monospace, sans-serif';
+  ctx.fillText('Brother QL-600 • 1.1" x 2.4" (29x62mm)', qrCenter, 616);
+
+  return canvas;
+}
+
+/**
+ * Downloads the Brother QL-600 1.1" x 2.4" label as a 300-DPI PNG file.
+ * 
+ * @param {Object} rawCoffee
+ */
+export async function downloadBrotherQlStickerPng(rawCoffee = {}) {
+  const coffee = createCoffeeProfile(rawCoffee);
+  const canvas = await generateBrotherQlStickerCanvas(coffee);
+  const slug = slugify(coffee.beanName || 'coffee');
+
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = `smart_bag_brother_ql_600_1.1x2.4_${slug}_300dpi.png`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+/**
  * Downloads the 300-DPI composite packaging sticker as a PNG file.
  * 
  * @param {Object} rawCoffee

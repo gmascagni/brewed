@@ -42,6 +42,7 @@ import RoasterVideoPlayer from './RoasterVideoPlayer';
 import { generateSmartBagUrl } from '../data/roasterRegistry';
 import { 
   downloadCompleteStickerPng, 
+  downloadBrotherQlStickerPng,
   downloadVectorQrSvg, 
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
@@ -1797,10 +1798,17 @@ function CoffeePackagingLabel({
     e.stopPropagation();
     setIsDownloading(true);
     try {
-      await downloadCompleteStickerPng({
-        ...coffee,
-        roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
-      });
+      if (layout === 'brother_ql') {
+        await downloadBrotherQlStickerPng({
+          ...coffee,
+          roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
+        });
+      } else {
+        await downloadCompleteStickerPng({
+          ...coffee,
+          roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
+        });
+      }
     } catch (err) {
       console.error('Download sticker error:', err);
     } finally {
@@ -1923,6 +1931,126 @@ function CoffeePackagingLabel({
             disabled={isDownloading}
             className="flex-1 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-white font-mono text-[10px] font-bold flex items-center justify-center gap-1 shadow transition cursor-pointer"
             title="Download 300 DPI composite sticker PNG"
+          >
+            <Download className="w-3 h-3 text-amber-400" />
+            <span>{isDownloading ? 'Exporting...' : 'Save PNG'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="py-1.5 px-2 rounded-lg bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-800 font-mono text-[10px] font-bold flex items-center gap-1 transition cursor-pointer"
+            title="Print label direct"
+          >
+            <Printer className="w-3 h-3" />
+            <span>Print</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="py-1.5 px-2 rounded-lg bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-800 font-mono text-[10px] font-bold flex items-center gap-1 transition cursor-pointer"
+            title="Copy scannable recipe URL"
+          >
+            {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+          </button>
+
+          {onEnlarge && (
+            <button
+              type="button"
+              onClick={() => onEnlarge(coffee)}
+              className="py-1.5 px-2 rounded-lg bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-800 font-mono text-[10px] font-bold flex items-center gap-1 transition cursor-pointer"
+              title="Enlarge label proof"
+            >
+              <Maximize2 className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Brother QL-600 Compact Thermal Label (1.1" x 2.4" / DK-1209)
+  if (layout === 'brother_ql') {
+    return (
+      <div className={`w-full max-w-md mx-auto flex flex-col justify-between rounded-2xl bg-white text-stone-900 p-3.5 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 print-label-target print-label-brother-ql group ${isEnlarged ? 'scale-100' : ''}`}>
+        <div className="flex items-center justify-between gap-2.5">
+          {/* Left Column: Details */}
+          <div className="flex-1 min-w-0 pr-1 space-y-1">
+            <div>
+              <div className="flex items-center gap-1 mb-0.5">
+                <span className="text-[7px] font-mono uppercase tracking-wider font-extrabold bg-stone-900 text-white px-1.5 py-0.5 rounded">
+                  THEBREW.APP
+                </span>
+                <span className="text-[7px] font-mono text-stone-500 uppercase tracking-tight truncate">
+                  {roastText} Roast
+                </span>
+              </div>
+              <h4 className="font-serif text-sm font-bold text-stone-950 truncate leading-tight">
+                {roaster?.name || coffee.roaster || 'Specialty Roaster'}
+              </h4>
+              <p className="text-[11px] text-stone-700 font-medium truncate font-sans">
+                {coffee.beanName}
+              </p>
+            </div>
+
+            {/* 4-Cell Dial-In Matrix */}
+            <div className="grid grid-cols-2 gap-1 py-1 px-1.5 bg-stone-100 rounded-md border border-stone-200 text-[8px] font-mono">
+              <div>
+                <span className="text-stone-500 block text-[7px] uppercase leading-none">Ratio</span>
+                <span className="font-bold text-amber-800">1:{coffee.recommendedRatio || 16.5}</span>
+              </div>
+              <div>
+                <span className="text-stone-500 block text-[7px] uppercase leading-none">Temp</span>
+                <span className="font-bold text-stone-900">{coffee.tempF || 202}°F</span>
+              </div>
+              <div>
+                <span className="text-stone-500 block text-[7px] uppercase leading-none">Method</span>
+                <span className="font-bold text-stone-900 capitalize truncate block">
+                  {(coffee.brewMethod || 'pour_over').replace(/_/g, ' ')}
+                </span>
+              </div>
+              <div>
+                <span className="text-stone-500 block text-[7px] uppercase leading-none">Grind</span>
+                <span className="font-bold text-stone-900 truncate block">
+                  {(coffee.recommendedGrind || 'Med-Fine').split('(')[0]}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-[7px] font-mono text-stone-500 pt-0.5 border-t border-stone-200">
+              <span className="truncate">{upc}</span>
+              <span className="font-bold text-stone-800">Scan Recipe</span>
+            </div>
+          </div>
+
+          {/* Right Column: QR Code */}
+          <div className="flex flex-col items-center justify-center flex-shrink-0 bg-stone-50 p-2 rounded-lg border border-stone-200 w-28 h-28">
+            {qrDataUrl ? (
+              <img
+                src={qrDataUrl}
+                alt={`Smart Bag QR for ${coffee.beanName}`}
+                className="w-20 h-20 object-contain"
+              />
+            ) : (
+              <div className="w-20 h-20 flex items-center justify-center text-stone-400 font-mono text-[9px]">
+                Generating...
+              </div>
+            )}
+            <span className="text-[7px] font-mono font-bold text-stone-600 mt-1 tracking-tight text-center">
+              DK-1209 (1.1x2.4")
+            </span>
+          </div>
+        </div>
+
+        {/* Action Toolbar */}
+        <div className="pt-2.5 mt-2.5 border-t border-stone-200 flex items-center justify-between gap-1.5">
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className="flex-1 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-white font-mono text-[10px] font-bold flex items-center justify-center gap-1 shadow transition cursor-pointer"
+            title="Download Brother QL-600 300 DPI label PNG"
           >
             <Download className="w-3 h-3 text-amber-400" />
             <span>{isDownloading ? 'Exporting...' : 'Save PNG'}</span>
@@ -2141,6 +2269,18 @@ function PackagingLabelProofModal({
             }`}
           >
             <span>Luxury Badge</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setLayout('brother_ql')}
+            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              layout === 'brother_ql'
+                ? 'bg-amber-gold text-espresso-950 shadow'
+                : 'text-cream-soft hover:text-white'
+            }`}
+            title="Brother QL-600 thermal roll label (DK-1209 1.1x2.4 / 29x62mm)"
+          >
+            <span>Brother QL (1.1"x2.4")</span>
           </button>
         </div>
 

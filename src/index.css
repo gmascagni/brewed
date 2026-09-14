@@ -337,8 +337,17 @@ input[type=range]::-webkit-slider-thumb:hover {
     margin: 0 !important;
     z-index: 999999 !important;
   }
+  .print-label-target.print-label-brother-ql {
+    width: 2.4in !important;
+    height: 1.1in !important;
+    max-width: 2.4in !important;
+    max-height: 1.1in !important;
+    padding: 0.08in !important;
+    border-radius: 4px !important;
+    top: 0.5cm !important;
+  }
   @page {
-    margin: 0.5cm;
+    margin: 0.2cm;
     size: auto;
   }
 }

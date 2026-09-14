@@ -9,6 +9,7 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { createCoffeeProfile } from '../models/coffeeProfile';
 import { 
   downloadCompleteStickerPng, 
+  downloadBrotherQlStickerPng,
   downloadVectorQrSvg, 
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
@@ -160,6 +161,17 @@ export function AppOrchestratorProvider({
     }
   }, [showToast]);
 
+  const downloadBrotherQlSticker = useCallback(async (rawCoffee) => {
+    try {
+      showToast('Rendering Brother QL-600 (1.1" x 2.4") thermal label...');
+      await downloadBrotherQlStickerPng(rawCoffee);
+      showToast('Downloaded Brother QL label to Downloads!');
+    } catch (err) {
+      console.warn('Error downloading Brother QL label:', err);
+      showToast('Could not render Brother QL label. Please try again.');
+    }
+  }, [showToast]);
+
   const downloadVector = useCallback(async (rawCoffee) => {
     try {
       await downloadVectorQrSvg(rawCoffee);
@@ -221,6 +233,7 @@ export function AppOrchestratorProvider({
 
     // Direct Packaging Downloads
     downloadSticker,
+    downloadBrotherQlSticker,
     downloadVector,
     downloadQr
   };
