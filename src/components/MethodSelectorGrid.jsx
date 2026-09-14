@@ -1,5 +1,6 @@
 import React from 'react';
 import { Thermometer, Clock, CheckCircle2, ChevronRight, Sparkles, Coffee, Gauge } from 'lucide-react';
+import { getAssetUrl } from '../utils/assetUrl';
 
 export default function MethodSelectorGrid({ methods, activeMethod, setActiveMethod, onNextStep, unitSystem }) {
   const isMetric = unitSystem === 'metric';
@@ -21,7 +22,7 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <img
             key={activeMethod?.id || 'default_hero'}
-            src={activeMethod?.heroImage || '/pour_over_hero.jpg'}
+            src={getAssetUrl(activeMethod?.heroImage || '/pour_over_hero.jpg')}
             alt={activeMethod?.name || 'Selected Brewer'}
             className="w-full h-full object-cover object-center transform scale-105 filter saturate-110 contrast-105 transition-all duration-700 opacity-25 sm:opacity-30"
           />
@@ -72,7 +73,7 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
               {isSelected && method.heroImage && (
                 <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-2xl">
                   <img
-                    src={method.heroImage}
+                    src={getAssetUrl(method.heroImage)}
                     alt={method.name}
                     className="w-full h-full object-cover object-center opacity-20 filter saturate-110"
                   />

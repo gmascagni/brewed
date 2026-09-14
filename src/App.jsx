@@ -39,6 +39,7 @@ import { recordTelemetryEvent } from './utils/telemetry';
 import { getMethodJsonLd, updatePageSeo } from './utils/seo';
 import { syncCloudCatalog } from './data/roasterRegistry';
 import { parseRecipePayload } from './utils/recipeParser';
+import { getAssetUrl } from './utils/assetUrl';
 import { ChevronRight, ChevronLeft, Sparkles, Coffee } from 'lucide-react';
 
 const DEFAULT_LOCAL_PROFILES = [];
@@ -594,14 +595,19 @@ export default function App() {
       <div className="min-h-screen font-sans flex flex-col transition-colors duration-700 relative bg-[#FAF7F2] text-[#14110F] selection:bg-[#C48B56] selection:text-white">
 
       {/* High-Definition Extraction Method Background Image Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-10 transition-all duration-1000">
+      <div 
+        className="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-all duration-1000 select-none"
+        aria-hidden="true"
+      >
         <img
-          key={currentActiveMethod?.heroImage || 'coffee_hero'}
-          src={currentActiveMethod?.heroImage || '/pour_over_hero.jpg'}
-          alt={currentActiveMethod?.name || 'Extraction Background'}
-          className="w-full h-full object-cover object-center filter blur-[2px] scale-105 transform transition-transform duration-1000"
+          key={currentActiveMethod?.id || currentActiveMethod?.heroImage || 'technique_backdrop'}
+          src={getAssetUrl(currentActiveMethod?.heroImage || (trackMode === 'tea' ? '/tea_ceremony.jpg' : '/pour_over_hero.jpg'))}
+          alt=""
+          className="w-full h-full object-cover object-center filter saturate-[1.25] contrast-[1.08] brightness-[0.92] scale-105 transform transition-all duration-1000 ease-out"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/90 via-[#FAF7F2]/75 to-[#FAF7F2]/95" />
+        {/* Atmospheric Scrim & Radial Vignette: Ensures warm cafe luxury & pristine card readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/82 via-[#FAF7F2]/68 to-[#FAF7F2]/88 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#FAF7F2]/30 to-[#FAF7F2]/85" />
       </div>
       
       {/* 100% Bulletproof Sticky Top Header Container */}

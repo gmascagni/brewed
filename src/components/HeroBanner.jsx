@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Thermometer, Gauge, Sparkles, Droplets, Lightbulb } from 'lucide-react';
 import V60ProTipModal from './V60ProTipModal';
+import { getAssetUrl } from '../utils/assetUrl';
 
 export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
   const isCoffee = trackMode === 'coffee';
@@ -24,7 +25,7 @@ export default function HeroBanner({ trackMode, activeMethod, unitSystem }) {
       <div className="absolute inset-0 z-0">
         <img
           key={heroImage}
-          src={heroImage}
+          src={getAssetUrl(heroImage)}
           alt={activeMethod?.name || 'Brewing Method'}
           className="w-full h-full object-cover object-center transform scale-105 filter brightness-[0.7] contrast-110 group-hover:scale-100 transition-transform duration-1000"
         />
