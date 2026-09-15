@@ -1,26 +1,23 @@
 import React from 'react';
 import {
   Coffee,
-  BookOpen,
   Compass,
   Store,
-  SlidersHorizontal
+  GraduationCap,
+  BookOpen
 } from 'lucide-react';
 import { hapticTap } from '../utils/haptics';
 
 export default function MobileBottomNav({
   currentView,
   isShopsView = false,
-  onSelectView,
-  onOpenLocalCoffee,
-  onOpenRoasterShowcase,
-  onOpenTools,
-  isToolsOpen
+  onSelectView
 }) {
-  const isBrew = (currentView === 'brew_station' || currentView === 'discovery') && !isShopsView && currentView !== 'shops' && currentView !== 'recipes' && currentView !== 'roasters' && currentView !== 'learn';
-  const isRecipes = currentView === 'recipes';
-  const isShops = currentView === 'shops' || isShopsView;
-  const isRoasters = currentView === 'roasters';
+  const isBrew = currentView === 'brew' || currentView === 'brew_station' || (!['discover', 'roasters', 'cafes', 'shops', 'learn', 'my_coffee', 'recipes'].includes(currentView) && !isShopsView);
+  const isDiscover = currentView === 'discover' || currentView === 'roasters';
+  const isCafes = currentView === 'cafes' || currentView === 'shops' || isShopsView;
+  const isLearn = currentView === 'learn';
+  const isMyCoffee = currentView === 'my_coffee' || currentView === 'recipes';
 
   return (
     <nav 
@@ -28,123 +25,119 @@ export default function MobileBottomNav({
       role="navigation"
       aria-label="Mobile Navigation Bar"
     >
-      {/* 1. Brew Station */}
+      {/* 1. Brew */}
       <button
         type="button"
         onClick={() => {
           hapticTap();
-          if (onSelectView) onSelectView('discovery');
+          if (onSelectView) onSelectView('brew');
         }}
         className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target ${
-          isBrew && !isToolsOpen
+          isBrew
             ? 'text-[#C88A4B] font-bold'
             : 'hover:text-[#14110F]'
         }`}
-        title="Brew Station"
-        aria-label="Brew Station"
+        title="Guided Brew Station"
+        aria-label="Guided Brew Station"
       >
         <div className={`p-1 rounded-xl transition-all ${
-          isBrew && !isToolsOpen ? 'bg-[#FAF0E6]' : ''
+          isBrew ? 'bg-[#FAF0E6]' : ''
         }`}>
           <Coffee className="w-5 h-5" />
         </div>
         <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Brew</span>
       </button>
 
-      {/* 2. Recipes Vault */}
+      {/* 2. Discover */}
       <button
         type="button"
         onClick={() => {
           hapticTap();
-          if (onSelectView) onSelectView('recipes');
+          if (onSelectView) onSelectView('discover');
         }}
         className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target ${
-          isRecipes && !isToolsOpen
+          isDiscover
             ? 'text-[#C88A4B] font-bold'
             : 'hover:text-[#14110F]'
         }`}
-        title="Master Recipes Vault"
-        aria-label="Master Recipes Vault"
+        title="Discover Coffees & Roasters"
+        aria-label="Discover Coffees & Roasters"
       >
         <div className={`p-1 rounded-xl transition-all ${
-          isRecipes && !isToolsOpen ? 'bg-[#FAF0E6]' : ''
+          isDiscover ? 'bg-[#FAF0E6]' : ''
+        }`}>
+          <Compass className="w-5 h-5" />
+        </div>
+        <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Discover</span>
+      </button>
+
+      {/* 3. Cafés */}
+      <button
+        type="button"
+        onClick={() => {
+          hapticTap();
+          if (onSelectView) onSelectView('cafes');
+        }}
+        className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target ${
+          isCafes
+            ? 'text-[#C88A4B] font-bold'
+            : 'hover:text-[#14110F]'
+        }`}
+        title="Specialty Coffee Shop & Roaster Radar"
+        aria-label="Specialty Coffee Shop & Roaster Radar"
+      >
+        <div className={`p-1 rounded-xl transition-all ${
+          isCafes ? 'bg-[#FAF0E6]' : ''
+        }`}>
+          <Store className="w-5 h-5 text-[#C88A4B]" />
+        </div>
+        <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Cafés</span>
+      </button>
+
+      {/* 4. Learn */}
+      <button
+        type="button"
+        onClick={() => {
+          hapticTap();
+          if (onSelectView) onSelectView('learn');
+        }}
+        className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target ${
+          isLearn
+            ? 'text-[#C88A4B] font-bold'
+            : 'hover:text-[#14110F]'
+        }`}
+        title="Specialty Coffee Academy & Science"
+        aria-label="Specialty Coffee Academy & Science"
+      >
+        <div className={`p-1 rounded-xl transition-all ${
+          isLearn ? 'bg-[#FAF0E6]' : ''
+        }`}>
+          <GraduationCap className="w-5 h-5" />
+        </div>
+        <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Learn</span>
+      </button>
+
+      {/* 5. My Coffee */}
+      <button
+        type="button"
+        onClick={() => {
+          hapticTap();
+          if (onSelectView) onSelectView('my_coffee');
+        }}
+        className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target ${
+          isMyCoffee
+            ? 'text-[#C88A4B] font-bold'
+            : 'hover:text-[#14110F]'
+        }`}
+        title="My Coffee Journal & Recipes"
+        aria-label="My Coffee Journal & Recipes"
+      >
+        <div className={`p-1 rounded-xl transition-all ${
+          isMyCoffee ? 'bg-[#FAF0E6]' : ''
         }`}>
           <BookOpen className="w-5 h-5" />
         </div>
-        <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Recipes</span>
-      </button>
-
-      {/* 3. Shop Local Radar */}
-      <button
-        type="button"
-        onClick={() => {
-          hapticTap();
-          if (onSelectView) {
-            onSelectView('shops');
-          } else if (onOpenLocalCoffee) {
-            onOpenLocalCoffee();
-          }
-        }}
-        className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target ${
-          isShops && !isToolsOpen
-            ? 'text-[#C88A4B] font-bold'
-            : 'hover:text-[#14110F]'
-        }`}
-        title="Shop Local Specialty Coffee Radar"
-        aria-label="Shop Local Specialty Coffee Radar"
-      >
-        <div className={`p-1 rounded-xl transition-all ${
-          isShops && !isToolsOpen ? 'bg-[#FAF0E6]' : ''
-        }`}>
-          <Compass className="w-5 h-5 text-[#C88A4B]" />
-        </div>
-        <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Local</span>
-      </button>
-
-      {/* 4. Roaster Showcase */}
-      <button
-        type="button"
-        onClick={() => {
-          hapticTap();
-          if (onOpenRoasterShowcase) onOpenRoasterShowcase();
-        }}
-        className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target ${
-          isRoasters && !isToolsOpen
-            ? 'text-[#C88A4B] font-bold'
-            : 'hover:text-[#14110F]'
-        }`}
-        title="Specialty Roasters"
-        aria-label="Specialty Roasters"
-      >
-        <div className={`p-1 rounded-xl transition-all ${
-          isRoasters && !isToolsOpen ? 'bg-[#FAF0E6]' : ''
-        }`}>
-          <Store className="w-5 h-5" />
-        </div>
-        <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Roasters</span>
-      </button>
-
-      {/* 5. Tools & Portals */}
-      <button
-        type="button"
-        onClick={() => {
-          hapticTap();
-          if (onOpenTools) onOpenTools();
-        }}
-        className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target ${
-          isToolsOpen
-            ? 'text-[#C88A4B] font-bold'
-            : 'hover:text-[#14110F]'
-        }`}
-        title="Tools & Portals Menu"
-        aria-label="Tools and Settings"
-      >
-        <div className={`p-1 rounded-xl transition-all ${
-          isToolsOpen ? 'bg-[#FAF0E6]' : ''
-        }`}>
-          <SlidersHorizontal className="w-5 h-5" />
-        </div>
-        <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Tools</span>
+        <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">My Coffee</span>
       </button>
     </nav>
   );

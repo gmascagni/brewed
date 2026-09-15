@@ -89,13 +89,22 @@ export default function Header({
             </div>
           </div>
 
-          {/* Mobile Tools Menu Toggle */}
+          {/* Mobile Tools Menu Toggle & Quick Brew */}
           <div className="flex items-center gap-1.5 md:hidden">
+            <button
+              type="button"
+              onClick={() => onSelectView && onSelectView('brew')}
+              className="px-2.5 py-1.5 rounded-xl bg-[#14110F] text-white flex items-center gap-1 text-xs font-bold font-sans mobile-touch-target shadow-xs"
+              title="Start a Brew"
+            >
+              <Coffee className="w-3.5 h-3.5 text-[#E8AF72]" />
+              <span className="text-[11px]">Brew</span>
+            </button>
             {onOpenSearch && (
               <button
                 type="button"
                 onClick={onOpenSearch}
-                className="p-2.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B] mobile-touch-target flex items-center justify-center"
+                className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B] mobile-touch-target flex items-center justify-center"
                 title="Open Global Search (Ctrl + K)"
                 aria-label="Open Global Search"
               >
@@ -111,7 +120,7 @@ export default function Header({
                   setIsToolsMenuOpen(!isToolsMenuOpen);
                 }
               }}
-              className="p-2.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#14110F] flex items-center justify-center gap-1 text-xs font-bold font-sans mobile-touch-target"
+              className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#14110F] flex items-center justify-center gap-1 text-xs font-bold font-sans mobile-touch-target"
               title="Open Barista Tools & Settings"
               aria-label="Open Barista Tools Menu"
             >
@@ -120,27 +129,27 @@ export default function Header({
           </div>
         </div>
 
-        {/* 2. Center: 5 PRIMARY NAVIGATION ITEMS (Brew, Recipes, Shops, Roasters, Learn) */}
+        {/* 2. Center: 5 PRIMARY NAVIGATION AREAS (BREW | DISCOVER | CAFÉS | LEARN | MY COFFEE) */}
         {(() => {
-          const isRoastersActive = isRoasterShowcaseView || currentView === 'roasters';
-          const isShopsActive = isShopsView || currentView === 'shops';
-          const isRecipesActive = currentView === 'recipes';
+          const isBrewActive = currentView === 'brew' || currentView === 'brew_station' || (!['discover', 'roasters', 'cafes', 'shops', 'learn', 'my_coffee', 'recipes'].includes(currentView) && !isRoasterShowcaseView && !isShopsView);
+          const isDiscoverActive = currentView === 'discover' || currentView === 'roasters' || isRoasterShowcaseView;
+          const isCafesActive = currentView === 'cafes' || currentView === 'shops' || isShopsView;
           const isLearnActive = currentView === 'learn';
-          const isBrewActive = !isRoastersActive && !isShopsActive && !isRecipesActive && !isLearnActive;
+          const isMyCoffeeActive = currentView === 'my_coffee' || currentView === 'recipes';
 
           return (
             <nav className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-2xl border border-[#ECE6DC] w-full md:w-auto justify-center overflow-x-auto">
               
-              {/* Primary 1: Brew */}
+              {/* Primary 1: BREW */}
               <button
                 type="button"
-                onClick={() => onSelectView && onSelectView('brew_station')}
+                onClick={() => onSelectView && onSelectView('brew')}
                 className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
                   isBrewActive
                     ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                     : 'text-[#766A62] hover:text-[#14110F]'
                 }`}
-                title="Interactive Precision Brewing Atelier & Timer"
+                title="Guided Coffee Brewing Atelier & Timer"
               >
                 <span>Brew</span>
                 {isBrewActive && (
@@ -148,64 +157,43 @@ export default function Header({
                 )}
               </button>
 
-              {/* Primary 2: Recipes */}
+              {/* Primary 2: DISCOVER */}
               <button
                 type="button"
-                onClick={() => onSelectView ? onSelectView('recipes') : (onOpenCommunity && onOpenCommunity())}
+                onClick={() => onSelectView && onSelectView('discover')}
                 className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                  isRecipesActive
+                  isDiscoverActive
                     ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                     : 'text-[#766A62] hover:text-[#14110F]'
                 }`}
-                title="Open Recipe Vault & Custom Studio"
+                title="Discover Specialty Coffees, Artisan Roasters & Smart Bags"
               >
-                <span>Recipes</span>
-                {isRecipesActive && (
+                <Compass className="w-3.5 h-3.5 text-[#C88A4B]" />
+                <span>Discover</span>
+                {isDiscoverActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
                 )}
               </button>
 
-              {/* Primary 3: Shops / Shop Local Coffee Radar */}
-              {(onOpenLocalCoffee || onSelectView) && (
-                <button
-                  type="button"
-                  onClick={() => onSelectView ? onSelectView('shops') : (onOpenLocalCoffee && onOpenLocalCoffee())}
-                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                    isShopsActive
-                      ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
-                      : 'text-[#766A62] hover:text-[#14110F]'
-                  }`}
-                  title="Shop Local Coffee & Roasters"
-                >
-                  <Compass className="w-3.5 h-3.5 text-[#C88A4B]" />
-                  <span>Shop Local</span>
-                  {isShopsActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
-                  )}
-                </button>
-              )}
+              {/* Primary 3: CAFÉS */}
+              <button
+                type="button"
+                onClick={() => onSelectView && onSelectView('cafes')}
+                className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                  isCafesActive
+                    ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                    : 'text-[#766A62] hover:text-[#14110F]'
+                }`}
+                title="Find Specialty Coffee Shops & Roasters Near You"
+              >
+                <Store className="w-3.5 h-3.5 text-[#C88A4B]" />
+                <span>Cafés</span>
+                {isCafesActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
+                )}
+              </button>
 
-              {/* Primary 4: Roasters */}
-              {(onOpenRoasterShowcase || onSelectView) && (
-                <button
-                  type="button"
-                  onClick={() => onSelectView ? onSelectView('roasters') : (onOpenRoasterShowcase && onOpenRoasterShowcase())}
-                  className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                    isRoastersActive
-                      ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
-                      : 'text-[#766A62] hover:text-[#14110F]'
-                  }`}
-                  title="View Roaster Showcase & Dial-In Profiles (Methodical, Onyx, Black & White)"
-                >
-                  <Store className="w-3.5 h-3.5 text-[#C88A4B]" />
-                  <span>Roasters</span>
-                  {isRoastersActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
-                  )}
-                </button>
-              )}
-
-              {/* Primary 5: Learn */}
+              {/* Primary 4: LEARN */}
               <button
                 type="button"
                 onClick={() => onSelectView && onSelectView('learn')}
@@ -214,11 +202,29 @@ export default function Header({
                     ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                     : 'text-[#766A62] hover:text-[#14110F]'
                 }`}
-                title="Specialty Coffee Learning Center, Video Masterclasses, Diagnostics & World News"
+                title="Specialty Coffee Video Academy, Extraction Science & World News"
               >
                 <GraduationCap className="w-3.5 h-3.5 text-[#C88A4B]" />
                 <span>Learn</span>
                 {isLearnActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
+                )}
+              </button>
+
+              {/* Primary 5: MY COFFEE */}
+              <button
+                type="button"
+                onClick={() => onSelectView && onSelectView('my_coffee')}
+                className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                  isMyCoffeeActive
+                    ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                    : 'text-[#766A62] hover:text-[#14110F]'
+                }`}
+                title="Tasting Journal, Recipe Vault & Personal Studio"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-[#C88A4B]" />
+                <span>My Coffee</span>
+                {isMyCoffeeActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
                 )}
               </button>
@@ -266,6 +272,17 @@ export default function Header({
               <Search className="w-4 h-4" />
             </button>
           )}
+
+          {/* Global Primary Action: START A BREW */}
+          <button
+            type="button"
+            onClick={() => onSelectView && onSelectView('brew')}
+            className="px-3.5 py-1.5 rounded-xl bg-[#14110F] hover:bg-[#A8622D] text-white font-sans font-bold text-xs transition-all shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95 group"
+            title="Start a Guided Coffee Brew"
+          >
+            <Coffee className="w-3.5 h-3.5 text-[#E8AF72] group-hover:scale-110 transition-transform" />
+            <span>Start a Brew</span>
+          </button>
 
           {/* Consolidated Secondary Dropdown Menu ("Tools & Barista") */}
           <div className="relative z-50" ref={toolsMenuRef}>

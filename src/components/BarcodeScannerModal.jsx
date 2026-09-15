@@ -1153,7 +1153,7 @@ export default function BarcodeScannerModal({
           {isLookingUp && (
             <div className="p-4 rounded-2xl bg-black/50 border border-amber-gold/30 flex items-center justify-center gap-3 text-cream-light font-mono text-xs animate-pulse">
               <Loader2 className="w-4 h-4 text-amber-gold animate-spin" />
-              <span>Querying verified roasters & Open Food Facts product database...</span>
+              <span>Querying roaster catalog & Open Food Facts product database...</span>
             </div>
           )}
 
@@ -1227,6 +1227,9 @@ export default function BarcodeScannerModal({
                 <div className="flex items-center gap-2">
                   <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-gold text-[10px] font-mono font-bold uppercase border border-amber-500/30">
                     {matchedBean.roaster}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-white/[0.06] text-cream-soft/70 text-[10px] font-mono border border-white/10">
+                    Example Profile (Unverified)
                   </span>
                   <span className="text-[10px] text-cream-soft/50 font-mono">
                     Code: {scannedResult || matchedBean.upc}

@@ -1,5 +1,5 @@
-// Verified Roaster Showcase Data for The Brew App
-// Comprehensive, authentic profile datasets for specialty coffee partner roasters.
+// Educational Roaster Showcase Data for The Brew App (Unverified Demonstration Profiles)
+// Comprehensive, authentic reference profile datasets for specialty coffee roasters.
 // Abides strictly by RULE[user_global] (zero mock data, authentic bios, real origins, real coordinates).
 
 export const SHOWCASE_ROASTERS = [
@@ -625,7 +625,7 @@ function formatCustomRoasterAsShowcase(custom, coffees = []) {
     sourcingPhilosophy: custom.sourcingPhilosophy || '100% Traceable Specialty Direct-Trade',
     carbonFootprint: 'Precision Micro-Batch Roasting',
     monogram,
-    emblemSubtitle: `${location.toUpperCase()} • VERIFIED ROASTERY`,
+    emblemSubtitle: `${location.toUpperCase()} • EXAMPLE ROASTERY (UNVERIFIED)`,
     stats: [
       { label: 'Active Micro-Lots', value: `${formattedCoffees.length} Lots` },
       { label: 'Roast Style', value: 'Specialty Light-Med' },

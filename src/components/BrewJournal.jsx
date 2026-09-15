@@ -17,7 +17,9 @@ export default function BrewJournal({
   cupMl,
   customRatio,
   unitSystem,
-  onOpenScanner
+  onOpenScanner,
+  isInline = false,
+  onBrewAgain = null
 }) {
   const isCoffee = trackMode === 'coffee';
   const isMetric = unitSystem === 'metric';
@@ -165,13 +167,10 @@ export default function BrewJournal({
   const favoriteCount = logs.filter(l => l.isFavorite).length;
   const avgRating = totalLogs > 0 ? (logs.reduce((acc, l) => acc + l.rating, 0) / totalLogs).toFixed(1) : '5.0';
 
-  if (!isOpen) return null;
+  if (!isOpen && !isInline) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-black/85 backdrop-blur-2xl animate-fade-in overflow-y-auto">
-      
-      {/* Main Dialog Panel */}
-      <div role="dialog" aria-modal="true" aria-label="Tasting Journal & Extraction Log" className="relative max-w-4xl w-full rounded-3xl bg-[#120F0D] border border-white/[0.12] p-6 md:p-9 shadow-2xl overflow-hidden my-8">
+  const content = (
+    <div role={isInline ? "region" : "dialog"} aria-modal={!isInline} aria-label="Tasting Journal & Extraction Log" className={`relative max-w-4xl w-full rounded-3xl bg-[#120F0D] border border-white/[0.12] p-6 md:p-9 shadow-2xl overflow-hidden ${isInline ? 'my-2' : 'my-8'}`}>
         
         {/* Ambient Top Glow */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -221,14 +220,17 @@ export default function BrewJournal({
               </button>
             )}
 
-            <button
-              onClick={onClose}
-              title="Close Journal"
-              aria-label="Close Tasting Journal"
-              className="p-2.5 rounded-2xl bg-white/[0.08] text-stone-300 hover:text-amber-gold hover:bg-white/[0.15] transition-all border border-white/[0.12]"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            {/* Close Button (Modal mode only) */}
+            {!isInline && (
+              <button
+                onClick={onClose}
+                title="Close Journal"
+                aria-label="Close Tasting Journal"
+                className="p-2.5 rounded-2xl bg-white/[0.08] text-stone-300 hover:text-amber-gold hover:bg-white/[0.15] transition-all border border-white/[0.12]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -568,13 +570,34 @@ export default function BrewJournal({
                   </p>
                 )}
 
+                {/* 1-Click Brew Again Button */}
+                {onBrewAgain && (
+                  <div className="pt-3 mt-3 border-t border-white/[0.06] flex items-center justify-end">
+                    <button
+                      type="button"
+                      onClick={() => onBrewAgain(log)}
+                      className="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 text-xs font-mono font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs"
+                    >
+                      <span>☕ Brew Again in 1-Click</span>
+                    </button>
+                  </div>
+                )}
+
               </div>
             ))
           )}
         </div>
 
       </div>
+  );
 
+  if (isInline) {
+    return content;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-black/85 backdrop-blur-2xl animate-fade-in overflow-y-auto">
+      {content}
     </div>
   );
 }

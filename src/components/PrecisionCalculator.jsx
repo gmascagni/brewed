@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { CupSoda, Scale, Sliders, CheckCircle2, Sparkles, Thermometer, Clock, ChevronRight, ChevronLeft, Volume2, VolumeX, Lightbulb, Gauge, RotateCcw } from 'lucide-react';
+import { CupSoda, Scale, Sliders, CheckCircle2, Sparkles, Thermometer, Clock, ChevronRight, ChevronLeft, Volume2, VolumeX, Lightbulb, Gauge, RotateCcw, FlaskConical, ChevronDown, ChevronUp, Coffee } from 'lucide-react';
 import V60ProTipModal from './V60ProTipModal';
+import GrindVisualGuide from './GrindVisualGuide';
 import { hapticTap } from '../utils/haptics';
 
 export default function PrecisionCalculator({
@@ -21,13 +22,16 @@ export default function PrecisionCalculator({
   isMuted,
   setIsMuted,
   onPrevStep,
-  onNextStep
+  onNextStep,
+  selectedCoffee = null,
+  onOpenWaterLab = null
 }) {
   const isCoffee = trackMode === 'coffee';
   const isTea = trackMode === 'tea';
   const isMetric = unitSystem === 'metric';
   const isPourOver = activeMethod?.id === 'classic_pour_over' || activeMethod?.id === 'pour_over' || activeMethod?.id === 'chemex';
   const [isProTipOpen, setIsProTipOpen] = useState(false);
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
   // Math Calculations for Coffee & Tea
   const totalWaterMl = customWaterMl !== null ? customWaterMl : (cupCount * cupMl);
@@ -90,7 +94,7 @@ export default function PrecisionCalculator({
             isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'
           }`}>
             <Sparkles className="w-4 h-4 animate-pulse" />
-            <span>Step 02 of 04 • Precision Scaler & Ratio Matrix</span>
+            <span>Step 03 of 04 • Recipe & Grind Dial-In</span>
           </div>
 
           {/* Embedded Preferences Control Bar: Imperial/Metric Unit Toggle & Audio */}
@@ -162,6 +166,35 @@ export default function PrecisionCalculator({
             ? 'Calculates exact dry coffee ground weight (oz/g) and hot water volume (fl oz/mL). Adjust cup count, mug size, or fine-tune water volume directly below.'
             : 'Calculates exact tea leaf weight (oz/g) and hot water volume (fl oz/mL). Adjust cup count, mug size, or fine-tune water volume directly below.'}
         </p>
+
+        {/* Active Selected Coffee Context Pill */}
+        {selectedCoffee && (
+          <div className="mt-4 p-3 rounded-2xl bg-black/50 border border-white/10 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-[#D2A06E] flex items-center justify-center">
+                <Coffee className="w-3.5 h-3.5" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono text-stone-400 uppercase tracking-wider block">Selected Coffee</span>
+                <span className="font-serif font-bold text-cream-light text-sm">
+                  {selectedCoffee.beanName || selectedCoffee.name}
+                </span>
+                <span className="text-stone-400 text-xs ml-2">
+                  • {selectedCoffee.roaster || selectedCoffee.origin || 'Artisan Selection'} ({selectedCoffee.roastLevel || 'Specialty'} Roast)
+                </span>
+              </div>
+            </div>
+            {onPrevStep && (
+              <button
+                type="button"
+                onClick={onPrevStep}
+                className="text-[11px] font-mono text-amber-gold hover:underline cursor-pointer"
+              >
+                Change Coffee →
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Horizontal Scroll Method Picker Quick Tabs */}
         <div className="mt-6 pt-5 border-t border-white/[0.08]">
@@ -496,24 +529,98 @@ export default function PrecisionCalculator({
 
       </div>
 
-      {/* Step Navigation Controls */}
+      {/* 2. Interactive Burr Grinder Dial-In Guide (Inlined directly in Step 3) */}
+      {isCoffee && (
+        <GrindVisualGuide activeMethod={activeMethod} />
+      )}
+
+      {/* 3. Progressive Disclosure: Advanced Extraction & Water Settings Accordion */}
+      <div className="rounded-3xl border border-white/10 bg-black/40 overflow-hidden shadow-xl transition-all">
+        <button
+          type="button"
+          onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+          className="w-full p-4 sm:p-5 flex items-center justify-between text-left hover:bg-white/5 transition-colors cursor-pointer"
+        >
+          <div className="flex items-center gap-2.5">
+            <Sliders className="w-4 h-4 text-[#D2A06E]" />
+            <div>
+              <h4 className="font-serif font-bold text-sm text-cream-light">
+                Advanced Extraction & Water Lab Settings
+              </h4>
+              <p className="text-[11px] text-stone-400">
+                SCA mineral specs, Lotus drop formulas, bloom scaling math & pro tips
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono text-stone-400 uppercase font-bold">
+              {isAdvancedOpen ? 'Hide' : 'Expand'}
+            </span>
+            {isAdvancedOpen ? <ChevronUp className="w-4 h-4 text-stone-400" /> : <ChevronDown className="w-4 h-4 text-stone-400" />}
+          </div>
+        </button>
+
+        {isAdvancedOpen && (
+          <div className="p-5 sm:p-6 border-t border-white/10 space-y-4 text-xs font-mono animate-fade-in">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-1 text-left">
+                <span className="text-[10px] text-stone-400 uppercase font-bold block">Water Chemistry</span>
+                <p className="text-cream-light text-[11px]">SCA Benchmark: 125–175 ppm TDS • 68 ppm GH • 40 ppm KH</p>
+                {onOpenWaterLab && (
+                  <button
+                    type="button"
+                    onClick={onOpenWaterLab}
+                    className="mt-2 text-cyan-300 hover:text-cyan-200 text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <FlaskConical className="w-3.5 h-3.5" />
+                    <span>Launch Water Chemistry Lab ↗</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-1 text-left">
+                <span className="text-[10px] text-stone-400 uppercase font-bold block">SCA Extraction Yield</span>
+                <p className="text-cream-light text-[11px]">Target 18% – 22% solubles yield at 1.25% – 1.45% TDS</p>
+                <div className="text-[10px] text-stone-400 pt-1">
+                  Slurry Temp: ~198°F • Bloom Ratio: ~3x dry weight
+                </div>
+              </div>
+            </div>
+
+            {isPourOver && (
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsProTipOpen(true)}
+                  className="w-full py-2.5 px-4 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-200 text-xs font-sans font-bold flex items-center justify-center gap-2 cursor-pointer transition"
+                >
+                  <Lightbulb className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Open 1-Cup V60 Pro Tip & Temperature Masterclass</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 4. Step Navigation Controls */}
       {onPrevStep && onNextStep && (
-        <div className="flex items-center justify-between pt-8 mt-8 border-t border-white/[0.08]">
+        <div className="flex items-center justify-between pt-6 mt-6 border-t border-white/[0.08]">
           <button
             onClick={onPrevStep}
-            className="py-4 px-8 rounded-2xl bg-white/[0.08] text-cream-light font-extrabold text-xs uppercase tracking-wider flex items-center gap-2.5 hover:bg-white/[0.15] transition-all border border-white/[0.12]"
+            className="py-3.5 px-6 rounded-2xl bg-white/[0.08] text-cream-light font-extrabold text-xs uppercase tracking-wider flex items-center gap-2 hover:bg-white/[0.15] transition-all border border-white/[0.12] cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>Step 01: Choose Method</span>
+            <span>Step 02: Coffee</span>
           </button>
 
           <button
             onClick={onNextStep}
-            className={`py-4 px-9 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all ${
+            className={`py-3.5 px-8 rounded-2xl font-extrabold text-xs uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer ${
               isCoffee ? 'btn-tactile-coffee text-[#140C08]' : 'btn-tactile-tea text-white'
             }`}
           >
-            <span>Step 03: Grind & Specs</span>
+            <span>Step 04: Guided Brew ☕</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

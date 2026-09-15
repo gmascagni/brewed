@@ -24,9 +24,9 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
             key={activeMethod?.id || 'default_hero'}
             src={getAssetUrl(activeMethod?.heroImage || '/pour_over_hero.jpg')}
             alt={activeMethod?.name || 'Selected Brewer'}
-            className="w-full h-full object-cover object-center transform scale-105 filter saturate-105 contrast-100 transition-all duration-700 opacity-15 sm:opacity-20"
+            className="w-full h-full object-cover object-center transform scale-105 filter saturate-105 contrast-100 transition-all duration-700 opacity-25 sm:opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-[#FFFDF9]/95 via-[#FFFDF9]/88 to-[#FAF7F2]/80 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FFFDF9]/88 via-[#FFFDF9]/78 to-[#FAF7F2]/72 backdrop-blur-[1px]" />
         </div>
 
         <div className="relative z-10 max-w-3xl space-y-3">
@@ -75,9 +75,9 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
                   <img
                     src={getAssetUrl(method.heroImage)}
                     alt={method.name}
-                    className="w-full h-full object-cover object-center opacity-20 filter saturate-110"
+                    className="w-full h-full object-cover object-center opacity-30 filter saturate-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#FFFDF9] via-[#FFFDF9]/80 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#FFFDF9]/90 via-[#FFFDF9]/70 to-transparent" />
                 </div>
               )}
 

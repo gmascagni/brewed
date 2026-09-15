@@ -230,10 +230,10 @@ export default function ConsumerDiscoveryFeed({
               key={activeBrewer.id}
               src={getAssetUrl(activeBrewer.heroImage)}
               alt={activeBrewer.name}
-              className="w-full h-full object-cover object-center transform scale-105 filter saturate-105 contrast-100 transition-all duration-700 opacity-15 sm:opacity-20"
+              className="w-full h-full object-cover object-center transform scale-105 filter saturate-105 contrast-100 transition-all duration-700 opacity-25 sm:opacity-30"
             />
             {/* Soft warm gradient overlay: ensures crisp readability while revealing the brewer silhouette */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FFFDF9]/95 via-[#FFFDF9]/90 to-[#FAF7F2]/85 backdrop-blur-[1px]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FFFDF9]/88 via-[#FFFDF9]/80 to-[#FAF7F2]/75 backdrop-blur-[1px]" />
           </div>
 
           <div className="relative z-10 space-y-7">

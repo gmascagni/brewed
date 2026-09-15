@@ -12,7 +12,7 @@ export default function BrandLogo({ size = 36, className = "" }) {
   if (!imgError) {
     return (
       <img
-        src="/images/branding/logo_coffee_medallion.jpg"
+        src="/images/branding/thebrew_medallion.png"
         alt="TheBrew.App Coffee Medallion Logo"
         width={size}
         height={size}
@@ -23,7 +23,7 @@ export default function BrandLogo({ size = 36, className = "" }) {
     );
   }
 
-  // Pure SVG Fallback representing the all-coffee gold medallion
+  // Pure SVG Fallback representing the all-coffee gold medallion with center bean
   return (
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
@@ -86,6 +86,11 @@ export default function BrandLogo({ size = 36, className = "" }) {
         strokeLinecap="round" 
         opacity="0.8" 
       />
+      {/* Golden Center Coffee Bean */}
+      <g transform="translate(50, 49) rotate(-10)">
+        <ellipse cx="0" cy="0" rx="6.5" ry="9.5" fill="url(#tbaGoldRim)" stroke="#78350F" strokeWidth="0.9" />
+        <path d="M 0 -7.5 C 1.2 -2.5, -1.2 2.5, 0 7.5" fill="none" stroke="#2A1B10" strokeWidth="1.1" strokeLinecap="round" />
+      </g>
     </svg>
   );
 }

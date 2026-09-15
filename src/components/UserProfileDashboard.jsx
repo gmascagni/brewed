@@ -3,8 +3,8 @@ import { X, User, Flame, Award, Sparkles, Coffee, Leaf, Shield, CheckCircle2, Bo
 import { BADGES_DATA } from '../data/badgesData';
 import { getAssetUrl } from '../utils/assetUrl';
 
-export default function UserProfileDashboard({ isOpen, onClose, trackMode, currentUser, onOpenAuth, onLogout }) {
-  if (!isOpen) return null;
+export default function UserProfileDashboard({ isOpen, onClose, trackMode, currentUser, onOpenAuth, onLogout, isInline = false }) {
+  if (!isOpen && !isInline) return null;
 
   const [showInstructions, setShowInstructions] = useState(false);
   const [userAvatarFailed, setUserAvatarFailed] = useState(false);
@@ -90,17 +90,18 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
   const profile = currentUser;
   const isOwnProfile = !!currentUser;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
-      <div role="dialog" aria-modal="true" aria-label="User Profile Dashboard" className="relative max-w-3xl w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] text-cream-light">
-        
-        {/* Modal Close Button */}
+  const content = (
+    <div role={isInline ? "region" : "dialog"} aria-modal={!isInline} aria-label="User Profile Dashboard" className={`relative max-w-3xl w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 p-6 md:p-8 shadow-2xl overflow-y-auto max-h-[90vh] text-cream-light ${isInline ? 'my-2' : ''}`}>
+      
+      {/* Modal Close Button */}
+      {!isInline && (
         <button
           onClick={onClose}
           className="absolute top-5 right-5 p-2 rounded-full bg-white/10 text-stone-300 hover:text-cream-light hover:bg-white/20 transition-all"
         >
           <X className="w-5 h-5" />
         </button>
+      )}
 
         {/* User Header Profile Card */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 mb-8 pb-6 border-b border-white/10">
@@ -272,6 +273,15 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
         </div>
 
       </div>
+  );
+
+  if (isInline) {
+    return content;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fade-in">
+      {content}
     </div>
   );
 }

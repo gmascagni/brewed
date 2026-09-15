@@ -29,6 +29,8 @@ import ConsumerDiscoveryFeed from './components/ConsumerDiscoveryFeed';
 import CafePartnerPortal from './components/CafePartnerPortal';
 import LearnSection from './components/LearnSection';
 import RecipeExplorer from './components/RecipeExplorer';
+import BrewCoffeeSelector from './components/BrewCoffeeSelector';
+import MyCoffeeHub from './components/MyCoffeeHub';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileToolsDrawer from './components/MobileToolsDrawer';
 import Footer from './components/Footer';
@@ -41,7 +43,7 @@ import { syncCloudCatalog } from './data/roasterRegistry';
 import { parseRecipePayload } from './utils/recipeParser';
 import { getAssetUrl } from './utils/assetUrl';
 import { getRecentBrews, JOURNAL_UPDATED_EVENT } from './utils/journalStorage';
-import { ChevronRight, ChevronLeft, Sparkles, Coffee, Clock, Play, BookOpen } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Sparkles, Coffee, Clock, Play, BookOpen, Store } from 'lucide-react';
 
 const DEFAULT_LOCAL_PROFILES = [];
 
@@ -136,18 +138,30 @@ export default function App() {
   const [isRoasterInfoOpen, setIsRoasterInfoOpen] = useState(false);
   const [roasterPrefillBarcode, setRoasterPrefillBarcode] = useState('');
   const [roasterPrefillBean, setRoasterPrefillBean] = useState(null);
-  const [isRoasterShowcaseView, setIsRoasterShowcaseView] = useState(() => {
+  
+  // Primary 5 Logical Application Areas: 'brew' | 'discover' | 'cafes' | 'learn' | 'my_coffee'
+  const [currentArea, setCurrentArea] = useState(() => {
     if (typeof window !== 'undefined') {
       const p = window.location.pathname.replace(/^\/brewed/, '');
       const search = window.location.search || '';
-      return p.startsWith('/roasters') || p.startsWith('/roaster') || search.includes('roaster=') || search.includes('slug=');
+      if (p.startsWith('/roasters') || p.startsWith('/roaster') || p.startsWith('/discover') || search.includes('roaster=') || search.includes('slug=')) {
+        return 'discover';
+      }
+      if (p.startsWith('/shops') || p.startsWith('/cafes') || p.startsWith('/local')) {
+        return 'cafes';
+      }
+      if (p.startsWith('/learn') || p.startsWith('/academy') || p.startsWith('/videos') || p.startsWith('/guides')) {
+        return 'learn';
+      }
+      if (p.startsWith('/recipes') || p.startsWith('/recipe') || p.startsWith('/my-coffee') || p.startsWith('/journal') || p.startsWith('/profile')) {
+        return 'my_coffee';
+      }
     }
-    return false;
+    return 'brew';
   });
-  const [isCafePortalView, setIsCafePortalView] = useState(false);
-  const [isLearnView, setIsLearnView] = useState(false);
-  const [isRecipesView, setIsRecipesView] = useState(false);
-  const [isShopsView, setIsShopsView] = useState(false);
+
+  const [isCafePartnerPortalOpen, setIsCafePartnerPortalOpen] = useState(false);
+  const [selectedCoffee, setSelectedCoffee] = useState(null);
   const [selectedRoasterSlug, setSelectedRoasterSlug] = useState(() => {
     if (typeof window !== 'undefined') {
       const p = window.location.pathname.replace(/^\/brewed/, '');
@@ -163,11 +177,40 @@ export default function App() {
         return querySlug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
       }
     }
-    return 'methodical';
+    return null;
   });
+
+  // Backward compatible alias flags
+  const isRoasterShowcaseView = currentArea === 'discover';
+  const isCafePortalView = currentArea === 'cafes' && isCafePartnerPortalOpen;
+  const isLearnView = currentArea === 'learn';
+  const isRecipesView = currentArea === 'my_coffee';
+  const isShopsView = currentArea === 'cafes' && !isCafePartnerPortalOpen;
+
   const [isVideoAcademyOpen, setIsVideoAcademyOpen] = useState(false);
   const [selectedAcademyVideoId, setSelectedAcademyVideoId] = useState(null);
   const [dialedInCoffee, setDialedInCoffee] = useState(null);
+
+  // Primary Action Throughout App: Start a Brew
+  const handleStartBrew = (initialMethod = null, initialCoffee = null) => {
+    setCurrentArea('brew');
+    if (initialCoffee) {
+      setSelectedCoffee(initialCoffee);
+      setDialedInCoffee(initialCoffee);
+    }
+    if (initialMethod) {
+      setActiveMethod(initialMethod);
+      setCurrentStep(initialCoffee ? 3 : 2);
+      navigate(`/methods/${initialMethod.id}`);
+    } else if (currentActiveMethod) {
+      setCurrentStep(2);
+      navigate(`/methods/${currentActiveMethod.id}`);
+    } else {
+      setCurrentStep(1);
+      navigate('/');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Handler for Brew Along With Video Action
   const handleBrewWithVideo = (video) => {
@@ -180,6 +223,7 @@ export default function App() {
       setCustomRatio(ratio);
     }
     setIsVideoAcademyOpen(false);
+    setCurrentArea('brew');
     setCurrentStep(4); // Advance straight to the active guided timer so user brews along
     navigate(`/methods/${targetMethod.id}`);
     setTimeout(() => {
@@ -191,9 +235,8 @@ export default function App() {
 
   // Handler for Brew News navigation (resets sub-views, opens Learn, and smoothly scrolls)
   const handleOpenBrewNews = () => {
-    setIsCafePortalView(false);
-    setIsRoasterShowcaseView(false);
-    setIsLearnView(true);
+    setCurrentArea('learn');
+    navigate('/learn');
     window.dispatchEvent(new CustomEvent('open-world-news'));
     const tryScroll = (attempts = 0) => {
       const el = document.getElementById('world-news');
@@ -207,18 +250,33 @@ export default function App() {
   };
 
   // Handler for Specialty Roaster Showcase Navigation
-  const handleOpenRoasterShowcase = () => {
-    setIsCafePortalView(false);
-    setIsLearnView(false);
-    setIsRecipesView(false);
-    setIsShopsView(false);
-    if (isRoasterShowcaseView) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleOpenRoasterShowcase = (slug = null) => {
+    setCurrentArea('discover');
+    if (slug) {
+      setSelectedRoasterSlug(slug);
+      navigate(`/roasters/${slug}`);
     } else {
-      setIsRoasterShowcaseView(true);
+      setSelectedRoasterSlug(null);
       navigate('/roasters');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handler for Selecting Coffee from Discover Feed or Roaster Page
+  const handleSelectBeanToBrew = (bean) => {
+    if (!bean) return;
+    setSelectedCoffee(bean);
+    setDialedInCoffee(bean);
+    if (bean.recommendedRatio) setCustomRatio(Number(bean.recommendedRatio));
+    if (bean.brewMethod) {
+      const allMethods = BREW_METHODS.coffee;
+      const match = allMethods.find(m => m.id === bean.brewMethod || m.id.includes(bean.brewMethod));
+      if (match) setActiveMethod(match);
+    }
+    setCurrentArea('brew');
+    setCurrentStep(3); // Land on Step 3: Recipe & Dial In
+    navigate(currentActiveMethod ? `/methods/${currentActiveMethod.id}` : '/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Handlers for Scanned / Roaster Dial-In Actions
@@ -702,11 +760,11 @@ export default function App() {
           key={currentActiveMethod?.id || currentActiveMethod?.heroImage || 'technique_backdrop'}
           src={getAssetUrl(currentActiveMethod?.heroImage || (trackMode === 'tea' ? '/tea_ceremony.jpg' : '/pour_over_hero.jpg'))}
           alt=""
-          className="w-full h-full object-cover object-center opacity-15 sm:opacity-20 filter saturate-[1.05] contrast-[0.98] brightness-[1.04] scale-105 transform transition-all duration-1000 ease-out"
+          className="w-full h-full object-cover object-center opacity-25 sm:opacity-30 filter saturate-[1.05] contrast-[0.98] brightness-[1.04] scale-105 transform transition-all duration-1000 ease-out"
         />
         {/* Atmospheric Scrim & Radial Vignette: Ensures warm cafe luxury & pristine card readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/95 via-[#FAF7F2]/88 to-[#FAF7F2]/96 backdrop-blur-[1.5px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#FAF7F2]/45 to-[#FAF7F2]/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/88 via-[#FAF7F2]/78 to-[#FAF7F2]/90 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#FAF7F2]/35 to-[#FAF7F2]/82" />
       </div>
       
       {/* 100% Bulletproof Sticky Top Header Container */}
