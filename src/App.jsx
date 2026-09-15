@@ -40,7 +40,8 @@ import { getMethodJsonLd, updatePageSeo } from './utils/seo';
 import { syncCloudCatalog } from './data/roasterRegistry';
 import { parseRecipePayload } from './utils/recipeParser';
 import { getAssetUrl } from './utils/assetUrl';
-import { ChevronRight, ChevronLeft, Sparkles, Coffee } from 'lucide-react';
+import { getRecentBrews, JOURNAL_UPDATED_EVENT } from './utils/journalStorage';
+import { ChevronRight, ChevronLeft, Sparkles, Coffee, Clock, Play, BookOpen } from 'lucide-react';
 
 const DEFAULT_LOCAL_PROFILES = [];
 
@@ -280,6 +281,30 @@ export default function App() {
     });
   };
 
+  // Handler for applying closed-loop dial-in engine tweaks to next brew
+  const handleApplyNextBrewTweak = (recipePatch) => {
+    if (!recipePatch) return;
+    if (recipePatch.ratio) {
+      setCustomRatio(Number(recipePatch.ratio));
+    }
+    if (dialedInCoffee) {
+      setDialedInCoffee(prev => ({
+        ...prev,
+        tempF: recipePatch.tempF || prev.tempF,
+        recommendedRatio: recipePatch.ratio || prev.recommendedRatio,
+        recommendedGrind: recipePatch.grindSetting ? `${recipePatch.grindSetting}` : prev.recommendedGrind
+      }));
+    } else {
+      setDialedInCoffee({
+        beanName: activeMethod?.preferredCoffeeTypes?.split('.')[0] || 'Single-Origin Lot',
+        roaster: 'Specialty Roastery',
+        tempF: recipePatch.tempF || 202,
+        recommendedRatio: recipePatch.ratio || 16,
+        recommendedGrind: recipePatch.grindSetting || 'Medium-Fine'
+      });
+    }
+  };
+
   // Handler for Quick-Start Direct Brew from Hero Calculator
   const handleLaunchDirectBrew = ({ methodId, waterGrams, ratio }) => {
     const allMethods = BREW_METHODS.coffee;
@@ -345,6 +370,66 @@ export default function App() {
   const [cupMl, setCupMl] = useState(240);
   const [customRatio, setCustomRatio] = useState(null);
   const [customWaterMl, setCustomWaterMl] = useState(null);
+
+  // Recent Brews for 1-Click Replay Shelf (Synced from Tasting Journal)
+  const [recentBrews, setRecentBrews] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return getRecentBrews(3);
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    const handleJournalUpdate = () => {
+      setRecentBrews(getRecentBrews(3));
+    };
+    window.addEventListener(JOURNAL_UPDATED_EVENT, handleJournalUpdate);
+    window.addEventListener('storage', handleJournalUpdate);
+    return () => {
+      window.removeEventListener(JOURNAL_UPDATED_EVENT, handleJournalUpdate);
+      window.removeEventListener('storage', handleJournalUpdate);
+    };
+  }, []);
+
+  const handleBrewAgain = (entry) => {
+    if (!entry) return;
+
+    const allMethods = BREW_METHODS[entry.trackMode || 'coffee'] || BREW_METHODS.coffee;
+    const targetMethod = allMethods.find(m => m.id === entry.methodId) ||
+                         allMethods.find(m => m.name?.toLowerCase() === (entry.methodName || '').toLowerCase()) ||
+                         allMethods[0];
+
+    const parsedRatio = parseFloat(String(entry.ratioStr || '').replace('1 :', '').trim()) || entry.ratio || 16;
+    const parsedWater = parseFloat(String(entry.waterStr || '').replace(/[^0-9.]/g, '')) || entry.waterMl || 300;
+
+    setActiveMethod(targetMethod);
+    setTrackMode(entry.trackMode || 'coffee');
+    setCustomRatio(parsedRatio);
+    setCustomWaterMl(parsedWater);
+    setCupCount(1);
+    setCupMl(parsedWater);
+
+    setDialedInCoffee({
+      beanName: entry.beanName,
+      roaster: entry.roaster,
+      recommendedGrind: entry.grindStr,
+      tempF: parseInt(entry.tempStr) || 202
+    });
+
+    setCurrentStep(4);
+    navigate(`/methods/${targetMethod.id}`);
+
+    setTimeout(() => {
+      const timerEl = document.getElementById('step-4') || document.querySelector('main');
+      if (timerEl) timerEl.scrollIntoView({ behavior: 'smooth' });
+    }, 150);
+
+    trackEvent('brew_again_launched', {
+      method: targetMethod.id,
+      bean: entry.beanName,
+      roaster: entry.roaster
+    });
+  };
 
   // Masterclass & Split Screen State
   const [isSplitScreen, setIsSplitScreen] = useState(false);
@@ -829,6 +914,89 @@ export default function App() {
                     onOpenScanner={() => setIsScannerOpen(true)}
                   />
 
+                  {/* RECENT BREWS • BREW AGAIN IN 1-CLICK SHELF */}
+                  {recentBrews && recentBrews.length > 0 && (
+                    <div className="p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-[#FAF7F2] to-[#F3EDE2] border border-[#ECE6DC] shadow-sm">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5 pb-3 border-b border-[#ECE6DC]">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-[#A8622D]/15 text-[#A8622D] flex items-center justify-center font-bold shadow-xs">
+                            <Clock className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-mono uppercase tracking-widest font-extrabold text-[#A8622D] block">
+                              Tasting Journal Sync
+                            </span>
+                            <h3 className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F]">
+                              Recent Brews • Brew Again in 1-Click
+                            </h3>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setIsJournalOpen(true)}
+                          className="text-xs font-mono font-bold text-[#A8622D] hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto"
+                        >
+                          <span>Full Tasting Journal ({recentBrews.length})</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {recentBrews.map((brew) => (
+                          <div
+                            key={brew.id}
+                            className="p-4 rounded-2xl bg-white border border-[#ECE6DC] shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-3 text-left group"
+                          >
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between text-[11px] font-mono text-stone-500">
+                                <span className="font-bold text-[#A8622D]">{brew.methodName}</span>
+                                <span>{brew.date}</span>
+                              </div>
+                              <h4 className="font-serif font-bold text-base text-[#14110F] line-clamp-1">
+                                {brew.beanName}
+                              </h4>
+                              <p className="text-xs text-stone-500 line-clamp-1">
+                                {brew.roaster}
+                              </p>
+                              <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[10px] font-mono">
+                                <span className="px-2 py-0.5 rounded-md bg-[#FAF7F2] border border-[#ECE6DC] text-stone-700 font-semibold">
+                                  {brew.doseStr} • {brew.ratioStr}
+                                </span>
+                                {brew.grindStr && (
+                                  <span className="px-2 py-0.5 rounded-md bg-[#FAF7F2] border border-[#ECE6DC] text-stone-600">
+                                    {brew.grindStr}
+                                  </span>
+                                )}
+                                {brew.tasteFeedback && (
+                                  <span className={`px-2 py-0.5 rounded-md font-bold ${
+                                    brew.tasteFeedback === 'sweet'
+                                      ? 'bg-emerald-500/15 text-emerald-700 border border-emerald-500/30'
+                                      : brew.tasteFeedback === 'sour'
+                                      ? 'bg-amber-500/15 text-amber-800 border border-amber-500/30'
+                                      : brew.tasteFeedback === 'bitter'
+                                      ? 'bg-rose-500/15 text-rose-800 border border-rose-500/30'
+                                      : 'bg-stone-100 text-stone-600 border border-stone-200'
+                                  }`}>
+                                    {brew.tasteFeedback === 'sweet' ? '✨ Golden Cup' : brew.tasteFeedback === 'sour' ? '🍋 Sour' : brew.tasteFeedback === 'bitter' ? '🪵 Bitter' : '☕ Brewed'}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleBrewAgain(brew)}
+                              className="w-full py-2.5 px-3 rounded-xl bg-[#14110F] hover:bg-[#A8622D] text-white font-mono text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 group-hover:scale-[1.01] active:scale-95 cursor-pointer"
+                            >
+                              <Play className="w-3.5 h-3.5 fill-current" />
+                              <span>Brew Again in 1-Click</span>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div id="brew-atelier" className="pt-8 border-t border-[#ECE6DC]">
                     <div className="mb-4">
                       <span className="text-xs font-sans font-semibold text-[#A8622D]">
@@ -989,6 +1157,10 @@ export default function App() {
                 setIsMuted={setIsMuted}
                 onPrevStep={() => setCurrentStep(3)}
                 onOpenJournal={() => setIsJournalOpen(true)}
+                dialedInCoffee={dialedInCoffee}
+                totalWaterMl={calculatedTotalWaterMl}
+                customRatio={effectiveRatio}
+                onApplyNextBrewTweak={handleApplyNextBrewTweak}
               />
             </div>
           )}

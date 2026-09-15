@@ -20,7 +20,9 @@ import {
   Loader2,
   Mail,
   Download,
-  Printer
+  Printer,
+  FileText,
+  Cpu
 } from 'lucide-react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import jsQR from 'jsqr';
@@ -28,6 +30,8 @@ import { getRegisteredCoffees, fetchRemoteCoffeeByCode, saveRoasterCoffee } from
 import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 import { createCoffeeProfile } from '../models/coffeeProfile';
 import { hapticScan } from '../utils/haptics';
+import { performBagOcr, parseCoffeeBagLabel, generateTargetBrewRecipe } from '../utils/bagLabelOcr';
+import { getSavedGrinderId } from '../data/grinderProfiles';
 
 import { VERIFIED_BEAN_CATALOG } from '../data/verifiedBeans';
 export { VERIFIED_BEAN_CATALOG };
@@ -54,6 +58,12 @@ export default function BarcodeScannerModal({
   const [shutterFlash, setShutterFlash] = useState(false);
   const [scanNotice, setScanNotice] = useState(null);
 
+  // AI Bag Scanning (Camera OCR) Mode & State
+  const [scannerMode, setScannerMode] = useState('barcode'); // 'barcode' | 'ai_label'
+  const [ocrProgress, setOcrProgress] = useState({ status: '', progress: 0 });
+  const [isOcrRunning, setIsOcrRunning] = useState(false);
+  const [aiBagResult, setAiBagResult] = useState(null);
+
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const scanIntervalRef = useRef(null);
@@ -77,9 +87,24 @@ export default function BarcodeScannerModal({
       setIsSnapshotScanning(false);
       setScanNotice(null);
       setShutterFlash(false);
+      setAiBagResult(null);
+      setIsOcrRunning(false);
+      setOcrProgress({ status: '', progress: 0 });
     }
     return () => stopCamera();
   }, [isOpen]);
+
+  // Handle mode switching between Barcode and AI Label OCR
+  useEffect(() => {
+    if (scannerMode === 'ai_label') {
+      if (scanIntervalRef.current) {
+        clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
+    } else if (cameraActive && !capturedSnapshot) {
+      startScanLoop();
+    }
+  }, [scannerMode, cameraActive, capturedSnapshot]);
 
   const startCamera = async () => {
     setCameraError(null);
@@ -336,6 +361,73 @@ export default function BarcodeScannerModal({
     }, 380);
   };
 
+  // Bag Label OCR Execution Engine
+  const handleRunBagOcr = async (sourceCanvasOrUrl) => {
+    setIsOcrRunning(true);
+    setOcrProgress({ status: 'Starting Optical Character Recognition...', progress: 0.05 });
+    setScanNotice(null);
+    setUncatalogedResult(null);
+
+    try {
+      const extractedText = await performBagOcr(sourceCanvasOrUrl, (progressObj) => {
+        setOcrProgress(progressObj);
+      });
+
+      if (!extractedText || extractedText.trim().length < 5) {
+        setScanNotice({
+          type: 'warning',
+          message: 'No readable text was recognized on this coffee bag photo. Ensure clear direct lighting and frame the roaster, origin country, and process names clearly.'
+        });
+        setIsOcrRunning(false);
+        return;
+      }
+
+      const parsed = parseCoffeeBagLabel(extractedText);
+      const activeGrinderId = getSavedGrinderId();
+      const targetRecipe = generateTargetBrewRecipe(parsed, activeGrinderId);
+
+      setAiBagResult({
+        metadata: parsed,
+        recipe: targetRecipe,
+        rawText: extractedText
+      });
+      setMatchedBean(targetRecipe);
+      setScannedResult(`OCR_${targetRecipe.roaster}_${targetRecipe.origin}`);
+      hapticScan();
+    } catch (err) {
+      console.warn('AI Bag OCR failed:', err);
+      setScanNotice({
+        type: 'error',
+        message: 'Bag label optical recognition error: ' + (err.message || 'Please try again with clear lighting.')
+      });
+    } finally {
+      setIsOcrRunning(false);
+    }
+  };
+
+  const handleRunDemoBagOcr = (type = 'washed') => {
+    let demoText = '';
+    if (type === 'washed') {
+      demoText = `SEY COFFEE\nWORKA CHELICHELE\nETHIOPIA - GEDEB, YIRGACHEFFE\nVARIETAL: HEIRLOOM\nPROCESS: WASHED\nELEVATION: 2050 MASL\nNOTES: JASMINE, WHITE PEACH, BERGAMOT\nROAST: LIGHT`;
+    } else if (type === 'anaerobic') {
+      demoText = `METHODICAL COFFEE\nEL PARAISO - DIEGO BERMUDEZ\nCOLOMBIA - CAUCA\nVARIETAL: CASTILLO\nPROCESS: THERMAL SHOCK ANAEROBIC NATURAL\nELEVATION: 1950 MASL\nNOTES: STRAWBERRY JAM, PASSION FRUIT, LYCHEE\nROAST: LIGHT`;
+    } else {
+      demoText = `ONYX COFFEE LAB\nSOUTHERN WEATHER\nCOLOMBIA & ETHIOPIA\nPROCESS: WASHED & NATURAL\nNOTES: MILK CHOCOLATE, PLUM, CANDIED WALNUT\nROAST: MEDIUM`;
+    }
+    const parsed = parseCoffeeBagLabel(demoText);
+    const activeGrinderId = getSavedGrinderId();
+    const targetRecipe = generateTargetBrewRecipe(parsed, activeGrinderId);
+
+    setAiBagResult({
+      metadata: parsed,
+      recipe: targetRecipe,
+      rawText: demoText
+    });
+    setMatchedBean(targetRecipe);
+    setScannedResult(`AI_DEMO_${parsed.origin}_${parsed.process}`);
+    hapticScan();
+  };
+
   // High-Resolution Snapshot Capture and Multi-Pass Barcode & QR Decoding
   const captureSnapshotAndScan = async () => {
     if (!videoRef.current || videoRef.current.readyState < 2) {
@@ -363,6 +455,13 @@ export default function BarcodeScannerModal({
 
       const snapshotUrl = canvas.toDataURL('image/jpeg', 0.92);
       setCapturedSnapshot(snapshotUrl);
+
+      // Branch: AI Bag Label OCR Mode
+      if (scannerMode === 'ai_label') {
+        await handleRunBagOcr(canvas);
+        return;
+      }
+
       setIsSnapshotScanning(true);
       setScanNotice(null);
 
@@ -576,6 +675,12 @@ export default function BarcodeScannerModal({
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         ctx.drawImage(img, 0, 0);
 
+        if (scannerMode === 'ai_label') {
+          setIsSnapshotScanning(false);
+          await handleRunBagOcr(canvas);
+          return;
+        }
+
         const decoded = await scanCanvasMultiPass(canvas, ctx, width, height);
 
         setIsSnapshotScanning(false);
@@ -635,7 +740,7 @@ export default function BarcodeScannerModal({
         <div className="flex items-center justify-between p-5 sm:p-6 border-b border-white/10 bg-black/40">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-[#A66E38]/20 border border-[#A66E38]/40 flex items-center justify-center text-amber-gold shadow">
-              <ScanLine className="w-5 h-5" />
+              {scannerMode === 'ai_label' ? <Sparkles className="w-5 h-5 text-amber-gold" /> : <ScanLine className="w-5 h-5" />}
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -643,11 +748,11 @@ export default function BarcodeScannerModal({
                   Camera Vision & Ingestion
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[9px] font-bold border border-emerald-500/30">
-                  UPC • EAN • QR
+                  UPC • EAN • QR • OCR
                 </span>
               </div>
               <h2 id="scanner-modal-title" className="font-serif text-xl sm:text-2xl font-bold text-cream-light">
-                Bean Bag Barcode & QR Scanner
+                {scannerMode === 'ai_label' ? 'AI Coffee Bag Label Scanner' : 'Bean Bag Barcode & QR Scanner'}
               </h2>
             </div>
           </div>
@@ -662,8 +767,42 @@ export default function BarcodeScannerModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 custom-scrollbar">
+        <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar">
           
+          {/* Dual-Mode Selector Tabs */}
+          <div className="grid grid-cols-2 p-1 bg-black/60 rounded-2xl border border-white/10 shadow-inner">
+            <button
+              type="button"
+              onClick={() => {
+                setScannerMode('barcode');
+                setScanNotice(null);
+              }}
+              className={`py-2.5 px-3 rounded-xl font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                scannerMode === 'barcode'
+                  ? 'bg-amber-gold text-espresso-950 shadow-md scale-[1.02]'
+                  : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.04]'
+              }`}
+            >
+              <ScanLine className="w-4 h-4" />
+              <span>Barcode & QR Code</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setScannerMode('ai_label');
+                setScanNotice(null);
+              }}
+              className={`py-2.5 px-3 rounded-xl font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                scannerMode === 'ai_label'
+                  ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-espresso-950 shadow-md scale-[1.02]'
+                  : 'text-stone-400 hover:text-cream-light hover:bg-white/[0.04]'
+              }`}
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>AI Bag Label (OCR)</span>
+            </button>
+          </div>
+
           {/* Viewfinder Section */}
           <div className="relative rounded-2xl overflow-hidden bg-black border border-white/15 aspect-[4/3] sm:aspect-video flex items-center justify-center shadow-inner">
             {/* Live Camera Video */}
@@ -700,8 +839,34 @@ export default function BarcodeScannerModal({
               <div className="absolute inset-0 bg-white z-30 pointer-events-none transition-opacity duration-150 opacity-90" />
             )}
 
-            {/* Laser Scan Animation Overlay (Live Camera Mode) */}
-            {cameraActive && !capturedSnapshot && (
+            {/* AI OCR Processing Overlay with Progress Bar */}
+            {isOcrRunning && (
+              <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3.5 animate-fade-in z-30 p-6 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border-2 border-amber-gold/50 flex items-center justify-center text-amber-gold shadow-lg shadow-amber-gold/20">
+                  <Cpu className="w-7 h-7 text-amber-gold animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="font-serif text-lg font-bold text-cream-light">
+                    AI Label Analysis in Progress
+                  </h4>
+                  <p className="text-xs font-mono text-amber-gold/90 mt-0.5">
+                    {ocrProgress.status || 'Extracting roaster, origin, and processing chemistry...'}
+                  </p>
+                </div>
+                <div className="w-64 h-2.5 bg-white/10 rounded-full overflow-hidden border border-white/20 shadow-inner">
+                  <div 
+                    className="h-full bg-gradient-to-r from-amber-500 to-amber-300 transition-all duration-300 shadow"
+                    style={{ width: `${Math.max(12, Math.round((ocrProgress.progress || 0) * 100))}%` }}
+                  />
+                </div>
+                <span className="text-[10px] font-mono text-cream-soft/70">
+                  On-device neural OCR • Zero synthetic data
+                </span>
+              </div>
+            )}
+
+            {/* Laser Scan Animation Overlay (Live Camera Mode - Barcode Mode) */}
+            {cameraActive && !capturedSnapshot && !isOcrRunning && scannerMode === 'barcode' && (
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                 {/* Viewfinder Framing Box */}
                 <div className="relative w-64 h-48 border-2 border-amber-gold/60 rounded-2xl shadow-[0_0_15px_rgba(212,140,70,0.3)]">
@@ -716,19 +881,40 @@ export default function BarcodeScannerModal({
               </div>
             )}
 
+            {/* Framing Box for AI Bag Label Mode */}
+            {cameraActive && !capturedSnapshot && !isOcrRunning && scannerMode === 'ai_label' && (
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center p-4">
+                <div className="relative w-72 sm:w-80 h-52 sm:h-56 border-2 border-dashed border-amber-gold/80 rounded-2xl shadow-[0_0_20px_rgba(212,140,70,0.25)] flex flex-col items-center justify-between p-3 bg-amber-500/[0.03]">
+                  <div className="w-full flex items-center justify-between text-[10px] font-mono font-bold text-amber-gold bg-black/60 px-2 py-0.5 rounded border border-amber-gold/30">
+                    <span>TOP: ROASTER & BEAN</span>
+                    <span>AI VISION</span>
+                  </div>
+                  <div className="text-center px-2">
+                    <span className="text-[11px] font-mono text-cream-light/90 bg-black/70 px-3 py-1 rounded-full border border-white/15 shadow">
+                      Frame Roaster, Origin, Process & Altitude
+                    </span>
+                  </div>
+                  <div className="w-full flex items-center justify-between text-[10px] font-mono font-bold text-amber-gold bg-black/60 px-2 py-0.5 rounded border border-amber-gold/30">
+                    <span>BOTTOM: ELEVATION & NOTES</span>
+                    <span>1-CLICK DIAL-IN</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Prominent Circular Camera Shutter Button (Over Live Camera) */}
-            {cameraActive && !capturedSnapshot && (
+            {cameraActive && !capturedSnapshot && !isOcrRunning && (
               <div className="absolute bottom-3 sm:bottom-4 inset-x-0 flex flex-col items-center justify-center z-20 pointer-events-auto">
                 <button
                   type="button"
                   onClick={captureSnapshotAndScan}
-                  disabled={isSnapshotScanning}
+                  disabled={isSnapshotScanning || isOcrRunning}
                   className="group relative flex items-center justify-center w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-black/60 border-4 border-amber-gold shadow-[0_0_25px_rgba(212,140,70,0.6)] backdrop-blur-md hover:scale-110 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-amber-gold/50 cursor-pointer disabled:opacity-50"
-                  title="Snap & Scan Coffee Bag Barcode"
+                  title={scannerMode === 'ai_label' ? "Snap Photo & Extract Bag Label" : "Snap & Scan Coffee Bag Barcode"}
                   aria-label="Snap photo to scan coffee bag"
                 >
                   <span className="w-12 h-12 rounded-full bg-amber-gold flex items-center justify-center text-espresso-950 shadow-inner group-hover:bg-amber-300 transition">
-                    {isSnapshotScanning ? (
+                    {isSnapshotScanning || isOcrRunning ? (
                       <Loader2 className="w-6 h-6 animate-spin text-espresso-950" />
                     ) : (
                       <Camera className="w-6 h-6 text-espresso-950" />
@@ -736,7 +922,13 @@ export default function BarcodeScannerModal({
                   </span>
                 </button>
                 <div className="mt-1.5 px-3 py-0.5 rounded-full bg-black/80 backdrop-blur text-[11px] font-mono font-bold text-amber-gold shadow border border-amber-gold/40">
-                  {isSnapshotScanning ? 'Scanning Snapshot...' : '📸 Snap & Scan Coffee Bag'}
+                  {isOcrRunning 
+                    ? 'Extracting Bag Label...' 
+                    : isSnapshotScanning 
+                    ? 'Scanning Snapshot...' 
+                    : scannerMode === 'ai_label' 
+                    ? '📸 Snap Bag Label & Analyze' 
+                    : '📸 Snap & Scan Barcode'}
                 </div>
               </div>
             )}
@@ -836,49 +1028,82 @@ export default function BarcodeScannerModal({
               </label>
             </div>
 
-            {/* Quick Demo SKU Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto py-1">
-              <span className="text-[10px] text-cream-soft/60 font-mono uppercase">Quick Presets:</span>
-              <button
-                type="button"
-                onClick={() => handleCodeDetected(JSON.stringify({
-                  v: 1,
-                  roaster: "Stumptown",
-                  coffee: "Hair Bender",
-                  roast: "medium",
-                  brewer: "pour-over",
-                  ratio: 16,
-                  dose: 18.8,
-                  water: 300,
-                  temp_f: 205,
-                  grind: "Medium-Fine",
-                  total_time_sec: 210,
-                  bloom_water: 60,
-                  bloom_time_sec: 45,
-                  notes: "Milk chocolate, sweet orange. 45-second bloom recommended."
-                }), "qr_code")}
-                className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-[11px] font-mono text-amber-gold border border-amber-500/40 shrink-0 font-bold"
-              >
-                ⚡ Stumptown Recipe QR
-              </button>
-              <button
-                onClick={() => handleCodeDetected("850012345012", "upc_a")}
-                className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
-              >
-                Onyx Southern
-              </button>
-              <button
-                onClick={() => handleCodeDetected("850098765011", "upc_a")}
-                className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
-              >
-                Sey Pink Bourbon
-              </button>
-              <button
-                onClick={() => handleCodeDetected("935412300101", "upc_a")}
-                className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
-              >
-                Proud Mary Ghost
-              </button>
+            {/* Quick Demo SKU & AI Bag Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto py-1 custom-scrollbar">
+              <span className="text-[10px] text-cream-soft/60 font-mono uppercase whitespace-nowrap">
+                {scannerMode === 'ai_label' ? 'AI Label Demos:' : 'Quick Presets:'}
+              </span>
+
+              {scannerMode === 'ai_label' ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleRunDemoBagOcr('washed')}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-[11px] font-mono text-amber-gold border border-amber-500/40 shrink-0 font-bold flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    <span>Dense Washed Ethiopia (208°F • 1:16.5)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRunDemoBagOcr('anaerobic')}
+                    className="px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-[11px] font-mono text-purple-300 border border-purple-500/40 shrink-0 font-bold flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Sparkles className="w-3 h-3 text-purple-400" />
+                    <span>Anaerobic Thermal Shock (198°F • 1:15.5)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRunDemoBagOcr('medium')}
+                    className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
+                  >
+                    Medium Roast Blend
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleCodeDetected(JSON.stringify({
+                      v: 1,
+                      roaster: "Stumptown",
+                      coffee: "Hair Bender",
+                      roast: "medium",
+                      brewer: "pour-over",
+                      ratio: 16,
+                      dose: 18.8,
+                      water: 300,
+                      temp_f: 205,
+                      grind: "Medium-Fine",
+                      total_time_sec: 210,
+                      bloom_water: 60,
+                      bloom_time_sec: 45,
+                      notes: "Milk chocolate, sweet orange. 45-second bloom recommended."
+                    }), "qr_code")}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-[11px] font-mono text-amber-gold border border-amber-500/40 shrink-0 font-bold"
+                  >
+                    ⚡ Stumptown Recipe QR
+                  </button>
+                  <button
+                    onClick={() => handleCodeDetected("850012345012", "upc_a")}
+                    className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
+                  >
+                    Onyx Southern
+                  </button>
+                  <button
+                    onClick={() => handleCodeDetected("850098765011", "upc_a")}
+                    className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
+                  >
+                    Sey Pink Bourbon
+                  </button>
+                  <button
+                    onClick={() => handleCodeDetected("935412300101", "upc_a")}
+                    className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
+                  >
+                    Proud Mary Ghost
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -892,18 +1117,35 @@ export default function BarcodeScannerModal({
                     {scanNotice.message}
                   </p>
                   <p className="text-[11px] text-cream-soft/70 mt-0.5">
-                    Align the barcode or QR code steadily within the center framing box and snap again, or select a demo bag above.
+                    {scannerMode === 'barcode'
+                      ? 'Align the barcode or QR code steadily within the center framing box, or switch to AI Label Vision.'
+                      : 'Hold the coffee bag steady under direct lighting with roaster, origin country, and process visible.'}
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={handleRetakeSnapshot}
-                className="shrink-0 px-3.5 py-1.5 rounded-xl bg-white/[0.1] hover:bg-white/[0.18] text-cream-light font-mono text-xs font-bold flex items-center gap-1.5 border border-white/15 transition active:scale-95"
-              >
-                <RefreshCw className="w-3.5 h-3.5 text-amber-gold" />
-                <span>Retake Photo</span>
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                {scannerMode === 'barcode' && capturedSnapshot && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setScannerMode('ai_label');
+                      handleRunBagOcr(capturedSnapshot);
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-espresso-950 font-mono text-xs font-bold flex items-center gap-1.5 shadow hover:scale-105 active:scale-95 transition"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-espresso-950" />
+                    <span>Scan Label (AI)</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleRetakeSnapshot}
+                  className="px-3.5 py-1.5 rounded-xl bg-white/[0.1] hover:bg-white/[0.18] text-cream-light font-mono text-xs font-bold flex items-center gap-1.5 border border-white/15 transition active:scale-95"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 text-amber-gold" />
+                  <span>Retake Photo</span>
+                </button>
+              </div>
             </div>
           )}
 
@@ -1042,6 +1284,26 @@ export default function BarcodeScannerModal({
                 ))}
               </div>
 
+              {/* Process Chemistry & Density Scientific Rationale Callout */}
+              {matchedBean.extractionPhilosophy && (
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/35 text-xs font-mono space-y-2 animate-fade-in shadow-inner">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 text-amber-gold font-bold text-[11px] uppercase tracking-wider">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Scientific Process & Density Rationale</span>
+                    </div>
+                    {matchedBean.pourAgitation && (
+                      <span className="px-2 py-0.5 rounded bg-black/50 text-[10px] text-amber-300 border border-amber-500/30">
+                        {matchedBean.pourAgitation}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[12px] leading-relaxed text-cream-light font-sans">
+                    {matchedBean.extractionPhilosophy}
+                  </p>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-end gap-3">
                 {/* 1. Direct 300-DPI Packaging Sticker Download */}
@@ -1105,13 +1367,13 @@ export default function BarcodeScannerModal({
                   <span>Log to Brew Cellar</span>
                 </button>
 
-                {/* 4. Load into Dial-In Station */}
+                {/* 5. Load into Dial-In Station */}
                 <button
                   type="button"
                   onClick={handleApplyToDialIn}
                   className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-gold/20 transition active:scale-95 hover:scale-105"
                 >
-                  <span>{matchedBean.isBagRecipe ? 'Brew This Bag Recipe' : 'Load into Dial-In Station'}</span>
+                  <span>{matchedBean.isAiExtracted ? 'Brew This Bag (Apply Dial-In)' : matchedBean.isBagRecipe ? 'Brew This Bag Recipe' : 'Load into Dial-In Station'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

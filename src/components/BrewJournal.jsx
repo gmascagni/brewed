@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Star, Sparkles, Plus, Trash2, X, Filter, Heart, Coffee, Leaf, Scale, Gauge, Thermometer, Calendar, Award, Download, Upload, ScanLine } from 'lucide-react';
 
-const LOCAL_STORAGE_KEY = 'the_brew_app_journal_v1';
+import { 
+  JOURNAL_STORAGE_KEY, 
+  JOURNAL_UPDATED_EVENT, 
+  getJournalLogs, 
+  saveJournalLogs 
+} from '../utils/journalStorage';
 
 export default function BrewJournal({
   isOpen,
@@ -41,26 +46,22 @@ export default function BrewJournal({
   const [tastingNotes, setTastingNotes] = useState('');
   const [notes, setNotes] = useState('');
 
-  // Load logs from localStorage on mount
+  // Load logs from localStorage on mount and listen for live session updates
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (saved) {
-        setLogs(JSON.parse(saved));
-      }
-    } catch (e) {
-      console.error('Failed to load brew logs from localStorage', e);
-    }
+    setLogs(getJournalLogs());
+
+    const handleUpdate = (e) => {
+      if (e?.detail) setLogs(e.detail);
+      else setLogs(getJournalLogs());
+    };
+    window.addEventListener(JOURNAL_UPDATED_EVENT, handleUpdate);
+    return () => window.removeEventListener(JOURNAL_UPDATED_EVENT, handleUpdate);
   }, []);
 
   // Save logs to localStorage whenever logs change
   const saveLogsToStorage = (updatedLogs) => {
     setLogs(updatedLogs);
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedLogs));
-    } catch (e) {
-      console.error('Failed to save brew logs to localStorage', e);
-    }
+    saveJournalLogs(updatedLogs);
   };
 
   // Add new log entry

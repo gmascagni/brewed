@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Gauge, Sparkles, Eye, X } from 'lucide-react';
+import { Gauge, Sparkles, Eye, X, Sliders } from 'lucide-react';
 import { GRIND_VISUAL_GUIDE } from '../data/brewData';
+import { 
+  GRINDER_PROFILES, 
+  getSavedGrinderId, 
+  saveGrinderId, 
+  getGrinderSetting 
+} from '../data/grinderProfiles';
 
 export default function GrindVisualGuide({ activeMethod }) {
   const [selectedGrindId, setSelectedGrindId] = useState('medium_fine');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedGrinderId, setSelectedGrinderId] = useState(getSavedGrinderId);
 
   // Automatically sync preselected grind when activeMethod changes
   useEffect(() => {
@@ -25,7 +32,14 @@ export default function GrindVisualGuide({ activeMethod }) {
     }
   }, [activeMethod]);
 
+  const handleGrinderChange = (e) => {
+    const nextId = e.target.value;
+    setSelectedGrinderId(nextId);
+    saveGrinderId(nextId);
+  };
+
   const activeGrind = GRIND_VISUAL_GUIDE.find((g) => g.id === selectedGrindId) || GRIND_VISUAL_GUIDE[2];
+  const currentGrinderSetting = getGrinderSetting(selectedGrinderId, activeGrind.id);
 
   const handleOpenPhotoBubble = (grindItem, e) => {
     e.stopPropagation();
@@ -37,7 +51,7 @@ export default function GrindVisualGuide({ activeMethod }) {
     <section className="mt-10 p-7 md:p-9 rounded-3xl glass-panel shadow-2xl transition-all duration-500 relative">
       
       {/* Section Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/10">
         <div>
           <div className="inline-flex items-center space-x-2 text-xs font-extrabold uppercase tracking-widest text-amber-gold mb-1.5">
             <Gauge className="w-4 h-4 animate-pulse" />
@@ -56,10 +70,66 @@ export default function GrindVisualGuide({ activeMethod }) {
         </span>
       </div>
 
+      {/* Interactive Grinder Model Dial-In Setting Banner */}
+      <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-espresso-950 via-black/80 to-espresso-950 border border-amber-gold/30 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-gold/20 border border-amber-gold/40 flex items-center justify-center text-amber-gold shrink-0">
+            <Sliders className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-amber-gold font-extrabold">
+                EQUIPMENT DIAL-IN TRANSLATOR
+              </span>
+              <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/10 text-cream-soft/80 font-mono">
+                Real Micron Calibration
+              </span>
+            </div>
+            <h4 className="font-serif text-lg font-bold text-cream-light leading-tight mt-0.5">
+              Dial Setting for <span className="text-amber-gold">{activeGrind.name}</span>
+            </h4>
+          </div>
+        </div>
+
+        {/* Grinder Model Dropdown & Live Setting Badge */}
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+          <div className="flex flex-col">
+            <label htmlFor="grinder-model-select" className="text-[10px] font-mono text-cream-soft/60 mb-1">
+              Select Your Burr Grinder:
+            </label>
+            <select
+              id="grinder-model-select"
+              value={selectedGrinderId}
+              onChange={handleGrinderChange}
+              className="px-3 py-1.5 rounded-xl bg-black/60 border border-white/20 text-cream-light text-xs font-mono font-medium focus:outline-none focus:border-amber-gold cursor-pointer"
+            >
+              {GRINDER_PROFILES.map((grinder) => (
+                <option key={grinder.id} value={grinder.id} className="bg-stone-900 text-cream-light">
+                  {grinder.name} ({grinder.brand})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="px-4 py-2 rounded-xl bg-amber-gold/15 border border-amber-gold/50 text-center shadow-inner min-w-[120px]">
+            <span className="block text-[8px] font-mono uppercase tracking-wider text-amber-gold/90 font-bold">
+              Target Setting
+            </span>
+            <span className="font-mono text-base font-extrabold text-amber-gold">
+              {currentGrinderSetting.setting}
+            </span>
+            <span className="block text-[8px] font-mono text-cream-soft/70 truncate max-w-[160px]">
+              {currentGrinderSetting.subtext}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Burr Grinder Settings Buttons Grid with Instant Photo Bubble Badges */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         {GRIND_VISUAL_GUIDE.map((item) => {
           const isSelected = item.id === activeGrind.id;
+          const modelSetting = getGrinderSetting(selectedGrinderId, item.id);
           return (
             <div
               key={item.id}
@@ -73,8 +143,17 @@ export default function GrindVisualGuide({ activeMethod }) {
               <div>
                 <div className="text-xs font-extrabold tracking-wide drop-shadow mb-1">{item.name}</div>
                 <div className="text-[11px] font-mono font-bold text-amber-gold mb-1">{item.micron}</div>
-                <div className={`text-[10px] truncate mb-3 ${isSelected ? 'opacity-90 font-semibold' : 'text-cream-soft/60'}`}>
+                <div className={`text-[10px] truncate mb-2 ${isSelected ? 'opacity-90 font-semibold' : 'text-cream-soft/60'}`}>
                   {item.textureComparison.split('/')[0]}
+                </div>
+                {/* Grinder model specific dial translation */}
+                <div className={`py-1 px-1.5 rounded-lg text-[10px] font-mono font-bold flex items-center justify-between border ${
+                  isSelected
+                    ? 'bg-espresso-950 text-amber-gold border-amber-gold/40'
+                    : 'bg-black/40 text-amber-200/90 border-white/10'
+                }`}>
+                  <span className="text-[8px] uppercase tracking-wider text-stone-400">Dial:</span>
+                  <span className="truncate ml-1">{modelSetting.setting}</span>
                 </div>
               </div>
 
@@ -97,7 +176,7 @@ export default function GrindVisualGuide({ activeMethod }) {
 
       {/* Active Preselected Grind Details Card */}
       <div className="p-6 rounded-3xl bg-espresso-950/90 border border-white/15 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="space-y-2 max-w-2xl">
+        <div className="space-y-2.5 max-w-2xl">
           <div className="flex items-center space-x-3">
             <h4 className="font-serif text-xl font-bold text-cream-light">
               {activeGrind.name} Grind Setting ({activeGrind.micron})
@@ -106,6 +185,19 @@ export default function GrindVisualGuide({ activeMethod }) {
               {activeGrind.textureComparison}
             </span>
           </div>
+
+          {/* Grinder-specific dial suggestion pill */}
+          <div className="p-2.5 rounded-xl bg-amber-gold/10 border border-amber-gold/30 text-xs font-mono text-cream-light flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span className="text-amber-gold font-bold">{currentGrinderSetting.grinderName}: </span>
+              <span className="text-white font-extrabold text-sm">{currentGrinderSetting.setting}</span>
+              <span className="text-cream-soft/70 text-[11px] ml-1.5">({currentGrinderSetting.subtext})</span>
+            </div>
+            <div className="text-[10px] text-cream-soft/70 italic">
+              💡 {currentGrinderSetting.calibrationTip}
+            </div>
+          </div>
+
           <p className="text-xs text-cream-soft/90 font-medium leading-relaxed">
             {activeGrind.burrSettingTip}
           </p>
@@ -131,7 +223,7 @@ export default function GrindVisualGuide({ activeMethod }) {
             {/* Modal Close Button */}
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 p-2.5 rounded-full bg-white/10 text-cream-light hover:text-amber-gold hover:bg-white/20 transition-all border border-white/15"
+              className="absolute top-4 right-4 p-2.5 rounded-full bg-white/10 text-cream-light hover:text-amber-gold hover:bg-white/20 transition-all border border-white/15 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -144,9 +236,20 @@ export default function GrindVisualGuide({ activeMethod }) {
             <h3 className="font-serif text-2xl font-extrabold text-cream-light mb-1">
               {activeGrind.name} Ground Coffee Photo
             </h3>
-            <p className="text-xs text-cream-soft/80 mb-4 font-medium">
+            <p className="text-xs text-cream-soft/80 mb-3 font-medium">
               Texture Comparison: <strong className="text-amber-gold">{activeGrind.textureComparison}</strong>
             </p>
+
+            {/* Model-specific dial in modal */}
+            <div className="p-3 rounded-xl bg-amber-gold/10 border border-amber-gold/30 text-xs font-mono text-cream-light mb-4">
+              <div className="flex items-center justify-between">
+                <strong className="text-amber-gold">{currentGrinderSetting.grinderName}:</strong>
+                <span className="text-white font-extrabold text-sm">{currentGrinderSetting.setting}</span>
+              </div>
+              <p className="text-[10px] text-cream-soft/80 mt-1">
+                {currentGrinderSetting.calibrationTip}
+              </p>
+            </div>
 
             {/* High-Definition Macro Photo Container */}
             <div className="aspect-square w-full rounded-2xl overflow-hidden border-2 border-amber-gold/40 shadow-2xl mb-5 relative group">
@@ -162,16 +265,13 @@ export default function GrindVisualGuide({ activeMethod }) {
 
             <div className="p-4 rounded-2xl bg-white/5 border border-white/10 mb-5 text-xs text-cream-soft/90 font-medium space-y-2">
               <div>
-                <strong className="text-amber-gold">Recommended Burr Settings:</strong> {activeGrind.burrSettingTip}
-              </div>
-              <div>
                 <strong className="text-amber-gold">Sensory Impact:</strong> {activeGrind.sensoryImpact}
               </div>
             </div>
 
             <button
               onClick={() => setIsModalOpen(false)}
-              className="w-full py-3 rounded-2xl btn-tactile-amber text-espresso-950 text-xs font-extrabold shadow-xl active:scale-95"
+              className="w-full py-3 rounded-2xl btn-tactile-amber text-espresso-950 text-xs font-extrabold shadow-xl active:scale-95 cursor-pointer"
             >
               Close Photo Bubble
             </button>

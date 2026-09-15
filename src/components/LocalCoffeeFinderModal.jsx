@@ -19,8 +19,21 @@ function getHaversineDistanceMiles(lat1, lon1, lat2, lon2) {
   return Math.round(R * c * 10) / 10;
 }
 
-// Curated Specialty Spotlight Roasters
+// Specialty Coffee Capitals for Instant Zero-Hang Switcher
+export const SPECIALTY_COFFEE_CAPITALS = [
+  { id: 'atlanta', name: 'Atlanta, GA', lat: 33.7490, lng: -84.3880, flag: '🍑' },
+  { id: 'portland', name: 'Portland, OR', lat: 45.5152, lng: -122.6784, flag: '🌲' },
+  { id: 'seattle', name: 'Seattle, WA', lat: 47.6062, lng: -122.3321, flag: '🌧️' },
+  { id: 'san_francisco', name: 'San Francisco, CA', lat: 37.7749, lng: -122.4194, flag: '🌉' },
+  { id: 'new_york', name: 'New York, NY', lat: 40.7128, lng: -74.0060, flag: '🗽' },
+  { id: 'chicago', name: 'Chicago, IL', lat: 41.8781, lng: -87.6298, flag: '🏙️' },
+  { id: 'london', name: 'London, UK', lat: 51.5074, lng: -0.1278, flag: '🇬🇧' },
+  { id: 'tokyo', name: 'Tokyo, JP', lat: 35.6762, lng: 139.6503, flag: '🇯🇵' }
+];
+
+// Curated Specialty Spotlight Roasters Across Global Coffee Capitals
 const CURATED_SPECIALTY_SHOPS = [
+  // --- ATLANTA, GA ---
   {
     id: 'curated_atl_east_pole',
     name: 'East Pole Coffee Co.',
@@ -125,6 +138,236 @@ const CURATED_SPECIALTY_SHOPS = [
     isCurated: true,
     equipment: 'Modbar Espresso, Slayer Custom, Hario V60 Bar',
     description: 'Iconic shipping container espresso bar in Buckhead serving direct-trade single-origin coffees brewed with extreme precision.'
+  },
+
+  // --- PORTLAND, OR ---
+  {
+    id: 'curated_pdx_proud_mary',
+    name: 'Proud Mary Cafe Portland',
+    city: 'Portland',
+    state: 'OR',
+    zip: '97211',
+    address: '2001 NE Alberta St, Portland, OR 97211',
+    lat: 45.5589,
+    lng: -122.6450,
+    rating: 4.9,
+    hours: '8:00 AM - 4:00 PM',
+    phone: '(503) 208-3475',
+    specialtyGrade: 'Specialty Geisha Lots & Australian Espresso Excellence',
+    isCurated: true,
+    onBar: 'Hartmann Natural Geisha (Panama)',
+    equipment: 'Synesso MVP, Mythos Two, Marco SP9 Precision Brewers',
+    description: 'World-renowned Australian cafe bringing ultra-exclusive Geshas, anaerobic naturals, and precision batch brews to Alberta Arts.'
+  },
+  {
+    id: 'curated_pdx_coava',
+    name: 'Coava Coffee Roasters',
+    city: 'Portland',
+    state: 'OR',
+    zip: '97214',
+    address: '1300 SE Grand Ave, Portland, OR 97214',
+    lat: 45.5134,
+    lng: -122.6607,
+    rating: 4.8,
+    hours: '7:00 AM - 5:00 PM',
+    phone: '(503) 894-8134',
+    specialtyGrade: 'Single-Origin Direct Trade Pioneer',
+    isCurated: true,
+    onBar: 'Kilenso Ethiopian Natural',
+    equipment: 'Kees van der Westen Mirage, Custom Kone Metal Filters',
+    description: 'Industrial timber showroom serving meticulously sourced single-origin coffees with proprietary metal cone drippers.'
+  },
+  {
+    id: 'curated_pdx_stumptown',
+    name: 'Stumptown Coffee Roasters',
+    city: 'Portland',
+    state: 'OR',
+    zip: '97214',
+    address: '4525 SE Division St, Portland, OR 97214',
+    lat: 45.5049,
+    lng: -122.6160,
+    rating: 4.7,
+    hours: '6:30 AM - 5:00 PM',
+    phone: '(503) 230-7797',
+    specialtyGrade: 'Third-Wave Coffee Heritage Institution',
+    isCurated: true,
+    onBar: 'Hair Bender Blend & Rwanda Huye Mountain',
+    equipment: 'La Marzocco Linea Classic, Mazzer Robur, Chemex',
+    description: 'The historic original location where Portland’s third-wave coffee movement gained worldwide recognition.'
+  },
+
+  // --- SEATTLE, WA ---
+  {
+    id: 'curated_sea_milstead',
+    name: 'Milstead & Co.',
+    city: 'Seattle',
+    state: 'WA',
+    zip: '98103',
+    address: '754 N 34th St, Seattle, WA 98103',
+    lat: 47.6488,
+    lng: -122.3486,
+    rating: 4.9,
+    hours: '7:00 AM - 4:00 PM',
+    phone: '(206) 957-2739',
+    specialtyGrade: 'Multi-Roaster Curator of World-Class Lots',
+    isCurated: true,
+    onBar: 'Heart, Sey, and Bows & Arrows Guest Bar',
+    equipment: 'Slayer 3-Group Espresso, Mahlkönig EK43, AeroPress',
+    description: 'Fremont canal-side temple of specialty coffee rotating North America’s finest roasters on dial-in manual bars.'
+  },
+  {
+    id: 'curated_sea_vivace',
+    name: 'Espresso Vivace',
+    city: 'Seattle',
+    state: 'WA',
+    zip: '98102',
+    address: '532 Broadway E, Seattle, WA 98102',
+    lat: 47.6241,
+    lng: -122.3207,
+    rating: 4.8,
+    hours: '6:00 AM - 7:00 PM',
+    phone: '(206) 860-5869',
+    specialtyGrade: 'David Schomer Espresso Micro-Foam Pioneer',
+    isCurated: true,
+    onBar: 'Dolce Espresso Blend',
+    equipment: 'Custom Synesso Cyncra, Flat Burr Precision Grinders',
+    description: 'Legendary birthplace of modern American latte art and caramel-thick Northern Italian extraction science.'
+  },
+
+  // --- SAN FRANCISCO, CA ---
+  {
+    id: 'curated_sf_sightglass',
+    name: 'Sightglass Coffee (Flagship)',
+    city: 'San Francisco',
+    state: 'CA',
+    zip: '94103',
+    address: '270 7th St, San Francisco, CA 94103',
+    lat: 37.7770,
+    lng: -122.4085,
+    rating: 4.8,
+    hours: '7:00 AM - 5:00 PM',
+    phone: '(415) 861-1313',
+    specialtyGrade: 'Vintage Probat Roastery & Single-Origin Pour-Overs',
+    isCurated: true,
+    onBar: 'Blueboon & Owl’s Howl Espresso',
+    equipment: 'Vintage Cast Iron Probat, La Marzocco Strada, V60 Bar',
+    description: 'Expansive multi-level SOMA roastery and pour-over bar renowned for direct-trade African and Central American lots.'
+  },
+  {
+    id: 'curated_sf_saint_frank',
+    name: 'Saint Frank Coffee',
+    city: 'San Francisco',
+    state: 'CA',
+    zip: '94109',
+    address: '2340 Polk St, San Francisco, CA 94109',
+    lat: 37.7981,
+    lng: -122.4223,
+    rating: 4.9,
+    hours: '7:00 AM - 4:00 PM',
+    phone: '(415) 775-1619',
+    specialtyGrade: 'Direct Origin Relationships & Washed Microlots',
+    isCurated: true,
+    onBar: 'Milton Monroy Geisha (Colombia)',
+    equipment: 'Under-Counter Modbar, Mahlkönig Peak, Kalita 185',
+    description: 'Minimalist Russian Hill gem with open sunken Modbar counters connecting barista craftsmanship directly with coffee drinkers.'
+  },
+
+  // --- NEW YORK, NY ---
+  {
+    id: 'curated_nyc_sey',
+    name: 'Sey Coffee',
+    city: 'New York',
+    state: 'NY',
+    zip: '11206',
+    address: '18 Grattan St, Brooklyn, NY 11206',
+    lat: 40.7051,
+    lng: -73.9327,
+    rating: 4.9,
+    hours: '7:30 AM - 5:00 PM',
+    phone: '(347) 871-1611',
+    specialtyGrade: 'Ultra-Light Nordic Roast & Terroir Expression',
+    isCurated: true,
+    onBar: 'Chire Amharic Heirloom Washed (Ethiopia)',
+    equipment: 'Loring S15 Kestrel, Kees van der Westen Spirit, EK43',
+    description: 'Celebrated skylit Bushwick cafe and roastery known globally for transparent, ultra-clean Scandinavian roast philosophy.'
+  },
+  {
+    id: 'curated_nyc_devocion',
+    name: 'Devoción Coffee',
+    city: 'New York',
+    state: 'NY',
+    zip: '11249',
+    address: '69 Grand St, Brooklyn, NY 11249',
+    lat: 40.7161,
+    lng: -73.9649,
+    rating: 4.8,
+    hours: '8:00 AM - 6:00 PM',
+    phone: '(718) 285-6180',
+    specialtyGrade: 'Farm-to-Cup 10-Day Colombian Freshness',
+    isCurated: true,
+    onBar: 'Toro Blend & Seasonal Cundinamarca Microlot',
+    equipment: 'La Marzocco Linea PB, Mythos One, Pour-Over Bar',
+    description: 'Iconic Williamsburg roastery with living vertical plant wall, roasting green Colombian beans within 10 days of harvest.'
+  },
+
+  // --- CHICAGO, IL ---
+  {
+    id: 'curated_chi_metric',
+    name: 'Metric Coffee Co.',
+    city: 'Chicago',
+    state: 'IL',
+    zip: '60612',
+    address: '2020 W Fulton St, Chicago, IL 60612',
+    lat: 41.8866,
+    lng: -87.6775,
+    rating: 4.9,
+    hours: '7:00 AM - 4:00 PM',
+    phone: '(312) 982-2196',
+    specialtyGrade: 'Independent Craft Roaster & Transparent Pricing',
+    isCurated: true,
+    onBar: 'Alma Negra Natural (Costa Rica)',
+    equipment: 'Custom San Franciscan Roaster, Slayer Espresso, EK43',
+    description: 'West Town industrial roastery celebrated for exceptional single-origins, ethical farm equity, and community coffee education.'
+  },
+
+  // --- LONDON, UK ---
+  {
+    id: 'curated_lon_prufrock',
+    name: 'Prufrock Coffee',
+    city: 'London',
+    state: 'UK',
+    zip: 'EC1N 7TE',
+    address: '23-25 Leather Ln, London EC1N 7TE',
+    lat: 51.5202,
+    lng: -0.1085,
+    rating: 4.9,
+    hours: '7:30 AM - 5:00 PM',
+    phone: '+44 20 7242 0467',
+    specialtyGrade: 'World Barista Championship Heritage Bar',
+    isCurated: true,
+    onBar: 'Square Mile Single-Origins & Guest Roasts',
+    equipment: 'Victoria Arduino Black Eagle, Mahlkönig Mythos, Brew Bar',
+    description: 'Co-founded by World Barista Champion Gwilym Davies; the epicenter of London specialty coffee education and precision extraction.'
+  },
+
+  // --- TOKYO, JP ---
+  {
+    id: 'curated_tky_glitch',
+    name: 'Glitch Coffee & Roasters',
+    city: 'Tokyo',
+    state: 'JP',
+    zip: '101-0054',
+    address: '3-16 Kanda Nishikicho, Chiyoda-ku, Tokyo 101-0054',
+    lat: 35.6948,
+    lng: 139.7610,
+    rating: 4.9,
+    hours: '8:00 AM - 7:00 PM',
+    phone: '+81 3-5244-5458',
+    specialtyGrade: 'Single-Origin Light Roast & Japanese Hand-Drip Art',
+    isCurated: true,
+    onBar: 'Rare Competition Geshas & Thermal Shock Naturals',
+    equipment: 'Giesen W6A, Hario V60 Hand-Drip Flight Bar',
+    description: 'Tokyo’s premier light-roast specialty sanctum in Jimbocho offering three-origin tasting flights with detailed sensory tasting cards.'
   }
 ];
 
@@ -246,13 +489,36 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
       }
       setSearchStatusText(`Found ${combined.length} coffee shops & cafes nearby!`);
     } else {
-      // If live query had no results, show curated shops
-      setShops(CURATED_SPECIALTY_SHOPS);
-      setSearchStatusText(`No live cafes found in immediate area. Showing featured specialty roasters.`);
+      // If live query had no results, show curated shops sorted by distance to current coordinates
+      const sortedCurated = [...CURATED_SPECIALTY_SHOPS].sort((a, b) => {
+        return getHaversineDistanceMiles(lat, lng, a.lat, a.lng) - getHaversineDistanceMiles(lat, lng, b.lat, b.lng);
+      });
+      setShops(sortedCurated);
+      if (sortedCurated.length > 0) {
+        setSelectedShopId(sortedCurated[0].id);
+      }
+      setSearchStatusText(`Radar scan completed. Displaying verified specialty coffee destinations.`);
     }
 
     setIsSearchingApi(false);
   }, []);
+
+  // Instant Switch to Any Regional Coffee Capital
+  const handleSelectCapital = (cap) => {
+    setSearchQuery('');
+    setUserLocation({ lat: cap.lat, lng: cap.lng, label: cap.name });
+    
+    // Seed immediately from curated list so UI is instantly populated with zero delay
+    const cityCurated = CURATED_SPECIALTY_SHOPS.filter(s => 
+      s.city.toLowerCase() === cap.name.split(',')[0].toLowerCase()
+    );
+    if (cityCurated.length > 0) {
+      setShops(cityCurated);
+      setSelectedShopId(cityCurated[0].id);
+    }
+    fetchLiveNearbyShops(cap.lat, cap.lng, radiusMiles);
+    trackEvent('local_coffee_capital_selected', { capital: cap.name });
+  };
 
   // Request Real GPS Coordinates and Reverse-Geocode
   const handleGetLocation = () => {
@@ -290,9 +556,9 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
         (error) => {
           console.warn('Geolocation access denied or timed out:', error);
           setIsLocating(false);
-          setSearchStatusText('GPS access denied. You can search any city or zip code above.');
+          setSearchStatusText('GPS access unavailable. Select a specialty coffee capital or search below.');
         },
-        { timeout: 10000, enableHighAccuracy: true }
+        { timeout: 7000, enableHighAccuracy: true }
       );
     } else {
       setIsLocating(false);
@@ -348,9 +614,13 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
             setSearchStatusText(`No location found for "${cleaned}". Try a city or zip code.`);
             setIsSearchingApi(false);
           }
+        } else {
+          setSearchStatusText(`Search service busy. Try again.`);
+          setIsSearchingApi(false);
         }
       } catch (err) {
         console.warn('Geocoding search failed:', err);
+        setSearchStatusText('Search connection error. Showing closest coffee spots.');
         setIsSearchingApi(false);
       }
     }, 600);
@@ -368,8 +638,9 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
   // Sort shops by distance ascending
   shopsWithDistances.sort((a, b) => a.calculatedDistanceMiles - b.calculatedDistanceMiles);
 
-  // Filter shops by radius
-  const filteredShops = shopsWithDistances.filter((shop) => shop.calculatedDistanceMiles <= radiusMiles * 1.5);
+  // Filter shops by radius, with guaranteed fallback so user is never left with an empty list
+  const radiusFiltered = shopsWithDistances.filter((shop) => shop.calculatedDistanceMiles <= radiusMiles * 1.5);
+  const filteredShops = radiusFiltered.length > 0 ? radiusFiltered : shopsWithDistances.slice(0, 8);
 
   const activeShop = shopsWithDistances.find((s) => s.id === selectedShopId) || filteredShops[0] || shopsWithDistances[0];
 
@@ -758,6 +1029,32 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
             </div>
           </div>
 
+        </div>
+
+        {/* Quick Regional Coffee Capitals Bar */}
+        <div className="px-4 py-2.5 bg-[#120F0D] border-b border-white/10 flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-amber-gold/90 font-bold shrink-0 flex items-center gap-1">
+            <Coffee className="w-3 h-3" />
+            <span>Capitals:</span>
+          </span>
+          {SPECIALTY_COFFEE_CAPITALS.map((cap) => {
+            const isSelected = userLocation.label.includes(cap.name.split(',')[0]);
+            return (
+              <button
+                key={cap.id}
+                type="button"
+                onClick={() => handleSelectCapital(cap)}
+                className={`px-3 py-1 rounded-xl text-xs font-mono transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                  isSelected
+                    ? 'bg-amber-gold text-espresso-950 font-bold shadow-md ring-1 ring-amber-gold/50'
+                    : 'bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white border border-white/10'
+                }`}
+              >
+                <span>{cap.flag}</span>
+                <span>{cap.name.split(',')[0]}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Live Search Status Ribbon */}

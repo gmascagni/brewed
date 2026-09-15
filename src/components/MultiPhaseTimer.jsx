@@ -1,5 +1,22 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Play, Pause, RotateCcw, FastForward, Timer as TimerIcon, Volume2, VolumeX, Sparkles, CheckCircle2, ChevronLeft, BookOpen, Thermometer, Scale } from 'lucide-react';
+import { 
+  Play, 
+  Pause, 
+  RotateCcw, 
+  FastForward, 
+  Timer as TimerIcon, 
+  Volume2, 
+  VolumeX, 
+  Sparkles, 
+  CheckCircle2, 
+  ChevronLeft, 
+  BookOpen, 
+  Thermometer, 
+  Scale,
+  Check,
+  X,
+  ArrowRight
+} from 'lucide-react';
 import { 
   playTimerStartChime, 
   announcePhase, 
@@ -16,8 +33,24 @@ import { requestScreenWakeLock, releaseScreenWakeLock } from '../utils/wakeLock'
 import { hapticStart, hapticPhaseChange, hapticComplete, hapticTap } from '../utils/haptics';
 import { getBloomScalingMetrics, BLOOM_SCALING_TABLE } from '../utils/bloomScaling';
 import V60ProTipModal from './V60ProTipModal';
+import { logBrewSession } from '../utils/journalStorage';
+import { getSavedGrinderId, getGrinderSetting } from '../data/grinderProfiles';
+import { calculateClosedLoopDialIn, formatSecondsToMmSs, METHOD_DRAWDOWN_TARGETS } from '../utils/dialInEngine';
 
-export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams, unitSystem = 'imperial', isMuted, setIsMuted, onPrevStep, onOpenJournal }) {
+export default function MultiPhaseTimer({ 
+  trackMode, 
+  activeMethod, 
+  dryDoseGrams, 
+  unitSystem = 'imperial', 
+  isMuted, 
+  setIsMuted, 
+  onPrevStep, 
+  onOpenJournal,
+  dialedInCoffee = null,
+  totalWaterMl = null,
+  customRatio = null,
+  onApplyNextBrewTweak = null
+}) {
   const isCoffee = trackMode === 'coffee';
 
   // Default fallback phases if method phases are not loaded
@@ -59,6 +92,45 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
   const [isAnnouncing, setIsAnnouncing] = useState(false);
   const [announcementText, setAnnouncementText] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
+  const [tasteFeedback, setTasteFeedback] = useState(null); // 'sour' | 'sweet' | 'bitter'
+  const [isSavedToLog, setIsSavedToLog] = useState(false);
+  const [isEvaluationSkipped, setIsEvaluationSkipped] = useState(false);
+
+  // Closed-Loop Recipe Adjustment (Dial-In Engine) State
+  const scheduledTotalDurationSec = useMemo(() => {
+    return phases.reduce((acc, p) => acc + (p.durationSec || 0), 0);
+  }, [phases]);
+
+  const [actualDrawdownSec, setActualDrawdownSec] = useState(() => {
+    return phases.reduce((acc, p) => acc + (p.durationSec || 0), 0);
+  });
+  const brewStartedTimeRef = useRef(null);
+
+  // Synchronize initial default drawdown duration when method / dose changes
+  useEffect(() => {
+    if (!isRunning && !isCompleted) {
+      setActualDrawdownSec(scheduledTotalDurationSec);
+    }
+  }, [scheduledTotalDurationSec, isRunning, isCompleted]);
+
+  // Dynamic Closed-Loop Dial-In Engine calculation
+  const dialInDiagnosis = useMemo(() => {
+    if (!isCompleted || !tasteFeedback) return null;
+    const savedGrinderId = getSavedGrinderId();
+    const ratio = customRatio || activeMethod?.ratio || 16;
+    const tempF = dialedInCoffee?.tempF || activeMethod?.tempF || 204;
+    const currentGrind = dialedInCoffee?.recommendedGrind || activeMethod?.grind || 'Medium-Fine';
+
+    return calculateClosedLoopDialIn({
+      methodId: activeMethod?.id || 'pour_over',
+      actualDrawdownSec: actualDrawdownSec,
+      tasteProfile: tasteFeedback,
+      currentTempF: tempF,
+      currentRatio: ratio,
+      currentGrindSetting: currentGrind,
+      grinderId: savedGrinderId
+    });
+  }, [isCompleted, tasteFeedback, actualDrawdownSec, customRatio, activeMethod, dialedInCoffee]);
 
   // Local muted state synced with prop
   const [localMuted, setLocalMuted] = useState(isMuted ?? false);
@@ -208,13 +280,18 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       setIsRunning(false);
       setIsAnnouncing(false);
       setIsCompleted(true);
+      const totalPlanned = phases.reduce((acc, p) => acc + (p.durationSec || 0), 0);
+      const elapsedTotal = brewStartedTimeRef.current 
+        ? Math.round((Date.now() - brewStartedTimeRef.current) / 1000) 
+        : totalPlanned;
+      setActualDrawdownSec(elapsedTotal > 30 && elapsedTotal < 900 ? elapsedTotal : totalPlanned);
       endTimeRef.current = null;
       remainingAtPauseRef.current = null;
       releaseScreenWakeLock();
       hapticComplete();
       playCompletionChime(localMuted);
     }
-  }, [localMuted]);
+  }, [localMuted, phases]);
 
   // Main High-Precision Countdown Loop (Wall-clock accurate, immune to background mobile sleep)
   useEffect(() => {
@@ -228,20 +305,21 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       // Play authentic mechanical clockwork tick on every second of countdown
       if (lastTickedSecRef.current !== diffSec) {
         lastTickedSecRef.current = diffSec;
-        if (diffSec > 0) {
-          playClockTick(localMuted, diffSec);
-        }
+        playClockTick(localMuted);
       }
-
-      setTimeLeft(diffSec);
 
       if (diffSec <= 0) {
         handlePhaseAdvance();
+      } else {
+        setTimeLeft(diffSec);
       }
     };
 
+    // Run tick immediately on effect invocation
     tick();
-    const intervalId = setInterval(tick, 200);
+
+    // High frequency interval (100ms) to ensure no sub-second stutter or frame dropping
+    const intervalId = setInterval(tick, 100);
 
     return () => clearInterval(intervalId);
   }, [isRunning, handlePhaseAdvance, localMuted]);
@@ -260,19 +338,27 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
       hapticTap();
 
       if (endTimeRef.current) {
-        const remaining = Math.max(0, Math.ceil((endTimeRef.current - Date.now()) / 1000));
-        remainingAtPauseRef.current = remaining;
-        setTimeLeft(remaining);
+        const now = Date.now();
+        const rem = Math.max(0, Math.ceil((endTimeRef.current - now) / 1000));
+        remainingAtPauseRef.current = rem;
+        setTimeLeft(rem);
       }
     } else {
       // Start or Resume action: Request screen wake lock & trigger start haptic vibration
       requestScreenWakeLock();
       hapticStart();
 
+      if (!brewStartedTimeRef.current) {
+        brewStartedTimeRef.current = Date.now();
+      }
+
       let secondsToRun = timeLeft;
 
       if (isCompleted) {
         setIsCompleted(false);
+        setTasteFeedback(null);
+        setIsSavedToLog(false);
+        setIsEvaluationSkipped(false);
         setCurrentPhaseIndex(0);
         currentPhaseIndexRef.current = 0;
         announcedPhasesRef.current.clear();
@@ -330,10 +416,11 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     unlockAudio();
     playMechanicalClick(localMuted);
     stopSpeechAnnouncement();
+    hapticTap();
     setIsAnnouncing(false);
     lastTickedSecRef.current = null;
 
-    const currentIdx = currentPhaseIndex;
+    const currentIdx = currentPhaseIndexRef.current;
     if (currentIdx < phases.length - 1) {
       const nextIdx = currentIdx + 1;
       const nextPhase = phases[nextIdx];
@@ -373,6 +460,11 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     } else {
       setIsRunning(false);
       setIsCompleted(true);
+      const totalPlanned = phases.reduce((acc, p) => acc + (p.durationSec || 0), 0);
+      const elapsedTotal = brewStartedTimeRef.current 
+        ? Math.round((Date.now() - brewStartedTimeRef.current) / 1000) 
+        : totalPlanned;
+      setActualDrawdownSec(elapsedTotal > 30 && elapsedTotal < 900 ? elapsedTotal : totalPlanned);
       endTimeRef.current = null;
       remainingAtPauseRef.current = null;
       releaseScreenWakeLock();
@@ -392,6 +484,10 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     setIsAnnouncing(false);
     setIsRunning(false);
     setIsCompleted(false);
+    setTasteFeedback(null);
+    setIsSavedToLog(false);
+    setIsEvaluationSkipped(false);
+    brewStartedTimeRef.current = null;
     endTimeRef.current = null;
     remainingAtPauseRef.current = null;
     lastTickedSecRef.current = null;
@@ -399,6 +495,52 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
     currentPhaseIndexRef.current = 0;
     announcedPhasesRef.current.clear();
     setTimeLeft(phases[0]?.durationSec || 60);
+    setActualDrawdownSec(scheduledTotalDurationSec);
+  };
+
+  const handleSaveToLog = () => {
+    const savedGrinderId = getSavedGrinderId();
+    const grindSetting = getGrinderSetting(savedGrinderId, activeMethod?.id === 'espresso' ? 'extra_fine' : activeMethod?.id === 'french_press' ? 'coarse' : 'medium_fine');
+    const ratio = customRatio || activeMethod?.ratio || 16;
+    const water = totalWaterMl || Math.round(effectiveDose * ratio);
+    const remedyText = dialInDiagnosis?.recommendationText || (tasteFeedback === 'sour'
+      ? `Under-extracted (sour/weak). Suggested: Grind 1 step finer on ${grindSetting.grinderName} or increase water temp by 2°F.`
+      : tasteFeedback === 'sweet'
+      ? `Golden Cup! Dialed in at 1:${ratio} on ${grindSetting.grinderName} setting ${grindSetting.setting}.`
+      : tasteFeedback === 'bitter'
+      ? `Over-extracted (bitter/dry). Suggested: Grind 1 step coarser on ${grindSetting.grinderName} or lower water temp by 2°F.`
+      : 'Completed multi-phase timed extraction.');
+
+    logBrewSession({
+      trackMode,
+      methodId: activeMethod?.id || 'pour_over',
+      methodName: activeMethod?.name || 'Guided Extraction',
+      beanName: dialedInCoffee?.beanName || activeMethod?.preferredCoffeeTypes?.split('.')[0] || 'Single-Origin Coffee',
+      roaster: dialedInCoffee?.roaster || 'Specialty Roastery',
+      doseGrams: effectiveDose,
+      waterMl: water,
+      ratio: ratio,
+      tempF: dialInDiagnosis?.recipePatch?.tempF || activeMethod?.tempF || 202,
+      grindName: activeMethod?.grind || 'Medium-Fine',
+      grinderModel: grindSetting.grinderName,
+      grinderSetting: grindSetting.setting,
+      tasteFeedback: tasteFeedback || 'skipped',
+      remedy: remedyText,
+      elapsedSec: actualDrawdownSec || scheduledTotalDurationSec
+    });
+
+    setIsSavedToLog(true);
+  };
+
+  const handleApplyDialInTweak = () => {
+    if (!dialInDiagnosis) return;
+    if (onApplyNextBrewTweak) {
+      onApplyNextBrewTweak(dialInDiagnosis.recipePatch);
+    }
+    if (!isSavedToLog) {
+      handleSaveToLog();
+    }
+    handleReset();
   };
 
   // Replay Active Extraction Instruction out loud on demand
@@ -604,139 +746,445 @@ export default function MultiPhaseTimer({ trackMode, activeMethod, dryDoseGrams,
           </div>
         </div>
 
-        {/* Phase Instruction & Active Target Pour Box */}
+        {/* Phase Instruction & Active Target Pour Box OR Post-Brew Extraction Feedback Card */}
         <div className="max-w-md w-full space-y-4 text-center lg:text-left">
-          <div className={`p-6 rounded-3xl bg-black/40 border shadow-inner space-y-3 transition-all duration-300 ${
-            isAnnouncing
-              ? 'border-amber-400/50 shadow-[0_0_20px_rgba(251,191,36,0.15)] ring-1 ring-amber-400/30'
-              : 'border-white/10'
-          }`}>
-            <div className="flex items-center justify-between gap-2">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-stone-400 font-extrabold flex items-center gap-1.5">
-                <Sparkles className={`w-3.5 h-3.5 ${isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
-                <span>Active Extraction Instruction</span>
-              </div>
-
-              {/* Dedicated Listen / Replay Instruction Button */}
-              <button
-                type="button"
-                onClick={handleReplayInstruction}
-                className={`px-3 py-1.5 rounded-xl border text-[11px] font-mono font-bold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-sm ${
-                  isAnnouncing
-                    ? 'bg-amber-500/25 border-amber-400/60 text-amber-200 animate-pulse ring-1 ring-amber-400/40'
-                    : 'bg-white/10 hover:bg-white/20 border-white/15 text-stone-200 hover:text-white'
-                }`}
-                title="Tap to hear Active Extraction Instruction spoken aloud"
-                aria-label="Hear Active Extraction Instruction"
-              >
-                <Volume2 className={`w-3.5 h-3.5 ${isAnnouncing ? 'text-amber-300 animate-bounce' : 'text-stone-300'}`} />
-                <span>{isAnnouncing ? 'Speaking...' : '🔊 Listen'}</span>
-              </button>
-            </div>
-            
-            <p className="text-sm md:text-base text-cream-light font-medium leading-relaxed">
-              {activePhase?.instruction || 'Follow standard extraction pulse pouring technique.'}
-            </p>
-
-            {/* Active Voice Guidance Banner */}
-            {isAnnouncing && (
-              <div className="pt-2 flex items-center gap-2 text-xs font-mono text-amber-300 animate-pulse border-t border-white/10">
-                <Volume2 className="w-4 h-4 flex-shrink-0 animate-spin" />
-                <span className="font-semibold">Speaking Active Instruction: "{announcementText || activePhase?.instruction}"</span>
-              </div>
-            )}
-          </div>
-
-          {/* The Two Scaling Variables Indicator (Bloom Phase) */}
-          {isBloomPhase && (
-            <div className="p-4 rounded-3xl bg-[#A66E38]/15 border border-[#A66E38]/40 text-xs font-mono space-y-3 shadow-md text-left">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 font-bold text-amber-gold uppercase tracking-wider text-[11px]">
-                  <Scale className="w-4 h-4 text-amber-gold" />
-                  <span>The Two Scaling Variables (Bloom Phase)</span>
+          {isCompleted ? (
+            isEvaluationSkipped ? (
+              /* Bypassed state (Clean celebration card) */
+              <div className="p-6 rounded-3xl bg-black/50 border border-white/15 space-y-4 text-center animate-fade-in shadow-xl">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center mx-auto shadow-lg">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-400" />
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold uppercase">
-                  {bloomMetrics.tierName} ({effectiveDose}g)
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-left">
-                <div className="p-3 rounded-2xl bg-black/50 border border-white/10 space-y-1">
-                  <span className="text-[10px] text-stone-400 uppercase tracking-wide block font-semibold">1. Bloom Water Weight</span>
-                  <span className="text-cream-light font-bold text-base block font-mono">~{bloomMetrics.targetWaterGrams}g</span>
-                  <span className="text-amber-gold/90 text-[10px] block font-mono">{bloomMetrics.waterRangeStr}</span>
+                <div>
+                  <h4 className="font-serif text-xl font-bold text-cream-light">
+                    Brewing Complete!
+                  </h4>
+                  <p className="text-xs text-stone-300 mt-1">
+                    Enjoy your fresh cup of {activeMethod?.name || 'specialty coffee'}.
+                  </p>
                 </div>
-
-                <div className="p-3 rounded-2xl bg-black/50 border border-white/10 space-y-1">
-                  <span className="text-[10px] text-stone-400 uppercase tracking-wide block font-semibold">2. Bloom Time</span>
-                  <span className="text-cream-light font-bold text-base block font-mono">{bloomMetrics.durationSec}s</span>
-                  <span className="text-amber-gold/90 text-[10px] block font-mono">{bloomMetrics.bloomTimeRange}</span>
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-mono font-bold shadow-lg hover:scale-105 active:scale-95 transition cursor-pointer"
+                  >
+                    Reset Timer
+                  </button>
+                  {onOpenJournal && (
+                    <button
+                      type="button"
+                      onClick={onOpenJournal}
+                      className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-cream-light text-xs font-mono font-bold border border-white/15 transition cursor-pointer"
+                    >
+                      View Tasting Journal
+                    </button>
+                  )}
                 </div>
               </div>
-
-              {/* Benchmark Reference Grid */}
-              <div className="pt-2 border-t border-white/10 grid grid-cols-3 gap-1.5 text-[9px] text-stone-400 text-center font-mono">
-                <div className={`p-1.5 rounded-xl border transition ${bloomMetrics.tier === 'small' ? 'bg-amber-500/20 text-amber-200 font-bold border-amber-500/40 shadow-sm' : 'bg-black/30 border-white/5 opacity-70'}`}>
-                  <div>Small (12–15g)</div>
-                  <div className="text-[8.5px] mt-0.5">35–45g • 30–40s</div>
-                </div>
-                <div className={`p-1.5 rounded-xl border transition ${bloomMetrics.tier === 'standard' ? 'bg-amber-500/20 text-amber-200 font-bold border-amber-500/40 shadow-sm' : 'bg-black/30 border-white/5 opacity-70'}`}>
-                  <div>Standard (20–30g)</div>
-                  <div className="text-[8.5px] mt-0.5">60–90g • 40–45s</div>
-                </div>
-                <div className={`p-1.5 rounded-xl border transition ${bloomMetrics.tier === 'large' ? 'bg-amber-500/20 text-amber-200 font-bold border-amber-500/40 shadow-sm' : 'bg-black/30 border-white/5 opacity-70'}`}>
-                  <div>Large (45–60g+)</div>
-                  <div className="text-[8.5px] mt-0.5">135–180g • 45–60+s</div>
-                </div>
-              </div>
-
-              {/* View Full Scaling Guide Button */}
-              <button
-                type="button"
-                onClick={() => setIsProTipOpen(true)}
-                className="w-full py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95"
-              >
-                <span>View Full V60 Technique & Scaling Guide</span>
-                <span>↗</span>
-              </button>
-            </div>
-          )}
-
-          {/* Target Water Pour & Water Temp Indicator */}
-          {(targetPhaseWaterMl || activeMethod?.tempC || activeMethod?.tempF) && (
-            <div className="space-y-2">
-              {targetPhaseWaterMl && (
-                <div className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-mono font-bold shadow-md ${
-                  isCoffee
-                    ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
-                    : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
-                }`}>
-                  <span>Target Pour Water:</span>
-                  <span className="text-cream-light text-sm font-black">
-                    ~{targetPhaseWaterMl} mL ({Math.round(targetPhaseWaterMl / 29.5735 * 10) / 10} fl oz)
-                  </span>
-                </div>
-              )}
-
-              {/* Water Temperature Indicator */}
-              {(activeMethod?.tempC || activeMethod?.tempF) && (
-                <div className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs font-mono font-bold shadow-md ${
-                  isCoffee
-                    ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
-                    : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
-                }`}>
-                  <div className="flex items-center gap-1.5">
-                    <Thermometer className="w-3.5 h-3.5 text-cyan-300" />
-                    <span>Water Temp:</span>
+            ) : (
+              /* Post-Brew Extraction Feedback & Dial-In Card (with Skip option) */
+              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#1C130D] to-black border-2 border-amber-gold/50 space-y-4 shadow-2xl animate-fade-in text-left relative overflow-hidden">
+                {/* Header with Skip button */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div>
+                    <div className="flex items-center gap-1.5 text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Post-Brew Dial-In Engine</span>
+                    </div>
+                    <h4 className="font-serif text-lg font-bold text-cream-light mt-0.5">
+                      Dial In Your Next Extraction
+                    </h4>
                   </div>
-                  <span className="text-cream-light font-black">
-                    {unitSystem === 'metric'
-                      ? `${activeMethod?.tempC || 93}°C (${activeMethod?.tempF || 200}°F)`
-                      : `${activeMethod?.tempF || 200}°F (${activeMethod?.tempC || 93}°C)`}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsEvaluationSkipped(true)}
+                    className="text-xs font-mono text-stone-400 hover:text-white px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition cursor-pointer flex items-center gap-1"
+                    title="Skip extraction feedback and finish"
+                  >
+                    <X className="w-3 h-3" />
+                    <span>Skip</span>
+                  </button>
+                </div>
+
+                {/* Input 1: Actual Drawdown Time Stepper */}
+                <div className="p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-1">
+                    <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-cream-light">
+                      <TimerIcon className="w-3.5 h-3.5 text-amber-gold" />
+                      <span>1. Total Drawdown Time:</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-stone-400">
+                      Target for {activeMethod?.name || 'V60'}: <strong className="text-amber-gold">{METHOD_DRAWDOWN_TARGETS[activeMethod?.id || 'pour_over']?.idealStr || '2:45 – 3:30'}</strong>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-0.5">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-mono font-black text-amber-gold tracking-wider">
+                        {formatSecondsToMmSs(actualDrawdownSec)}
+                      </span>
+                      <span className="text-[11px] font-mono text-stone-400">
+                        ({actualDrawdownSec}s)
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 font-mono text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setActualDrawdownSec(prev => Math.max(30, prev - 15))}
+                        className="px-2.5 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.18] text-cream-light font-bold border border-white/10 active:scale-95 transition"
+                        title="Decrease drawdown by 15 seconds"
+                      >
+                        -15s
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActualDrawdownSec(prev => Math.max(30, prev - 5))}
+                        className="px-2 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.18] text-cream-light font-bold border border-white/10 active:scale-95 transition"
+                        title="Decrease drawdown by 5 seconds"
+                      >
+                        -5s
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActualDrawdownSec(prev => Math.min(600, prev + 5))}
+                        className="px-2 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.18] text-cream-light font-bold border border-white/10 active:scale-95 transition"
+                        title="Increase drawdown by 5 seconds"
+                      >
+                        +5s
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActualDrawdownSec(prev => Math.min(600, prev + 15))}
+                        className="px-2.5 py-1.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.18] text-cream-light font-bold border border-white/10 active:scale-95 transition"
+                        title="Increase drawdown by 15 seconds"
+                      >
+                        +15s
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Input 2: Taste Evaluation Chips */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-mono font-bold text-cream-light px-0.5">
+                    <span>2. Cup Taste Profile:</span>
+                    <span className="text-[10px] text-stone-400 font-normal">Tap to diagnose extraction physics</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
+                    <button
+                      type="button"
+                      onClick={() => setTasteFeedback('sour')}
+                      className={`p-2.5 sm:p-3 rounded-2xl border transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                        tasteFeedback === 'sour'
+                          ? 'bg-amber-500/30 border-amber-400 text-amber-200 ring-2 ring-amber-400/50 shadow-lg scale-102 font-bold'
+                          : 'bg-black/40 border-white/10 text-stone-300 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      <span className="text-lg sm:text-xl">🍋</span>
+                      <span className="text-[10px] sm:text-[11px] font-bold leading-tight">Sour / Bright</span>
+                      <span className="text-[8px] sm:text-[9px] text-stone-400">Under-extracted</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setTasteFeedback('sweet')}
+                      className={`p-2.5 sm:p-3 rounded-2xl border transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                        tasteFeedback === 'sweet'
+                          ? 'bg-emerald-500/30 border-emerald-400 text-emerald-200 ring-2 ring-emerald-400/50 shadow-lg scale-102 font-bold'
+                          : 'bg-black/40 border-white/10 text-stone-300 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      <span className="text-lg sm:text-xl">✨</span>
+                      <span className="text-[10px] sm:text-[11px] font-bold text-emerald-300 leading-tight">Sweet & Balanced</span>
+                      <span className="text-[8px] sm:text-[9px] text-stone-400">Golden Cup</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setTasteFeedback('bitter')}
+                      className={`p-2.5 sm:p-3 rounded-2xl border transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+                        tasteFeedback === 'bitter'
+                          ? 'bg-rose-500/30 border-rose-400 text-rose-200 ring-2 ring-rose-400/50 shadow-lg scale-102 font-bold'
+                          : 'bg-black/40 border-white/10 text-stone-300 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      <span className="text-lg sm:text-xl">🪵</span>
+                      <span className="text-[10px] sm:text-[11px] font-bold leading-tight">Bitter / Dry</span>
+                      <span className="text-[8px] sm:text-[9px] text-stone-400">Over-extracted</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Dynamic Closed-Loop Diagnosis & Next-Brew Quantitative Tweaks */}
+                {dialInDiagnosis && (
+                  <div className={`p-4 rounded-2xl border text-xs font-mono space-y-2.5 animate-fade-in shadow-xl ${
+                    dialInDiagnosis.tasteProfile === 'sweet'
+                      ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-100'
+                      : dialInDiagnosis.tasteProfile === 'bitter'
+                      ? 'bg-rose-500/10 border-rose-500/40 text-rose-100'
+                      : 'bg-amber-500/10 border-amber-500/40 text-amber-100'
+                  }`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 font-bold text-amber-gold text-[11px] uppercase tracking-wider">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Closed-Loop Dial-In Recommendation:</span>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border shrink-0 ${
+                        dialInDiagnosis.diagnosisType === 'sweet_spot'
+                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                          : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                      }`}>
+                        {dialInDiagnosis.headline}
+                      </span>
+                    </div>
+
+                    {/* Plain English user recommendation */}
+                    <p className="text-[12px] leading-relaxed text-cream-light font-sans font-medium">
+                      "{dialInDiagnosis.recommendationText}"
+                    </p>
+
+                    {/* Quantitative Tweaks Grid */}
+                    {dialInDiagnosis.recipePatch && (
+                      <div className="grid grid-cols-3 gap-2 pt-1 text-[11px] font-mono">
+                        <div className="p-2 rounded-xl bg-black/40 border border-white/10 text-center">
+                          <span className="text-[9px] text-stone-400 uppercase block">Grind Adjustment</span>
+                          <span className="font-bold text-amber-gold truncate block">
+                            {dialInDiagnosis.recipePatch.grindSetting || 'Keep setting'}
+                          </span>
+                          <span className="text-[9px] text-stone-400 block mt-0.5">
+                            {dialInDiagnosis.recipePatch.grindShift > 0 
+                              ? `+${dialInDiagnosis.recipePatch.grindShift} clicks coarser` 
+                              : dialInDiagnosis.recipePatch.grindShift < 0 
+                              ? `${dialInDiagnosis.recipePatch.grindShift} clicks finer` 
+                              : 'Locked in'}
+                          </span>
+                        </div>
+
+                        <div className="p-2 rounded-xl bg-black/40 border border-white/10 text-center">
+                          <span className="text-[9px] text-stone-400 uppercase block">Water Temp</span>
+                          <span className="font-bold text-cream-light block">
+                            {dialInDiagnosis.recipePatch.tempF}°F
+                          </span>
+                          <span className="text-[9px] text-stone-400 block mt-0.5">
+                            {dialInDiagnosis.recipePatch.tempShiftF > 0 
+                              ? `+${dialInDiagnosis.recipePatch.tempShiftF}°F hotter` 
+                              : dialInDiagnosis.recipePatch.tempShiftF < 0 
+                              ? `${dialInDiagnosis.recipePatch.tempShiftF}°F cooler` 
+                              : 'Locked in'}
+                          </span>
+                        </div>
+
+                        <div className="p-2 rounded-xl bg-black/40 border border-white/10 text-center">
+                          <span className="text-[9px] text-stone-400 uppercase block">Target Ratio</span>
+                          <span className="font-bold text-amber-gold block">
+                            1 : {dialInDiagnosis.recipePatch.ratio}
+                          </span>
+                          <span className="text-[9px] text-stone-400 block mt-0.5">
+                            {dialInDiagnosis.recipePatch.ratioShift !== 0
+                              ? `${dialInDiagnosis.recipePatch.ratioShift > 0 ? '+' : ''}${dialInDiagnosis.recipePatch.ratioShift}`
+                              : 'Locked in'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 1-Click Apply Tweaks Button */}
+                    {onApplyNextBrewTweak && dialInDiagnosis.recipePatch && (
+                      <div className="pt-1.5">
+                        <button
+                          type="button"
+                          onClick={handleApplyDialInTweak}
+                          className="w-full py-2.5 px-4 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg hover:scale-[1.02] active:scale-98 transition cursor-pointer"
+                        >
+                          <ArrowRight className="w-4 h-4" />
+                          <span>Apply Tweaks to Next Brew</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Dial-In Summary & 1-Click Save */}
+                <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                  <div className="text-[10px] font-mono text-stone-400">
+                    <div>Bean: <strong className="text-cream-light">{dialedInCoffee?.beanName || activeMethod?.preferredCoffeeTypes?.split('.')[0] || 'Single-Origin Lot'}</strong></div>
+                    <div>Dose & Water: <strong className="text-cream-light">{effectiveDose}g • ~{totalWaterMl || Math.round(effectiveDose * (customRatio || activeMethod?.ratio || 16))} mL</strong></div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSaveToLog}
+                      disabled={isSavedToLog}
+                      className={`px-4 py-2 rounded-xl font-mono text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer ${
+                        isSavedToLog
+                          ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-500/50'
+                          : 'btn-tactile-amber text-espresso-950 hover:scale-105'
+                      }`}
+                    >
+                      {isSavedToLog ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Logged to Journal!</span>
+                        </>
+                      ) : (
+                        <>
+                          <BookOpen className="w-3.5 h-3.5" />
+                          <span>Save to Brew Log</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsEvaluationSkipped(true)}
+                      className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white text-xs font-mono font-medium border border-white/15 transition cursor-pointer"
+                      title="Skip feedback evaluation"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          ) : (
+            /* Normal In-Flight Phase Instructions */
+            <>
+              <div className={`p-6 rounded-3xl bg-black/40 border shadow-inner space-y-3 transition-all duration-300 ${
+                isAnnouncing
+                  ? 'border-amber-400/50 shadow-[0_0_20px_rgba(251,191,36,0.15)] ring-1 ring-amber-400/30'
+                  : 'border-white/10'
+              }`}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-stone-400 font-extrabold flex items-center gap-1.5">
+                    <Sparkles className={`w-3.5 h-3.5 ${isCoffee ? 'text-[#D2A06E]' : 'text-sage-300'}`} />
+                    <span>Active Extraction Instruction</span>
+                  </div>
+
+                  {/* Dedicated Listen / Replay Instruction Button */}
+                  <button
+                    type="button"
+                    onClick={handleReplayInstruction}
+                    className={`px-3 py-1.5 rounded-xl border text-[11px] font-mono font-bold flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-sm ${
+                      isAnnouncing
+                        ? 'bg-amber-500/25 border-amber-400/60 text-amber-200 animate-pulse ring-1 ring-amber-400/40'
+                        : 'bg-white/10 hover:bg-white/20 border-white/15 text-stone-200 hover:text-white'
+                    }`}
+                    title="Tap to hear Active Extraction Instruction spoken aloud"
+                    aria-label="Hear Active Extraction Instruction"
+                  >
+                    <Volume2 className={`w-3.5 h-3.5 ${isAnnouncing ? 'text-amber-300 animate-bounce' : 'text-stone-300'}`} />
+                    <span>{isAnnouncing ? 'Speaking...' : '🔊 Listen'}</span>
+                  </button>
+                </div>
+                
+                <p className="text-sm md:text-base text-cream-light font-medium leading-relaxed">
+                  {activePhase?.instruction || 'Follow standard extraction pulse pouring technique.'}
+                </p>
+
+                {/* Active Voice Guidance Banner */}
+                {isAnnouncing && (
+                  <div className="pt-2 flex items-center gap-2 text-xs font-mono text-amber-300 animate-pulse border-t border-white/10">
+                    <Volume2 className="w-4 h-4 flex-shrink-0 animate-spin" />
+                    <span className="font-semibold">Speaking Active Instruction: "{announcementText || activePhase?.instruction}"</span>
+                  </div>
+                )}
+              </div>
+
+              {/* The Two Scaling Variables Indicator (Bloom Phase) */}
+              {isBloomPhase && (
+                <div className="p-4 rounded-3xl bg-[#A66E38]/15 border border-[#A66E38]/40 text-xs font-mono space-y-3 shadow-md text-left">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 font-bold text-amber-gold uppercase tracking-wider text-[11px]">
+                      <Scale className="w-4 h-4 text-amber-gold" />
+                      <span>The Two Scaling Variables (Bloom Phase)</span>
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold uppercase">
+                      {bloomMetrics.tierName} ({effectiveDose}g)
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-left">
+                    <div className="p-3 rounded-2xl bg-black/50 border border-white/10 space-y-1">
+                      <span className="text-[10px] text-stone-400 uppercase tracking-wide block font-semibold">1. Bloom Water Weight</span>
+                      <span className="text-cream-light font-bold text-base block font-mono">~{bloomMetrics.targetWaterGrams}g</span>
+                      <span className="text-amber-gold/90 text-[10px] block font-mono">{bloomMetrics.waterRangeStr}</span>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-black/50 border border-white/10 space-y-1">
+                      <span className="text-[10px] text-stone-400 uppercase tracking-wide block font-semibold">2. Bloom Time</span>
+                      <span className="text-cream-light font-bold text-base block font-mono">{bloomMetrics.durationSec}s</span>
+                      <span className="text-amber-gold/90 text-[10px] block font-mono">{bloomMetrics.bloomTimeRange}</span>
+                    </div>
+                  </div>
+
+                  {/* Benchmark Reference Grid */}
+                  <div className="pt-2 border-t border-white/10 grid grid-cols-3 gap-1.5 text-[9px] text-stone-400 text-center font-mono">
+                    <div className={`p-1.5 rounded-xl border transition ${bloomMetrics.tier === 'small' ? 'bg-amber-500/20 text-amber-200 font-bold border-amber-500/40 shadow-sm' : 'bg-black/30 border-white/5 opacity-70'}`}>
+                      <div>Small (12–15g)</div>
+                      <div className="text-[8.5px] mt-0.5">35–45g • 30–40s</div>
+                    </div>
+                    <div className={`p-1.5 rounded-xl border transition ${bloomMetrics.tier === 'standard' ? 'bg-amber-500/20 text-amber-200 font-bold border-amber-500/40 shadow-sm' : 'bg-black/30 border-white/5 opacity-70'}`}>
+                      <div>Standard (20–30g)</div>
+                      <div className="text-[8.5px] mt-0.5">60–90g • 40–45s</div>
+                    </div>
+                    <div className={`p-1.5 rounded-xl border transition ${bloomMetrics.tier === 'large' ? 'bg-amber-500/20 text-amber-200 font-bold border-amber-500/40 shadow-sm' : 'bg-black/30 border-white/5 opacity-70'}`}>
+                      <div>Large (45–60g+)</div>
+                      <div className="text-[8.5px] mt-0.5">135–180g • 45–60+s</div>
+                    </div>
+                  </div>
+
+                  {/* View Full Scaling Guide Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsProTipOpen(true)}
+                    className="w-full py-2 px-3 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                  >
+                    <span>View Full V60 Technique & Scaling Guide</span>
+                    <span>↗</span>
+                  </button>
                 </div>
               )}
-            </div>
+
+              {/* Target Water Pour & Water Temp Indicator */}
+              {(targetPhaseWaterMl || activeMethod?.tempC || activeMethod?.tempF) && (
+                <div className="space-y-2">
+                  {targetPhaseWaterMl && (
+                    <div className={`p-4 rounded-2xl border flex items-center justify-between text-xs font-mono font-bold shadow-md ${
+                      isCoffee
+                        ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
+                        : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
+                    }`}>
+                      <span>Target Pour Water:</span>
+                      <span className="text-cream-light text-sm font-black">
+                        ~{targetPhaseWaterMl} mL ({Math.round(targetPhaseWaterMl / 29.5735 * 10) / 10} fl oz)
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Water Temperature Indicator */}
+                  {(activeMethod?.tempC || activeMethod?.tempF) && (
+                    <div className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs font-mono font-bold shadow-md ${
+                      isCoffee
+                        ? 'bg-[#A66E38]/15 text-[#D2A06E] border-[#A66E38]/30'
+                        : 'bg-sage-500/15 text-sage-300 border-sage-500/30'
+                    }`}>
+                      <div className="flex items-center gap-1.5">
+                        <Thermometer className="w-3.5 h-3.5 text-cyan-300" />
+                        <span>Water Temp:</span>
+                      </div>
+                      <span className="text-cream-light font-black">
+                        {unitSystem === 'metric'
+                          ? `${activeMethod?.tempC || 93}°C (${activeMethod?.tempF || 200}°F)`
+                          : `${activeMethod?.tempF || 200}°F (${activeMethod?.tempC || 93}°C)`}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
 
