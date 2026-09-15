@@ -1706,11 +1706,11 @@ function useCoffeeLabelQrCodes(coffees = [], roaster = null) {
           const url = generateSmartBagUrl({
             ...coffee,
             roaster: roaster?.name || coffee.roaster || 'Specialty Roaster'
-          });
+          }, null, { compact: true });
           const dataUrl = await QRCode.toDataURL(url, {
             errorCorrectionLevel: 'M',
             margin: 1,
-            width: 256,
+            width: 800,
             color: {
               dark: '#000000',
               light: '#FFFFFF'
@@ -1974,9 +1974,9 @@ function CoffeePackagingLabel({
   if (layout === 'brother_ql') {
     return (
       <div className={`w-full max-w-md mx-auto flex flex-col justify-between rounded-2xl bg-white text-stone-900 p-3.5 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 print-label-target print-label-brother-ql group ${isEnlarged ? 'scale-100' : ''}`}>
-        <div className="flex items-center justify-between gap-2.5">
+        <div className="flex items-stretch justify-between gap-2.5 h-full">
           {/* Left Column: Details */}
-          <div className="flex-1 min-w-0 pr-1 space-y-1">
+          <div className="flex-1 min-w-0 pr-1 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-1 mb-0.5">
                 <span className="text-[7px] font-mono uppercase tracking-wider font-extrabold bg-stone-900 text-white px-1.5 py-0.5 rounded">
@@ -1995,7 +1995,7 @@ function CoffeePackagingLabel({
             </div>
 
             {/* 4-Cell Dial-In Matrix */}
-            <div className="grid grid-cols-2 gap-1 py-1 px-1.5 bg-stone-100 rounded-md border border-stone-200 text-[8px] font-mono">
+            <div className="grid grid-cols-2 gap-1 py-1 px-1.5 bg-stone-100 rounded-md border border-stone-200 text-[8px] font-mono my-1">
               <div>
                 <span className="text-stone-500 block text-[7px] uppercase leading-none">Ratio</span>
                 <span className="font-bold text-amber-800">1:{coffee.recommendedRatio || 16.5}</span>
@@ -2024,22 +2024,19 @@ function CoffeePackagingLabel({
             </div>
           </div>
 
-          {/* Right Column: QR Code */}
-          <div className="flex flex-col items-center justify-center flex-shrink-0 bg-stone-50 p-2 rounded-lg border border-stone-200 w-28 h-28">
+          {/* Right Column: Maximized QR Code (Full Height) */}
+          <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-lg border border-stone-300 h-full aspect-square w-28 h-28 sm:w-32 sm:h-32">
             {qrDataUrl ? (
               <img
                 src={qrDataUrl}
                 alt={`Smart Bag QR for ${coffee.beanName}`}
-                className="w-20 h-20 object-contain"
+                className="w-full h-full object-contain"
               />
             ) : (
-              <div className="w-20 h-20 flex items-center justify-center text-stone-400 font-mono text-[9px]">
+              <div className="w-full h-full flex items-center justify-center text-stone-400 font-mono text-[9px]">
                 Generating...
               </div>
             )}
-            <span className="text-[7px] font-mono font-bold text-stone-600 mt-1 tracking-tight text-center">
-              DK-1209 (1.1x2.4")
-            </span>
           </div>
         </div>
 

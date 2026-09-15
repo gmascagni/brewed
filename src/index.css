@@ -342,12 +342,32 @@ input[type=range]::-webkit-slider-thumb:hover {
     height: 1.1in !important;
     max-width: 2.4in !important;
     max-height: 1.1in !important;
-    padding: 0.08in !important;
-    border-radius: 4px !important;
-    top: 0.5cm !important;
+    padding: 0.04in !important;
+    border-radius: 0 !important;
+    border: 1px solid #000000 !important;
+    top: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    gap: 0.06in !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+  }
+  .print-label-target.print-label-brother-ql img {
+    height: 1.02in !important;
+    width: 1.02in !important;
+    max-height: 1.02in !important;
+    max-width: 1.02in !important;
+    min-width: 1.02in !important;
+    object-fit: contain !important;
+    image-rendering: pixelated !important;
+    image-rendering: -moz-crisp-edges !important;
+    image-rendering: crisp-edges !important;
   }
   @page {
-    margin: 0.2cm;
+    margin: 0;
     size: auto;
   }
 }

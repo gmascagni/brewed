@@ -271,7 +271,8 @@ export default function RoasterPortalModal({
       recommendedGrind,
       upc
     };
-    const targetUrl = customUrl.trim() || generateSmartBagUrl(coffee);
+    const isBrotherLayout = qrLayout === 'brother_ql';
+    const targetUrl = customUrl.trim() || generateSmartBagUrl(coffee, null, { compact: isBrotherLayout });
     setActiveTargetUrl(targetUrl);
 
     let darkColor = '#000000';
@@ -284,17 +285,20 @@ export default function RoasterPortalModal({
       lightColor = '#1A120B';
     }
 
+    const effectiveEcc = isBrotherLayout ? 'M' : qrEcc;
+    const effectiveMargin = isBrotherLayout ? 1 : 2;
+
     Promise.all([
       QRCode.toDataURL(targetUrl, {
         width: 1200,
-        margin: 2,
-        errorCorrectionLevel: qrEcc,
+        margin: effectiveMargin,
+        errorCorrectionLevel: effectiveEcc,
         color: { dark: darkColor, light: lightColor }
       }),
       QRCode.toString(targetUrl, {
         type: 'svg',
-        margin: 2,
-        errorCorrectionLevel: qrEcc,
+        margin: effectiveMargin,
+        errorCorrectionLevel: effectiveEcc,
         color: { dark: darkColor, light: lightColor }
       })
     ]).then(([pngUrl, svgStr]) => {
@@ -307,7 +311,7 @@ export default function RoasterPortalModal({
     });
 
     return () => { isMounted = false; };
-  }, [selectedCoffeeForSticker, roasterName, beanName, brewMethod, recommendedRatio, tempF, recommendedGrind, upc, customUrl, qrColor, qrEcc]);
+  }, [selectedCoffeeForSticker, roasterName, beanName, brewMethod, recommendedRatio, tempF, recommendedGrind, upc, customUrl, qrColor, qrEcc, qrLayout]);
 
   if (!isOpen) return null;
 
@@ -1494,7 +1498,7 @@ export default function RoasterPortalModal({
                 {qrLayout === 'brother_ql' && (
                   <div 
                     ref={stickerRef}
-                    className="w-full max-w-lg h-56 rounded-xl bg-white text-stone-900 p-3.5 shadow-2xl border-2 border-stone-800 flex items-center justify-between gap-3 relative overflow-hidden print-label-target print-label-brother-ql select-none"
+                    className="w-full max-w-lg h-56 rounded-xl bg-white text-stone-900 p-3 shadow-2xl border-2 border-stone-800 flex items-stretch justify-between gap-3 relative overflow-hidden print-label-target print-label-brother-ql select-none"
                   >
                     {/* Left Details Column */}
                     <div className="flex-1 flex flex-col justify-between h-full min-w-0 pr-1">
@@ -1553,28 +1557,19 @@ export default function RoasterPortalModal({
                       </div>
                     </div>
 
-                    {/* Right QR Column */}
-                    <div className="flex flex-col items-center justify-center flex-shrink-0 bg-stone-50 p-2 rounded-lg border border-stone-200 h-full w-36">
-                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-full bg-stone-900 text-white font-mono text-[7px] font-bold uppercase tracking-wider mb-1 shadow-xs">
-                        <Sparkles className="w-2.5 h-2.5 text-amber-400" />
-                        <span>Scan Me</span>
-                      </div>
-
+                    {/* Right QR Column: Maximized Full-Height QR Code */}
+                    <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-lg border border-stone-300 h-full aspect-square">
                       {qrDataUrl ? (
                         <img
                           src={qrDataUrl}
                           alt="Brother QL Smart Bag QR Code"
-                          className="w-24 h-24 object-contain"
+                          className="w-full h-full object-contain"
                         />
                       ) : (
-                        <div className="w-24 h-24 flex items-center justify-center text-stone-400 font-mono text-[9px]">
+                        <div className="w-full h-full flex items-center justify-center text-stone-400 font-mono text-[9px]">
                           Generating...
                         </div>
                       )}
-
-                      <span className="text-[7px] font-mono font-bold text-stone-600 mt-1 tracking-tight text-center">
-                        Brother QL-600 (1.1x2.4")
-                      </span>
                     </div>
                   </div>
                 )}

@@ -188,9 +188,9 @@ export async function generateCompositeStickerCanvas(rawCoffee = {}) {
  */
 export async function generateBrotherQlStickerCanvas(rawCoffee = {}) {
   const coffee = createCoffeeProfile(rawCoffee);
-  const targetUrl = coffee.packaging?.customUrl?.trim() || generateSmartBagUrl(coffee);
+  const targetUrl = coffee.packaging?.customUrl?.trim() || generateSmartBagUrl(coffee, null, { compact: true });
 
-  // 1440 x 660 px (2x high-resolution rendering of 720 x 330 at 300 DPI)
+  // 1440 x 660 px (2x high-resolution rendering of 720 x 330 at 300 DPI for Brother DK-1209 1.1" x 2.4" / 29x62mm)
   const canvas = document.createElement('canvas');
   canvas.width = 1440;
   canvas.height = 660;
@@ -200,164 +200,134 @@ export async function generateBrotherQlStickerCanvas(rawCoffee = {}) {
   ctx.fillStyle = '#FFFFFF';
   ctx.fillRect(0, 0, 1440, 660);
 
-  // 2. Outer thermal die-cut boundary
+  // 2. Outer thermal boundary (clean hairline)
   ctx.strokeStyle = '#1C1917';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(16, 16, 1408, 628);
+  ctx.lineWidth = 4;
+  ctx.strokeRect(12, 12, 1416, 636);
 
-  // 3. Inner hairline frame
-  ctx.strokeStyle = '#E7E5E4';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(26, 26, 1388, 608);
-
-  // LEFT COLUMN: ROASTERY & RECIPE METADATA (Width: ~880px)
-  const leftX = 48;
+  // LEFT COLUMN: ROASTERY & RECIPE METADATA (Occupies x = 44 to 800)
+  const leftX = 44;
 
   // Header Subtitle
-  ctx.fillStyle = '#78716C';
+  ctx.fillStyle = '#57534E';
   ctx.font = 'bold 18px monospace, sans-serif';
   ctx.textAlign = 'left';
-  ctx.fillText('SPECIALTY COFFEE • SMART BAG CERTIFIED', leftX, 64);
+  ctx.fillText('THEBREW.APP • SMART BAG™ DIAL-IN', leftX, 60);
 
   // Roaster Brand Title
-  ctx.fillStyle = '#1C1917';
-  ctx.font = 'bold 42px Georgia, "Times New Roman", serif';
+  ctx.fillStyle = '#0C0A09';
+  ctx.font = 'bold 38px Georgia, "Times New Roman", serif';
   const roasterText = coffee.roaster || 'Specialty Roaster';
-  ctx.fillText(roasterText.length > 28 ? `${roasterText.slice(0, 26)}…` : roasterText, leftX, 114);
+  ctx.fillText(roasterText.length > 28 ? `${roasterText.slice(0, 26)}…` : roasterText, leftX, 108);
 
   // Bean Name
-  ctx.fillStyle = '#0C0A09';
-  ctx.font = 'bold 36px Georgia, serif';
+  ctx.fillStyle = '#1C1917';
+  ctx.font = 'bold 32px Georgia, serif';
   const beanText = coffee.beanName || 'Single Origin Lot';
-  ctx.fillText(beanText.length > 32 ? `${beanText.slice(0, 30)}…` : beanText, leftX, 162);
+  ctx.fillText(beanText.length > 30 ? `${beanText.slice(0, 28)}…` : beanText, leftX, 154);
 
   // Terroir & Roast Details
   ctx.fillStyle = '#57534E';
-  ctx.font = '500 22px -apple-system, sans-serif';
+  ctx.font = '600 20px -apple-system, sans-serif';
   const roastPill = (coffee.roastLevel || 'LIGHT').toUpperCase();
   const originLine = `${roastPill} • ${coffee.origin || 'Single Origin'} • ${coffee.process || 'Washed'}`;
-  ctx.fillText(originLine, leftX, 200);
+  ctx.fillText(originLine, leftX, 192);
 
   // Tasting Notes
   const notesStr = (coffee.tastingNotes || []).slice(0, 3).join(', ');
   if (notesStr) {
     ctx.fillStyle = '#92400E';
-    ctx.font = 'italic 22px Georgia, serif';
-    ctx.fillText(`Notes: ${notesStr}`, leftX, 236);
+    ctx.font = 'italic 20px Georgia, serif';
+    ctx.fillText(`Notes: ${notesStr}`, leftX, 226);
   }
 
   // Divider Line
   ctx.strokeStyle = '#E7E5E4';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(leftX, 258);
-  ctx.lineTo(870, 258);
+  ctx.moveTo(leftX, 246);
+  ctx.lineTo(790, 246);
   ctx.stroke();
 
   // Extraction Specification Box (Left Side, Bottom)
-  const boxY = 276;
+  const boxY = 262;
   const boxH = 290;
+  const boxW = 746;
   ctx.fillStyle = '#F5F5F4';
-  ctx.fillRect(leftX, boxY, 822, boxH);
+  ctx.fillRect(leftX, boxY, boxW, boxH);
   ctx.strokeStyle = '#D6D3D1';
   ctx.lineWidth = 2;
-  ctx.strokeRect(leftX, boxY, 822, boxH);
+  ctx.strokeRect(leftX, boxY, boxW, boxH);
 
   // Subheader
   ctx.fillStyle = '#78716C';
-  ctx.font = 'bold 18px monospace, sans-serif';
-  ctx.fillText('BARISTA DIAL-IN SPECIFICATIONS', leftX + 24, boxY + 36);
+  ctx.font = 'bold 16px monospace, sans-serif';
+  ctx.fillText('BARISTA DIAL-IN SPECIFICATIONS', leftX + 20, boxY + 34);
 
   // Grid of 4 Parameters
-  const colW = 774 / 4;
-  const pY = boxY + 85;
+  const colW = (boxW - 40) / 4;
+  const pY = boxY + 80;
 
   // Col 1: Ratio
   ctx.fillStyle = '#78716C';
-  ctx.font = 'bold 16px monospace, sans-serif';
-  ctx.fillText('RATIO', leftX + 24, pY);
+  ctx.font = 'bold 15px monospace, sans-serif';
+  ctx.fillText('RATIO', leftX + 20, pY);
   ctx.fillStyle = '#92400E';
-  ctx.font = 'bold 36px monospace, sans-serif';
-  ctx.fillText(`1:${coffee.extraction?.ratio || '16'}`, leftX + 24, pY + 44);
+  ctx.font = 'bold 34px monospace, sans-serif';
+  ctx.fillText(`1:${coffee.extraction?.ratio || '16'}`, leftX + 20, pY + 42);
 
   // Col 2: Temp
   ctx.fillStyle = '#78716C';
-  ctx.font = 'bold 16px monospace, sans-serif';
-  ctx.fillText('TEMP', leftX + 24 + colW, pY);
+  ctx.font = 'bold 15px monospace, sans-serif';
+  ctx.fillText('TEMP', leftX + 20 + colW, pY);
   ctx.fillStyle = '#1C1917';
-  ctx.font = 'bold 36px monospace, sans-serif';
-  ctx.fillText(`${coffee.extraction?.tempF || '202'}°F`, leftX + 24 + colW, pY + 44);
+  ctx.font = 'bold 34px monospace, sans-serif';
+  ctx.fillText(`${coffee.extraction?.tempF || '202'}°F`, leftX + 20 + colW, pY + 42);
 
   // Col 3: Method
   ctx.fillStyle = '#78716C';
-  ctx.font = 'bold 16px monospace, sans-serif';
-  ctx.fillText('METHOD', leftX + 24 + colW * 2, pY);
+  ctx.font = 'bold 15px monospace, sans-serif';
+  ctx.fillText('METHOD', leftX + 20 + colW * 2, pY);
   ctx.fillStyle = '#1C1917';
-  ctx.font = 'bold 24px -apple-system, sans-serif';
+  ctx.font = 'bold 22px -apple-system, sans-serif';
   const methodStr = String(coffee?.extraction?.method || 'pour_over').replace(/_/g, ' ');
-  ctx.fillText(methodStr.length > 12 ? `${methodStr.slice(0, 10)}…` : methodStr, leftX + 24 + colW * 2, pY + 42);
+  ctx.fillText(methodStr.length > 10 ? `${methodStr.slice(0, 9)}…` : methodStr, leftX + 20 + colW * 2, pY + 40);
 
   // Col 4: Grind
   ctx.fillStyle = '#78716C';
-  ctx.font = 'bold 16px monospace, sans-serif';
-  ctx.fillText('GRIND', leftX + 24 + colW * 3, pY);
+  ctx.font = 'bold 15px monospace, sans-serif';
+  ctx.fillText('GRIND', leftX + 20 + colW * 3, pY);
   ctx.fillStyle = '#1C1917';
-  ctx.font = 'bold 22px -apple-system, sans-serif';
+  ctx.font = 'bold 20px -apple-system, sans-serif';
   const grindStr = (coffee.extraction?.grind || 'Med-Fine').split('(')[0].trim();
-  ctx.fillText(grindStr, leftX + 24 + colW * 3, pY + 42);
+  ctx.fillText(grindStr, leftX + 20 + colW * 3, pY + 40);
 
   // Micro Advice Line inside box
   ctx.fillStyle = '#57534E';
   ctx.font = 'italic 18px Georgia, serif';
-  ctx.fillText('Scan QR for animated multi-phase timer & dynamic dose scaling.', leftX + 24, boxY + 220);
+  ctx.fillText('Scan QR with phone camera for auto-timer & dynamic dose scaling.', leftX + 20, boxY + 220);
 
   // Footer Tagline
   ctx.fillStyle = '#78716C';
-  ctx.font = 'bold 18px monospace, sans-serif';
-  ctx.fillText('thebrew.app dial-in', leftX, 608);
+  ctx.font = 'bold 16px monospace, sans-serif';
+  ctx.fillText('thebrew.app/roasters', leftX, 608);
   ctx.textAlign = 'right';
-  ctx.fillText(`LOT: ${coffee.packaging?.upc || 'CERTIFIED-LOT'}`, 870, 608);
+  ctx.fillText(`LOT: ${coffee.packaging?.upc || 'CERTIFIED-LOT'}`, 790, 608);
 
-  // RIGHT COLUMN: PROMINENT QR CODE & CALLOUT (Width: ~500px)
-  const qrCenter = 1145;
+  // RIGHT COLUMN: MAXIMIZED HIGH-RESOLUTION QR CODE (580 x 580 px)
+  // Filling the full vertical height of the 1.1" label (580px out of 660px = 88% height)
+  const qrSize = 580;
+  const qrX = 820;
+  const qrY = 40;
 
-  // "SCAN ME FOR RECIPE" Banner
-  const bannerY = 48;
-  const bannerH = 56;
-  const bannerW = 440;
-  const bannerX = qrCenter - (bannerW / 2);
-  ctx.fillStyle = '#1C1917';
-  if (ctx.roundRect) {
-    ctx.beginPath();
-    ctx.roundRect(bannerX, bannerY, bannerW, bannerH, 28);
-    ctx.fill();
-  } else {
-    ctx.fillRect(bannerX, bannerY, bannerW, bannerH);
-  }
-
-  ctx.fillStyle = '#F59E0B'; // Amber Gold
-  ctx.font = 'bold 22px monospace, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('✨ SCAN FOR RECIPE ✨', qrCenter, bannerY + 36);
-
-  // Centered High-Res QR Code (440 x 440 px)
   const qrCanvas = document.createElement('canvas');
   await QRCode.toCanvas(qrCanvas, targetUrl, {
-    width: 440,
+    width: qrSize,
     margin: 1,
-    errorCorrectionLevel: 'H',
+    errorCorrectionLevel: 'M',
     color: { dark: '#000000', light: '#FFFFFF' }
   });
-  ctx.drawImage(qrCanvas, qrCenter - 220, 120, 440, 440);
-
-  // Subtitle below QR
-  ctx.fillStyle = '#78716C';
-  ctx.font = 'bold 18px monospace, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('AIM PHONE CAMERA TO BREW', qrCenter, 592);
-  ctx.fillStyle = '#A8A29E';
-  ctx.font = '15px monospace, sans-serif';
-  ctx.fillText('Brother QL-600 • 1.1" x 2.4" (29x62mm)', qrCenter, 616);
+  ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
 
   return canvas;
 }

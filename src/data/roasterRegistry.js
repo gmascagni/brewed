@@ -342,7 +342,7 @@ export function getSmartBagBaseUrl() {
 /**
  * Generate a deep-link URL for a coffee profile that opens the Roaster's Portfolio page with dial-in parameters
  */
-export function generateSmartBagUrl(coffee, baseUrl) {
+export function generateSmartBagUrl(coffee, baseUrl, options = {}) {
   const base = (baseUrl || getSmartBagBaseUrl()).replace(/\/+$/, '');
   if (!coffee) return `${base}/roasters/`;
 
@@ -353,6 +353,20 @@ export function generateSmartBagUrl(coffee, baseUrl) {
 
   const params = new URLSearchParams();
   params.set('roaster', roasterSlug);
+
+  // If compact mode is requested (e.g. for small thermal labels like Brother QL-600 / DK-1209),
+  // keep only essential dial-in params so the QR code stays low-density with large scannable modules.
+  if (options.compact) {
+    if (coffee.beanName) params.set('bean', coffee.beanName);
+    if (coffee.id) params.set('coffeeId', coffee.id);
+    if (coffee.brewMethod) params.set('method', coffee.brewMethod);
+    if (coffee.recommendedRatio) params.set('ratio', coffee.recommendedRatio.toString());
+    if (coffee.tempF) params.set('tempF', coffee.tempF.toString());
+    if (coffee.recommendedGrind) params.set('grind', coffee.recommendedGrind.split('(')[0].trim());
+    if (coffee.upc) params.set('upc', coffee.upc);
+    return `${base}/roasters/?${params.toString()}`;
+  }
+
   if (coffee.roaster && coffee.roaster !== roasterSlug) params.set('roasterName', coffee.roaster);
   if (coffee.beanName) params.set('bean', coffee.beanName);
   if (coffee.id) params.set('coffeeId', coffee.id);
