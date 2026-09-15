@@ -629,13 +629,27 @@ export default function App() {
   }, [location.pathname, location.search]);
 
   const handleSelectMethodFromGrid = (method) => {
-    setActiveMethod(method);
-    setCustomRatio(null);
-    setCustomWaterMl(null);
-    if (setActiveVideo) setActiveVideo(null);
-    setCurrentStep(2);
-    navigate(`/methods/${method.id}`);
+    if (currentActiveMethod?.id === method.id) {
+      setCurrentStep(2);
+      navigate(`/methods/${method.id}`);
+    } else {
+      setActiveMethod(method);
+      setCustomRatio(null);
+      setCustomWaterMl(null);
+      if (setActiveVideo) setActiveVideo(null);
+    }
     trackEvent('select_method', { method_id: method.id, method_name: method.name });
+  };
+
+  const handleSelectBrewerFromHero = (brewerId) => {
+    const allMethods = BREW_METHODS.coffee;
+    const match = allMethods.find(m => m.id === brewerId || (brewerId === 'pour_over' && (m.id === 'pour_over' || m.id === 'classic_pour_over'))) || allMethods[0];
+    if (match) {
+      setActiveMethod(match);
+      setCustomRatio(null);
+      setCustomWaterMl(null);
+      trackEvent('select_hero_brewer', { brewer_id: brewerId, method_name: match.name });
+    }
   };
 
   const isCoffee = true;
@@ -688,11 +702,11 @@ export default function App() {
           key={currentActiveMethod?.id || currentActiveMethod?.heroImage || 'technique_backdrop'}
           src={getAssetUrl(currentActiveMethod?.heroImage || (trackMode === 'tea' ? '/tea_ceremony.jpg' : '/pour_over_hero.jpg'))}
           alt=""
-          className="w-full h-full object-cover object-center filter saturate-[1.25] contrast-[1.08] brightness-[0.92] scale-105 transform transition-all duration-1000 ease-out"
+          className="w-full h-full object-cover object-center opacity-15 sm:opacity-20 filter saturate-[1.05] contrast-[0.98] brightness-[1.04] scale-105 transform transition-all duration-1000 ease-out"
         />
         {/* Atmospheric Scrim & Radial Vignette: Ensures warm cafe luxury & pristine card readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/82 via-[#FAF7F2]/68 to-[#FAF7F2]/88 backdrop-blur-[1px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#FAF7F2]/30 to-[#FAF7F2]/85" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/95 via-[#FAF7F2]/88 to-[#FAF7F2]/96 backdrop-blur-[1.5px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#FAF7F2]/45 to-[#FAF7F2]/90" />
       </div>
       
       {/* 100% Bulletproof Sticky Top Header Container */}
@@ -892,6 +906,8 @@ export default function App() {
               {currentStep === 1 && (
                 <div className="space-y-12">
                   <ConsumerDiscoveryFeed
+                    activeBrewerId={currentActiveMethod?.id}
+                    onSelectBrewerId={handleSelectBrewerFromHero}
                     onSelectBeanToBrew={handleApplyScannedRecipe}
                     onLaunchDirectBrew={handleLaunchDirectBrew}
                     onNavigateToRoaster={(roasterSlug) => {

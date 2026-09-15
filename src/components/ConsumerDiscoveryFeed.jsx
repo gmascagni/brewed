@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, 
   ChevronRight, 
@@ -19,6 +19,7 @@ import BeanCard from './BeanCard';
 import TastingNoteBadge from './TastingNoteBadge';
 import { CURATED_SINGLE_ORIGINS } from '../data/coffeeSensoryData';
 import { SHOWCASE_ROASTERS } from '../data/roasterShowcaseData';
+import { getAssetUrl } from '../utils/assetUrl';
 
 // Friendly coffee flavor filter options
 const FRIENDLY_FLAVORS = [
@@ -123,10 +124,23 @@ export default function ConsumerDiscoveryFeed({
   onNavigateToRoaster,
   onOpenLocator,
   onStartBrewStation,
-  onOpenScanner
+  onOpenScanner,
+  activeBrewerId,
+  onSelectBrewerId
 }) {
   // Quick Calculator State
-  const [selectedBrewerId, setSelectedBrewerId] = useState('pour_over');
+  const [selectedBrewerId, setSelectedBrewerId] = useState(activeBrewerId || 'pour_over');
+
+  // Keep selected brewer in sync if parent changes activeMethod
+  useEffect(() => {
+    if (activeBrewerId) {
+      const mappedId = (activeBrewerId === 'classic_pour_over') ? 'pour_over' : activeBrewerId;
+      if (QUICK_BREWERS.some(b => b.id === mappedId)) {
+        setSelectedBrewerId(mappedId);
+      }
+    }
+  }, [activeBrewerId]);
+
   const [selectedWaterGrams, setSelectedWaterGrams] = useState(300);
   const [selectedFilter, setSelectedFilter] = useState('All Coffees');
 
@@ -193,7 +207,7 @@ export default function ConsumerDiscoveryFeed({
               onClick={onStartBrewStation}
               className="py-2.5 px-4 rounded-xl bg-white hover:bg-[#FAF7F2] text-[#2A2421] font-sans font-semibold text-xs border border-[#ECE6DC] hover:border-[#D69550] flex items-center gap-1.5 shadow-subtle active:scale-95 transition-all cursor-pointer"
             >
-              <span>Explore All 8 Brewing Guides</span>
+              <span>Explore All Brewing Guides</span>
               <ChevronRight className="w-3.5 h-3.5 text-[#C88A4B]" />
             </button>
 
@@ -214,12 +228,12 @@ export default function ConsumerDiscoveryFeed({
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <img
               key={activeBrewer.id}
-              src={activeBrewer.heroImage}
+              src={getAssetUrl(activeBrewer.heroImage)}
               alt={activeBrewer.name}
-              className="w-full h-full object-cover object-center transform scale-105 filter saturate-110 contrast-105 transition-all duration-700 opacity-30 sm:opacity-35"
+              className="w-full h-full object-cover object-center transform scale-105 filter saturate-105 contrast-100 transition-all duration-700 opacity-15 sm:opacity-20"
             />
             {/* Soft warm gradient overlay: ensures crisp readability while revealing the brewer silhouette */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FFFDF9]/90 via-[#FFFDF9]/80 to-[#FAF7F2]/70 backdrop-blur-[0.5px]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FFFDF9]/95 via-[#FFFDF9]/90 to-[#FAF7F2]/85 backdrop-blur-[1px]" />
           </div>
 
           <div className="relative z-10 space-y-7">
@@ -242,7 +256,12 @@ export default function ConsumerDiscoveryFeed({
                     <button
                       key={brewer.id}
                       type="button"
-                      onClick={() => setSelectedBrewerId(brewer.id)}
+                      onClick={() => {
+                        setSelectedBrewerId(brewer.id);
+                        if (onSelectBrewerId) {
+                          onSelectBrewerId(brewer.id);
+                        }
+                      }}
                       className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between backdrop-blur-xs ${
                         isSelected
                           ? 'bg-[#14110F] text-[#FAF7F2] border-[#14110F] shadow-md ring-2 ring-[#C88A4B]/30 -translate-y-0.5'

@@ -159,6 +159,26 @@ export const BREW_METHODS = {
         { name: 'Cap & Flip Rest', durationSec: 30, waterMultiplier: 1.0, instruction: 'Attach filter cap, carefully flip onto sturdy mug.' },
         { name: 'Gentle Plunge', durationSec: 30, waterMultiplier: 1.0, instruction: 'Apply steady downward pressure until subtle hiss sound.' }
       ]
+    },
+    {
+      id: 'cold_brew',
+      name: 'Cold Brew (Slow Immersion)',
+      category: 'coffee',
+      featured: false,
+      heroImage: '/cold_brew_hero.jpg',
+      ratio: 8, // 1:8 concentrate ratio
+      defaultCupMl: 350,
+      tempC: 20,
+      tempF: 68,
+      grind: 'Extra Coarse',
+      micron: '1000 - 1200 µm',
+      description: 'Slow 16-hour cold water immersion yielding an ultra-smooth, naturally sweet coffee concentrate with virtually zero perceived bitterness.',
+      preferredCoffeeTypes: 'Medium to Dark Roasts. Latin American & chocolatey origins for rich fudgy sweetness, toasted almond, and low-acid cold refreshment.',
+      phases: [
+        { name: 'Grounds Saturation', durationSec: 60, waterMultiplier: 1.0, instruction: 'Gently pour cold filtered water over extra-coarse grounds in pitcher or French Press, stirring thoroughly.' },
+        { name: 'Refrigerated Cold Steep', durationSec: 57600, waterMultiplier: 1.0, instruction: 'Cover tightly and place in refrigerator or cool dark cupboard to steep for 16 hours.' },
+        { name: 'Filter & Decant', durationSec: 180, waterMultiplier: 1.0, instruction: 'Pour through fine stainless mesh or paper filter into clean glass carafe. Serve over ice with splash of milk or water.' }
+      ]
     }
   ]
 };
