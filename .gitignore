@@ -34,3 +34,6 @@ scratch/
 # GitHub Actions workflows (handled via GitHub web interface to bypass local PAT workflow scope limits)
 .github/
 
+# Backups and Local Artifacts
+*.zip
+Email SMTP RESEND API KEY.png
