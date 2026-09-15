@@ -48,6 +48,7 @@ import {
   downloadVectorQrSvg, 
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
+import { printBrotherQlCoffee, printHtmlElementIsolated } from '../utils/printLabel';
 
 export default function RoasterPortalModal({
   isOpen,
@@ -478,9 +479,38 @@ export default function RoasterPortalModal({
     return true;
   };
 
-  const handlePrintSticker = () => {
+  const handlePrintSticker = async () => {
     if (!checkBarcodeOwnership()) return;
-    window.print();
+    const coffee = selectedCoffeeForSticker || {
+      roaster: roasterName || 'Specialty Roaster',
+      location: location || 'Artisan Small Batch',
+      beanName: beanName || 'Single Origin Lot',
+      origin: origin || 'Single Origin',
+      process: process || 'Washed',
+      elevation: elevation || '1,850 MASL',
+      roastLevel: roastLevel || 'Light',
+      tastingNotes: tastingNotesInput ? tastingNotesInput.split(',').map(s => s.trim()).filter(Boolean) : ['Peach', 'Jasmine', 'Honey'],
+      brewMethod: brewMethod || 'pour_over',
+      recommendedRatio: Number(recommendedRatio) || 16.5,
+      tempF: Number(tempF) || 202,
+      recommendedGrind: recommendedGrind || 'Medium-Fine',
+      upc: upc || 'LOT-2026-CERTIFIED',
+      customUrl: customUrl.trim(),
+      ownerEmail: currentUser?.email || '',
+      ownerUid: currentUser?.uid || ''
+    };
+
+    if (qrLayout === 'brother_ql') {
+      await printBrotherQlCoffee(coffee);
+    } else if (stickerRef.current) {
+      await printHtmlElementIsolated(stickerRef.current, {
+        width: qrLayout === 'minimal' ? '2.5in' : '3in',
+        height: qrLayout === 'minimal' ? '2.5in' : '3in',
+        title: `${coffee.beanName || 'Coffee'} Label`
+      });
+    } else {
+      await printBrotherQlCoffee(coffee);
+    }
   };
 
   const handleDownloadBrotherQlPng = async () => {
@@ -1283,7 +1313,7 @@ export default function RoasterPortalModal({
                 {qrLayout === 'thermal' && (
                   <div 
                     ref={stickerRef}
-                    className="w-full max-w-sm rounded-2xl bg-white text-stone-950 p-6 shadow-2xl border-2 border-stone-800 text-center space-y-3 font-sans relative overflow-hidden print-label-target"
+                    className="w-full max-w-sm rounded-2xl bg-white text-stone-950 p-6 shadow-2xl border-2 border-stone-800 text-center space-y-3 font-sans relative overflow-hidden"
                   >
                     {/* Header Branding */}
                     <div className="border-b border-stone-800 pb-2 text-left flex justify-between items-baseline">
@@ -1380,7 +1410,7 @@ export default function RoasterPortalModal({
                 {qrLayout === 'badge' && (
                   <div 
                     ref={stickerRef}
-                    className="w-full max-w-sm rounded-3xl bg-[#1A120B] border-2 border-amber-gold/60 p-6 shadow-2xl text-center space-y-4 text-cream-light relative overflow-hidden print-label-target"
+                    className="w-full max-w-sm rounded-3xl bg-[#1A120B] border-2 border-amber-gold/60 p-6 shadow-2xl text-center space-y-4 text-cream-light relative overflow-hidden"
                   >
                     <div className="absolute top-3 left-3 w-3 h-3 border-t-2 border-l-2 border-amber-gold" />
                     <div className="absolute top-3 right-3 w-3 h-3 border-t-2 border-r-2 border-amber-gold" />
@@ -1455,7 +1485,7 @@ export default function RoasterPortalModal({
                 {qrLayout === 'minimal' && (
                   <div 
                     ref={stickerRef}
-                    className="w-72 h-72 rounded-3xl bg-white text-stone-900 p-5 shadow-2xl border-2 border-stone-800 text-center flex flex-col justify-between print-label-target"
+                    className="w-72 h-72 rounded-3xl bg-white text-stone-900 p-5 shadow-2xl border-2 border-stone-800 text-center flex flex-col justify-between"
                   >
                     <div>
                       <h4 className="font-serif text-base font-bold text-stone-900 leading-tight">
@@ -1498,7 +1528,7 @@ export default function RoasterPortalModal({
                 {qrLayout === 'brother_ql' && (
                   <div 
                     ref={stickerRef}
-                    className="w-full max-w-lg h-56 rounded-xl bg-white text-stone-900 p-3 shadow-2xl border-2 border-stone-800 flex items-stretch justify-between gap-3 relative overflow-hidden print-label-target print-label-brother-ql select-none"
+                    className="w-full max-w-lg h-56 rounded-xl bg-white text-stone-900 p-3 shadow-2xl border-2 border-stone-800 flex items-stretch justify-between gap-3 relative overflow-hidden select-none"
                   >
                     {/* Left Details Column */}
                     <div className="flex-1 flex flex-col justify-between h-full min-w-0 pr-1">

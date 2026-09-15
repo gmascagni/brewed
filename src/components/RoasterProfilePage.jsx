@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Store,
   MapPin,
@@ -46,6 +46,7 @@ import {
   downloadVectorQrSvg, 
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
+import { printBrotherQlCoffee, printHtmlElementIsolated } from '../utils/printLabel';
 
 export default function RoasterProfilePage({
   initialRoasterId = 'methodical',
@@ -1782,6 +1783,7 @@ function CoffeePackagingLabel({
   onBrewCoffee,
   isEnlarged = false
 }) {
+  const labelRef = useRef(null);
   const [copied, setCopied] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -1816,9 +1818,25 @@ function CoffeePackagingLabel({
     }
   };
 
-  const handlePrint = (e) => {
+  const handlePrint = async (e) => {
     e.stopPropagation();
-    window.print();
+    if (layout === 'brother_ql') {
+      await printBrotherQlCoffee({
+        ...coffee,
+        roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
+      });
+    } else if (labelRef.current) {
+      await printHtmlElementIsolated(labelRef.current, {
+        width: '3in',
+        height: '3in',
+        title: `${coffee.beanName || 'Coffee'} Thermal Label`
+      });
+    } else {
+      await printBrotherQlCoffee({
+        ...coffee,
+        roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
+      });
+    }
   };
 
   const roastText = (coffee.roastLevel || 'Light').toUpperCase();
@@ -1827,7 +1845,10 @@ function CoffeePackagingLabel({
   // Thermal White Sticker Layout (3" x 3")
   if (layout === 'thermal') {
     return (
-      <div className={`w-full max-w-sm mx-auto flex flex-col justify-between rounded-3xl bg-white text-stone-900 p-5 sm:p-6 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 group ${isEnlarged ? 'scale-100' : ''}`}>
+      <div 
+        ref={labelRef}
+        className={`w-full max-w-sm mx-auto flex flex-col justify-between rounded-3xl bg-white text-stone-900 p-5 sm:p-6 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 group ${isEnlarged ? 'scale-100' : ''}`}
+      >
         {/* Alignment corner tick marks */}
         <div className="absolute top-2 left-2 text-[10px] font-mono text-stone-300 leading-none select-none">+</div>
         <div className="absolute top-2 right-2 text-[10px] font-mono text-stone-300 leading-none select-none">+</div>
@@ -1973,7 +1994,7 @@ function CoffeePackagingLabel({
   // Brother QL-600 Compact Thermal Label (1.1" x 2.4" / DK-1209)
   if (layout === 'brother_ql') {
     return (
-      <div className={`w-full max-w-md mx-auto flex flex-col justify-between rounded-2xl bg-white text-stone-900 p-3.5 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 print-label-target print-label-brother-ql group ${isEnlarged ? 'scale-100' : ''}`}>
+      <div className={`w-full max-w-md mx-auto flex flex-col justify-between rounded-2xl bg-white text-stone-900 p-3.5 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 group ${isEnlarged ? 'scale-100' : ''}`}>
         <div className="flex items-stretch justify-between gap-2.5 h-full">
           {/* Left Column: Details */}
           <div className="flex-1 min-w-0 pr-1 flex flex-col justify-between">
