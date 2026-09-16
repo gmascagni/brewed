@@ -1,9 +1,9 @@
 {
   "version": "1.5.0",
-  "buildId": "1.5.0-3426901-mu3206pd",
-  "commit": "3426901",
-  "branch": "main",
-  "buildDate": "2026-09-15T19:17:26.640Z",
+  "buildId": "1.5.0-d6b85c5-mu4jmj55",
+  "commit": "d6b85c5",
+  "branch": "feat/ux-refactor-cohesive-companion",
+  "buildDate": "2026-09-16T20:18:28.840Z",
   "environment": "production",
   "appName": "the-brew-app"
 }

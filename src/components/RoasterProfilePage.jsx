@@ -86,13 +86,9 @@ export default function RoasterProfilePage({
   const [cardLabelFlipMap, setCardLabelFlipMap] = useState({});
   const [activeLabelModalCoffee, setActiveLabelModalCoffee] = useState(null);
 
-  // In-page walkthrough navigation helper (eliminates forced modal popups and X buttons)
+  // In-page walkthrough navigation helper & video theater modal opener
   const handleOpenWalkthroughTab = () => {
-    setActiveTab('walkthrough');
-    const tabsEl = document.getElementById('roaster-tabs');
-    if (tabsEl) {
-      tabsEl.scrollIntoView({ behavior: 'smooth' });
-    }
+    setIsVideoModalOpen(true);
   };
 
   // Keyboard accessibility: close theater modal on Escape key
@@ -367,6 +363,11 @@ export default function RoasterProfilePage({
           
           {/* Brand Metadata Badges */}
           <div className="flex flex-wrap items-center gap-2.5">
+            <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-extrabold border border-amber-500/40 flex items-center gap-1.5 shadow-sm">
+              <CheckCircle2 className="w-3.5 h-3.5 text-amber-gold" />
+              <span>VERIFIED ROASTER PARTNER</span>
+            </span>
+
             {isBrandOwner ? (
               <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -375,7 +376,7 @@ export default function RoasterProfilePage({
             ) : (
               <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/40 flex items-center gap-1.5 shadow-sm">
                 <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                <span>Unverified Roaster • Example Profile</span>
+                <span>Showcase Roaster Profile</span>
               </span>
             )}
 

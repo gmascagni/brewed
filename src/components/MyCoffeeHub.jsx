@@ -43,7 +43,7 @@ export default function MyCoffeeHub({
   };
 
   return (
-    <div className="space-y-8 animate-fade-in w-full max-w-6xl mx-auto">
+    <div className="space-y-8 animate-fade-in w-full max-w-6xl mx-auto" data-view="recipes" id="recipe-vault-section">
       
       {/* 1. Header: My Coffee Personal Studio */}
       <div className="p-6 sm:p-8 md:p-10 rounded-3xl bg-gradient-to-br from-[#FFFDF9] via-[#FAF7F2] to-[#F5EFE8] border border-[#ECE6DC] shadow-sm relative overflow-hidden">

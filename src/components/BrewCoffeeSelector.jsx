@@ -81,7 +81,8 @@ export default function BrewCoffeeSelector({
   onOpenScanner,
   onPrevStep,
   onNextStep,
-  unitSystem = 'imperial'
+  unitSystem = 'imperial',
+  setUnitSystem
 }) {
   const [activeTab, setActiveTab] = useState('presets'); // 'presets' | 'stash' | 'showcase'
   const isMetric = unitSystem === 'metric';
@@ -155,9 +156,25 @@ export default function BrewCoffeeSelector({
       {/* 1. Header: Step Title & Purpose */}
       <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#FFFDF9] via-[#FAF7F2] to-[#F5EFE8] border border-[#ECE6DC] shadow-sm relative overflow-hidden">
         <div className="max-w-3xl relative z-10 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] text-xs font-sans font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
-            <span>Step 2 of 4 • Select Your Coffee</span>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] text-xs font-sans font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
+              <span>STEP 02 OF 04 • PRECISION SCALER & COFFEE SELECTION</span>
+            </div>
+
+            {setUnitSystem && (
+              <button
+                type="button"
+                onClick={() => {
+                  hapticTap();
+                  setUnitSystem(unitSystem === 'metric' ? 'imperial' : 'metric');
+                }}
+                className="px-3 py-1.5 rounded-xl border border-[#ECE6DC] bg-white text-xs font-mono font-bold text-[#14110F] hover:border-[#D69550] transition-all flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95"
+                title="Toggle Imperial vs Metric units"
+              >
+                <span>Unit: {isMetric ? 'Metric (g / ml)' : 'Imperial (oz / °F)'}</span>
+              </button>
+            )}
           </div>
 
           <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#14110F] leading-tight">
@@ -165,7 +182,7 @@ export default function BrewCoffeeSelector({
           </h2>
 
           <p className="text-sm text-[#5C524B] leading-relaxed font-sans">
-            Your coffee’s origin and roast level determine the ideal extraction temperature, golden ratio, and grind coarseness for your {activeMethod?.name || 'brewer'}.
+            Your coffee’s origin and roast level determine the ideal extraction temperature, golden ratio (1:15–1:17), and grind coarseness for your {activeMethod?.name || 'brewer'}.
           </p>
         </div>
       </div>
@@ -485,7 +502,7 @@ export default function BrewCoffeeSelector({
           }}
           className="py-3 px-7 rounded-2xl bg-[#C88A4B] hover:bg-[#D69550] text-[#14110F] font-sans font-bold text-xs flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
         >
-          <span>Step 03: Recipe & Ratio</span>
+          <span>Step 03: Recipe, Ratio & Grind Specs</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>

@@ -20,7 +20,8 @@ import {
   GraduationCap,
   SlidersHorizontal,
   Layers,
-  Wrench
+  Wrench,
+  Bookmark
 } from 'lucide-react';
 import BrandLogo from './BrandLogo';
 
@@ -163,10 +164,10 @@ export default function Header({
                 onClick={() => onSelectView && onSelectView('discover')}
                 className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
                   isDiscoverActive
-                    ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+                    ? 'bg-amber-gold/15 text-[#14110F] shadow-xs border border-amber-gold/30'
                     : 'text-[#766A62] hover:text-[#14110F]'
                 }`}
-                title="Discover Specialty Coffees, Artisan Roasters & Smart Bags"
+                title="Roaster Showcase • Discover Specialty Coffees, Artisan Roasters & Smart Bags"
               >
                 <Compass className="w-3.5 h-3.5 text-[#C88A4B]" />
                 <span>Discover</span>
@@ -184,7 +185,7 @@ export default function Header({
                     ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                     : 'text-[#766A62] hover:text-[#14110F]'
                 }`}
-                title="Find Specialty Coffee Shops & Roasters Near You"
+                title="Shop Local Coffee • Find Specialty Coffee Shops & Roasters Near You"
               >
                 <Store className="w-3.5 h-3.5 text-[#C88A4B]" />
                 <span>Cafés</span>
@@ -202,7 +203,7 @@ export default function Header({
                     ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                     : 'text-[#766A62] hover:text-[#14110F]'
                 }`}
-                title="Specialty Coffee Video Academy, Extraction Science & World News"
+                title="Learn • Specialty Coffee Science & Guides"
               >
                 <GraduationCap className="w-3.5 h-3.5 text-[#C88A4B]" />
                 <span>Learn</span>
@@ -220,9 +221,9 @@ export default function Header({
                     ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
                     : 'text-[#766A62] hover:text-[#14110F]'
                 }`}
-                title="Tasting Journal, Recipe Vault & Personal Studio"
+                title="My Coffee Hub • Saved Beans, Recipes & Profile"
               >
-                <BookOpen className="w-3.5 h-3.5 text-[#C88A4B]" />
+                <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
                 <span>My Coffee</span>
                 {isMyCoffeeActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
@@ -232,10 +233,10 @@ export default function Header({
           );
         })()}
 
-        {/* 3. Right: Utility Controls & Consolidated Secondary Menu */}
-        <div className="hidden md:flex items-center gap-2 text-xs">
+        {/* 3. Right: Quick Actions & Primary Start a Brew Button */}
+        <div className="flex items-center space-x-2">
 
-          {/* Global Audible / Mute Sound Toggle Button */}
+          {/* Audio Engine Mute / Sound Toggle */}
           {onToggleMute && (
             <button
               type="button"
@@ -268,6 +269,7 @@ export default function Header({
               onClick={onOpenSearch}
               className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B] hover:text-[#14110F] hover:border-[#D69550] transition-all active:scale-95 shadow-xs"
               title="Open Global Search (Ctrl + K)"
+              aria-label="Search recipes, methods, and roasters"
             >
               <Search className="w-4 h-4" />
             </button>
@@ -281,7 +283,7 @@ export default function Header({
             title="Start a Guided Coffee Brew"
           >
             <Coffee className="w-3.5 h-3.5 text-[#E8AF72] group-hover:scale-110 transition-transform" />
-            <span>Start a Brew</span>
+            <span>Brew Station</span>
           </button>
 
           {/* Consolidated Secondary Dropdown Menu ("Tools & Barista") */}
@@ -301,7 +303,7 @@ export default function Header({
             <div className={`absolute right-0 mt-2 w-80 rounded-2xl bg-white border border-[#ECE6DC] shadow-2xl p-2.5 z-50 transition-all duration-200 space-y-1 ${
               isToolsMenuOpen 
                 ? 'opacity-100 scale-100 pointer-events-auto' 
-                : 'opacity-0 scale-95 pointer-events-none hidden'
+                : 'opacity-0 scale-95 pointer-events-none'
             }`}>
               
               {/* Section Header: Tools & Utilities */}
@@ -433,6 +435,29 @@ export default function Header({
                   </h4>
                   <p className="text-[11px] text-[#766A62]">
                     Curated RSS dispatch from Daily Coffee News and Sprudge.
+                  </p>
+                </div>
+              </button>
+
+              {/* 6. Recipe Vault */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsToolsMenuOpen(false);
+                  if (onSelectView) onSelectView('my_coffee');
+                }}
+                className="w-full text-left flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
+                title="Recipe Vault • Master Formulas & Custom Community Recipes"
+              >
+                <div className="w-7 h-7 rounded-lg bg-[#FAF7F2] border border-[#ECE6DC] flex items-center justify-center text-[#C88A4B] shrink-0 mt-0.5">
+                  <Bookmark className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <h4 className="font-sans font-bold text-xs text-[#14110F] group-hover:text-[#A8622D] transition-colors">
+                    Recipe Vault
+                  </h4>
+                  <p className="text-[11px] text-[#766A62]">
+                    Explore community brew formulas & dialed-in records.
                   </p>
                 </div>
               </button>

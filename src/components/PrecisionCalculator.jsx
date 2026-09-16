@@ -175,7 +175,9 @@ export default function PrecisionCalculator({
                 <Coffee className="w-3.5 h-3.5" />
               </div>
               <div>
-                <span className="text-[10px] font-mono text-stone-400 uppercase tracking-wider block">Selected Coffee</span>
+                <span className="text-[10px] font-mono text-[#E8AF72] uppercase tracking-wider block font-bold">
+                  Roaster Certified Dial-In Active • Selected Coffee
+                </span>
                 <span className="font-serif font-bold text-cream-light text-sm">
                   {selectedCoffee.beanName || selectedCoffee.name}
                 </span>

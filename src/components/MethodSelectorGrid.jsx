@@ -178,7 +178,7 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
           onClick={onNextStep}
           className="w-full sm:w-auto py-3 px-8 rounded-2xl font-sans font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-card hover:shadow-elevated active:scale-95 transition-all bg-[#14110F] hover:bg-[#2A2421] text-[#FAF7F2] cursor-pointer"
         >
-          <span>Continue to Coffee & Water</span>
+          <span>Continue to Step 02: Coffee Selection</span>
           <ChevronRight className="w-4 h-4 text-[#E8AF72]" />
         </button>
       </div>

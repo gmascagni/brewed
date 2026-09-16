@@ -170,6 +170,7 @@ export default function App() {
         if (parts.length > 1 && !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(parts[1].toLowerCase())) {
           return parts[1];
         }
+        return 'methodical';
       }
       const searchParams = new URLSearchParams(window.location.search);
       const querySlug = searchParams.get('roaster') || searchParams.get('slug');
@@ -241,12 +242,13 @@ export default function App() {
     const tryScroll = (attempts = 0) => {
       const el = document.getElementById('world-news');
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      } else if (attempts < 15) {
-        setTimeout(() => tryScroll(attempts + 1), 60);
+        const topPos = el.getBoundingClientRect().top + window.pageYOffset - 70;
+        window.scrollTo({ top: Math.max(topPos, 450), behavior: 'auto' });
+      } else if (attempts < 20) {
+        setTimeout(() => tryScroll(attempts + 1), 50);
       }
     };
-    setTimeout(() => tryScroll(0), 80);
+    setTimeout(() => tryScroll(0), 50);
   };
 
   // Handler for Specialty Roaster Showcase Navigation
@@ -283,9 +285,10 @@ export default function App() {
   const handleApplyScannedRecipe = (scannedBean) => {
     if (!scannedBean) return;
 
-    // 1. Immediately exit Roaster Showcase or Scanner overlay
-    setIsRoasterShowcaseView(false);
+    // 1. Immediately switch to Brew area and close overlays
+    setCurrentArea('brew');
     setIsScannerOpen(false);
+    setIsRoasterPortalOpen(false);
 
     // 2. Extract ratio, dose, and water volume
     const ratio = Number(scannedBean.recommendedRatio || scannedBean.extraction?.ratio || 16);
@@ -312,6 +315,7 @@ export default function App() {
     }
 
     setActiveMethod(prev => prev?.id === targetMethod.id ? { ...prev, ...targetMethod } : targetMethod);
+    setSelectedCoffee(scannedBean);
     setDialedInCoffee(scannedBean);
 
     // 4. Advance straight to Step 4 (Guided Brew Timer) and navigate URL
@@ -522,14 +526,13 @@ export default function App() {
     }
 
     if (path.startsWith('/methods/')) {
-      setIsRoasterShowcaseView(false);
+      setCurrentArea('brew');
       const methodId = path.replace('/methods/', '').replace(/\/$/, '');
       const allMethods = BREW_METHODS.coffee;
       const found = allMethods.find(m => m.id === methodId);
 
       if (found) {
         setActiveMethod(prev => (prev?.id === found.id ? prev : found));
-        setCurrentStep(prev => (prev === 1 ? 2 : prev));
 
         // Update Dynamic SEO & JSON-LD Structured Data
         updatePageSeo(
@@ -552,7 +555,6 @@ export default function App() {
         }
       }
     } else if (path.startsWith('/guides/coffee-water-chemistry') || path.startsWith('/guides/water-chemistry-gh-kh')) {
-      setIsRoasterShowcaseView(false);
       setIsWaterLabOpen(true);
       const isGhKh = path.startsWith('/guides/water-chemistry-gh-kh');
       updatePageSeo(
@@ -564,15 +566,11 @@ export default function App() {
           ? 'https://thebrew.app/guides/water-chemistry-gh-kh'
           : 'https://thebrew.app/guides/coffee-water-chemistry'
       );
-    } else if (path.startsWith('/roasters') || path.startsWith('/roaster') || (typeof window !== 'undefined' && (window.location.pathname.includes('/roasters') || window.location.search.includes('roaster=')))) {
-      setIsShopsView(false);
-      setIsCafePortalView(false);
-      setIsLearnView(false);
-      setIsRecipesView(false);
+    } else if (path.startsWith('/roasters') || path.startsWith('/roaster') || path.startsWith('/discover') || (typeof window !== 'undefined' && (window.location.pathname.includes('/roasters') || window.location.search.includes('roaster=')))) {
+      setCurrentArea('discover');
       if (path === '/roasters/partner' || path === '/roasters/info') {
         setIsRoasterInfoOpen(true);
       } else {
-        setIsRoasterShowcaseView(true);
         const fullPath = (typeof window !== 'undefined' ? window.location.pathname : path).replace(/^\/brewed/, '');
         const parts = fullPath.split('/').filter(Boolean);
         const searchParams = new URLSearchParams(location.search || (typeof window !== 'undefined' ? window.location.search : ''));
@@ -592,7 +590,7 @@ export default function App() {
         'https://thebrew.app/roasters'
       );
     } else if (path.startsWith('/academy') || path.startsWith('/videos')) {
-      setIsShopsView(false);
+      setCurrentArea('learn');
       setIsVideoAcademyOpen(true);
       updatePageSeo(
         'Coffee Academy & Video Masterclasses | The Brew App',
@@ -600,34 +598,23 @@ export default function App() {
         'https://thebrew.app/academy'
       );
     } else if (path.startsWith('/learn')) {
-      setIsRoasterShowcaseView(false);
-      setIsCafePortalView(false);
-      setIsRecipesView(false);
-      setIsShopsView(false);
-      setIsLearnView(true);
+      setCurrentArea('learn');
       updatePageSeo(
         'Specialty Coffee Learning Center & Extraction Science | TheBrew.App',
         'Master specialty coffee brewing: video masterclasses, extraction channeling diagnostics, SCA water mineral chemistry, and gear guides.',
         'https://thebrew.app/learn'
       );
-    } else if (path.startsWith('/recipes') || path.startsWith('/recipe')) {
-      setIsRoasterShowcaseView(false);
-      setIsCafePortalView(false);
-      setIsLearnView(false);
-      setIsShopsView(false);
-      setIsRecipesView(true);
+    } else if (path.startsWith('/recipes') || path.startsWith('/recipe') || path.startsWith('/my-coffee') || path.startsWith('/journal') || path.startsWith('/profile')) {
+      setCurrentArea('my_coffee');
       setIsCommunityOpen(false);
       updatePageSeo(
         'Specialty Coffee Master Recipe Vault & Personal Studio | TheBrew.App',
         'Explore verified benchmark extraction guides from world champions and craft your own custom recipes saved locally on your device.',
         'https://thebrew.app/recipes'
       );
-    } else if (path.startsWith('/shops') || path.startsWith('/local')) {
-      setIsRoasterShowcaseView(false);
-      setIsCafePortalView(false);
-      setIsLearnView(false);
-      setIsRecipesView(false);
-      setIsShopsView(true);
+    } else if (path.startsWith('/shops') || path.startsWith('/cafes') || path.startsWith('/local')) {
+      setCurrentArea('cafes');
+      setIsCafePartnerPortalOpen(false);
       setIsLocalCoffeeOpen(false);
       updatePageSeo(
         'Find Specialty Coffee Shops Near Me | TheBrew.App',
@@ -635,8 +622,6 @@ export default function App() {
         'https://thebrew.app/shops'
       );
     } else if (path.includes('smart-bag-scanner') || path.startsWith('/demo') || path.startsWith('/scanner') || path.startsWith('/scan') || location.search.includes('scanner=') || location.search.includes('scan=')) {
-      setIsRoasterShowcaseView(false);
-      setIsShopsView(false);
       setIsScannerOpen(true);
       updatePageSeo(
         'Smart Bag Barcode & QR Scanner Demo | The Brew App',
@@ -644,11 +629,7 @@ export default function App() {
         'https://thebrew.app/demo/smart-bag-scanner'
       );
     } else if (path === '/' || path === '') {
-      setIsRoasterShowcaseView(false);
-      setIsCafePortalView(false);
-      setIsLearnView(false);
-      setIsRecipesView(false);
-      setIsShopsView(false);
+      setCurrentArea('brew');
       // Check for Smart Bag deep link query parameters or video parameter:
       const searchParams = new URLSearchParams(location.search);
       const videoParam = searchParams.get('video');
@@ -775,24 +756,22 @@ export default function App() {
           onOpenProfile={() => setIsProfileOpen(true)}
           onOpenCommunity={() => setIsCommunityOpen(true)}
           onOpenLocalCoffee={() => {
-            setIsCafePortalView(false);
-            setIsRoasterShowcaseView(false);
-            setIsLearnView(false);
-            setIsRecipesView(false);
-            setIsShopsView(true);
+            setCurrentArea('cafes');
+            setIsCafePartnerPortalOpen(false);
             navigate('/shops');
           }}
           onOpenAuth={handleOpenAuth}
           onOpenScanner={() => setIsScannerOpen(true)}
           onOpenWaterLab={() => setIsWaterLabOpen(true)}
           onOpenRoasterPortal={() => { setRoasterPrefillBarcode(''); setRoasterPrefillBean(null); setIsRoasterPortalOpen(true); }}
-          onOpenCafePortal={() => { setIsRoasterShowcaseView(false); setIsShopsView(false); setIsCafePortalView(true); }}
+          onOpenCafePortal={() => { setCurrentArea('cafes'); setIsCafePartnerPortalOpen(true); }}
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
           onOpenRoasterShowcase={handleOpenRoasterShowcase}
           onOpenMobileTools={() => setIsMobileToolsOpen(true)}
-          isRoasterShowcaseView={isRoasterShowcaseView}
-          isShopsView={isShopsView}
-          currentView={isShopsView ? 'shops' : isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : isRecipesView ? 'recipes' : (currentStep > 1 ? 'brew_station' : 'discovery')}
+          isRoasterShowcaseView={currentArea === 'discover'}
+          isShopsView={currentArea === 'cafes'}
+          currentView={currentArea}
+          onStartBrew={() => handleStartBrew()}
           onSelectView={(v) => {
             // Dismiss all open modals when navigating primary views
             setIsCommunityOpen(false);
@@ -804,50 +783,23 @@ export default function App() {
             setIsProfileOpen(false);
             setIsSearchOpen(false);
 
-            if (v === 'discovery') {
-              setIsCafePortalView(false);
-              setIsRoasterShowcaseView(false);
-              setIsLearnView(false);
-              setIsRecipesView(false);
-              setIsShopsView(false);
-              setCurrentStep(1);
-              navigate('/');
-            } else if (v === 'brew_station') {
-              setIsCafePortalView(false);
-              setIsRoasterShowcaseView(false);
-              setIsLearnView(false);
-              setIsRecipesView(false);
-              setIsShopsView(false);
-              navigate('/');
-              const el = document.getElementById('brew-atelier');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            } else if (v === 'recipes') {
-              setIsCafePortalView(false);
-              setIsRoasterShowcaseView(false);
-              setIsLearnView(false);
-              setIsShopsView(false);
-              setIsRecipesView(true);
-              navigate('/recipes');
-            } else if (v === 'shops') {
-              setIsCafePortalView(false);
-              setIsRoasterShowcaseView(false);
-              setIsLearnView(false);
-              setIsRecipesView(false);
-              setIsShopsView(true);
+            if (v === 'brew') {
+              setCurrentArea('brew');
+              navigate(currentStep > 1 && currentActiveMethod ? `/methods/${currentActiveMethod.id}` : '/');
+            } else if (v === 'discover') {
+              setCurrentArea('discover');
+              setSelectedRoasterSlug('methodical');
+              navigate('/roasters');
+            } else if (v === 'cafes') {
+              setCurrentArea('cafes');
+              setIsCafePartnerPortalOpen(false);
               navigate('/shops');
-            } else if (v === 'roasters') {
-              setIsCafePortalView(false);
-              setIsLearnView(false);
-              setIsRecipesView(false);
-              setIsShopsView(false);
-              handleOpenRoasterShowcase();
             } else if (v === 'learn') {
-              setIsCafePortalView(false);
-              setIsRoasterShowcaseView(false);
-              setIsRecipesView(false);
-              setIsShopsView(false);
-              setIsLearnView(true);
+              setCurrentArea('learn');
               navigate('/learn');
+            } else if (v === 'my_coffee') {
+              setCurrentArea('my_coffee');
+              navigate('/recipes');
             }
           }}
           onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
@@ -857,8 +809,8 @@ export default function App() {
           currentUser={currentUser}
         />
         
-        {/* Step Progress Bar Pinned Inside Sticky Top Bar (hidden in Roaster Showcase, Cafe Portal, Learn, Recipes, or Shops) */}
-        {!isRoasterShowcaseView && !isCafePortalView && !isLearnView && !isRecipesView && !isShopsView && (
+        {/* Step Progress Bar Pinned Inside Sticky Top Bar (active only in BREW area) */}
+        {currentArea === 'brew' && (
           <StepIndicator
             currentStep={currentStep}
             setCurrentStep={(stepNum) => {
@@ -879,36 +831,126 @@ export default function App() {
 
         <main className="mt-4 space-y-10">
 
-          {isCafePortalView ? (
-            <CafePartnerPortal
-              onClose={() => setIsCafePortalView(false)}
-              onNavigateToConsumer={() => setIsCafePortalView(false)}
-            />
-          ) : isRoasterShowcaseView ? (
-            <RoasterProfilePage
-              initialRoasterId={selectedRoasterSlug}
-              onBackToApp={() => {
-                setIsRoasterShowcaseView(false);
-                navigate('/');
-              }}
-              onBrewCoffee={(coffee) => {
-                setIsRoasterShowcaseView(false);
-                handleApplyScannedRecipe(coffee);
-              }}
-              onOpenWaterLabWithProfile={(waterProfile) => {
-                setIsWaterLabOpen(true);
-              }}
-              onOpenRoasterPortalWithBean={(bean) => {
-                setRoasterPrefillBean(bean);
-                setIsRoasterPortalOpen(true);
-              }}
-              onOpenRoasterInfo={() => {
-                setIsRoasterInfoOpen(true);
-              }}
-              currentUser={currentUser}
-              onOpenAuth={handleOpenAuth}
-            />
-          ) : isLearnView ? (
+          {/* AREA 1: DISCOVER (ROASTERS & SINGLE ORIGINS) */}
+          {currentArea === 'discover' && (
+            selectedRoasterSlug ? (
+              <RoasterProfilePage
+                initialRoasterId={selectedRoasterSlug}
+                onBackToApp={() => {
+                  setSelectedRoasterSlug(null);
+                  setCurrentArea('brew');
+                  navigate('/');
+                }}
+                onBrewCoffee={(coffee) => {
+                  handleSelectBeanToBrew(coffee);
+                }}
+                onOpenWaterLabWithProfile={() => {
+                  setIsWaterLabOpen(true);
+                }}
+                onOpenRoasterPortalWithBean={(bean) => {
+                  setRoasterPrefillBean(bean);
+                  setIsRoasterPortalOpen(true);
+                }}
+                onOpenRoasterInfo={() => {
+                  setIsRoasterInfoOpen(true);
+                }}
+                currentUser={currentUser}
+                onOpenAuth={handleOpenAuth}
+              />
+            ) : (
+              <div className="space-y-8 animate-fade-in">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#ECE6DC]">
+                  <div>
+                    <span className="text-[11px] font-mono uppercase tracking-widest font-extrabold text-[#A8622D] block">
+                      DISCOVER SPECIALTY COFFEE
+                    </span>
+                    <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#14110F] mt-1">
+                      Artisan Roasters & Single-Origin Vault
+                    </h2>
+                    <p className="text-sm font-sans text-stone-600 mt-1 max-w-xl">
+                      Explore farm gate origins, tasting notes, and roaster-certified dial-in parameters for world-class beans.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsScannerOpen(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#14110F] hover:bg-[#A8622D] text-white text-xs font-mono font-bold transition-all shadow-sm cursor-pointer self-start sm:self-auto"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-gold" />
+                    <span>Scan Any Bag Barcode</span>
+                  </button>
+                </div>
+
+                <ConsumerDiscoveryFeed
+                  activeBrewerId={currentActiveMethod?.id}
+                  onSelectBrewerId={handleSelectBrewerFromHero}
+                  onSelectBeanToBrew={handleSelectBeanToBrew}
+                  onLaunchDirectBrew={handleLaunchDirectBrew}
+                  onNavigateToRoaster={(roasterSlug) => {
+                    setSelectedRoasterSlug(roasterSlug);
+                    navigate(`/roasters/${roasterSlug}`);
+                  }}
+                  onOpenLocator={() => {
+                    setCurrentArea('cafes');
+                    navigate('/shops');
+                  }}
+                  onStartBrewStation={() => {
+                    setCurrentArea('brew');
+                    setCurrentStep(1);
+                    navigate('/');
+                  }}
+                  onOpenScanner={() => setIsScannerOpen(true)}
+                />
+              </div>
+            )
+          )}
+
+          {/* AREA 2: CAFÉS & RADAR */}
+          {currentArea === 'cafes' && (
+            isCafePartnerPortalOpen ? (
+              <CafePartnerPortal
+                onClose={() => setIsCafePartnerPortalOpen(false)}
+                onNavigateToConsumer={() => setIsCafePartnerPortalOpen(false)}
+              />
+            ) : (
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 animate-fade-in w-full space-y-6" id="local-coffee-shops-section" data-view="cafes" role="region" aria-label="Specialty Coffee Shop & Roaster Radar">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#FAF7F2] to-[#F3EDE2] border border-[#ECE6DC] shadow-xs">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#A8622D]/10 text-[#A8622D] flex items-center justify-center font-bold shrink-0">
+                      <Store className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-serif font-bold text-stone-900 text-base sm:text-lg">
+                        Are you a specialty cafe owner or artisan roaster?
+                      </h3>
+                      <p className="text-xs text-stone-600 font-sans">
+                        Manage your verified shop pin, retail bean list, and custom brew recipes.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsCafePartnerPortalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-[#14110F] hover:bg-[#A8622D] text-white font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow-xs"
+                  >
+                    Open Partner Portal →
+                  </button>
+                </div>
+
+                <LocalCoffeeFinderModal
+                  isModal={false}
+                  isOpen={true}
+                  onClose={() => {
+                    setCurrentArea('brew');
+                    navigate('/');
+                  }}
+                  trackMode={trackMode}
+                />
+              </div>
+            )
+          )}
+
+          {/* AREA 3: LEARN (ACADEMY & SCIENCE) */}
+          {currentArea === 'learn' && (
             <LearnSection
               trackMode={trackMode}
               activeMethod={currentActiveMethod}
@@ -919,74 +961,71 @@ export default function App() {
                 const allMethods = BREW_METHODS.coffee;
                 const match = allMethods.find(m => m.id === methodId || m.id.includes(methodId)) || allMethods[0];
                 handleSelectMethodFromGrid(match);
-                setIsLearnView(false);
+                setCurrentArea('brew');
               }}
             />
-          ) : isRecipesView ? (
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 animate-fade-in w-full" id="recipe-vault-section" data-view="recipes" role="region" aria-label="Master Recipe Vault & Personal Studio">
-              <RecipeExplorer
-                trackMode={trackMode}
-                onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
-                onSelectRecipe={(recipe) => {
-                  const allMethods = BREW_METHODS.coffee;
-                  const match = allMethods.find(m => m.id === recipe.methodId || m.id.includes(recipe.methodId)) || allMethods[0];
-                  setActiveMethod(match);
-                  if (recipe.ratio) setCustomRatio(recipe.ratio);
-                  const waterAmount = Number(recipe.waterGrams || (recipe.doseGrams ? Math.round(recipe.doseGrams * (recipe.ratio || 16)) : 320));
-                  setCustomWaterMl(waterAmount);
-                  setCupCount(1);
-                  setCupMl(waterAmount);
-                  setIsRecipesView(false);
-                  setCurrentStep(4);
-                  navigate(`/methods/${match.id}`);
-                  setTimeout(() => {
-                    const timerEl = document.getElementById('step-4') || document.querySelector('main');
-                    if (timerEl) timerEl.scrollIntoView({ behavior: 'smooth' });
-                  }, 150);
-                }}
-              />
-            </div>
-          ) : isShopsView ? (
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 animate-fade-in w-full" id="local-coffee-shops-section" data-view="shops" role="region" aria-label="Specialty Coffee Shop & Roaster Radar">
-              <LocalCoffeeFinderModal
-                isModal={false}
-                isOpen={true}
-                onClose={() => {
-                  setIsShopsView(false);
-                  navigate('/');
-                }}
-                trackMode={trackMode}
-              />
-            </div>
-          ) : (
+          )}
+
+          {/* AREA 4: MY COFFEE (JOURNAL, RECIPES, PROFILE, ROASTER TOOLS) */}
+          {currentArea === 'my_coffee' && (
+            <MyCoffeeHub
+              trackMode={trackMode}
+              currentUser={currentUser}
+              onOpenAuth={handleOpenAuth}
+              onLogout={() => setCurrentUser(null)}
+              onBrewAgain={(entry) => handleBrewAgain(entry)}
+              onSelectRecipe={(recipe) => {
+                const allMethods = BREW_METHODS.coffee;
+                const match = allMethods.find(m => m.id === recipe.methodId || m.id.includes(recipe.methodId)) || allMethods[0];
+                setActiveMethod(match);
+                if (recipe.ratio) setCustomRatio(recipe.ratio);
+                const waterAmount = Number(recipe.waterGrams || (recipe.doseGrams ? Math.round(recipe.doseGrams * (recipe.ratio || 16)) : 320));
+                setCustomWaterMl(waterAmount);
+                setCupCount(1);
+                setCupMl(waterAmount);
+                setCurrentArea('brew');
+                setCurrentStep(4);
+                navigate(`/methods/${match.id}`);
+                setTimeout(() => {
+                  const timerEl = document.getElementById('step-4') || document.querySelector('main');
+                  if (timerEl) timerEl.scrollIntoView({ behavior: 'smooth' });
+                }, 150);
+              }}
+              onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
+              onSelectBeanToBrew={(bean) => handleSelectBeanToBrew(bean)}
+              onOpenScanner={() => setIsScannerOpen(true)}
+              activeMethod={currentActiveMethod}
+              unitSystem={unitSystem}
+            />
+          )}
+
+          {/* AREA 5: BREW (4-STEP GUIDED BREW WORKFLOW) */}
+          {currentArea === 'brew' && (
             <>
-              {/* STEP 01: CONSUMER DISCOVERY FEED + METHOD SELECTOR */}
+              {/* STEP 01: CHOOSE BREWER */}
               {currentStep === 1 && (
-                <div className="space-y-12">
-                  <ConsumerDiscoveryFeed
-                    activeBrewerId={currentActiveMethod?.id}
-                    onSelectBrewerId={handleSelectBrewerFromHero}
-                    onSelectBeanToBrew={handleApplyScannedRecipe}
-                    onLaunchDirectBrew={handleLaunchDirectBrew}
-                    onNavigateToRoaster={(roasterSlug) => {
-                      setSelectedRoasterSlug(roasterSlug);
-                      setIsRoasterShowcaseView(true);
-                      navigate(`/roasters/${roasterSlug}`);
-                    }}
-                    onOpenLocator={() => {
-                      setIsCafePortalView(false);
-                      setIsRoasterShowcaseView(false);
-                      setIsLearnView(false);
-                      setIsRecipesView(false);
-                      setIsShopsView(true);
-                      navigate('/shops');
-                    }}
-                    onStartBrewStation={() => {
-                      const el = document.getElementById('brew-atelier');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    onOpenScanner={() => setIsScannerOpen(true)}
-                  />
+                <div className="space-y-10 animate-fade-in">
+                  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#ECE6DC]">
+                    <div>
+                      <span className="text-[11px] font-mono uppercase tracking-widest font-extrabold text-[#A8622D] block">
+                        STEP 01 OF 04 • BREWING METHOD
+                      </span>
+                      <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#14110F] mt-1">
+                        Choose Your Brewer
+                      </h2>
+                      <p className="text-sm font-sans text-stone-600 mt-1 max-w-xl">
+                        Select your brewing geometry to calibrate flow rate, water dispersion, and extraction dynamics.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsScannerOpen(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/15 text-[#A8622D] hover:bg-amber-500/25 border border-amber-500/30 text-xs font-mono font-bold transition-all cursor-pointer self-start sm:self-auto"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Have a Bag? Scan Barcode</span>
+                    </button>
+                  </div>
 
                   {/* RECENT BREWS • BREW AGAIN IN 1-CLICK SHELF */}
                   {recentBrews && recentBrews.length > 0 && (
@@ -1007,7 +1046,10 @@ export default function App() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => setIsJournalOpen(true)}
+                          onClick={() => {
+                            setCurrentArea('my_coffee');
+                            navigate('/recipes');
+                          }}
                           className="text-xs font-mono font-bold text-[#A8622D] hover:underline flex items-center gap-1 cursor-pointer self-start sm:self-auto"
                         >
                           <span>Full Tasting Journal ({recentBrews.length})</span>
@@ -1071,16 +1113,7 @@ export default function App() {
                     </div>
                   )}
 
-                  <div id="brew-atelier" className="pt-8 border-t border-[#ECE6DC]">
-                    <div className="mb-4">
-                      <span className="text-xs font-sans font-semibold text-[#A8622D]">
-                        Brewing Guides
-                      </span>
-                      <h2 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
-                        Pick your favorite way to brew
-                      </h2>
-                    </div>
-
+                  <div id="brew-atelier" className="pt-2">
                     <MethodSelectorGrid
                       trackMode={trackMode}
                       setTrackMode={setTrackMode}
@@ -1099,147 +1132,139 @@ export default function App() {
                 </div>
               )}
 
-          {/* STEP 02: PRECISION RATIO CALCULATOR & SCALER */}
-          {currentStep === 2 && (
-            <div className="animate-fade-in space-y-8">
-              <PrecisionCalculator
-                trackMode={trackMode}
-                methods={methods}
-                activeMethod={currentActiveMethod}
-                setActiveMethod={(m) => {
-                  setActiveMethod(m);
-                  navigate(`/methods/${m.id}`);
-                }}
-                cupCount={cupCount}
-                setCupCount={setCupCount}
-                cupMl={cupMl}
-                setCupMl={setCupMl}
-                customRatio={customRatio}
-                setCustomRatio={setCustomRatio}
-                customWaterMl={customWaterMl}
-                setCustomWaterMl={setCustomWaterMl}
-                unitSystem={unitSystem}
-                setUnitSystem={setUnitSystem}
-                isMuted={isMuted}
-                setIsMuted={setIsMuted}
-                onNextStep={() => setCurrentStep(3)}
-                onPrevStep={() => {
-                  setCurrentStep(1);
-                  navigate('/');
-                }}
-              />
-            </div>
-          )}
-
-          {/* STEP 03: METHOD SPECIFICATIONS & HERO */}
-          {currentStep === 3 && (
-            <div className="animate-fade-in space-y-8">
-              <HeroBanner
-                trackMode={trackMode}
-                activeMethod={currentActiveMethod}
-                unitSystem={unitSystem}
-              />
-
-              {isCoffee && <GrindVisualGuide activeMethod={currentActiveMethod} />}
-
-              {/* Step Navigation Controls */}
-              <div className="flex items-center justify-between pt-6 border-t border-white/10">
-                <button
-                  onClick={() => setCurrentStep(2)}
-                  className="py-3 px-6 rounded-2xl bg-white/10 text-cream-light font-extrabold text-xs flex items-center gap-2 hover:bg-white/20 transition-all border border-white/15"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  <span>Step 02: Ratio & Scaler</span>
-                </button>
-
-                <button
-                  onClick={() => setCurrentStep(4)}
-                  className="py-3.5 px-8 rounded-2xl font-extrabold text-xs flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all btn-tactile-coffee text-[#140C08]"
-                >
-                  <span>Step 04: Guided Brew Timer</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
-            </div>
-          )}
-
-          {/* STEP 04: GUIDED BREW TIMER */}
-          {currentStep === 4 && (
-            <div id="step-4" className="animate-fade-in space-y-6">
-              {dialedInCoffee && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-md shadow-lg">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                      <div>
-                        <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-amber-gold font-bold flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>{dialedInCoffee.isBagRecipe ? 'Bag Recipe QR Dial-In Active' : 'Roaster Certified Dial-In Active'}</span>
-                        </div>
-                        <div className="text-base sm:text-lg font-serif font-bold text-cream-light">
-                          {dialedInCoffee.roaster} • {dialedInCoffee.beanName}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Roaster Tasting Notes & Advice */}
-                    {dialedInCoffee.tastingNotes && dialedInCoffee.tastingNotes.length > 0 && (
-                      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                        <span className="text-[10px] font-mono text-cream-soft/60 uppercase">Roaster Notes:</span>
-                        {dialedInCoffee.tastingNotes.map((note, idx) => (
-                          <span key={idx} className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-200 border border-amber-500/30 text-[11px] font-sans font-medium">
-                            {note}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {dialedInCoffee.notes && (
-                      <p className="text-xs text-cream-soft/80 italic font-sans max-w-xl line-clamp-2">
-                        "{dialedInCoffee.notes}"
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="text-xs font-mono text-cream-soft bg-black/40 p-3 rounded-xl border border-white/10 flex flex-wrap sm:flex-col sm:items-end gap-2 self-start sm:self-center shrink-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-amber-gold font-bold">1:{effectiveRatio}</span>
-                      <span>•</span>
-                      <span className="text-cream-light font-bold">{dryDoseGrams}g : {calculatedTotalWaterMl}g</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-cream-soft/80">
-                      {(dialedInCoffee.tempF || dialedInCoffee.extraction?.tempF) && (
-                        <span>{dialedInCoffee.tempF || dialedInCoffee.extraction?.tempF}°F</span>
-                      )}
-                      {(dialedInCoffee.recommendedGrind || dialedInCoffee.extraction?.grind) && (
-                        <>
-                          <span>•</span>
-                          <span>{dialedInCoffee.recommendedGrind || dialedInCoffee.extraction?.grind}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
+              {/* STEP 02: COFFEE & ROAST PROFILE SELECTION */}
+              {currentStep === 2 && (
+                <div className="animate-fade-in">
+                  <BrewCoffeeSelector
+                    selectedCoffee={selectedCoffee}
+                    onSelectCoffee={(coffee) => {
+                      setSelectedCoffee(coffee);
+                      if (coffee) {
+                        setDialedInCoffee(coffee);
+                        if (coffee.recommendedRatio) setCustomRatio(Number(coffee.recommendedRatio));
+                      }
+                      setCurrentStep(3);
+                    }}
+                    onNextStep={() => setCurrentStep(3)}
+                    onPrevStep={() => {
+                      setCurrentStep(1);
+                      navigate('/');
+                    }}
+                    onOpenScanner={() => setIsScannerOpen(true)}
+                    activeMethod={currentActiveMethod}
+                    unitSystem={unitSystem}
+                    setUnitSystem={setUnitSystem}
+                  />
                 </div>
               )}
 
-              <MultiPhaseTimer
-                trackMode={trackMode}
-                activeMethod={currentActiveMethod}
-                dryDoseGrams={dryDoseGrams}
-                unitSystem={unitSystem}
-                isMuted={isMuted}
-                setIsMuted={setIsMuted}
-                onPrevStep={() => setCurrentStep(3)}
-                onOpenJournal={() => setIsJournalOpen(true)}
-                dialedInCoffee={dialedInCoffee}
-                totalWaterMl={calculatedTotalWaterMl}
-                customRatio={effectiveRatio}
-                onApplyNextBrewTweak={handleApplyNextBrewTweak}
-              />
-            </div>
+              {/* STEP 03: RECIPE & DIAL IN (RATIO, DOSE, GRIND, WATER LAB) */}
+              {currentStep === 3 && (
+                <div className="animate-fade-in space-y-8">
+                  <PrecisionCalculator
+                    trackMode={trackMode}
+                    methods={methods}
+                    activeMethod={currentActiveMethod}
+                    setActiveMethod={(m) => {
+                      setActiveMethod(m);
+                      navigate(`/methods/${m.id}`);
+                    }}
+                    cupCount={cupCount}
+                    setCupCount={setCupCount}
+                    cupMl={cupMl}
+                    setCupMl={setCupMl}
+                    customRatio={customRatio}
+                    setCustomRatio={setCustomRatio}
+                    customWaterMl={customWaterMl}
+                    setCustomWaterMl={setCustomWaterMl}
+                    unitSystem={unitSystem}
+                    setUnitSystem={setUnitSystem}
+                    isMuted={isMuted}
+                    setIsMuted={setIsMuted}
+                    onNextStep={() => setCurrentStep(4)}
+                    onPrevStep={() => setCurrentStep(2)}
+                    selectedCoffee={selectedCoffee}
+                    onOpenWaterLab={() => setIsWaterLabOpen(true)}
+                  />
+                </div>
+              )}
+
+              {/* STEP 04: GUIDED BREW TIMER & SENSORY EVALUATION */}
+              {currentStep === 4 && (
+                <div id="step-4" className="animate-fade-in space-y-6">
+                  {(dialedInCoffee || selectedCoffee) && (
+                    <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-md shadow-lg">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-3">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                          <div>
+                            <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-amber-gold font-bold flex items-center gap-1.5">
+                              <Sparkles className="w-3.5 h-3.5" />
+                              <span>{(dialedInCoffee || selectedCoffee).isBagRecipe ? 'Bag Recipe QR Dial-In Active' : 'Specialty Dial-In Active'}</span>
+                            </div>
+                            <div className="text-base sm:text-lg font-serif font-bold text-cream-light">
+                              {(dialedInCoffee || selectedCoffee).roaster || (dialedInCoffee || selectedCoffee).roasteryName || 'Artisan Roaster'} • {(dialedInCoffee || selectedCoffee).beanName || (dialedInCoffee || selectedCoffee).name}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Roaster Tasting Notes */}
+                        {(dialedInCoffee || selectedCoffee).tastingNotes && (dialedInCoffee || selectedCoffee).tastingNotes.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                            <span className="text-[10px] font-mono text-cream-soft/60 uppercase">Flavor Profile:</span>
+                            {(dialedInCoffee || selectedCoffee).tastingNotes.map((note, idx) => (
+                              <span key={idx} className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-200 border border-amber-500/30 text-[11px] font-sans font-medium">
+                                {note}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {(dialedInCoffee || selectedCoffee).notes && (
+                          <p className="text-xs text-cream-soft/80 italic font-sans max-w-xl line-clamp-2">
+                            "{(dialedInCoffee || selectedCoffee).notes}"
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="text-xs font-mono text-cream-soft bg-black/40 p-3 rounded-xl border border-white/10 flex flex-wrap sm:flex-col sm:items-end gap-2 self-start sm:self-center shrink-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-amber-gold font-bold">1:{effectiveRatio}</span>
+                          <span>•</span>
+                          <span className="text-cream-light font-bold">{dryDoseGrams}g : {calculatedTotalWaterMl}g</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] text-cream-soft/80">
+                          {((dialedInCoffee || selectedCoffee).tempF || (dialedInCoffee || selectedCoffee).extraction?.tempF) && (
+                            <span>{(dialedInCoffee || selectedCoffee).tempF || (dialedInCoffee || selectedCoffee).extraction?.tempF}°F</span>
+                          )}
+                          {((dialedInCoffee || selectedCoffee).recommendedGrind || (dialedInCoffee || selectedCoffee).grindSize || (dialedInCoffee || selectedCoffee).extraction?.grind) && (
+                            <>
+                              <span>•</span>
+                              <span>{(dialedInCoffee || selectedCoffee).recommendedGrind || (dialedInCoffee || selectedCoffee).grindSize || (dialedInCoffee || selectedCoffee).extraction?.grind}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <MultiPhaseTimer
+                    trackMode={trackMode}
+                    activeMethod={currentActiveMethod}
+                    dryDoseGrams={dryDoseGrams}
+                    unitSystem={unitSystem}
+                    isMuted={isMuted}
+                    setIsMuted={setIsMuted}
+                    onPrevStep={() => setCurrentStep(3)}
+                    onOpenJournal={() => setIsJournalOpen(true)}
+                    dialedInCoffee={dialedInCoffee || selectedCoffee}
+                    totalWaterMl={calculatedTotalWaterMl}
+                    customRatio={effectiveRatio}
+                    onApplyNextBrewTweak={handleApplyNextBrewTweak}
+                  />
+                </div>
+              )}
+            </>
           )}
-        </>
-      )}
 
           {/* Tasting Journal Modal */}
           <BrewJournal
@@ -1412,8 +1437,8 @@ export default function App() {
 
         {/* Mobile Sticky 1-Thumb Bottom Navigation Bar */}
         <MobileBottomNav
-          currentView={isShopsView ? 'shops' : isCafePortalView ? 'cafe_portal' : isRoasterShowcaseView ? 'roasters' : isLearnView ? 'learn' : isRecipesView ? 'recipes' : (currentStep > 1 ? 'brew_station' : 'discovery')}
-          isShopsView={isShopsView}
+          currentView={currentArea}
+          isShopsView={currentArea === 'cafes'}
           onSelectView={(v) => {
             // Dismiss all open modals when navigating primary views
             setIsCommunityOpen(false);
@@ -1426,42 +1451,33 @@ export default function App() {
             setIsSearchOpen(false);
             setIsMobileToolsOpen(false);
 
-            if (v === 'discovery') {
-              setIsCafePortalView(false);
-              setIsRoasterShowcaseView(false);
-              setIsLearnView(false);
-              setIsRecipesView(false);
-              setIsShopsView(false);
-              setCurrentStep(1);
-              navigate('/');
-            } else if (v === 'recipes') {
-              setIsCafePortalView(false);
-              setIsRoasterShowcaseView(false);
-              setIsLearnView(false);
-              setIsShopsView(false);
-              setIsRecipesView(true);
-              navigate('/recipes');
-            } else if (v === 'shops') {
-              setIsCafePortalView(false);
-              setIsRoasterShowcaseView(false);
-              setIsLearnView(false);
-              setIsRecipesView(false);
-              setIsShopsView(true);
+            if (v === 'brew') {
+              setCurrentArea('brew');
+              navigate(currentStep > 1 && currentActiveMethod ? `/methods/${currentActiveMethod.id}` : '/');
+            } else if (v === 'discover') {
+              setCurrentArea('discover');
+              navigate('/roasters');
+            } else if (v === 'cafes') {
+              setCurrentArea('cafes');
+              setIsCafePartnerPortalOpen(false);
               navigate('/shops');
+            } else if (v === 'learn') {
+              setCurrentArea('learn');
+              navigate('/learn');
+            } else if (v === 'my_coffee') {
+              setCurrentArea('my_coffee');
+              navigate('/recipes');
             }
           }}
+          onStartBrew={() => handleStartBrew()}
           onOpenLocalCoffee={() => {
             setIsMobileToolsOpen(false);
-            setIsCafePortalView(false);
-            setIsRoasterShowcaseView(false);
-            setIsLearnView(false);
-            setIsRecipesView(false);
-            setIsShopsView(true);
+            setCurrentArea('cafes');
+            setIsCafePartnerPortalOpen(false);
             navigate('/shops');
           }}
           onOpenRoasterShowcase={() => {
             setIsMobileToolsOpen(false);
-            setIsShopsView(false);
             handleOpenRoasterShowcase();
           }}
           onOpenTools={() => setIsMobileToolsOpen(true)}
