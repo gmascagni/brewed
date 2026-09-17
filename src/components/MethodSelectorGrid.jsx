@@ -1,5 +1,6 @@
 import React from 'react';
 import { Thermometer, Clock, CheckCircle2, ChevronRight, Sparkles, Coffee, Gauge } from 'lucide-react';
+import { getAssetUrl } from '../utils/assetUrl';
 
 export default function MethodSelectorGrid({ methods, activeMethod, setActiveMethod, onNextStep, unitSystem }) {
   const isMetric = unitSystem === 'metric';
@@ -15,27 +16,49 @@ export default function MethodSelectorGrid({ methods, activeMethod, setActiveMet
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Step Header: Warm and welcoming cafe atmosphere */}
+      {/* Step Header: Editorial Split Hero Layout */}
       <div className="p-6 sm:p-8 md:p-10 rounded-3xl relative overflow-hidden bg-gradient-to-br from-[#FFFDF9] via-[#FAF7F2] to-[#F5EFE8] border border-[#ECE6DC] shadow-sm">
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] text-xs font-sans font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
-            <span>Step 1 • Pick your brewer</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+          <div className="lg:col-span-7 space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] text-xs font-sans font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
+              <span>Step 1 • Pick your brewer</span>
+            </div>
+
+            <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#14110F] leading-tight">
+              How would you like to brew today?
+            </h2>
+            
+            <p className="text-sm text-[#5C524B] leading-relaxed font-sans">
+              Select your favorite method below. We'll automatically calculate the exact coffee dose, water volume, grind size, and step-by-step timer for your cup.
+            </p>
+
+            <div className="inline-flex items-center gap-2 pt-1 text-xs text-[#766A62] font-sans">
+              <Coffee className="w-4 h-4 text-[#C88A4B]" />
+              <span className="font-medium text-[#2A2421]">{methods?.length || 9} Easy Brewing Guides</span>
+              <span className="text-[#DFD7CB]">•</span>
+              <span>Tested for beginner & experienced coffee lovers</span>
+            </div>
           </div>
 
-          <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#14110F] leading-tight">
-            How would you like to brew today?
-          </h2>
-          
-          <p className="text-sm text-[#5C524B] leading-relaxed font-sans">
-            Select your favorite method below. We'll automatically calculate the exact coffee dose, water volume, grind size, and step-by-step timer for your cup.
-          </p>
-
-          <div className="inline-flex items-center gap-2 pt-1 text-xs text-[#766A62] font-sans">
-            <Coffee className="w-4 h-4 text-[#C88A4B]" />
-            <span className="font-medium text-[#2A2421]">{methods?.length || 9} Easy Brewing Guides</span>
-            <span className="text-[#DFD7CB]">•</span>
-            <span>Tested for beginner & experienced coffee lovers</span>
+          <div className="lg:col-span-5">
+            <div className="relative h-44 sm:h-48 rounded-2xl overflow-hidden shadow-card border border-[#ECD4BD] bg-[#FAF7F2] group">
+              <img
+                key={activeMethod?.id || 'active_hero'}
+                src={getAssetUrl(activeMethod?.heroImage || '/coffee_setup.jpg')}
+                alt={activeMethod?.name || 'Selected Brewer'}
+                className="w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs font-sans">
+                <span className="font-semibold px-2.5 py-1 rounded-lg bg-black/40 backdrop-blur-md border border-white/10">
+                  {activeMethod?.name || 'Selected Brewer'}
+                </span>
+                <span className="px-2 py-1 rounded-lg bg-white/20 backdrop-blur-md text-[11px] font-medium">
+                  1:{activeMethod?.ratio || 16} • {isMetric ? `${activeMethod?.tempC || 93}°C` : `${activeMethod?.tempF || 200}°F`}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
