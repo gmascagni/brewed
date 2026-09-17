@@ -732,20 +732,12 @@ export default function App() {
     >
       <div className="min-h-screen font-sans flex flex-col transition-colors duration-700 relative bg-[#FAF7F2] text-[#14110F] selection:bg-[#C48B56] selection:text-white">
 
-      {/* High-Definition Extraction Method Background Image Overlay */}
+      {/* Subtle Warm Atmospheric Ambient Vignette */}
       <div 
-        className="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-all duration-1000 select-none"
+        className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-[#FAF7F2]"
         aria-hidden="true"
       >
-        <img
-          key={currentActiveMethod?.id || currentActiveMethod?.heroImage || 'technique_backdrop'}
-          src={getAssetUrl(currentActiveMethod?.heroImage || (trackMode === 'tea' ? '/tea_ceremony.jpg' : '/pour_over_hero.jpg'))}
-          alt=""
-          className="w-full h-full object-cover object-center opacity-25 sm:opacity-30 filter saturate-[1.05] contrast-[0.98] brightness-[1.04] scale-105 transform transition-all duration-1000 ease-out"
-        />
-        {/* Atmospheric Scrim & Radial Vignette: Ensures warm cafe luxury & pristine card readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/88 via-[#FAF7F2]/78 to-[#FAF7F2]/90 backdrop-blur-[1px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#FAF7F2]/35 to-[#FAF7F2]/82" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-50/40 via-transparent to-stone-100/30" />
       </div>
       
       {/* 100% Bulletproof Sticky Top Header Container */}

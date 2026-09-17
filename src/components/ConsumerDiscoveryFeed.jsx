@@ -19,7 +19,6 @@ import BeanCard from './BeanCard';
 import TastingNoteBadge from './TastingNoteBadge';
 import { CURATED_SINGLE_ORIGINS } from '../data/coffeeSensoryData';
 import { SHOWCASE_ROASTERS } from '../data/roasterShowcaseData';
-import { getAssetUrl } from '../utils/assetUrl';
 
 // Friendly coffee flavor filter options
 const FRIENDLY_FLAVORS = [
@@ -224,18 +223,6 @@ export default function ConsumerDiscoveryFeed({
 
         {/* Interactive Hero Quick-Start Calculator Box */}
         <div className="p-6 sm:p-8 md:p-10 rounded-3xl bg-[#FFFDF9] border-2 border-[#ECD4BD] shadow-elevated relative overflow-hidden transition-all duration-500">
-          {/* Transparent Background Image of Selected Brewer */}
-          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-            <img
-              key={activeBrewer.id}
-              src={getAssetUrl(activeBrewer.heroImage)}
-              alt={activeBrewer.name}
-              className="w-full h-full object-cover object-center transform scale-105 filter saturate-105 contrast-100 transition-all duration-700 opacity-25 sm:opacity-30"
-            />
-            {/* Soft warm gradient overlay: ensures crisp readability while revealing the brewer silhouette */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FFFDF9]/88 via-[#FFFDF9]/80 to-[#FAF7F2]/75 backdrop-blur-[1px]" />
-          </div>
-
           <div className="relative z-10 space-y-7">
             {/* Step A: Pick Brewer */}
             <div className="space-y-3">

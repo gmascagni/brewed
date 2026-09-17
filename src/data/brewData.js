@@ -5,7 +5,7 @@ export const BREW_METHODS = {
       name: 'Flat-Bottom Pour Over (Kalita)',
       category: 'coffee',
       featured: true,
-      heroImage: '/pourover_technique_thumb.jpg',
+      heroImage: '/coffee_setup.jpg',
       ratio: 16, // 1:16 ratio (1g coffee to 16ml water)
       defaultCupMl: 240,
       tempC: 93,

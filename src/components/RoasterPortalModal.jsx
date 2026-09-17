@@ -895,7 +895,7 @@ export default function RoasterPortalModal({
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-cream-soft/80 font-mono text-xs flex items-center gap-1.5 font-bold">
                       <UploadCloud className="w-3.5 h-3.5 text-amber-gold" />
-                      <span>Roastery Brand Logo (Watermark & Showcase)</span>
+                      <span>Roastery Brand Logo (Showcase & Packaging)</span>
                     </label>
                     <span className="text-[10px] text-cream-soft/50 font-mono">PNG, JPG, SVG, WebP (Max 5MB)</span>
                   </div>
@@ -911,7 +911,7 @@ export default function RoasterPortalModal({
                             {logoFileName || 'Brand Logo Uploaded'}
                           </span>
                           <span className="text-[10px] text-emerald-400 font-mono">
-                            ✓ Ready for packaging stickers & ambient background
+                            ✓ Ready for packaging stickers & showcase page
                           </span>
                         </div>
                       </div>
@@ -938,7 +938,7 @@ export default function RoasterPortalModal({
                         />
                       </label>
                       <span className="text-[11px] text-cream-soft/60 font-mono">
-                        This logo becomes the ambient watermark on your Roaster Showcase page & prints on Smart Bag stickers.
+                        This logo appears on your Roaster Showcase page & prints on Smart Bag stickers.
                       </span>
                     </div>
                   )}

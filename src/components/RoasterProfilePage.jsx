@@ -244,7 +244,7 @@ export default function RoasterProfilePage({
     <div className="min-h-screen bg-[#0A0604] text-cream-light selection:bg-amber-gold selection:text-espresso-950 font-sans pb-24 relative overflow-hidden">
       
       {/* ========================================================================= */}
-      {/* 1. BACKGROUND LOGO WATERMARK & AMBIENT ATMOSPHERE                        */}
+      {/* 1. AMBIENT ATMOSPHERE                                                    */}
       {/* ========================================================================= */}
       <div className="absolute top-0 inset-x-0 h-[680px] pointer-events-none overflow-hidden select-none z-0">
         
@@ -253,29 +253,6 @@ export default function RoasterProfilePage({
           className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-25 blur-[120px]"
           style={{ background: roaster.brandColor }}
         />
-
-        {/* Roaster Brand Logo or Monogram Ambient Watermark */}
-        {roaster.logoImage ? (
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[520px] flex items-center justify-center pointer-events-none opacity-25 filter contrast-125 select-none transform scale-105 transition-all duration-700">
-            <img 
-              src={roaster.logoImage} 
-              alt="" 
-              className="max-w-[85vw] sm:max-w-[560px] max-h-[440px] object-contain drop-shadow-[0_0_90px_rgba(212,163,115,0.25)]"
-            />
-          </div>
-        ) : (
-          <div className="absolute top-12 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center opacity-[0.06] transform scale-110">
-            <span 
-              className="font-serif font-black text-[280px] sm:text-[380px] leading-none tracking-tighter"
-              style={{ color: roaster.brandColor }}
-            >
-              {roaster.monogram}
-            </span>
-            <span className="font-mono text-xs sm:text-sm tracking-[0.3em] uppercase -mt-16 text-cream-soft font-bold">
-              {roaster.emblemSubtitle}
-            </span>
-          </div>
-        )}
 
         {/* Ambient vignette gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0A0604]/80 to-[#0A0604]" />
