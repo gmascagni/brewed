@@ -732,12 +732,20 @@ export default function App() {
     >
       <div className="min-h-screen font-sans flex flex-col transition-colors duration-700 relative bg-[#FAF7F2] text-[#14110F] selection:bg-[#C48B56] selection:text-white">
 
-      {/* Subtle Warm Atmospheric Ambient Vignette */}
+      {/* High-Definition Extraction Method Background Image Overlay */}
       <div 
-        className="fixed inset-0 pointer-events-none -z-10 overflow-hidden select-none"
+        className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
         aria-hidden="true"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-50/40 via-transparent to-stone-100/30" />
+        <img
+          key={activeMethod?.id || 'technique_backdrop'}
+          src={getAssetUrl(activeMethod?.heroImage || (trackMode === 'tea' ? '/tea_ceremony.jpg' : '/coffee_setup.jpg'))}
+          alt=""
+          className="w-full h-full object-cover object-center opacity-35 filter saturate-110 contrast-100 transition-all duration-700"
+        />
+        {/* Atmospheric Scrim: Soft cafe warmth with crystal clear readability for all foreground content */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/80 via-[#FAF7F2]/65 to-[#FAF7F2]/85" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#FAF7F2]/30 to-[#FAF7F2]/75" />
       </div>
       
       {/* 100% Bulletproof Sticky Top Header Container */}
