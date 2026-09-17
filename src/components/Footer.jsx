@@ -1,6 +1,7 @@
 import React from 'react';
 import { Mail, ExternalLink, Store, Tv } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
+import { getAssetUrl } from '../utils/assetUrl';
 
 export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpenRoasterShowcase, onOpenVideoAcademy }) {
   const isCoffee = trackMode === 'coffee';
@@ -66,17 +67,44 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
             </button>
           )}
 
-          {/* Compact Contact HQ Button */}
-          <a
-            href={`mailto:${emailAddress}?subject=TheBrew.App%20Inquiry`}
-            onClick={handleMailtoClick}
-            className="py-2 px-4 rounded-xl text-xs font-extrabold tracking-wider uppercase flex items-center gap-2 shadow-xs hover:scale-105 active:scale-95 transition-all bg-[#D69550] hover:bg-[#C48B56] text-white"
+          {/* Compact Contact HQ Button (with stealth Easter Egg on 'HQ') */}
+          <div
+            onClick={(e) => {
+              if (!e.defaultPrevented) {
+                handleMailtoClick();
+                window.location.href = `mailto:${emailAddress}?subject=TheBrew.App%20Inquiry`;
+              }
+            }}
+            className="py-2 px-4 rounded-xl text-xs font-extrabold tracking-wider uppercase flex items-center gap-2 shadow-xs hover:scale-105 active:scale-95 transition-all bg-[#D69550] hover:bg-[#C48B56] text-white cursor-pointer select-none"
             title="Contact Founder HQ"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleMailtoClick();
+                window.location.href = `mailto:${emailAddress}?subject=TheBrew.App%20Inquiry`;
+              }
+            }}
           >
-            <Mail className="w-3.5 h-3.5" />
-            <span>Contact HQ</span>
-            <ExternalLink className="w-3 h-3 opacity-80" />
-          </a>
+            <Mail className="w-3.5 h-3.5 pointer-events-none" />
+            <span className="flex items-center pointer-events-none">
+              <span>Contact&nbsp;</span>
+              <a
+                href={getAssetUrl('/coffee_brew_timer.zip')}
+                download="coffee_brew_timer.zip"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  trackEvent('easter_egg_timer_download');
+                }}
+                className="pointer-events-auto text-white hover:text-white focus:outline-none"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+                tabIndex={-1}
+              >
+                HQ
+              </a>
+            </span>
+            <ExternalLink className="w-3 h-3 opacity-80 pointer-events-none" />
+          </div>
         </div>
 
       </div>

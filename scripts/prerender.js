@@ -27,7 +27,7 @@ const spa404Html = `<!doctype html>
       var l = window.location;
 
       // Do not redirect static assets or media (prevents executing 404 HTML as JS module)
-      if (/\\.(js|css|png|jpg|jpeg|svg|webp|json|woff2|ico|wav|mp3)$/i.test(l.pathname)) {
+      if (/\\.(js|css|png|jpg|jpeg|svg|webp|json|woff2|ico|wav|mp3|zip)$/i.test(l.pathname)) {
         return;
       }
 
@@ -731,6 +731,12 @@ const distRoasters = path.join(distDir, 'roasters');
 const brewedRoasters = path.join(brewedDir, 'roasters');
 if (fs.existsSync(distRoasters)) {
   fs.cpSync(distRoasters, brewedRoasters, { recursive: true });
+}
+
+const distZip = path.join(distDir, 'coffee_brew_timer.zip');
+const brewedZip = path.join(brewedDir, 'coffee_brew_timer.zip');
+if (fs.existsSync(distZip)) {
+  fs.copyFileSync(distZip, brewedZip);
 }
 
 fs.writeFileSync(path.join(distDir, 'CNAME'), 'thebrew.app\n');

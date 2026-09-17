@@ -36,4 +36,5 @@ scratch/
 
 # Backups and Local Artifacts
 *.zip
+!public/coffee_brew_timer.zip
 Email SMTP RESEND API KEY.png
