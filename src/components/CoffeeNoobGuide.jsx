@@ -32,7 +32,10 @@ const METHOD_PRODUCT_MAP = {
   aeropress: 'aeropress_original',
   pour_over: 'v60_dripper_kit',
   chemex: 'chemex_8cup',
-  moka_pot: 'bialetti_moka_express'
+  moka_pot: 'bialetti_moka_express',
+  cold_brew: 'bodum_french_press',
+  drip_brewer: 'baratza_encore',
+  espresso: 'lavazza_super_crema'
 };
 
 // 8 Beginner Brew Method Profiles with Pros, Cons, and Quick Specs
@@ -318,7 +321,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
   };
 
   return (
-    <section id="coffee-noob-section" className="space-y-8 animate-fade-in scroll-mt-20">
+    <section id="coffee-noob-section" className="space-y-8 animate-fade-in scroll-mt-20 relative z-10">
       {/* 1. Header Banner */}
       <div className="p-7 sm:p-9 md:p-10 rounded-3xl bg-gradient-to-br from-[#FFFDF9] via-[#FAF7F2] to-[#F5EFEB] border-2 border-[#ECD4BD] shadow-elevated relative overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
@@ -402,7 +405,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
       </div>
 
       {/* 2. Interactive Navigation Tabs Bar (Prominent, High-Contrast, Always Shows Selected Content) */}
-      <div id="noob-tab-navigation" className="p-2.5 sm:p-3 rounded-2xl bg-white border border-[#ECE6DC] shadow-sm">
+      <div id="noob-tab-navigation" className="p-2.5 sm:p-3 rounded-2xl bg-white border border-[#ECE6DC] shadow-sm relative z-10">
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           {NOOB_TABS.map((tab) => {
             const Icon = tab.icon;
@@ -430,7 +433,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
       </div>
 
       {/* 3. Active Tab Content Area */}
-      <div id="noob-tab-content" className="scroll-mt-24">
+      <div id="noob-tab-content" className="scroll-mt-24 relative z-10">
       {/* ========================================================================= */}
       {/* TAB 1: THE 5 GOLDEN RULES (What Makes a Good Cup Important)               */}
       {/* ========================================================================= */}
@@ -665,18 +668,33 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
           {/* Detailed Selected Brewer Spotlight Card */}
           <div className="p-6 sm:p-8 rounded-3xl bg-white border-2 border-[#ECD4BD] shadow-card space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#ECE6DC] pb-5">
-              <div>
-                <div className="flex items-center gap-2.5 mb-1">
-                  <h4 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
-                    {selectedMethod.name}
-                  </h4>
-                  <span className={`px-3 py-1 rounded-full text-xs font-sans font-bold border ${selectedMethod.difficultyColor}`}>
-                    {selectedMethod.difficulty}
-                  </span>
+              <div className="flex items-center gap-4">
+                {(() => {
+                  const product = PRODUCTS_DATA.find(p => p.id === METHOD_PRODUCT_MAP[selectedMethod.id]);
+                  if (!product) return null;
+                  return (
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white border border-[#ECE6DC] shrink-0 p-1.5 flex items-center justify-center shadow-xs overflow-hidden">
+                      <img
+                        src={getAssetUrl(product.image)}
+                        alt={product.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  );
+                })()}
+                <div>
+                  <div className="flex items-center gap-2.5 mb-1">
+                    <h4 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
+                      {selectedMethod.name}
+                    </h4>
+                    <span className={`px-3 py-1 rounded-full text-xs font-sans font-bold border ${selectedMethod.difficultyColor}`}>
+                      {selectedMethod.difficulty}
+                    </span>
+                  </div>
+                  <p className="font-sans text-base sm:text-lg text-[#A25A24] font-semibold">
+                    "{selectedMethod.tagline}"
+                  </p>
                 </div>
-                <p className="font-sans text-base sm:text-lg text-[#A25A24] font-semibold">
-                  "{selectedMethod.tagline}"
-                </p>
               </div>
 
               {/* Quick Specs Badges */}

@@ -734,7 +734,7 @@ export default function App() {
 
       {/* Subtle Warm Atmospheric Ambient Vignette */}
       <div 
-        className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-[#FAF7F2]"
+        className="fixed inset-0 pointer-events-none -z-10 overflow-hidden select-none"
         aria-hidden="true"
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-50/40 via-transparent to-stone-100/30" />
@@ -819,7 +819,7 @@ export default function App() {
       </header>
 
       {/* Main Workspace Container */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 pb-24 md:pb-8">
+      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 pb-24 md:pb-8 relative z-10">
 
         <main className="mt-4 space-y-10">
 
