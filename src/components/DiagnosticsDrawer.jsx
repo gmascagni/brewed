@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import TroubleshootingHub from './TroubleshootingHub';
 
-export default function DiagnosticsDrawer({ trackMode }) {
+export default function DiagnosticsDrawer({ trackMode, isOpen: controlledIsOpen, onToggle }) {
   const isCoffee = trackMode === 'coffee';
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalOpen;
+  const toggleOpen = onToggle || (() => setInternalOpen(prev => !prev));
 
   return (
-    <div className="mt-14 border-t border-white/[0.08] pt-10">
+    <div id="diagnostics-drawer-section" className="mt-14 border-t border-[#ECE6DC] pt-10 scroll-mt-24">
       {/* Diagnostics Drawer Toggle Bar */}
       <div className={`p-7 md:p-9 rounded-3xl border shadow-2xl backdrop-blur-2xl flex flex-col sm:flex-row items-center justify-between gap-5 transition-colors duration-500 ${
         isCoffee ? 'bg-[#14110E]/90 border-[#A66E38]/30' : 'bg-[#0B150F]/90 border-sage-500/30'
@@ -36,7 +38,7 @@ export default function DiagnosticsDrawer({ trackMode }) {
         </div>
 
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={toggleOpen}
           className={`px-7 py-4 rounded-2xl text-xs font-extrabold uppercase tracking-wider flex items-center gap-2.5 shadow-2xl transition-all active:scale-95 whitespace-nowrap ${
             isOpen
               ? isCoffee ? 'btn-tactile-coffee text-[#140C08]' : 'btn-tactile-tea text-white'

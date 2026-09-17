@@ -229,6 +229,14 @@ const NOOB_BREW_METHODS = [
   }
 ];
 
+const NOOB_TABS = [
+  { id: 'pillars', label: '1. The 5 Golden Rules', icon: Sparkles },
+  { id: 'methods', label: '2. Brew Methods (Pros & Cons)', icon: Coffee },
+  { id: 'water', label: '3. The Truth About Water', icon: Droplets },
+  { id: 'checklist', label: '4. Tomorrow Morning Checklist', icon: CheckCircle2 },
+  { id: 'gear', label: '5. Recommended Gear', icon: ShoppingBag }
+];
+
 /**
  * Reusable Product Recommendation Callout with Direct Amazon ASIN Link
  */
@@ -237,8 +245,8 @@ function NoobProductCallout({ productId, label = "Recommended Gear", whyNoobsLov
   if (!product) return null;
 
   return (
-    <div className="mt-3 p-3.5 sm:p-4 rounded-2xl bg-[#FFFDF9] border border-[#ECD4BD] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs hover:border-[#D69550] transition-colors">
-      <div className="flex items-center gap-3 min-w-0">
+    <div className="mt-3 p-4 sm:p-4.5 rounded-2xl bg-[#FFFDF9] border border-[#ECD4BD] flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 shadow-xs hover:border-[#D69550] transition-colors">
+      <div className="flex items-center gap-3.5 min-w-0">
         <div className="w-14 h-14 rounded-xl overflow-hidden bg-white border border-[#ECE6DC] shrink-0 p-1 flex items-center justify-center shadow-xs">
           <img
             src={getAssetUrl(product.image)}
@@ -248,22 +256,22 @@ function NoobProductCallout({ productId, label = "Recommended Gear", whyNoobsLov
           />
         </div>
         <div className="min-w-0">
-          <div className="flex items-center gap-1.5 text-[10px] font-sans font-bold text-[#A25A24] uppercase tracking-wider">
-            <Sparkles className="w-3 h-3 text-[#C88A4B]" />
+          <div className="flex items-center gap-1.5 text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
             <span>{label}</span>
           </div>
-          <h5 className="font-editorial text-sm font-bold text-[#14110F] truncate">
+          <h5 className="font-editorial text-base sm:text-lg font-bold text-[#14110F] truncate">
             {product.name}
           </h5>
-          <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs">
+          <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs sm:text-sm">
             <span className="font-sans font-bold text-[#2A2421]">{product.priceRange}</span>
             <span className="text-[#ECE6DC]">•</span>
-            <span className="flex items-center gap-1 text-[#A25A24] font-semibold text-[11px]">
-              <Star className="w-3 h-3 fill-current text-amber-500" />
+            <span className="flex items-center gap-1 text-[#A25A24] font-semibold text-xs sm:text-sm">
+              <Star className="w-3.5 h-3.5 fill-current text-amber-500" />
               <span>{product.rating}</span>
             </span>
             {whyNoobsLoveIt && (
-              <span className="text-[11px] text-[#766A62] hidden md:inline truncate">
+              <span className="text-xs sm:text-sm text-[#766A62] hidden md:inline truncate">
                 • {whyNoobsLoveIt}
               </span>
             )}
@@ -282,10 +290,10 @@ function NoobProductCallout({ productId, label = "Recommended Gear", whyNoobsLov
             source: 'coffee_noob_guide'
           });
         }}
-        className="px-3.5 py-2 rounded-xl bg-[#2A2421] hover:bg-[#14110F] text-white text-xs font-sans font-bold flex items-center justify-center gap-1.5 shrink-0 shadow-xs transition active:scale-95 cursor-pointer self-stretch sm:self-auto"
+        className="px-4 py-2.5 rounded-xl bg-[#2A2421] hover:bg-[#14110F] text-white text-xs sm:text-sm font-sans font-bold flex items-center justify-center gap-1.5 shrink-0 shadow-xs transition active:scale-95 cursor-pointer self-stretch sm:self-auto"
       >
         <span>View on Amazon</span>
-        <ExternalLink className="w-3.5 h-3.5 text-[#D69550]" />
+        <ExternalLink className="w-4 h-4 text-[#D69550]" />
       </a>
     </div>
   );
@@ -297,128 +305,170 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
 
   const selectedMethod = NOOB_BREW_METHODS.find(m => m.id === selectedMethodId) || NOOB_BREW_METHODS[0];
 
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    setTimeout(() => {
+      const el = document.getElementById('noob-tab-content');
+      if (el) {
+        const yOffset = -90;
+        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 50);
+  };
+
   return (
     <section id="coffee-noob-section" className="space-y-8 animate-fade-in scroll-mt-20">
       {/* 1. Header Banner */}
       <div className="p-7 sm:p-9 md:p-10 rounded-3xl bg-gradient-to-br from-[#FFFDF9] via-[#FAF7F2] to-[#F5EFEB] border-2 border-[#ECD4BD] shadow-elevated relative overflow-hidden">
-        <div className="max-w-3xl relative z-10 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] font-sans font-bold text-xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
-            <span>Coffee Noob • Beginner's Field Guide</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+          {/* Left Column: Mission & Intro */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] font-sans font-bold text-xs sm:text-sm">
+              <Sparkles className="w-4 h-4 text-[#C88A4B]" />
+              <span>Coffee Noob • Beginner's Field Guide</span>
+            </div>
+
+            <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl font-bold text-[#14110F] leading-tight">
+              How to brew the perfect cup, with zero snobbery.
+            </h2>
+
+            <p className="font-sans text-base sm:text-lg md:text-xl text-[#5C524B] leading-relaxed">
+              Welcome! If you're tired of bitter, burnt, or watery morning coffee and want to start making genuinely delicious cups at home, you're in the right place. You don't need a $2,000 machine or a chemistry degree. Here is everything that actually matters, in plain English.
+            </p>
+
+            {/* Quick Extraction Metrics */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs sm:text-sm font-sans font-semibold text-[#5C524B]">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#ECE6DC] text-[#2A2421] shadow-2xs">
+                ☕ Whole Beans Only
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#ECE6DC] text-[#2A2421] shadow-2xs">
+                ⚖️ 1:16 Golden Ratio
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#ECE6DC] text-[#2A2421] shadow-2xs">
+                🌡️ 200°F Sweet Spot
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#ECE6DC] text-[#2A2421] shadow-2xs">
+                ⏱️ 3–4 Min Brews
+              </span>
+            </div>
           </div>
 
-          <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl font-bold text-[#14110F] leading-tight">
-            How to brew the perfect cup, with zero snobbery.
-          </h2>
+          {/* Right Column: "First Cup Fast Start" Reference Card (Fills the large empty space) */}
+          <div className="lg:col-span-5">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white/95 backdrop-blur-sm border-2 border-[#ECD4BD] shadow-card space-y-4">
+              <div className="flex items-center justify-between border-b border-[#ECE6DC] pb-3">
+                <span className="font-editorial text-lg sm:text-xl font-bold text-[#14110F] flex items-center gap-2">
+                  <Coffee className="w-5 h-5 text-[#C88A4B]" />
+                  <span>The 3-Minute Quick Formula</span>
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#FAF0E6] text-[#A25A24] text-xs font-sans font-bold">
+                  Rule of Thumb
+                </span>
+              </div>
 
-          <p className="font-sans text-base sm:text-lg text-[#5C524B] leading-relaxed">
-            Welcome! If you're tired of bitter, burnt, or watery morning coffee and want to start making genuinely delicious cups at home, you're in the right place. You don't need a $2,000 machine or a chemistry degree. Here is everything that actually matters, in plain English.
-          </p>
+              <div className="space-y-3 text-xs sm:text-sm font-sans text-[#5C524B]">
+                <div className="flex items-start gap-2.5">
+                  <span className="w-6 h-6 rounded-lg bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</span>
+                  <div>
+                    <strong className="text-[#14110F]">Measure with a Scale:</strong> 18g coffee to 300g water fills a standard 10oz mug with balanced flavor.
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="w-6 h-6 rounded-lg bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</span>
+                  <div>
+                    <strong className="text-[#14110F]">Wait 30s Off the Boil:</strong> Rolling boiling water is ~212°F; resting 30 seconds lands right in the 200°F sweet spot.
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <span className="w-6 h-6 rounded-lg bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">3</span>
+                  <div>
+                    <strong className="text-[#14110F]">Bloom for 40 Seconds:</strong> Pour double the coffee weight (36g water), watch it puff, then pour steadily.
+                  </div>
+                </div>
+              </div>
 
-          {/* Quick Navigation Tabs */}
-          <div className="flex flex-wrap items-center gap-2 pt-2">
-            <button
-              type="button"
-              onClick={() => setActiveTab('pillars')}
-              className={`px-4 py-2 rounded-xl text-xs font-sans font-semibold transition-all cursor-pointer ${
-                activeTab === 'pillars'
-                  ? 'bg-[#2A2421] text-white shadow-sm'
-                  : 'bg-white text-[#5C524B] hover:bg-[#FAF0E6] border border-[#ECE6DC]'
-              }`}
-            >
-              1. The 5 Golden Rules
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('methods')}
-              className={`px-4 py-2 rounded-xl text-xs font-sans font-semibold transition-all cursor-pointer ${
-                activeTab === 'methods'
-                  ? 'bg-[#2A2421] text-white shadow-sm'
-                  : 'bg-white text-[#5C524B] hover:bg-[#FAF0E6] border border-[#ECE6DC]'
-              }`}
-            >
-              2. Brew Methods (Pros & Cons)
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('water')}
-              className={`px-4 py-2 rounded-xl text-xs font-sans font-semibold transition-all cursor-pointer ${
-                activeTab === 'water'
-                  ? 'bg-[#2A2421] text-white shadow-sm'
-                  : 'bg-white text-[#5C524B] hover:bg-[#FAF0E6] border border-[#ECE6DC]'
-              }`}
-            >
-              3. The Truth About Water
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('checklist')}
-              className={`px-4 py-2 rounded-xl text-xs font-sans font-semibold transition-all cursor-pointer ${
-                activeTab === 'checklist'
-                  ? 'bg-[#2A2421] text-white shadow-sm'
-                  : 'bg-white text-[#5C524B] hover:bg-[#FAF0E6] border border-[#ECE6DC]'
-              }`}
-            >
-              4. Tomorrow Morning Checklist
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('gear')}
-              className={`px-4 py-2 rounded-xl text-xs font-sans font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'gear'
-                  ? 'bg-[#2A2421] text-white shadow-sm'
-                  : 'bg-white text-[#5C524B] hover:bg-[#FAF0E6] border border-[#ECE6DC]'
-              }`}
-            >
-              <ShoppingBag className="w-3.5 h-3.5 text-[#C88A4B]" />
-              <span>5. Recommended Gear</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => handleTabChange('methods')}
+                className="w-full py-3 px-4 rounded-xl bg-[#2A2421] hover:bg-[#14110F] text-white text-xs sm:text-sm font-sans font-bold flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer shadow-xs"
+              >
+                <span>Compare All 8 Brew Methods Below</span>
+                <ChevronRight className="w-4 h-4 text-[#D69550]" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* 2. Interactive Navigation Tabs Bar (Prominent, High-Contrast, Always Shows Selected Content) */}
+      <div id="noob-tab-navigation" className="p-2.5 sm:p-3 rounded-2xl bg-white border border-[#ECE6DC] shadow-sm">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+          {NOOB_TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isTabActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabChange(tab.id)}
+                className={`py-3 px-4 sm:px-5 rounded-xl font-sans font-bold text-sm sm:text-base flex items-center gap-2 transition-all cursor-pointer active:scale-95 ${
+                  isTabActive
+                    ? 'bg-[#14110F] text-white shadow-md ring-2 ring-[#C88A4B]/40'
+                    : 'bg-[#FAF7F2] text-[#5C524B] hover:text-[#14110F] hover:bg-[#FAF0E6] border border-[#ECE6DC]'
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${isTabActive ? 'text-[#E8AF72]' : 'text-[#C88A4B]'}`} />
+                <span>{tab.label}</span>
+                {isTabActive && (
+                  <span className="w-2 h-2 rounded-full bg-[#E8AF72] animate-pulse ml-1" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. Active Tab Content Area */}
+      <div id="noob-tab-content" className="scroll-mt-24">
       {/* ========================================================================= */}
       {/* TAB 1: THE 5 GOLDEN RULES (What Makes a Good Cup Important)               */}
       {/* ========================================================================= */}
       {activeTab === 'pillars' && (
         <div className="space-y-6 animate-fade-in">
-          <div className="flex items-center justify-between border-b border-[#ECE6DC] pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#ECE6DC] pb-3 gap-1.5">
             <div>
-              <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider">Pillars of Extraction</span>
-              <h3 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
+              <span className="text-sm font-sans font-bold text-[#A25A24] uppercase tracking-wider">Pillars of Extraction</span>
+              <h3 className="font-editorial text-2xl sm:text-3xl lg:text-4xl font-bold text-[#14110F]">
                 The 5 Things That Actually Make a Good Cup
               </h3>
             </div>
-            <span className="text-xs font-sans text-[#766A62] hidden sm:inline">
+            <span className="text-sm font-sans text-[#766A62]">
               90% of your coffee quality comes from these 5 fundamentals.
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Rule 1: Fresh Whole Beans */}
-            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3.5 flex flex-col justify-between">
+              <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
-                  <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+                  <span className="w-9 h-9 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base">
                     1
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-sans font-semibold border border-emerald-200">
+                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-sans font-bold border border-emerald-200">
                     Most Important
                   </span>
                 </div>
-                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+                <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F]">
                   Fresh Whole Beans (Never Stale Pre-Ground)
                 </h4>
-                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
+                <p className="font-sans text-base sm:text-lg text-[#5C524B] leading-relaxed">
                   Coffee beans are food. The moment beans are ground, their cellular walls shatter, and more than 60% of their delicate floral and fruit aromas oxidize and evaporate within <strong>15 minutes</strong>.
                 </p>
-                <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
-                  <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2F663C]" />
+                <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-sm sm:text-base text-[#5C524B] space-y-2 font-sans leading-relaxed">
+                  <p className="font-bold text-[#14110F] flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#2F663C]" />
                     <span>The Noob Rule: Check the "Roasted On" Date</span>
                   </p>
                   <p>
@@ -435,25 +485,25 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
             </div>
 
             {/* Rule 2: Burr Grinder */}
-            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3.5 flex flex-col justify-between">
+              <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
-                  <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+                  <span className="w-9 h-9 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base">
                     2
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-[11px] font-sans font-semibold border border-amber-200">
+                  <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-sans font-bold border border-amber-200">
                     Game-Changing Gear
                   </span>
                 </div>
-                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+                <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F]">
                   A Burr Grinder (Ditch the Whirling Blade)
                 </h4>
-                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
+                <p className="font-sans text-base sm:text-lg text-[#5C524B] leading-relaxed">
                   Spinning blade choppers smash beans unevenly into giant boulders and micro-dust. When hot water hits this mess, the dust over-extracts (tasting bitter & ashy) while boulders under-extract (tasting sour & grassy) in the exact same cup.
                 </p>
-                <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
-                  <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2F663C]" />
+                <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-sm sm:text-base text-[#5C524B] space-y-2 font-sans leading-relaxed">
+                  <p className="font-bold text-[#14110F] flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#2F663C]" />
                     <span>The Noob Rule: Conical Burrs Crush Uniformly</span>
                   </p>
                   <p>
@@ -470,25 +520,25 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
             </div>
 
             {/* Rule 3: The Golden Ratio */}
-            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3.5 flex flex-col justify-between">
+              <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
-                  <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+                  <span className="w-9 h-9 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base">
                     3
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-800 text-[11px] font-sans font-semibold border border-blue-200">
+                  <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-800 text-xs font-sans font-bold border border-blue-200">
                     Instant Consistency
                   </span>
                 </div>
-                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+                <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F]">
                   The Golden Ratio (Weigh in Grams, Don't Guess with Spoons)
                 </h4>
-                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
+                <p className="font-sans text-base sm:text-lg text-[#5C524B] leading-relaxed">
                   Coffee density changes drastically by roast. A scoop of dark roast weighs much less than a scoop of dense light roast! Measuring with random spoons guarantees unpredictable, erratic coffee every morning.
                 </p>
-                <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
-                  <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
-                    <Scale className="w-3.5 h-3.5 text-[#A25A24]" />
+                <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-sm sm:text-base text-[#5C524B] space-y-2 font-sans leading-relaxed">
+                  <p className="font-bold text-[#14110F] flex items-center gap-2">
+                    <Scale className="w-4 h-4 text-[#A25A24]" />
                     <span>The Magic Ratio: 1:16 (1g Coffee per 16g Water)</span>
                   </p>
                   <p>
@@ -505,25 +555,25 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
             </div>
 
             {/* Rule 4: Water Temperature */}
-            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3.5 flex flex-col justify-between">
+              <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
-                  <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+                  <span className="w-9 h-9 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base">
                     4
                   </span>
-                  <span className="px-2.5 py-1 rounded-full bg-orange-50 text-orange-800 text-[11px] font-sans font-semibold border border-orange-200">
+                  <span className="px-3 py-1 rounded-full bg-orange-50 text-orange-800 text-xs font-sans font-bold border border-orange-200">
                     Thermal Control
                   </span>
                 </div>
-                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+                <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F]">
                   Water Temperature (The 195°F – 205°F Sweet Spot)
                 </h4>
-                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
+                <p className="font-sans text-base sm:text-lg text-[#5C524B] leading-relaxed">
                   Water too cool (under 195°F / 90°C) cannot dissolve the sweet caramelized sugars in coffee, resulting in weak, sour cups. Rolling boiling water (212°F / 100°C) can scorch darker roasts and pull out bitter wood fibers.
                 </p>
-                <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-xs text-[#5C524B] space-y-1.5 font-sans">
-                  <p className="font-semibold text-[#14110F] flex items-center gap-1.5">
-                    <Flame className="w-3.5 h-3.5 text-[#A25A24]" />
+                <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-sm sm:text-base text-[#5C524B] space-y-2 font-sans leading-relaxed">
+                  <p className="font-bold text-[#14110F] flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-[#A25A24]" />
                     <span>The Noob Rule: The 30-Second Rest</span>
                   </p>
                   <p>
@@ -540,22 +590,22 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
             </div>
 
             {/* Rule 5: The Bloom */}
-            <div className="p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3 md:col-span-2">
+            <div className="p-6 sm:p-7 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all space-y-3.5 md:col-span-2">
               <div className="flex items-center justify-between">
-                <span className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+                <span className="w-9 h-9 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base">
                   5
                 </span>
-                <span className="px-2.5 py-1 rounded-full bg-rose-50 text-rose-800 text-[11px] font-sans font-semibold border border-rose-200">
+                <span className="px-3 py-1 rounded-full bg-rose-50 text-rose-800 text-xs font-sans font-bold border border-rose-200">
                   Pro Technique
                 </span>
               </div>
-              <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+              <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F]">
                 The Magic "Bloom" (Why We Wet the Grounds First)
               </h4>
-              <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
+              <p className="font-sans text-base sm:text-lg text-[#5C524B] leading-relaxed">
                 When coffee beans roast, carbon dioxide gas (CO2) gets trapped inside their cellular pockets. If you dump all your hot water on dry coffee at once, the escaping gas bubbles push the water away, preventing it from touching the coffee bed.
               </p>
-              <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-sans text-[#5C524B]">
+              <div className="p-4 sm:p-5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm sm:text-base font-sans text-[#5C524B] leading-relaxed">
                 <div>
                   <strong className="text-[#14110F] block mb-1">Step 1: Pour 2x Weight</strong>
                   Pour double the dry coffee weight in water (e.g. 40g water for a 20g dose) gently over all grounds.
@@ -581,12 +631,12 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
         <div className="space-y-6 animate-fade-in">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#ECE6DC] pb-3 gap-2">
             <div>
-              <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider">Brew Method Guide</span>
+              <span className="text-xs sm:text-sm font-sans font-bold text-[#A25A24] uppercase tracking-wider">Brew Method Guide</span>
               <h3 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
                 Pick Your Brewing Weapon: Pros & Cons
               </h3>
             </div>
-            <span className="text-xs font-sans text-[#766A62]">
+            <span className="text-xs sm:text-sm font-sans text-[#766A62]">
               Click any brewer below to inspect its breakdown and gear recommendations.
             </span>
           </div>
@@ -600,7 +650,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                   key={method.id}
                   type="button"
                   onClick={() => setSelectedMethodId(method.id)}
-                  className={`px-4 py-2.5 rounded-xl font-sans text-xs font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                  className={`px-4 py-2.5 rounded-xl font-sans text-sm font-bold whitespace-nowrap transition-all cursor-pointer border ${
                     isSelected
                       ? 'bg-[#14110F] text-white border-[#14110F] shadow-sm'
                       : 'bg-white text-[#5C524B] hover:bg-[#FAF7F2] border-[#ECE6DC]'
@@ -620,34 +670,34 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                   <h4 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
                     {selectedMethod.name}
                   </h4>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-sans font-bold border ${selectedMethod.difficultyColor}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-sans font-bold border ${selectedMethod.difficultyColor}`}>
                     {selectedMethod.difficulty}
                   </span>
                 </div>
-                <p className="font-sans text-sm text-[#A25A24] font-semibold">
+                <p className="font-sans text-base sm:text-lg text-[#A25A24] font-semibold">
                   "{selectedMethod.tagline}"
                 </p>
               </div>
 
               {/* Quick Specs Badges */}
-              <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
-                <span className="px-3 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#2A2421]">
+              <div className="flex flex-wrap items-center gap-2 text-sm font-mono">
+                <span className="px-3.5 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#2A2421]">
                   Ratio: <strong>{selectedMethod.ratio}</strong>
                 </span>
-                <span className="px-3 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#2A2421]">
+                <span className="px-3.5 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#2A2421]">
                   Time: <strong>{selectedMethod.time}</strong>
                 </span>
-                <span className="px-3 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#2A2421]">
+                <span className="px-3.5 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#2A2421]">
                   Grind: <strong>{selectedMethod.grind}</strong>
                 </span>
               </div>
             </div>
 
-            <p className="font-sans text-base text-[#5C524B] leading-relaxed">
+            <p className="font-sans text-base sm:text-lg text-[#5C524B] leading-relaxed">
               {selectedMethod.description}
             </p>
 
-            <div className="p-4 rounded-2xl bg-[#FFFDF9] border border-[#ECD4BD] text-xs font-sans text-[#5C524B] space-y-1">
+            <div className="p-5 rounded-2xl bg-[#FFFDF9] border border-[#ECD4BD] text-sm sm:text-base font-sans text-[#5C524B] space-y-1.5">
               <span className="font-bold text-[#14110F] uppercase tracking-wider block">Flavor Profile & Best Beans:</span>
               <p><strong>Flavor:</strong> {selectedMethod.flavorProfile}</p>
               <p><strong>Recommended For:</strong> {selectedMethod.bestFor}</p>
@@ -656,15 +706,15 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
             {/* Pros and Cons Split Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
               {/* Pros */}
-              <div className="p-5 rounded-2xl bg-[#F0FDF4] border border-[#BBF7D0] space-y-3">
-                <div className="flex items-center gap-2 text-[#166534] font-sans font-bold text-sm">
-                  <ThumbsUp className="w-4 h-4 text-emerald-600" />
+              <div className="p-5 sm:p-6 rounded-2xl bg-[#F0FDF4] border border-[#BBF7D0] space-y-3">
+                <div className="flex items-center gap-2 text-[#166534] font-sans font-bold text-base">
+                  <ThumbsUp className="w-5 h-5 text-emerald-600" />
                   <span>The Pros (Why you'll love it)</span>
                 </div>
-                <ul className="space-y-2 text-xs font-sans text-[#14532D]">
+                <ul className="space-y-2.5 text-sm font-sans text-[#14532D]">
                   {selectedMethod.pros.map((pro, idx) => (
                     <li key={idx} className="flex items-start gap-2 leading-relaxed">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                       <span>{pro}</span>
                     </li>
                   ))}
@@ -672,15 +722,15 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
               </div>
 
               {/* Cons */}
-              <div className="p-5 rounded-2xl bg-[#FFF1F2] border border-[#FECDD3] space-y-3">
-                <div className="flex items-center gap-2 text-[#9F1239] font-sans font-bold text-sm">
-                  <ThumbsDown className="w-4 h-4 text-rose-600" />
+              <div className="p-5 sm:p-6 rounded-2xl bg-[#FFF1F2] border border-[#FECDD3] space-y-3">
+                <div className="flex items-center gap-2 text-[#9F1239] font-sans font-bold text-base">
+                  <ThumbsDown className="w-5 h-5 text-rose-600" />
                   <span>The Cons (What to watch out for)</span>
                 </div>
-                <ul className="space-y-2 text-xs font-sans text-[#881337]">
+                <ul className="space-y-2.5 text-sm font-sans text-[#881337]">
                   {selectedMethod.cons.map((con, idx) => (
                     <li key={idx} className="flex items-start gap-2 leading-relaxed">
-                      <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                       <span>{con}</span>
                     </li>
                   ))}
@@ -691,7 +741,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
             {/* Recommended Hardware Callout */}
             {METHOD_PRODUCT_MAP[selectedMethod.id] && (
               <div className="pt-2">
-                <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider block mb-1">
+                <span className="text-sm font-sans font-bold text-[#A25A24] uppercase tracking-wider block mb-2">
                   Tested & Recommended Equipment:
                 </span>
                 <NoobProductCallout
@@ -715,7 +765,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                 <button
                   type="button"
                   onClick={() => onSelectMethodToBrew(selectedMethod.id)}
-                  className="py-3 px-6 rounded-xl bg-[#2A2421] hover:bg-[#14110F] text-white font-sans font-bold text-xs flex items-center gap-2 shadow-sm transition active:scale-95 cursor-pointer"
+                  className="py-3.5 px-6 rounded-xl bg-[#2A2421] hover:bg-[#14110F] text-white font-sans font-bold text-sm sm:text-base flex items-center gap-2.5 shadow-sm transition active:scale-95 cursor-pointer"
                 >
                   <span>Open Guided Brew Timer for {selectedMethod.name}</span>
                   <ArrowRight className="w-4 h-4 text-[#D69550]" />
@@ -733,7 +783,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
         <div className="space-y-6 animate-fade-in">
           <div className="flex items-center justify-between border-b border-[#ECE6DC] pb-3">
             <div>
-              <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider">Water Chemistry Demystified</span>
+              <span className="text-xs sm:text-sm font-sans font-bold text-[#A25A24] uppercase tracking-wider">Water Chemistry Demystified</span>
               <h3 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
                 Why Water is 98% of Your Cup (And How to Fix It)
               </h3>
@@ -742,7 +792,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
               <button
                 type="button"
                 onClick={onOpenWaterLab}
-                className="text-xs font-sans font-semibold text-[#A25A24] hover:underline hidden sm:inline cursor-pointer"
+                className="text-xs sm:text-sm font-sans font-semibold text-[#A25A24] hover:underline hidden sm:inline cursor-pointer"
               >
                 Launch Advanced Mineral Lab →
               </button>
@@ -750,61 +800,61 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
           </div>
 
           <div className="p-6 sm:p-8 rounded-3xl bg-white border border-[#ECE6DC] shadow-card space-y-6">
-            <p className="font-sans text-base text-[#5C524B] leading-relaxed">
+            <p className="font-sans text-base sm:text-lg text-[#5C524B] leading-relaxed">
               When you drink a cup of coffee, you are drinking <strong>98.5% water</strong> and only 1.5% dissolved coffee solids. If you take world-class $40 single-origin gesha beans and brew them with harsh municipal tap water, your coffee will taste flat, chalky, or chemically bitter.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* Chemistry 1: The Flavor Magnets */}
-              <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] space-y-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+              <div className="p-5 sm:p-6 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] space-y-3">
+                <div className="w-9 h-9 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base">
                   🧲
                 </div>
-                <h4 className="font-editorial text-lg font-bold text-[#14110F]">
+                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
                   Minerals = Flavor Magnets
                 </h4>
-                <p className="font-sans text-xs text-[#5C524B] leading-relaxed">
+                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
                   Pure distilled water with zero minerals makes surprisingly terrible, empty coffee! Minerals like <strong>Magnesium</strong> and <strong>Calcium</strong> act like microscopic magnets that latch onto sweetness, fruit acids, and aromatics to pull them out of the bean.
                 </p>
               </div>
 
               {/* Chemistry 2: The Acid Buffer */}
-              <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] space-y-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+              <div className="p-5 sm:p-6 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] space-y-3">
+                <div className="w-9 h-9 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base">
                   🛡️
                 </div>
-                <h4 className="font-editorial text-lg font-bold text-[#14110F]">
+                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
                   Alkalinity = The Acid Sponge
                 </h4>
-                <p className="font-sans text-xs text-[#5C524B] leading-relaxed">
+                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
                   Bicarbonate buffer acts like a sponge. If you have <strong>too little buffer</strong>, coffee tastes unpleasantly sharp and vinegar-sour. If you have <strong>too much buffer</strong> (hard tap water), it kills all brightness, leaving dull, muddy coffee.
                 </p>
               </div>
 
               {/* Chemistry 3: Chlorine */}
-              <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] space-y-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm">
+              <div className="p-5 sm:p-6 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] space-y-3">
+                <div className="w-9 h-9 rounded-xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base">
                   🚫
                 </div>
-                <h4 className="font-editorial text-lg font-bold text-[#14110F]">
+                <h4 className="font-editorial text-xl font-bold text-[#14110F]">
                   Chlorine Destroys Aromatics
                 </h4>
-                <p className="font-sans text-xs text-[#5C524B] leading-relaxed">
+                <p className="font-sans text-sm text-[#5C524B] leading-relaxed">
                   Municipalities add chlorine to tap water to kill bacteria. When boiled, chlorine reacts with hot coffee compounds to create a distinctive medicine-like, astringent off-flavor.
                 </p>
               </div>
             </div>
 
             {/* 3 Simple Rules for Beginners */}
-            <div className="p-6 rounded-2xl bg-[#FFFDF9] border-2 border-[#ECD4BD] space-y-4">
-              <h4 className="font-editorial text-xl font-bold text-[#14110F] flex items-center gap-2">
-                <Droplets className="w-5 h-5 text-[#C88A4B]" />
+            <div className="p-6 sm:p-7 rounded-2xl bg-[#FFFDF9] border-2 border-[#ECD4BD] space-y-5">
+              <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F] flex items-center gap-2.5">
+                <Droplets className="w-6 h-6 text-[#C88A4B]" />
                 <span>The 3 No-Nonsense Water Rules for Beginners</span>
               </h4>
 
-              <div className="space-y-3 font-sans text-sm text-[#5C524B]">
-                <div className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+              <div className="space-y-4 font-sans text-base text-[#5C524B]">
+                <div className="flex items-start gap-3.5">
+                  <span className="w-7 h-7 rounded-full bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
                     1
                   </span>
                   <div>
@@ -813,8 +863,8 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                <div className="flex items-start gap-3.5">
+                  <span className="w-7 h-7 rounded-full bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
                     2
                   </span>
                   <div>
@@ -823,8 +873,8 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                <div className="flex items-start gap-3.5">
+                  <span className="w-7 h-7 rounded-full bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
                     3
                   </span>
                   <div>
@@ -837,7 +887,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
 
             {/* In-Line Water Products */}
             <div className="pt-2">
-              <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider block mb-1">
+              <span className="text-sm font-sans font-bold text-[#A25A24] uppercase tracking-wider block mb-2">
                 Recommended Water Minerals & Precision Kettles:
               </span>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -864,12 +914,12 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
         <div className="space-y-6 animate-fade-in">
           <div className="flex items-center justify-between border-b border-[#ECE6DC] pb-3">
             <div>
-              <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider">Action Plan</span>
+              <span className="text-xs sm:text-sm font-sans font-bold text-[#A25A24] uppercase tracking-wider">Action Plan</span>
               <h3 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
                 Your "First Win" Tomorrow Morning
               </h3>
             </div>
-            <span className="text-xs font-sans text-[#766A62] hidden sm:inline">
+            <span className="text-xs sm:text-sm font-sans text-[#766A62] hidden sm:inline">
               Three simple steps to immediately upgrade your coffee tomorrow.
             </span>
           </div>
@@ -877,95 +927,95 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
           <div className="p-6 sm:p-8 rounded-3xl bg-white border border-[#ECE6DC] shadow-card space-y-6">
             <div className="space-y-4">
               {/* Step 1 */}
-              <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-10 h-10 rounded-2xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base shrink-0">
+              <div className="p-5 sm:p-6 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-2xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-lg shrink-0">
                     1
                   </div>
                   <div>
-                    <h4 className="font-editorial text-lg font-bold text-[#14110F]">
+                    <h4 className="font-editorial text-xl font-bold text-[#14110F]">
                       Buy 1 bag of whole beans with a visible roast date
                     </h4>
-                    <p className="font-sans text-xs text-[#5C524B] mt-0.5">
+                    <p className="font-sans text-sm sm:text-base text-[#5C524B] mt-1 leading-relaxed">
                       Visit a local cafe or check your grocery shelf for a bag stamped roasted within the last 10–25 days. Choose a medium roast for balanced sweetness and chocolate notes.
                     </p>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-white text-[#A25A24] text-xs font-sans font-semibold border border-[#ECD4BD] shrink-0">
+                <span className="px-3.5 py-1.5 rounded-full bg-white text-[#A25A24] text-xs sm:text-sm font-sans font-bold border border-[#ECD4BD] shrink-0">
                   Flavor Upgrade: +50%
                 </span>
               </div>
 
               {/* Step 2 */}
-              <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-10 h-10 rounded-2xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base shrink-0">
+              <div className="p-5 sm:p-6 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-2xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-lg shrink-0">
                     2
                   </div>
                   <div>
-                    <h4 className="font-editorial text-lg font-bold text-[#14110F]">
+                    <h4 className="font-editorial text-xl font-bold text-[#14110F]">
                       Weigh 18g coffee and 300g water (1:16.6)
                     </h4>
-                    <p className="font-sans text-xs text-[#5C524B] mt-0.5">
+                    <p className="font-sans text-sm sm:text-base text-[#5C524B] mt-1 leading-relaxed">
                       Put your cup or brewer on a kitchen scale, hit tare (zero), and measure exactly 18g coffee. Pour 300g water total. Say goodbye to bitter accidental overdosing.
                     </p>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-white text-[#A25A24] text-xs font-sans font-semibold border border-[#ECD4BD] shrink-0">
+                <span className="px-3.5 py-1.5 rounded-full bg-white text-[#A25A24] text-xs sm:text-sm font-sans font-bold border border-[#ECD4BD] shrink-0">
                   Consistency: 100%
                 </span>
               </div>
 
               {/* Step 3 */}
-              <div className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-10 h-10 rounded-2xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-base shrink-0">
+              <div className="p-5 sm:p-6 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-2xl bg-[#FAF0E6] text-[#A25A24] flex items-center justify-center font-bold text-lg shrink-0">
                     3
                   </div>
                   <div>
-                    <h4 className="font-editorial text-lg font-bold text-[#14110F]">
+                    <h4 className="font-editorial text-xl font-bold text-[#14110F]">
                       Let boiling water rest for 30 seconds & bloom for 40s
                     </h4>
-                    <p className="font-sans text-xs text-[#5C524B] mt-0.5">
+                    <p className="font-sans text-sm sm:text-base text-[#5C524B] mt-1 leading-relaxed">
                       When your kettle boils, count to 30 before pouring. Pour about 40g water first, wait 40 seconds to let CO2 gas bubble off, then pour the remaining water steadily.
                     </p>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-white text-[#A25A24] text-xs font-sans font-semibold border border-[#ECD4BD] shrink-0">
+                <span className="px-3.5 py-1.5 rounded-full bg-white text-[#A25A24] text-xs sm:text-sm font-sans font-bold border border-[#ECD4BD] shrink-0">
                   Sweetness: Maximum
                 </span>
               </div>
             </div>
 
             {/* Beginner Flavor Diagnostic Table */}
-            <div className="pt-4 border-t border-[#ECE6DC] space-y-3">
-              <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+            <div className="pt-4 border-t border-[#ECE6DC] space-y-4">
+              <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F]">
                 Quick Diagnostic: How Does Your Cup Taste?
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-1.5 font-sans">
-                  <div className="flex items-center gap-2 font-bold text-amber-900 text-sm">
-                    <AlertCircle className="w-4 h-4 text-amber-700" />
+                <div className="p-5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2 font-sans">
+                  <div className="flex items-center gap-2 font-bold text-amber-900 text-base">
+                    <AlertCircle className="w-5 h-5 text-amber-700" />
                     <span>Tastes Sour, Salty, or Sharp?</span>
                   </div>
-                  <p className="text-xs text-amber-800">
+                  <p className="text-sm text-amber-800 leading-relaxed">
                     <strong>Cause: Under-extraction.</strong> Water didn't extract enough sweet sugars.
                   </p>
-                  <p className="text-xs text-amber-900 font-semibold">
+                  <p className="text-sm sm:text-base text-amber-950 font-bold pt-1">
                     👉 Fix: Grind one click finer, or brew with hotter water.
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-stone-100 border border-stone-300 space-y-1.5 font-sans">
-                  <div className="flex items-center gap-2 font-bold text-stone-900 text-sm">
-                    <AlertCircle className="w-4 h-4 text-stone-700" />
+                <div className="p-5 rounded-2xl bg-stone-100 border border-stone-300 space-y-2 font-sans">
+                  <div className="flex items-center gap-2 font-bold text-stone-900 text-base">
+                    <AlertCircle className="w-5 h-5 text-stone-700" />
                     <span>Tastes Bitter, Dry, or Ashy?</span>
                   </div>
-                  <p className="text-xs text-stone-800">
+                  <p className="text-sm text-stone-800 leading-relaxed">
                     <strong>Cause: Over-extraction.</strong> Water extracted harsh, woody tannins.
                   </p>
-                  <p className="text-xs text-stone-900 font-semibold">
+                  <p className="text-sm sm:text-base text-stone-950 font-bold pt-1">
                     👉 Fix: Grind one click coarser, or brew with slightly cooler water.
                   </p>
                 </div>
@@ -982,21 +1032,21 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
         <div className="space-y-8 animate-fade-in">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#ECE6DC] pb-4 gap-3">
             <div>
-              <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider">Buyer's Field Guide</span>
+              <span className="text-xs sm:text-sm font-sans font-bold text-[#A25A24] uppercase tracking-wider">Buyer's Field Guide</span>
               <h3 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
                 The Coffee Noob Starter Gear & Affiliate Picks
               </h3>
             </div>
-            <span className="text-xs font-sans text-[#766A62]">
+            <span className="text-xs sm:text-sm font-sans text-[#766A62]">
               Handpicked tools tested for real extraction consistency.
             </span>
           </div>
 
           {/* Transparent Affiliate Disclosure Banner */}
-          <div className="p-4 rounded-2xl bg-[#FFFDF9] border border-[#ECD4BD] flex items-start gap-3 shadow-xs">
+          <div className="p-5 rounded-2xl bg-[#FFFDF9] border border-[#ECD4BD] flex items-start gap-3.5 shadow-xs">
             <ShieldCheck className="w-5 h-5 text-[#C88A4B] shrink-0 mt-0.5" />
-            <div className="text-xs font-sans text-[#5C524B] leading-relaxed">
-              <strong className="text-[#14110F] block mb-0.5">Amazon Associate Disclosure & Transparency:</strong>
+            <div className="text-xs sm:text-sm font-sans text-[#5C524B] leading-relaxed">
+              <strong className="text-[#14110F] block mb-0.5 font-bold">Amazon Associate Disclosure & Transparency:</strong>
               As an Amazon Associate, TheBrew.App earns from qualifying purchases made through these links at zero extra cost to you. We do not accept paid manufacturer placements — every item here is independently selected because it genuinely improves home brewing.
             </div>
           </div>
@@ -1004,17 +1054,17 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
           {/* Two Clear Starter Paths */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Path A */}
-            <div className="p-6 rounded-3xl bg-white border-2 border-[#ECD4BD] shadow-card space-y-4">
+            <div className="p-6 sm:p-7 rounded-3xl bg-white border-2 border-[#ECD4BD] shadow-card space-y-4">
               <div className="flex items-center justify-between">
-                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-sans font-bold border border-emerald-200">
+                <span className="px-3.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-sans font-bold border border-emerald-200">
                   Option 1: The Budget Sweet Spot
                 </span>
-                <span className="font-sans font-bold text-sm text-[#A25A24]">~$75 – $95 Total</span>
+                <span className="font-sans font-bold text-sm sm:text-base text-[#A25A24]">~$75 – $95 Total</span>
               </div>
-              <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+              <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F]">
                 The "Zero-Stress" Starter Kit
               </h4>
-              <p className="font-sans text-xs text-[#5C524B] leading-relaxed">
+              <p className="font-sans text-sm sm:text-base text-[#5C524B] leading-relaxed">
                 Maximum flavor upgrade per dollar. An immersion brewer that is virtually impossible to mess up, paired with a precision scale and fresh whole beans.
               </p>
               <div className="space-y-3 pt-2">
@@ -1037,17 +1087,17 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
             </div>
 
             {/* Path B */}
-            <div className="p-6 rounded-3xl bg-white border-2 border-[#ECD4BD] shadow-card space-y-4">
+            <div className="p-6 sm:p-7 rounded-3xl bg-white border-2 border-[#ECD4BD] shadow-card space-y-4">
               <div className="flex items-center justify-between">
-                <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-sans font-bold border border-amber-200">
+                <span className="px-3.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs sm:text-sm font-sans font-bold border border-amber-200">
                   Option 2: The Enthusiast Path
                 </span>
-                <span className="font-sans font-bold text-sm text-[#A25A24]">~$220 – $280 Total</span>
+                <span className="font-sans font-bold text-sm sm:text-base text-[#A25A24]">~$220 – $280 Total</span>
               </div>
-              <h4 className="font-editorial text-xl font-bold text-[#14110F]">
+              <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#14110F]">
                 The "Home Barista Lab" Kit
               </h4>
-              <p className="font-sans text-xs text-[#5C524B] leading-relaxed">
+              <p className="font-sans text-sm sm:text-base text-[#5C524B] leading-relaxed">
                 The exact core kit used by specialty cafe baristas at home. A conical burr grinder for uniform particle distribution and the clarity champion V60.
               </p>
               <div className="space-y-3 pt-2">
@@ -1071,14 +1121,14 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
           </div>
 
           {/* Full Catalog of Tested Products */}
-          <div className="space-y-4 pt-4">
-            <h4 className="font-editorial text-2xl font-bold text-[#14110F]">
+          <div className="space-y-5 pt-4">
+            <h4 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
               All Recommended Equipment by Category
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {PRODUCTS_DATA.filter(p => p.track === 'coffee').map(product => (
-                <div key={product.id} className="p-5 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all flex flex-col justify-between">
-                  <div className="space-y-3">
+                <div key={product.id} className="p-5 sm:p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all flex flex-col justify-between">
+                  <div className="space-y-3.5">
                     <div className="aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#FAF7F2] p-2 flex items-center justify-center border border-[#ECE6DC]">
                       <img
                         src={getAssetUrl(product.image)}
@@ -1089,29 +1139,29 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                     </div>
                     <div>
                       {product.badge && (
-                        <span className="px-2 py-0.5 rounded-md bg-[#FAF0E6] text-[#A25A24] text-[10px] font-sans font-bold uppercase tracking-wider inline-block mb-1">
+                        <span className="px-2.5 py-0.5 rounded-md bg-[#FAF0E6] text-[#A25A24] text-xs font-sans font-bold uppercase tracking-wider inline-block mb-1.5">
                           {product.badge}
                         </span>
                       )}
-                      <h5 className="font-editorial text-base font-bold text-[#14110F] line-clamp-2">
+                      <h5 className="font-editorial text-lg font-bold text-[#14110F] line-clamp-2">
                         {product.name}
                       </h5>
-                      <div className="flex items-center gap-2 mt-1 text-xs">
+                      <div className="flex items-center gap-2 mt-1.5 text-sm">
                         <span className="font-sans font-bold text-[#2A2421]">{product.priceRange}</span>
                         <span className="text-[#ECE6DC]">•</span>
-                        <span className="flex items-center gap-1 text-[#A25A24] font-semibold text-[11px]">
-                          <Star className="w-3 h-3 fill-current text-amber-500" />
+                        <span className="flex items-center gap-1 text-[#A25A24] font-semibold text-xs sm:text-sm">
+                          <Star className="w-3.5 h-3.5 fill-current text-amber-500" />
                           <span>{product.rating}</span>
                           <span className="text-[#766A62] font-normal">({product.reviewsCount.toLocaleString()})</span>
                         </span>
                       </div>
                     </div>
-                    <p className="font-sans text-xs text-[#5C524B] line-clamp-3 leading-relaxed">
+                    <p className="font-sans text-sm text-[#5C524B] line-clamp-3 leading-relaxed">
                       {product.description}
                     </p>
                   </div>
 
-                  <div className="pt-4 mt-3 border-t border-[#ECE6DC]">
+                  <div className="pt-4 mt-4 border-t border-[#ECE6DC]">
                     <a
                       href={product.amazonUrl}
                       target="_blank"
@@ -1123,10 +1173,10 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                           source: 'coffee_noob_catalog'
                         });
                       }}
-                      className="w-full py-2.5 px-4 rounded-xl bg-[#2A2421] hover:bg-[#14110F] text-white text-xs font-sans font-bold flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                      className="w-full py-3 px-4 rounded-xl bg-[#2A2421] hover:bg-[#14110F] text-white text-sm font-sans font-bold flex items-center justify-center gap-2 shadow-xs transition active:scale-95 cursor-pointer"
                     >
                       <span>Check Price on Amazon</span>
-                      <ExternalLink className="w-3.5 h-3.5 text-[#D69550]" />
+                      <ExternalLink className="w-4 h-4 text-[#D69550]" />
                     </a>
                   </div>
                 </div>
@@ -1135,6 +1185,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
           </div>
         </div>
       )}
+      </div>
     </section>
   );
 }
