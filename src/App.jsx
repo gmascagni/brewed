@@ -741,11 +741,11 @@ export default function App() {
           key={activeMethod?.id || 'technique_backdrop'}
           src={getAssetUrl(activeMethod?.heroImage || (trackMode === 'tea' ? '/tea_ceremony.jpg' : '/coffee_setup.jpg'))}
           alt=""
-          className="w-full h-full object-cover object-center opacity-35 filter saturate-110 contrast-100 transition-all duration-700"
+          className="w-full h-full object-cover object-center opacity-55 filter saturate-115 contrast-105 transition-all duration-700"
         />
-        {/* Atmospheric Scrim: Soft cafe warmth with crystal clear readability for all foreground content */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/80 via-[#FAF7F2]/65 to-[#FAF7F2]/85" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#FAF7F2]/30 to-[#FAF7F2]/75" />
+        {/* Atmospheric Scrim: Tuned for rich warmth and unmistakable visibility while preserving card contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2]/65 via-[#FAF7F2]/45 to-[#FAF7F2]/75" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#FAF7F2]/20 to-[#FAF7F2]/65" />
       </div>
       
       {/* 100% Bulletproof Sticky Top Header Container */}

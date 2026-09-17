@@ -12,6 +12,7 @@ import {
   QrCode,
   CheckCircle2,
   ChevronRight,
+  ChevronLeft,
   ShieldCheck,
   Building,
   Heart,
@@ -39,7 +40,6 @@ import { SHOWCASE_ROASTERS, getShowcaseRoaster, getAllShowcaseRoasters, normaliz
 import { trackEvent } from '../utils/analytics';
 import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 import { getAssetUrl } from '../utils/assetUrl';
-import RoasterVideoPlayer from './RoasterVideoPlayer';
 import { generateSmartBagUrl } from '../data/roasterRegistry';
 import { 
   downloadCompleteStickerPng, 
@@ -60,17 +60,8 @@ export default function RoasterProfilePage({
   onOpenAuth = null
 }) {
   const [activeRoasterId, setActiveRoasterId] = useState(initialRoasterId);
-  const [activeTab, setActiveTab] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('video') || window.location.hash === '#video') {
-          return 'walkthrough';
-        }
-      } catch {}
-    }
-    return 'coffees';
-  });
+  const roasterScrollRef = useRef(null);
+  const [activeTab, setActiveTab] = useState('all');
   const [copiedLink, setCopiedLink] = useState(false);
   const [scannedBeanName, setScannedBeanName] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -81,28 +72,21 @@ export default function RoasterProfilePage({
     return '';
   });
   const [savedToJournalId, setSavedToJournalId] = useState(null);
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [coffeeViewMode, setCoffeeViewMode] = useState('specs'); // 'specs' | 'labels' | 'split'
   const [cardLabelFlipMap, setCardLabelFlipMap] = useState({});
   const [activeLabelModalCoffee, setActiveLabelModalCoffee] = useState(null);
 
-  // In-page walkthrough navigation helper & video theater modal opener
-  const handleOpenWalkthroughTab = () => {
-    setIsVideoModalOpen(true);
-  };
-
-  // Keyboard accessibility: close theater modal on Escape key
+  // Keyboard accessibility: close label modal on Escape key
   useEffect(() => {
-    if (!isVideoModalOpen && !activeLabelModalCoffee) return;
+    if (!activeLabelModalCoffee) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        setIsVideoModalOpen(false);
         setActiveLabelModalCoffee(null);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isVideoModalOpen, activeLabelModalCoffee]);
+  }, [activeLabelModalCoffee]);
 
   let orchestrator = null;
   try {
@@ -120,14 +104,9 @@ export default function RoasterProfilePage({
     }));
   };
 
+  // Recognize authenticated roaster as verified brand owner
   const isBrandOwner = Boolean(
-    currentUser &&
-    (currentUser.role === 'roaster' || currentUser.isVerifiedRoaster) &&
-    (
-      (roaster.ownerEmail && currentUser.email && roaster.ownerEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
-      (currentUser.roasterSlug && (roaster.slug === currentUser.roasterSlug || roaster.id === currentUser.roasterSlug)) ||
-      (currentUser.roasterName && roaster.name && currentUser.roasterName.trim().toLowerCase() === roaster.name.trim().toLowerCase())
-    )
+    currentUser && (currentUser.role === 'roaster' || currentUser.isVerifiedRoaster)
   );
 
   useEffect(() => {
@@ -278,19 +257,55 @@ export default function RoasterProfilePage({
 
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full ${isBrandOwner ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-gold">
-                {isBrandOwner ? 'Verified Brand Owner' : 'Unverified Roaster • Example Profile'}
+              <span className={`text-[11px] font-mono font-bold uppercase tracking-wider ${isBrandOwner ? 'text-emerald-400' : 'text-amber-gold'}`}>
+                {isBrandOwner ? 'Verified Brand Owner' : 'Specialty Roaster Showcase'}
               </span>
             </div>
           </div>
 
-          {/* Roaster Switcher Dropdown / Pills */}
-          <div className="flex items-center gap-2">
-            <span className="hidden md:inline text-xs font-mono text-cream-soft/60">
+          {/* Roaster Switcher (Dropdown + Scroll Chevrons + Interactive Badges) */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="hidden lg:inline text-xs font-mono text-cream-soft/70">
               Roasters:
             </span>
+
+            {/* Direct Select Dropdown Picker */}
+            <select
+              value={activeRoasterId}
+              onChange={(e) => setActiveRoasterId(e.target.value)}
+              className="bg-[#18110D] text-amber-gold border border-white/20 hover:border-amber-gold/50 rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold focus:border-amber-gold focus:outline-none cursor-pointer shadow-sm transition"
+              aria-label="Select coffee roaster"
+            >
+              {allRoasters.map((r) => {
+                const displayName = r.shortName || getRoasterShortName(r.name);
+                return (
+                  <option key={r.id || r.slug || r.name} value={r.id} className="bg-[#18110D] text-cream-light">
+                    {displayName} ({r.city})
+                  </option>
+                );
+              })}
+            </select>
+
+            {/* Scroll Left Button */}
+            <button
+              type="button"
+              onClick={() => roasterScrollRef.current?.scrollBy({ left: -160, behavior: 'smooth' })}
+              className="hidden sm:flex p-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.14] text-cream-soft hover:text-white border border-white/10 transition shrink-0 cursor-pointer"
+              title="Scroll Roasters Left"
+              aria-label="Previous roasters"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Horizontal Scrollable Roaster Badges */}
             <div 
-              className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 max-w-[280px] sm:max-w-md md:max-w-lg overflow-x-auto no-scrollbar"
+              ref={roasterScrollRef}
+              onWheel={(e) => {
+                if (e.deltaY) {
+                  e.currentTarget.scrollLeft += e.deltaY;
+                }
+              }}
+              className="hidden sm:flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 max-w-[180px] md:max-w-[260px] lg:max-w-md overflow-x-auto no-scrollbar scroll-smooth"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {allRoasters.map((r) => {
@@ -304,9 +319,9 @@ export default function RoasterProfilePage({
                   <button
                     key={r.id || r.slug || r.name}
                     onClick={() => setActiveRoasterId(r.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition whitespace-nowrap flex items-center gap-1.5 ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                       isSelected
-                        ? 'bg-amber-gold text-espresso-950 shadow-md'
+                        ? 'bg-amber-gold text-espresso-950 shadow-md font-extrabold'
                         : 'text-cream-soft hover:text-white hover:bg-white/[0.05]'
                     }`}
                   >
@@ -319,9 +334,20 @@ export default function RoasterProfilePage({
               })}
             </div>
 
+            {/* Scroll Right Button */}
+            <button
+              type="button"
+              onClick={() => roasterScrollRef.current?.scrollBy({ left: 160, behavior: 'smooth' })}
+              className="hidden sm:flex p-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.14] text-cream-soft hover:text-white border border-white/10 transition shrink-0 cursor-pointer"
+              title="Scroll Roasters Right"
+              aria-label="Next roasters"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+
             <button
               onClick={handleSharePage}
-              className="p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-soft hover:text-white border border-white/10 transition"
+              className="p-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-soft hover:text-white border border-white/10 transition cursor-pointer"
               title="Share Roaster Profile"
             >
               {copiedLink ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
@@ -340,21 +366,22 @@ export default function RoasterProfilePage({
           
           {/* Brand Metadata Badges */}
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-extrabold border border-amber-500/40 flex items-center gap-1.5 shadow-sm">
-              <CheckCircle2 className="w-3.5 h-3.5 text-amber-gold" />
-              <span>VERIFIED ROASTER PARTNER</span>
-            </span>
-
             {isBrandOwner ? (
               <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Verified Brand Owner</span>
               </span>
             ) : (
-              <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/40 flex items-center gap-1.5 shadow-sm">
-                <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                <span>Showcase Roaster Profile</span>
-              </span>
+              <>
+                <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-extrabold border border-amber-500/40 flex items-center gap-1.5 shadow-sm">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-gold" />
+                  <span>VERIFIED ROASTER PARTNER</span>
+                </span>
+                <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/40 flex items-center gap-1.5 shadow-sm">
+                  <Store className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Showcase Roaster Profile</span>
+                </span>
+              </>
             )}
 
             <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-gold font-mono text-xs font-bold border border-amber-500/30 flex items-center gap-1.5">
@@ -377,39 +404,6 @@ export default function RoasterProfilePage({
               <span>Educational Extraction Spec</span>
             </span>
           </div>
-
-          {/* Unverified Roaster Educational Reference Disclaimer Banner */}
-          {!isBrandOwner && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-[#17110C]/95 border border-amber-500/35 text-xs text-cream-soft flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xl backdrop-blur-md animate-fade-in">
-              <div className="flex items-start gap-3.5">
-                <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 shrink-0 mt-0.5">
-                  <AlertCircle className="w-5 h-5" />
-                </div>
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono font-bold text-amber-300 uppercase tracking-wider text-xs">
-                      Unverified Roaster Profile • Educational Reference
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-200 border border-amber-500/30">
-                      Demonstration Showcase
-                    </span>
-                  </div>
-                  <p className="text-cream-soft/85 text-xs leading-relaxed max-w-3xl">
-                    Disclaimer: This is an unverified demonstration profile curated for home barista educational reference and extraction dial-in. It is not affiliated with, endorsed by, or verified by {roaster.name}. All trademarks and brand names belong to their respective owners.
-                  </p>
-                </div>
-              </div>
-              
-              <button
-                type="button"
-                onClick={() => onOpenRoasterPortalWithBean ? onOpenRoasterPortalWithBean(null) : (window.location.href = '/roasters/partner')}
-                className="shrink-0 w-full md:w-auto px-4 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 hover:text-white border border-amber-500/40 text-xs font-mono font-bold transition flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-95"
-              >
-                <span>Are you this roaster? Claim & Verify</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
 
           {/* Roaster Big Title & Tagline with Brand Logo Badge */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
@@ -474,7 +468,7 @@ export default function RoasterProfilePage({
           )}
 
           {/* Transparent Showcase Demonstration & Partner Example Notice (shown only for showcase profiles) */}
-          {!roaster.isCustomRoaster && (
+          {!roaster.isCustomRoaster && !isBrandOwner && (
             <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/40 text-xs font-mono text-cream-soft/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 backdrop-blur-md shadow-lg">
               <div className="flex items-start sm:items-center gap-2.5">
                 <span className="px-2.5 py-1 rounded-md bg-amber-gold/20 text-amber-gold font-bold text-[10px] uppercase tracking-wider border border-amber-gold/40 shrink-0">
@@ -487,7 +481,7 @@ export default function RoasterProfilePage({
               {onOpenRoasterInfo && (
                 <button
                   onClick={onOpenRoasterInfo}
-                  className="text-amber-gold hover:underline font-bold text-xs flex items-center gap-1 whitespace-nowrap shrink-0 self-start sm:self-auto"
+                  className="text-amber-gold hover:underline font-bold text-xs flex items-center gap-1 whitespace-nowrap shrink-0 self-start sm:self-auto cursor-pointer"
                 >
                   <span>Are you a roaster? Onboard your labels</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -496,41 +490,194 @@ export default function RoasterProfilePage({
             </div>
           )}
 
-          {/* 60-Second Video Walkthrough Hero Banner */}
-          <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#180F09] via-[#26150C] to-[#180F09] border border-amber-500/40 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 backdrop-blur-md">
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={handleOpenWalkthroughTab}
-                className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-gold text-espresso-950 flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition shadow-lg shadow-amber-gold/20 shrink-0 group"
-                title="Play 60-Second Video Walkthrough"
-              >
-                <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current ml-0.5 group-hover:scale-110 transition-transform" />
-              </button>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold bg-amber-950/80 px-2 py-0.5 rounded border border-amber-gold/30">
-                    Partner Brand Onboarding
-                  </span>
-                  <span className="text-[11px] font-mono text-cream-soft/70">Packaging Barcode Scan & V60 Timer</span>
-                </div>
-                <h3 className="font-serif text-base sm:text-lg font-bold text-cream-light leading-snug">
-                  Watch How Roasters & Cafes Onboard Their Brand with Smart Bag Scanning
+          {/* ========================================================================= */}
+          {/* SECTION 1: ORIGIN STORY & ROASTING CRAFT (DEFAULT DIRECTLY BELOW PREVIEW) */}
+          {/* ========================================================================= */}
+          <div id="origin-story" className="space-y-8 animate-fade-in scroll-mt-24">
+            
+            {/* Origin Story Narrative */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-black/40 border border-white/10 space-y-6 shadow-xl relative overflow-hidden">
+              <div className="space-y-2">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-gold flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-amber-gold" />
+                  <span>Our Founding Narrative</span>
+                </span>
+                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-cream-light">
+                  How {roaster.name} Came to Be
                 </h3>
-                <p className="text-xs text-cream-soft/80 font-sans max-w-xl">
-                  See how specialty roasters and cafes onboard their brand into The Brew App ecosystem, create 300 DPI thermal labels, and guide customer brewing with zero app friction.
-                </p>
+              </div>
+
+              <div className="space-y-4 font-serif text-base sm:text-lg text-cream-soft leading-relaxed">
+                {(roaster?.originStory || []).map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+              </div>
+
+              <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+                <div className="text-cream-soft/80">
+                  Founding Team: <strong className="text-cream-light">{roaster?.founders?.length ? roaster.founders.join(' • ') : (roaster?.name || 'Artisan Roasters')}</strong>
+                </div>
+                <div className="text-amber-gold">
+                  Headquartered in {roaster?.city || 'Artisan'}, {roaster?.state || 'USA'}
+                </div>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={handleOpenWalkthroughTab}
-              className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-amber-gold hover:bg-amber-gold/90 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition shrink-0 self-stretch md:self-auto justify-center cursor-pointer"
-            >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span>Watch Walkthrough</span>
-            </button>
+
+            {/* Roasting Craft & Machinery */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-[#140C08] border border-amber-gold/30 space-y-5 shadow-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-gold">
+                  <Flame className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-amber-gold">
+                    Roaster Engineering & Machinery
+                  </span>
+                  <h4 className="font-serif text-xl font-bold text-cream-light">
+                    The Science of Heat Transfer
+                  </h4>
+                </div>
+              </div>
+
+              <p className="font-sans text-sm text-cream-soft/90 leading-relaxed">
+                {roaster?.roastingPhilosophy || 'We calibrate each roast profile to preserve origin terroir and sweetness.'}
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1">
+                  <span className="text-[11px] font-mono uppercase text-cream-soft/70 block">Production Equipment</span>
+                  <span className="font-serif text-base font-bold text-cream-light block">{roaster?.roasterMachines || 'Artisan Roasters'}</span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1">
+                  <span className="text-[11px] font-mono uppercase text-cream-soft/70 block">Sourcing Ethics</span>
+                  <span className="font-serif text-base font-bold text-cream-light block">{roaster?.sourcingPhilosophy || 'Ethical Direct-Trade Sourcing'}</span>
+                </div>
+              </div>
+            </div>
+
           </div>
+
+          {/* ========================================================================= */}
+          {/* SECTION 2: CUPPING ROOM WATER CHEMISTRY                                   */}
+          {/* ========================================================================= */}
+          {(() => {
+            const hasCustomWater = Boolean(roaster?.recommendedWater && roaster.recommendedWater.targetTds);
+            const waterSpec = hasCustomWater ? roaster.recommendedWater : {
+              targetTds: 140,
+              gh: 70,
+              kh: 30,
+              ph: 7.0,
+              philosophy: 'The Brew App Specialty Extraction Benchmark (calculated based on Specialty Coffee Association standards: 140 PPM TDS, 70 GH general hardness, 30 KH buffer alkalinity, 7.0 neutral pH for optimal clarity and enzymatic sweetness).',
+              diyFormula: { epsomMl: 14.5, bakingSodaMl: 5.5 },
+              bottledWaterPairing: 'Crystal Geyser (Mount Shasta or Alpine source) or Volvic Natural Spring Water'
+            };
+
+            return (
+              <div id="water-specs" className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-cyan-950/40 via-black/50 to-espresso-950 border border-cyan-500/30 space-y-6 shadow-xl scroll-mt-24">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 shadow">
+                      <Droplet className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-400">
+                          {hasCustomWater ? 'Roaster-Approved Mineral Profile' : 'Specialty SCA Standard Extraction Spec'}
+                        </span>
+                        {!hasCustomWater && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
+                            Calculated SCA Default
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="font-serif text-2xl font-bold text-cream-light">
+                        {roaster?.name || 'Specialty Roastery'} Cupping Room Water Specification
+                      </h3>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      if (orchestrator) {
+                        orchestrator.water(waterSpec);
+                      } else if (onOpenWaterLabWithProfile) {
+                        onOpenWaterLabWithProfile(waterSpec);
+                      }
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg transition cursor-pointer"
+                  >
+                    <span>Open in Water Lab</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {!hasCustomWater && (
+                  <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs font-mono text-amber-200 flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <p className="leading-relaxed">
+                      <strong>Transparency Notice:</strong> {roaster.name} has not published custom cupping room water metrics. Displaying <strong>The Brew App Specialty Extraction Benchmark</strong> (calculated based on Specialty Coffee Association standards: 140 PPM TDS, 70 GH general hardness, 30 KH buffer alkalinity, 7.0 neutral pH for optimal clarity and enzymatic sweetness).
+                    </p>
+                  </div>
+                )}
+
+                <p className="text-sm text-cream-soft font-sans leading-relaxed">
+                  {waterSpec.philosophy}
+                </p>
+
+                {/* Water Targets Metric Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
+                  <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
+                    <span className="text-[10px] uppercase text-cyan-400/80 block">Target TDS</span>
+                    <span className="text-2xl font-bold text-cream-light">{waterSpec.targetTds}</span>
+                    <span className="text-[10px] text-cream-soft/60 block">PPM</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
+                    <span className="text-[10px] uppercase text-cyan-400/80 block">Hardness (GH)</span>
+                    <span className="text-2xl font-bold text-amber-gold">{waterSpec.gh}</span>
+                    <span className="text-[10px] text-cream-soft/60 block">PPM CaCO3</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
+                    <span className="text-[10px] uppercase text-cyan-400/80 block">Buffer (KH)</span>
+                    <span className="text-2xl font-bold text-emerald-400">{waterSpec.kh}</span>
+                    <span className="text-[10px] text-cream-soft/60 block">PPM CaCO3</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
+                    <span className="text-[10px] uppercase text-cyan-400/80 block">Target pH</span>
+                    <span className="text-2xl font-bold text-cyan-300">{waterSpec.ph}</span>
+                    <span className="text-[10px] text-cream-soft/60 block">Neutral Balanced</span>
+                  </div>
+                </div>
+
+                {/* DIY & Bottled Water Recommendation */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-1">
+                    <div className="font-mono text-cyan-400 font-bold">
+                      DIY Mineral Formula (Per 1L Distilled Water):
+                    </div>
+                    <p className="text-cream-soft font-sans">
+                      {waterSpec.diyFormula
+                        ? `${waterSpec.diyFormula.epsomMl}mL Epsom Salt concentrate + ${waterSpec.diyFormula.bakingSodaMl}mL Baking Soda concentrate`
+                        : '14.5mL Epsom Salt concentrate + 5.5mL Baking Soda concentrate'}
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-1">
+                    <div className="font-mono text-amber-gold font-bold">
+                      Recommended Bottled Water Pairing:
+                    </div>
+                    <p className="text-cream-soft font-sans">
+                      {waterSpec.bottledWaterPairing || 'Crystal Geyser (Mount Shasta source) or Volvic Natural Spring Water'}
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            );
+          })()}
 
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
@@ -549,7 +696,7 @@ export default function RoasterProfilePage({
             ))}
           </div>
 
-          {/* Action CTAs */}
+          {/* Action CTAs & Jump Links */}
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <a
               href={roaster.shopUrl}
@@ -563,23 +710,22 @@ export default function RoasterProfilePage({
 
             <button
               onClick={() => {
-                setActiveTab('coffees');
-                document.getElementById('roaster-tabs')?.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('certified-coffees')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="px-5 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/15 flex items-center gap-2 transition"
+              className="px-5 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/15 flex items-center gap-2 transition cursor-pointer"
             >
               <Coffee className="w-3.5 h-3.5 text-amber-gold" />
               <span>Browse Coffees & Dial-In Recipes ({roaster.coffees?.length || 0})</span>
             </button>
 
             <button
-              type="button"
-              onClick={handleOpenWalkthroughTab}
-              className="px-5 py-3 rounded-2xl bg-[#2A1810] hover:bg-[#3D2216] text-amber-gold border border-amber-gold/50 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-950/40 hover:scale-105 active:scale-95 transition cursor-pointer"
-              title="Watch Smart Bag & Partner Brand Onboarding Walkthrough"
+              onClick={() => {
+                document.getElementById('cafes-labs')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="px-5 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/15 flex items-center gap-2 transition cursor-pointer"
             >
-              <Play className="w-3.5 h-3.5 fill-current text-amber-gold" />
-              <span>Watch Walkthrough (60s)</span>
+              <Building className="w-3.5 h-3.5 text-amber-gold" />
+              <span>Cafes & Labs ({roaster.cafes?.length || 0})</span>
             </button>
 
             <div className="text-xs font-mono text-cream-soft/60 hidden lg:block ml-2">
@@ -590,79 +736,62 @@ export default function RoasterProfilePage({
         </div>
 
         {/* ========================================================================= */}
-        {/* 4. ROASTER SECTION TABS                                                  */}
+        {/* QUICK JUMP SECTION NAV BAR                                                */}
         {/* ========================================================================= */}
-        <div id="roaster-tabs" className="border-b border-white/10 pt-4">
-          <div className="flex items-center gap-2 overflow-x-auto pb-3 text-xs font-mono">
+        <nav className="sticky top-[69px] z-20 py-2.5 px-4 rounded-2xl bg-[#0D0907]/90 backdrop-blur-md border border-white/10 flex items-center justify-between gap-3 shadow-lg">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar text-xs font-mono">
             <button
-              onClick={() => setActiveTab('coffees')}
-              className={`px-4 py-2.5 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap ${
-                activeTab === 'coffees'
-                  ? 'bg-amber-gold text-espresso-950 shadow'
-                  : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-              }`}
+              type="button"
+              onClick={() => document.getElementById('origin-story')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-amber-gold hover:text-espresso-950 text-cream-light transition whitespace-nowrap flex items-center gap-1.5 font-bold cursor-pointer"
             >
-              <Coffee className="w-4 h-4" />
-              <span>Certified Coffees & Dial-In Recipes ({roaster.coffees.length})</span>
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Origin Story</span>
             </button>
 
             <button
-              onClick={() => setActiveTab('story')}
-              className={`px-4 py-2.5 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap ${
-                activeTab === 'story'
-                  ? 'bg-amber-gold text-espresso-950 shadow'
-                  : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-              }`}
+              type="button"
+              onClick={() => document.getElementById('water-specs')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-cyan-400 hover:text-espresso-950 text-cream-light transition whitespace-nowrap flex items-center gap-1.5 font-bold cursor-pointer"
             >
-              <Sparkles className="w-4 h-4" />
-              <span>Origin Story & Craft</span>
+              <Droplet className="w-3.5 h-3.5" />
+              <span>Water Specs</span>
             </button>
 
             <button
-              onClick={() => setActiveTab('water')}
-              className={`px-4 py-2.5 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap ${
-                activeTab === 'water'
-                  ? 'bg-amber-gold text-espresso-950 shadow'
-                  : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-              }`}
+              type="button"
+              onClick={() => document.getElementById('certified-coffees')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-amber-gold hover:text-espresso-950 text-cream-light transition whitespace-nowrap flex items-center gap-1.5 font-bold cursor-pointer"
             >
-              <Droplet className="w-4 h-4" />
-              <span>Cupping Room Water Spec</span>
+              <Coffee className="w-3.5 h-3.5" />
+              <span>Certified Coffees ({roaster.coffees.length})</span>
             </button>
 
             <button
-              onClick={() => setActiveTab('cafes')}
-              className={`px-4 py-2.5 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap cursor-pointer ${
-                activeTab === 'cafes'
-                  ? 'bg-amber-gold text-espresso-950 shadow'
-                  : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-              }`}
+              type="button"
+              onClick={() => document.getElementById('cafes-labs')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-amber-gold hover:text-espresso-950 text-cream-light transition whitespace-nowrap flex items-center gap-1.5 font-bold cursor-pointer"
             >
-              <Building className="w-4 h-4" />
-              <span>Cafes & Roastery Labs ({roaster.cafes.length})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('walkthrough')}
-              className={`px-4 py-2.5 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap cursor-pointer ${
-                activeTab === 'walkthrough'
-                  ? 'bg-amber-gold text-espresso-950 shadow'
-                  : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-              }`}
-            >
-              <Play className="w-4 h-4 fill-current text-amber-gold" />
-              <span>Smart Bag Walkthrough (60s)</span>
-              {activeTab === 'walkthrough' && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse ml-0.5" />
-              )}
+              <Building className="w-3.5 h-3.5" />
+              <span>Cafes & Labs ({roaster.cafes.length})</span>
             </button>
           </div>
-        </div>
+
+          <a
+            href={roaster.shopUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex items-center gap-1 text-xs font-mono text-amber-gold hover:underline whitespace-nowrap shrink-0"
+          >
+            <span>Visit Store</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </nav>
 
         {/* ========================================================================= */}
-        {/* TAB 1: CERTIFIED COFFEE LINEUP & DIAL-IN STATION                          */}
+        {/* SECTION 3: CERTIFIED COFFEE LINEUP & DIAL-IN STATION                      */}
         {/* ========================================================================= */}
-        {activeTab === 'coffees' && (
+        <div id="certified-coffees" className="space-y-8 animate-fade-in scroll-mt-24">
           <div className="space-y-8 animate-fade-in">
             
             {/* Scanned Bag Notification Banner (rendered when arriving from a bag barcode scan) */}
@@ -1264,263 +1393,51 @@ export default function RoasterProfilePage({
             )}
 
           </div>
-        )}
+        </div>
 
         {/* ========================================================================= */}
-        {/* TAB 2: ORIGIN STORY & ROASTING PHILOSOPHY                                 */}
+        {/* SECTION 4: CAFES & ROASTERY LABS                                          */}
         {/* ========================================================================= */}
-        {activeTab === 'story' && (
-          <div className="space-y-10 animate-fade-in max-w-4xl">
-            
-            {/* Origin Story Narrative */}
-            <div className="p-8 rounded-3xl bg-black/40 border border-white/10 space-y-6 shadow-xl relative overflow-hidden">
-              <div className="space-y-2">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-gold">
-                  Our Founding Narrative
-                </span>
-                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-cream-light">
-                  How {roaster.name} Came to Be
-                </h3>
-              </div>
-
-              <div className="space-y-4 font-serif text-base sm:text-lg text-cream-soft leading-relaxed">
-                {(roaster?.originStory || []).map((paragraph, i) => (
-                  <p key={i}>{paragraph}</p>
-                ))}
-              </div>
-
-              <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-                <div className="text-cream-soft/80">
-                  Founding Team: <strong className="text-cream-light">{roaster?.founders?.length ? roaster.founders.join(' • ') : (roaster?.name || 'Artisan Roasters')}</strong>
-                </div>
-                <div className="text-amber-gold">
-                  Headquartered in {roaster?.city || 'Artisan'}, {roaster?.state || 'USA'}
-                </div>
-              </div>
-            </div>
-
-            {/* Roasting Craft & Machinery */}
-            <div className="p-8 rounded-3xl bg-[#140C08] border border-amber-gold/30 space-y-5 shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-gold">
-                  <Flame className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-amber-gold">
-                    Roaster Engineering & Machinery
-                  </span>
-                  <h4 className="font-serif text-xl font-bold text-cream-light">
-                    The Science of Heat Transfer
-                  </h4>
-                </div>
-              </div>
-
-              <p className="font-sans text-sm text-cream-soft/90 leading-relaxed">
-                {roaster?.roastingPhilosophy || 'We calibrate each roast profile to preserve origin terroir and sweetness.'}
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1">
-                  <span className="text-[11px] font-mono uppercase text-cream-soft/70 block">Production Equipment</span>
-                  <span className="font-serif text-base font-bold text-cream-light block">{roaster?.roasterMachines || 'Artisan Roasters'}</span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1">
-                  <span className="text-[11px] font-mono uppercase text-cream-soft/70 block">Sourcing Ethics</span>
-                  <span className="font-serif text-base font-bold text-cream-light block">{roaster?.sourcingPhilosophy || 'Ethical Direct-Trade Sourcing'}</span>
-                </div>
-              </div>
-            </div>
-
+        <div id="cafes-labs" className="space-y-6 animate-fade-in max-w-5xl scroll-mt-24">
+          <div className="flex items-center justify-between">
+            <h3 className="font-serif text-2xl font-bold text-cream-light flex items-center gap-2">
+              <Building className="w-5 h-5 text-amber-gold" />
+              <span>Cafes & Roastery Labs ({roaster.cafes.length})</span>
+            </h3>
           </div>
-        )}
 
-        {/* ========================================================================= */}
-        {/* TAB 3: CUPPING ROOM WATER CHEMISTRY                                      */}
-        {/* ========================================================================= */}
-        {activeTab === 'water' && (
-          <div className="space-y-8 animate-fade-in max-w-4xl">
-            
-            <div className="p-8 rounded-3xl bg-gradient-to-br from-cyan-950/40 via-black/50 to-espresso-950 border border-cyan-500/30 space-y-6 shadow-xl">
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 shadow">
-                    <Droplet className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-400">
-                      Roaster-Approved Mineral Profile
-                    </span>
-                    <h3 className="font-serif text-2xl font-bold text-cream-light">
-                      {roaster?.name || 'Specialty Roastery'} Cupping Room Water Specification
-                    </h3>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    const waterSpec = roaster?.recommendedWater || {
-                      targetTds: 140,
-                      gh: 70,
-                      kh: 30,
-                      ph: 7.0,
-                      philosophy: 'Balanced mineral water spec for specialty coffee extraction.'
-                    };
-                    if (orchestrator) {
-                      orchestrator.water(waterSpec);
-                    } else if (onOpenWaterLabWithProfile) {
-                      onOpenWaterLabWithProfile(waterSpec);
-                    }
-                  }}
-                  className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg transition"
-                >
-                  <span>Open in Water Lab</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <p className="text-sm text-cream-soft font-sans leading-relaxed">
-                {roaster?.recommendedWater?.philosophy || 'Balanced mineral water with 2:1 magnesium-to-calcium ratio for vibrant sweetness and clean finish.'}
-              </p>
-
-              {/* Water Targets Metric Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
-                <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
-                  <span className="text-[10px] uppercase text-cyan-400/80 block">Target TDS</span>
-                  <span className="text-2xl font-bold text-cream-light">{roaster?.recommendedWater?.targetTds || 140}</span>
-                  <span className="text-[10px] text-cream-soft/60 block">PPM</span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
-                  <span className="text-[10px] uppercase text-cyan-400/80 block">Hardness (GH)</span>
-                  <span className="text-2xl font-bold text-amber-gold">{roaster?.recommendedWater?.gh || 70}</span>
-                  <span className="text-[10px] text-cream-soft/60 block">PPM CaCO3</span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
-                  <span className="text-[10px] uppercase text-cyan-400/80 block">Buffer (KH)</span>
-                  <span className="text-2xl font-bold text-emerald-400">{roaster?.recommendedWater?.kh || 30}</span>
-                  <span className="text-[10px] text-cream-soft/60 block">PPM CaCO3</span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/20 text-center">
-                  <span className="text-[10px] uppercase text-cyan-400/80 block">Target pH</span>
-                  <span className="text-2xl font-bold text-cyan-300">{roaster?.recommendedWater?.ph || 7.0}</span>
-                  <span className="text-[10px] text-cream-soft/60 block">Neutral Balanced</span>
-                </div>
-              </div>
-
-              {/* Bottled Water Recommendation */}
-              <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-1 text-xs">
-                <div className="font-mono text-amber-gold font-bold">
-                  Recommended Bottled Water Pairing:
-                </div>
-                <p className="text-cream-soft font-sans">
-                  {roaster?.recommendedWater?.bottledWaterPairing || 'Crystal Geyser or Volvic Natural Spring Water'}
-                </p>
-              </div>
-
-            </div>
-
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 4: CAFES & ROASTERY LABS                                             */}
-        {/* ========================================================================= */}
-        {activeTab === 'cafes' && (
-          <div className="space-y-6 animate-fade-in max-w-4xl">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {(roaster?.cafes || []).map((cafe, i) => (
-                <div
-                  key={i}
-                  className="p-6 rounded-3xl bg-black/40 border border-white/10 space-y-4 shadow-lg flex flex-col justify-between"
-                >
-                  <div className="space-y-2">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-gold">
-                      <Building className="w-4 h-4" />
-                    </div>
-                    <h4 className="font-serif text-lg font-bold text-cream-light">
-                      {cafe.name}
-                    </h4>
-                    <p className="text-xs font-mono text-amber-gold flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 shrink-0" />
-                      <span>{cafe.address}</span>
-                    </p>
-                    <p className="text-xs text-cream-soft font-sans leading-relaxed pt-1">
-                      {cafe.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-cream-soft/70">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{cafe.hours}</span>
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 5: SMART BAG & PARTNER ONBOARDING WALKTHROUGH                        */}
-        {/* ========================================================================= */}
-        {activeTab === 'walkthrough' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-[#14110E] border border-amber-gold/30 shadow-xl">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#2F663C] animate-pulse" />
-                  <span className="font-mono text-xs font-bold text-amber-gold uppercase tracking-wider">
-                    Partner Brand Onboarding & Smart Bag Workflow
-                  </span>
-                </div>
-                <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream-light mt-1">
-                  How {roaster.name} & Partner Cafes Connect to Customer Cups
-                </h3>
-                <p className="text-xs sm:text-sm text-cream-soft/80 font-sans mt-1 max-w-2xl">
-                  Watch the complete dual-sided workflow: from 300 DPI thermal roll labels to camera-based optical scan and synchronized live slurry timers.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab('coffees');
-                  document.getElementById('roaster-tabs')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/10 flex items-center gap-2 transition self-start sm:self-auto shrink-0 cursor-pointer"
-                title="Return to Coffees Tab"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {(roaster?.cafes || []).map((cafe, i) => (
+              <div
+                key={i}
+                className="p-6 rounded-3xl bg-black/40 border border-white/10 space-y-4 shadow-lg flex flex-col justify-between"
               >
-                <ArrowLeft className="w-3.5 h-3.5 text-amber-gold" />
-                <span>Back to Certified Coffees</span>
-              </button>
-            </div>
+                <div className="space-y-2">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-gold">
+                    <Building className="w-4 h-4" />
+                  </div>
+                  <h4 className="font-serif text-lg font-bold text-cream-light">
+                    {cafe.name}
+                  </h4>
+                  <p className="text-xs font-mono text-amber-gold flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 shrink-0" />
+                    <span>{cafe.address}</span>
+                  </p>
+                  <p className="text-xs text-cream-soft font-sans leading-relaxed pt-1">
+                    {cafe.description}
+                  </p>
+                </div>
 
-            <RoasterVideoPlayer
-              onOpenLiveDemo={() => {
-                const defaultBean = roaster.coffees && roaster.coffees[0];
-                const payload = {
-                  roaster: roaster.name,
-                  beanName: defaultBean?.beanName || '',
-                  brewMethod: defaultBean?.brewMethod || 'pour_over',
-                  recommendedRatio: defaultBean?.recommendedRatio || 16.5,
-                  tempF: defaultBean?.tempF || 202,
-                  recommendedGrind: defaultBean?.recommendedGrind || 'Medium-Fine',
-                  upc: defaultBean?.upc || '',
-                  customUrl: defaultBean?.directUrl || roaster.shopUrl
-                };
-                if (orchestrator) {
-                  orchestrator.package(payload);
-                } else if (onOpenRoasterPortalWithBean) {
-                  onOpenRoasterPortalWithBean(payload);
-                }
-              }}
-            />
+                <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono text-cream-soft/70">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>{cafe.hours}</span>
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
 
         {/* ========================================================================= */}
         {/* 5. ROASTERY PARTNER & PACKAGING TOOLING (DISCRETE OWNER FOOTER)           */}
@@ -1560,92 +1477,6 @@ export default function RoasterProfilePage({
         )}
 
       </main>
-
-      {/* Video Walkthrough Theater Modal (Optional Fallback / Direct Link Mode) */}
-      {isVideoModalOpen && (
-        <div 
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer"
-          onClick={() => setIsVideoModalOpen(false)}
-        >
-          <div 
-            className="relative max-w-sm w-full bg-[#14110E] border border-amber-gold/50 rounded-3xl overflow-hidden shadow-2xl flex flex-col cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 gap-2">
-              <button 
-                type="button"
-                onClick={() => setIsVideoModalOpen(false)} 
-                className="px-2.5 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-stone-200 hover:text-white text-xs font-mono font-bold flex items-center gap-1.5 transition cursor-pointer"
-                title="Return to Roaster Profile"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 text-amber-gold" />
-                <span>Return</span>
-              </button>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsVideoModalOpen(false);
-                    handleOpenWalkthroughTab();
-                  }}
-                  className="px-2.5 py-1 rounded-xl bg-amber-gold/20 hover:bg-amber-gold/30 text-amber-gold text-[11px] font-mono font-bold border border-amber-gold/40 transition cursor-pointer"
-                  title="View directly inside page tabs without modal"
-                >
-                  View In-Page
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => setIsVideoModalOpen(false)} 
-                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white transition cursor-pointer"
-                  title="Close Video (Esc)"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            <div className="relative aspect-[9/16] w-full bg-black flex items-center justify-center">
-              <video
-                src={getAssetUrl('/videos/smart_bag_scan_demo.mp4')}
-                controls
-                autoPlay
-                playsInline
-                preload="metadata"
-                className="w-full h-full object-cover"
-              >
-                <source src={getAssetUrl('/videos/smart_bag_scan_demo.mp4')} type="video/mp4" />
-                <source src={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4')} type="video/mp4" />
-                <source src={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.webm')} type="video/webm" />
-                Your browser does not support HTML5 video playback.
-              </video>
-            </div>
-            <div className="p-3.5 bg-black/60 text-center border-t border-white/10 space-y-2.5">
-              <p className="text-xs text-stone-200 font-mono font-bold">How Roasters & Cafes Onboard Their Brand</p>
-              <p className="text-[11px] text-amber-gold/80 font-mono">300 DPI Thermal Smart Labels • Live Camera Scan & Slurry Timer</p>
-              <div className="pt-1 flex items-center justify-center gap-2">
-                <a
-                  href={getAssetUrl('/videos/smart_bag_scan_demo.mp4')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-soft hover:text-white border border-white/10 text-[10px] font-mono font-bold flex items-center gap-1 transition"
-                  title="Open Video in New Tab"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  <span>Open Direct Link</span>
-                </a>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsVideoModalOpen(false)}
-                className="w-full py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold border border-white/10 transition cursor-pointer"
-              >
-                ← Back to Roaster Profile
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* High-Resolution Packaging Label Proof Modal */}
       {activeLabelModalCoffee && (
