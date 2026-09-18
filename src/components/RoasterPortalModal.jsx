@@ -56,6 +56,7 @@ export default function RoasterPortalModal({
   prefilledBarcode = '',
   prefilledBean = null,
   onSelectBeanToBrew,
+  onNavigateToRoaster = null,
   currentUser = null,
   onOpenAuth = null
 }) {
@@ -681,7 +682,11 @@ export default function RoasterPortalModal({
     const rName = selectedCoffeeForSticker?.roaster || roasterName || 'methodical';
     const slug = rName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     onClose();
-    navigate(`/roasters/${slug}`);
+    if (onNavigateToRoaster) {
+      onNavigateToRoaster(slug);
+    } else {
+      navigate(`/roasters/${slug}`);
+    }
   };
 
   return (
@@ -1265,10 +1270,10 @@ export default function RoasterPortalModal({
                           ? 'bg-amber-gold text-espresso-950 shadow'
                           : 'bg-white/[0.06] text-cream-soft hover:text-white'
                       }`}
-                      title="Brother QL-600 / QL-800 thermal roll label (DK-1209 1.1x2.4 / 29x62mm)"
+                      title="Brother QL-600 / QL-800 thermal roll label (DK-1209: 62mm x 29mm / 2.44in x 1.14in)"
                     >
                       <Printer className="w-3.5 h-3.5" />
-                      <span>Brother QL-600 (1.1"x2.4")</span>
+                      <span>Brother QL (DK-1209 • 62x29mm)</span>
                     </button>
                   </div>
 
@@ -1604,6 +1609,21 @@ export default function RoasterPortalModal({
                   </div>
                 )}
 
+                {/* Brother QL Driver & Print Instructions Notice */}
+                {qrLayout === 'brother_ql' && (
+                  <div className="w-full max-w-lg mx-auto p-3 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs font-mono text-cyan-200 text-left space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold text-cyan-300">
+                      <Printer className="w-4 h-4 text-cyan-400 shrink-0" />
+                      <span>Brother QL-600 / QL-800 Direct Print Instructions:</span>
+                    </div>
+                    <p className="text-[11px] text-cyan-100/90 leading-relaxed font-sans">
+                      1. In your browser print dialog, set <strong>Paper size: 62mm x 29mm (2.44" x 1.14" / DK-1209)</strong>.<br />
+                      2. Set <strong>Margins: None</strong>.<br />
+                      3. If you had a previous printer size mismatch error, cancel any stuck jobs in Windows before reprinting.
+                    </p>
+                  </div>
+                )}
+
               </div>
 
               {/* Action Buttons for QR Studio */}
@@ -1611,11 +1631,11 @@ export default function RoasterPortalModal({
                 <button
                   onClick={qrLayout === 'brother_ql' ? handleDownloadBrotherQlPng : handleDownloadFullStickerPng}
                   className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-gold/20 hover:scale-105 active:scale-95 transition"
-                  title={qrLayout === 'brother_ql' ? 'Download 300 DPI Brother QL-600 (1.1" x 2.4") thermal label PNG' : 'Download complete 300 DPI composite packaging sticker PNG ready to email or upload to your printer'}
+                  title={qrLayout === 'brother_ql' ? 'Download 300 DPI Brother QL-600 (DK-1209: 62mm x 29mm / 2.44" x 1.14") thermal label PNG' : 'Download complete 300 DPI composite packaging sticker PNG ready to email or upload to your printer'}
                 >
                   <Download className="w-4 h-4 text-espresso-950" />
                   <span>
-                    {qrLayout === 'brother_ql' ? 'Download Brother QL Label (1.1"x2.4" PNG)' : 'Download Complete Sticker (PNG)'}
+                    {qrLayout === 'brother_ql' ? 'Download Brother QL (62x29mm PNG)' : 'Download Complete Sticker (PNG)'}
                   </span>
                 </button>
 

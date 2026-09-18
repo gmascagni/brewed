@@ -190,20 +190,20 @@ export async function generateBrotherQlStickerCanvas(rawCoffee = {}) {
   const coffee = createCoffeeProfile(rawCoffee);
   const targetUrl = coffee.packaging?.customUrl?.trim() || generateSmartBagUrl(coffee, null, { compact: true });
 
-  // 1440 x 660 px (2x high-resolution rendering of 720 x 330 at 300 DPI for Brother DK-1209 1.1" x 2.4" / 29x62mm)
+  // 1464 x 685 px (Exact 2x 300 DPI high-resolution rendering of Brother DK-1209: 62mm x 29mm / 2.44" x 1.14")
   const canvas = document.createElement('canvas');
-  canvas.width = 1440;
-  canvas.height = 660;
+  canvas.width = 1464;
+  canvas.height = 685;
   const ctx = canvas.getContext('2d');
 
   // 1. Clean white thermal label background
   ctx.fillStyle = '#FFFFFF';
-  ctx.fillRect(0, 0, 1440, 660);
+  ctx.fillRect(0, 0, 1464, 685);
 
   // 2. Outer thermal boundary (clean hairline)
   ctx.strokeStyle = '#1C1917';
   ctx.lineWidth = 4;
-  ctx.strokeRect(12, 12, 1416, 636);
+  ctx.strokeRect(12, 12, 1440, 661);
 
   // LEFT COLUMN: ROASTERY & RECIPE METADATA (Occupies x = 44 to 800)
   const leftX = 44;

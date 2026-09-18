@@ -47,7 +47,7 @@ import {
   downloadVectorQrSvg, 
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
-import { printBrotherQlCoffee, printHtmlElementIsolated } from '../utils/printLabel';
+import { printBrotherQlCoffee, printThermalSticker, printHtmlElementIsolated } from '../utils/printLabel';
 
 export default function RoasterProfilePage({
   initialRoasterId = 'methodical',
@@ -56,6 +56,7 @@ export default function RoasterProfilePage({
   onOpenWaterLabWithProfile,
   onOpenRoasterPortalWithBean,
   onOpenRoasterInfo,
+  onOpenProfile,
   currentUser = null,
   onOpenAuth = null
 }) {
@@ -106,7 +107,15 @@ export default function RoasterProfilePage({
 
   // Recognize authenticated roaster as verified brand owner
   const isBrandOwner = Boolean(
-    currentUser && (currentUser.role === 'roaster' || currentUser.isVerifiedRoaster)
+    currentUser && (
+      currentUser.role === 'roaster' || 
+      currentUser.isVerifiedRoaster || 
+      currentUser.accountType === 'roaster' ||
+      (roaster?.ownerEmail && currentUser?.email && roaster.ownerEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+      (roaster?.ownerUid && currentUser?.uid && roaster.ownerUid === currentUser.uid) ||
+      (currentUser.roasterSlug && roaster?.slug && currentUser.roasterSlug === roaster.slug) ||
+      (currentUser.roasterName && roaster?.name && currentUser.roasterName.toLowerCase() === roaster.name.toLowerCase())
+    )
   );
 
   useEffect(() => {
@@ -367,20 +376,30 @@ export default function RoasterProfilePage({
           {/* Brand Metadata Badges */}
           <div className="flex flex-wrap items-center gap-2.5">
             {isBrandOwner ? (
-              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
+              <button
+                type="button"
+                onClick={() => onOpenRoasterPortalWithBean && onOpenRoasterPortalWithBean(roaster.coffees?.[0] || null)}
+                className="px-3 py-1 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-mono text-xs font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                title="Manage packaging labels and verified recipes in Roaster Portal"
+              >
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Verified Brand Owner</span>
-              </span>
+              </button>
             ) : (
               <>
                 <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-extrabold border border-amber-500/40 flex items-center gap-1.5 shadow-sm">
                   <CheckCircle2 className="w-3.5 h-3.5 text-amber-gold" />
                   <span>VERIFIED ROASTER PARTNER</span>
                 </span>
-                <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-bold border border-amber-500/40 flex items-center gap-1.5 shadow-sm">
+                <button
+                  type="button"
+                  onClick={onOpenRoasterInfo}
+                  className="px-3 py-1 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-mono text-xs font-bold border border-amber-500/40 flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                  title="Learn about verified roaster partner profiles"
+                >
                   <Store className="w-3.5 h-3.5 text-amber-400" />
                   <span>Showcase Roaster Profile</span>
-                </span>
+                </button>
               </>
             )}
 
@@ -1446,7 +1465,14 @@ export default function RoasterProfilePage({
           <div className="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-cream-soft/60">
             <div className="flex items-center gap-2">
               <Store className="w-4 h-4 text-cream-soft/40" />
-              <span>Are you a team member or owner at {roaster.name}?</span>
+              {isBrandOwner ? (
+                <span className="text-emerald-300 font-semibold flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>You are managing {roaster.name} as a Verified Brand Owner</span>
+                </span>
+              ) : (
+                <span>Are you a team member or owner at {roaster.name}?</span>
+              )}
             </div>
             <button
               onClick={() => {
@@ -1467,11 +1493,15 @@ export default function RoasterProfilePage({
                   onOpenRoasterPortalWithBean(payload);
                 }
               }}
-              className="px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-cream-soft hover:text-cream-light border border-white/10 flex items-center gap-2 transition"
-              title="Open Smart Bag Packaging & Label Studio"
+              className={`px-4 py-2 rounded-xl flex items-center gap-2 transition cursor-pointer ${
+                isBrandOwner
+                  ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold'
+                  : 'bg-white/[0.04] hover:bg-white/[0.08] text-cream-soft hover:text-cream-light border border-white/10'
+              }`}
+              title={isBrandOwner ? "Open Roaster Portal & Manage Packaging" : "Open Smart Bag Packaging & Label Studio"}
             >
               <QrCode className="w-3.5 h-3.5 text-amber-gold" />
-              <span>Roaster Packaging & Label Studio</span>
+              <span>{isBrandOwner ? 'Roaster Portal & Label Studio' : 'Roaster Packaging & Label Studio'}</span>
             </button>
           </div>
         )}
@@ -2069,7 +2099,9 @@ function PackagingLabelProofModal({
   onClose,
   onBrewCoffee
 }) {
-  const [layout, setLayout] = useState('thermal'); // 'thermal' | 'badge'
+  const [layout, setLayout] = useState('thermal'); // 'thermal' | 'badge' | 'brother_ql'
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -2081,9 +2113,44 @@ function PackagingLabelProofModal({
 
   if (!coffee) return null;
 
+  const coffeePayload = {
+    ...coffee,
+    roaster: roaster?.name || coffee.roaster || 'Specialty Roaster'
+  };
+
+  const handlePrintModal = async () => {
+    setIsPrinting(true);
+    try {
+      if (layout === 'brother_ql') {
+        await printBrotherQlCoffee(coffeePayload);
+      } else {
+        await printThermalSticker(coffeePayload);
+      }
+    } catch (err) {
+      console.error('Modal print error:', err);
+    } finally {
+      setIsPrinting(false);
+    }
+  };
+
+  const handleDownloadModal = async () => {
+    setIsSaving(true);
+    try {
+      if (layout === 'brother_ql') {
+        await downloadBrotherQlStickerPng(coffeePayload);
+      } else {
+        await downloadCompleteStickerPng(coffeePayload);
+      }
+    } catch (err) {
+      console.error('Modal download error:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-      <div className="relative max-w-md w-full bg-[#120B08] border border-amber-gold/40 rounded-3xl p-6 shadow-2xl space-y-6">
+      <div className="relative max-w-lg w-full bg-[#120B08] border border-amber-gold/40 rounded-3xl p-6 shadow-2xl space-y-5">
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-gold flex items-center justify-center border border-amber-gold/40">
@@ -2108,22 +2175,22 @@ function PackagingLabelProofModal({
         </div>
 
         {/* Layout Switcher */}
-        <div className="flex items-center justify-center gap-2 p-1 bg-black/50 rounded-xl border border-white/10 text-xs font-mono">
+        <div className="flex items-center justify-center gap-1.5 p-1 bg-black/50 rounded-xl border border-white/10 text-xs font-mono">
           <button
             type="button"
             onClick={() => setLayout('thermal')}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
               layout === 'thermal'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-white'
             }`}
           >
-            <span>3"x3" Thermal Sticker</span>
+            <span>3"x3" Thermal</span>
           </button>
           <button
             type="button"
             onClick={() => setLayout('badge')}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
               layout === 'badge'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-white'
@@ -2134,14 +2201,14 @@ function PackagingLabelProofModal({
           <button
             type="button"
             onClick={() => setLayout('brother_ql')}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
               layout === 'brother_ql'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-white'
             }`}
-            title="Brother QL-600 thermal roll label (DK-1209 1.1x2.4 / 29x62mm)"
+            title="Brother QL-600 / QL-800 thermal roll label (DK-1209: 62mm x 29mm / 2.44in x 1.14in)"
           >
-            <span>Brother QL (1.1"x2.4")</span>
+            <span>Brother QL (DK-1209)</span>
           </button>
         </div>
 
@@ -2157,14 +2224,51 @@ function PackagingLabelProofModal({
           />
         </div>
 
+        {/* Brother QL Driver & Print Instructions Notice */}
+        {layout === 'brother_ql' && (
+          <div className="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs font-mono text-cyan-200 text-left space-y-1">
+            <div className="flex items-center gap-1.5 font-bold text-cyan-300">
+              <Printer className="w-4 h-4 text-cyan-400 shrink-0" />
+              <span>Brother QL-600 / QL-800 Direct Print Instructions:</span>
+            </div>
+            <p className="text-[11px] text-cyan-100/90 leading-relaxed font-sans">
+              1. In your browser print dialog, set <strong>Paper size: 62mm x 29mm (2.44" x 1.14" / DK-1209)</strong>.<br />
+              2. Set <strong>Margins: None</strong>.<br />
+              3. If you had a previous printer size error, cancel any stuck jobs in Windows before reprinting.
+            </p>
+          </div>
+        )}
+
         {/* Smartphone Camera Scanning Tip */}
-        <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs font-mono text-cream-soft text-center flex items-center justify-center gap-2">
+        <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs font-mono text-cream-soft text-center flex items-center justify-center gap-2">
           <Sparkles className="w-4 h-4 text-amber-gold shrink-0" />
-          <span>Point your phone camera directly at the QR code above to test instant recipe sync!</span>
+          <span>Point phone camera directly at the QR code to test instant dial-in sync!</span>
         </div>
 
         {/* Bottom Actions */}
-        <div className="flex items-center gap-3 pt-2">
+        <div className="flex flex-wrap items-center gap-2.5 pt-2">
+          <button
+            type="button"
+            onClick={handlePrintModal}
+            disabled={isPrinting}
+            className="flex-1 py-3 px-4 rounded-2xl bg-amber-gold hover:bg-amber-400 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg cursor-pointer transition active:scale-95"
+            title="Print label directly to your Brother QL thermal printer"
+          >
+            <Printer className="w-4 h-4" />
+            <span>{isPrinting ? 'Opening Print Dialog...' : 'Print Label Direct'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDownloadModal}
+            disabled={isSaving}
+            className="py-3 px-4 rounded-2xl bg-white/10 hover:bg-white/20 text-cream-light font-mono text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer"
+            title="Save 300 DPI high-resolution label PNG"
+          >
+            <Download className="w-4 h-4 text-amber-400" />
+            <span>{isSaving ? 'Exporting...' : 'Save PNG'}</span>
+          </button>
+
           <button
             type="button"
             onClick={() => {
@@ -2176,15 +2280,16 @@ function PackagingLabelProofModal({
                 });
               }
             }}
-            className="flex-1 py-3 rounded-2xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+            className="py-3 px-4 rounded-2xl bg-white/10 hover:bg-white/20 text-cream-light font-mono text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer"
           >
-            <Coffee className="w-4 h-4" />
-            <span>Test Brew Recipe</span>
+            <Coffee className="w-4 h-4 text-amber-gold" />
+            <span>Brew</span>
           </button>
+
           <button
             type="button"
             onClick={onClose}
-            className="py-3 px-5 rounded-2xl bg-white/10 hover:bg-white/20 text-cream-light font-mono text-xs font-bold transition cursor-pointer"
+            className="py-3 px-4 rounded-2xl bg-white/5 hover:bg-white/10 text-stone-400 hover:text-white font-mono text-xs font-bold transition cursor-pointer"
           >
             Close
           </button>

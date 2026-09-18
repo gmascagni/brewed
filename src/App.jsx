@@ -73,10 +73,11 @@ export default function App() {
   // Currently Active Logged In User (Persisted in localStorage)
   const [currentUser, setCurrentUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('the_brew_app_active_user');
+      const saved = localStorage.getItem('the_brew_app_active_user') || localStorage.getItem('the_brew_app_current_user');
       const user = saved ? JSON.parse(saved) : null;
       if (user && (user.username === '@barista_pro' || user.email === 'alex@specialtybrew.org')) {
         localStorage.removeItem('the_brew_app_active_user');
+        localStorage.removeItem('the_brew_app_current_user');
         return null;
       }
       return user;
@@ -854,6 +855,9 @@ export default function App() {
                 onOpenRoasterInfo={() => {
                   setIsRoasterInfoOpen(true);
                 }}
+                onOpenProfile={() => {
+                  setIsProfileOpen(true);
+                }}
                 currentUser={currentUser}
                 onOpenAuth={handleOpenAuth}
               />
@@ -1332,6 +1336,10 @@ export default function App() {
             trackMode={trackMode}
             currentUser={currentUser}
             onOpenAuth={handleOpenAuth}
+            onOpenRoasterPortal={() => {
+              setIsProfileOpen(false);
+              setIsRoasterPortalOpen(true);
+            }}
             onLogout={() => setCurrentUser(null)}
           />
 
@@ -1404,6 +1412,12 @@ export default function App() {
             prefilledBarcode={roasterPrefillBarcode}
             prefilledBean={roasterPrefillBean}
             onSelectBeanToBrew={handleApplyScannedRecipe}
+            onNavigateToRoaster={(slug) => {
+              setCurrentArea('discover');
+              setSelectedRoasterSlug(slug);
+              navigate(`/roasters/${slug}`);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             currentUser={currentUser}
             onOpenAuth={handleOpenAuth}
           />

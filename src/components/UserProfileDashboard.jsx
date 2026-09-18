@@ -3,7 +3,7 @@ import { X, User, Flame, Award, Sparkles, Coffee, Leaf, Shield, CheckCircle2, Bo
 import { BADGES_DATA } from '../data/badgesData';
 import { getAssetUrl } from '../utils/assetUrl';
 
-export default function UserProfileDashboard({ isOpen, onClose, trackMode, currentUser, onOpenAuth, onLogout, isInline = false }) {
+export default function UserProfileDashboard({ isOpen, onClose, trackMode, currentUser, onOpenAuth, onOpenRoasterPortal, onLogout, isInline = false }) {
   if (!isOpen && !isInline) return null;
 
   const [showInstructions, setShowInstructions] = useState(false);
@@ -183,6 +183,25 @@ export default function UserProfileDashboard({ isOpen, onClose, trackMode, curre
             <p className="text-xs text-stone-300 mt-2 leading-relaxed font-normal">
               {profile?.bio || 'You are brewing as an anonymous guest. All tasting notes and custom recipes save directly to your browser.'}
             </p>
+
+            {Boolean(profile && (profile.role === 'roaster' || profile.isVerifiedRoaster)) && onOpenRoasterPortal && (
+              <div className="mt-3 p-3 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2 text-xs font-mono text-amber-200">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Verified Roaster Brand: <strong className="text-white">{profile.roasterName || profile.displayName}</strong></span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenRoasterPortal();
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-amber-gold hover:bg-amber-400 text-espresso-950 font-mono text-xs font-bold flex items-center gap-1.5 shadow transition cursor-pointer shrink-0"
+                >
+                  <span>Open Roaster Portal →</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

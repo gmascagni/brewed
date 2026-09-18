@@ -6,7 +6,7 @@
  * hidden <iframe> with exact @page dimensions matching the physical roll.
  */
 
-import { generateBrotherQlStickerCanvas } from '../services/packagingAssetPipeline';
+import { generateBrotherQlStickerCanvas, generateCompositeStickerCanvas } from '../services/packagingAssetPipeline';
 
 /**
  * Prints a Brother QL-600 (DK-1209, 1.1" x 2.4" / 29mm x 62mm) thermal label.
@@ -55,25 +55,29 @@ export async function printBrotherQlCoffee(rawCoffee = {}) {
         <title>${title}</title>
         <style>
           @page {
-            size: 2.4in 1.1in;
+            size: 62mm 29mm;
             margin: 0mm;
           }
           @media print {
+            @page {
+              size: 62mm 29mm;
+              margin: 0mm;
+            }
             html, body {
               margin: 0 !important;
               padding: 0 !important;
-              width: 2.4in !important;
-              height: 1.1in !important;
+              width: 62mm !important;
+              height: 29mm !important;
               overflow: hidden !important;
               background: #ffffff !important;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
             img {
-              width: 2.4in !important;
-              height: 1.1in !important;
-              max-width: 2.4in !important;
-              max-height: 1.1in !important;
+              width: 62mm !important;
+              height: 29mm !important;
+              max-width: 62mm !important;
+              max-height: 29mm !important;
               display: block !important;
               margin: 0 !important;
               padding: 0 !important;
@@ -85,14 +89,14 @@ export async function printBrotherQlCoffee(rawCoffee = {}) {
           html, body {
             margin: 0;
             padding: 0;
-            width: 2.4in;
-            height: 1.1in;
+            width: 62mm;
+            height: 29mm;
             overflow: hidden;
             background: #ffffff;
           }
           img {
-            width: 2.4in;
-            height: 1.1in;
+            width: 62mm;
+            height: 29mm;
             display: block;
             object-fit: contain;
           }
@@ -100,6 +104,142 @@ export async function printBrotherQlCoffee(rawCoffee = {}) {
       </head>
       <body>
         <img id="label-img" src="${dataUrl}" alt="Brother QL Label" />
+      </body>
+      </html>
+    `);
+    doc.close();
+
+    const img = doc.getElementById('label-img');
+    const triggerPrint = () => {
+      setTimeout(() => {
+        try {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+        } catch (err) {
+          console.error('Print trigger error:', err);
+        } finally {
+          const handleAfterPrint = () => {
+            iframe.remove();
+            resolve();
+          };
+          if (iframe.contentWindow) {
+            iframe.contentWindow.onafterprint = handleAfterPrint;
+          }
+          setTimeout(() => {
+            if (document.body.contains(iframe)) {
+              iframe.remove();
+            }
+            resolve();
+          }, 30000);
+        }
+      }, 100);
+    };
+
+    if (img && !img.complete) {
+      img.onload = triggerPrint;
+      img.onerror = () => {
+        console.error('Failed to load label image for print');
+        iframe.remove();
+        resolve();
+      };
+    } else {
+      triggerPrint();
+    }
+  });
+}
+
+/**
+ * Prints a 3" x 3" square thermal label (1200 x 1200 px at 400 DPI / 3in x 3in).
+ * Renders the high-contrast canvas to an isolated iframe with strict @page dimensions.
+ * 
+ * @param {Object} rawCoffee - Coffee profile object
+ * @returns {Promise<void>}
+ */
+export async function printThermalSticker(rawCoffee = {}) {
+  const canvas = await generateCompositeStickerCanvas(rawCoffee);
+  const dataUrl = canvas.toDataURL('image/png');
+
+  return new Promise((resolve) => {
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    iframe.style.visibility = 'hidden';
+    iframe.title = 'Thermal 3x3 Label Print Frame';
+
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow?.document;
+    if (!doc) {
+      console.error('Failed to access iframe document for printing');
+      iframe.remove();
+      resolve();
+      return;
+    }
+
+    const title = `${rawCoffee.beanName || 'Coffee'} - 3x3 Thermal Sticker`;
+
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>${title}</title>
+        <style>
+          @page {
+            size: 3in 3in;
+            margin: 0mm;
+          }
+          @media print {
+            @page {
+              size: 3in 3in;
+              margin: 0mm;
+            }
+            html, body {
+              margin: 0 !important;
+              padding: 0 !important;
+              width: 3in !important;
+              height: 3in !important;
+              overflow: hidden !important;
+              background: #ffffff !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            img {
+              width: 3in !important;
+              height: 3in !important;
+              max-width: 3in !important;
+              max-height: 3in !important;
+              display: block !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              object-fit: contain !important;
+              image-rendering: -webkit-optimize-contrast !important;
+              image-rendering: crisp-edges !important;
+            }
+          }
+          html, body {
+            margin: 0;
+            padding: 0;
+            width: 3in;
+            height: 3in;
+            overflow: hidden;
+            background: #ffffff;
+          }
+          img {
+            width: 3in;
+            height: 3in;
+            display: block;
+            object-fit: contain;
+          }
+        </style>
+      </head>
+      <body>
+        <img id="label-img" src="${dataUrl}" alt="Thermal 3x3 Label" />
       </body>
       </html>
     `);

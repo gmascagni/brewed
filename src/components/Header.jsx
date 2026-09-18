@@ -101,6 +101,32 @@ export default function Header({
               <Coffee className="w-3.5 h-3.5 text-[#E8AF72]" />
               <span className="text-[11px]">Brew</span>
             </button>
+            {/* Mobile Direct Profile Button */}
+            {currentUser ? (
+              <button
+                type="button"
+                onClick={onOpenProfile}
+                className="w-8 h-8 rounded-xl bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center text-[#A25A24] text-xs font-bold font-mono overflow-hidden mobile-touch-target cursor-pointer"
+                title={`Signed in as ${currentUser.displayName || currentUser.username} • Click to open Profile`}
+                aria-label="Open My Profile"
+              >
+                {currentUser.avatar && currentUser.avatar !== '/' ? (
+                  <img src={currentUser.avatar} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span>{currentUser.displayName ? currentUser.displayName[0] : 'B'}</span>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onOpenAuth}
+                className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B] mobile-touch-target flex items-center justify-center cursor-pointer"
+                title="Profile Login / Sign Up"
+                aria-label="Profile Login / Sign Up"
+              >
+                <User className="w-4 h-4" />
+              </button>
+            )}
             {onOpenSearch && (
               <button
                 type="button"
@@ -285,6 +311,42 @@ export default function Header({
             <Coffee className="w-3.5 h-3.5 text-[#E8AF72] group-hover:scale-110 transition-transform" />
             <span>Brew Station</span>
           </button>
+
+          {/* Direct User / Roaster Profile Header Button */}
+          {currentUser ? (
+            <button
+              type="button"
+              onClick={onOpenProfile}
+              className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-[#ECE6DC] bg-[#FAF7F2] hover:bg-[#FAF0E6] hover:border-[#D69550] transition-all cursor-pointer shadow-xs active:scale-95 group"
+              title={`Signed in as ${currentUser.displayName || currentUser.username} • Click to open Profile`}
+              aria-label="Open My Profile"
+            >
+              <div className="w-5 h-5 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center text-[#A25A24] text-[10px] font-bold font-mono overflow-hidden">
+                {currentUser.avatar && currentUser.avatar !== '/' ? (
+                  <img src={currentUser.avatar} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span>{currentUser.displayName ? currentUser.displayName[0] : (currentUser.username ? currentUser.username[1] || currentUser.username[0] : 'B')}</span>
+                )}
+              </div>
+              <span className="font-sans font-bold text-xs text-[#14110F] max-w-[110px] truncate hidden md:inline">
+                {currentUser.displayName || currentUser.username}
+              </span>
+              <span className="text-[9px] font-mono text-[#A25A24] font-bold uppercase hidden lg:inline">
+                {currentUser.role === 'roaster' ? 'Roaster' : 'Profile'}
+              </span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onOpenAuth}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#ECE6DC] bg-[#FAF7F2] text-[#2A2421] hover:text-[#14110F] hover:border-[#C88A4B] font-sans font-semibold text-xs shadow-xs transition-all cursor-pointer active:scale-95"
+              title="Sign In or Create Profile"
+              aria-label="Sign In or Create Profile"
+            >
+              <User className="w-3.5 h-3.5 text-[#C88A4B]" />
+              <span>Sign In</span>
+            </button>
+          )}
 
           {/* Consolidated Secondary Dropdown Menu ("Tools & Barista") */}
           <div className="relative z-50" ref={toolsMenuRef}>
