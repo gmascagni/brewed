@@ -314,20 +314,32 @@ export async function generateBrotherQlStickerCanvas(rawCoffee = {}) {
   ctx.textAlign = 'right';
   ctx.fillText(`LOT: ${coffee.packaging?.upc || 'CERTIFIED-LOT'}`, 790, 608);
 
-  // RIGHT COLUMN: MAXIMIZED HIGH-RESOLUTION QR CODE (580 x 580 px)
-  // Filling the full vertical height of the 1.1" label (580px out of 660px = 88% height)
-  const qrSize = 580;
-  const qrX = 820;
-  const qrY = 40;
+  // RIGHT COLUMN: MAXIMIZED HIGH-RESOLUTION QR CODE (540 x 540 px)
+  // Filling the vertical height with clean human-readable short link underneath
+  const qrSize = 540;
+  const qrX = 840;
+  const qrY = 38;
+
+  // Use Error Correction 'M' (15%) for durability, falling back to 'L' (7%) if URL > 45 chars
+  // to strictly prevent exceeding low module density (Version 2-4) on 300 DPI thermal print heads
+  const errorLevel = targetUrl.length > 45 ? 'L' : 'M';
 
   const qrCanvas = document.createElement('canvas');
   await QRCode.toCanvas(qrCanvas, targetUrl, {
     width: qrSize,
     margin: 1,
-    errorCorrectionLevel: 'M',
+    errorCorrectionLevel: errorLevel,
     color: { dark: '#000000', light: '#FFFFFF' }
   });
   ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+  // Human-readable short link directly beneath QR code
+  ctx.fillStyle = '#57534E';
+  ctx.font = 'bold 20px monospace, sans-serif';
+  ctx.textAlign = 'center';
+  const displayShort = targetUrl.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+  const formattedLink = displayShort.length > 25 ? `${displayShort.slice(0, 23)}…` : displayShort;
+  ctx.fillText(formattedLink, qrX + qrSize / 2, qrY + qrSize + 32);
 
   return canvas;
 }

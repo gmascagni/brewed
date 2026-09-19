@@ -355,16 +355,23 @@ export function generateSmartBagUrl(coffee, baseUrl, options = {}) {
   params.set('roaster', roasterSlug);
 
   // If compact mode is requested (e.g. for small thermal labels like Brother QL-600 / DK-1209),
-  // keep only essential dial-in params so the QR code stays low-density with large scannable modules.
+  // use ultra-short URL format (thebrew.app/r/{code}) to guarantee low module density (Version 2–4).
   if (options.compact) {
-    if (coffee.beanName) params.set('bean', coffee.beanName);
-    if (coffee.id) params.set('coffeeId', coffee.id);
-    if (coffee.brewMethod) params.set('method', coffee.brewMethod);
-    if (coffee.recommendedRatio) params.set('ratio', coffee.recommendedRatio.toString());
-    if (coffee.tempF) params.set('tempF', coffee.tempF.toString());
-    if (coffee.recommendedGrind) params.set('grind', coffee.recommendedGrind.split('(')[0].trim());
-    if (coffee.upc) params.set('upc', coffee.upc);
-    return `${base}/roasters/?${params.toString()}`;
+    // 1. Direct Short URL if registered ID, shortCode, or UPC exists
+    const identifier = coffee.shortCode || coffee.id || coffee.upc;
+    if (identifier) {
+      return `${base}/r/${encodeURIComponent(identifier)}`;
+    }
+
+    // 2. Ultra-compact fallback with single-letter keys for custom one-off beans
+    const shortParams = new URLSearchParams();
+    if (roasterSlug) shortParams.set('r', roasterSlug);
+    if (coffee.beanName) shortParams.set('b', coffee.beanName);
+    if (coffee.brewMethod) shortParams.set('m', coffee.brewMethod);
+    if (coffee.recommendedRatio) shortParams.set('x', coffee.recommendedRatio.toString());
+    if (coffee.tempF) shortParams.set('t', coffee.tempF.toString());
+    if (coffee.recommendedGrind) shortParams.set('g', coffee.recommendedGrind.split('(')[0].trim());
+    return `${base}/r/?${shortParams.toString()}`;
   }
 
   if (coffee.roaster && coffee.roaster !== roasterSlug) params.set('roasterName', coffee.roaster);

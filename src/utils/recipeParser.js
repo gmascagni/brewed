@@ -9,6 +9,7 @@
  */
 
 import { VERIFIED_BEAN_CATALOG } from '../data/verifiedBeans.js';
+import { getRegisteredCoffees } from '../data/roasterRegistry.js';
 import { getBloomScalingMetrics } from './bloomScaling.js';
 
 /**
@@ -230,8 +231,8 @@ export function parseRecipePayload(input) {
           } catch {}
         }
 
-        // B. Direct query parameters
-        if (params.has('coffee') || params.has('roaster') || params.has('bean')) {
+        // B. Direct query parameters (supports both standard and ultra-compact single-letter keys)
+        if (params.has('coffee') || params.has('roaster') || params.has('bean') || params.has('b') || params.has('r') || params.has('c')) {
           let pathRoaster = null;
           if (raw.includes('/roasters/')) {
             const slugPart = raw.split('/roasters/')[1].split(/[?#]/)[0];
@@ -240,17 +241,54 @@ export function parseRecipePayload(input) {
             }
           }
 
+          // If 'c' (coffeeId / slug / upc) is present, attempt catalog lookup first
+          const coffeeIdQuery = params.get('c') || params.get('coffeeId');
+          if (coffeeIdQuery) {
+            const cleanQuery = coffeeIdQuery.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const registeredList = getRegisteredCoffees ? getRegisteredCoffees(VERIFIED_BEAN_CATALOG) : VERIFIED_BEAN_CATALOG;
+            const match = registeredList.find(b => {
+              if (!b) return false;
+              const cleanId = (b.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+              const cleanUpc = (b.upc || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+              const cleanName = (b.beanName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+              return (cleanId && (cleanId === cleanQuery || cleanId.includes(cleanQuery) || cleanQuery.includes(cleanId)))
+                  || (cleanUpc && cleanUpc === cleanQuery)
+                  || (cleanName && (cleanName === cleanQuery || cleanQuery.includes(cleanName) || cleanName.includes(cleanQuery)));
+            });
+            if (match) {
+              return normalizeRecipeBean({
+                roaster: match.roaster,
+                coffee: match.beanName,
+                roast: match.roastLevel,
+                brewer: match.brewMethod,
+                ratio: match.recommendedRatio,
+                dose: 18.8,
+                water: Math.round(18.8 * (match.recommendedRatio || 16)),
+                temp_f: match.tempF,
+                grind: match.recommendedGrind,
+                total_time_sec: 210,
+                bloom_water: 60,
+                bloom_time_sec: 45,
+                notes: match.notes,
+                tasting_notes: match.tastingNotes,
+                origin: match.origin,
+                process: match.process,
+                elevation: match.elevation
+              });
+            }
+          }
+
           const queryData = {
             v: parseInt(params.get('v') || '1', 10),
-            roaster: params.get('roaster') || pathRoaster || 'Specialty Roaster',
-            coffee: params.get('coffee') || params.get('bean'),
+            roaster: params.get('roaster') || params.get('r') || pathRoaster || 'Specialty Roaster',
+            coffee: params.get('coffee') || params.get('bean') || params.get('b'),
             roast: params.get('roast'),
-            brewer: params.get('brewer') || params.get('method'),
-            ratio: parseFloat(params.get('ratio')),
+            brewer: params.get('brewer') || params.get('method') || params.get('m'),
+            ratio: parseFloat(params.get('ratio') || params.get('x')),
             dose: parseFloat(params.get('dose') || params.get('coffee_grams')),
             water: parseFloat(params.get('water') || params.get('water_grams')),
-            temp_f: parseInt(params.get('temp_f') || params.get('tempF') || '205', 10),
-            grind: params.get('grind'),
+            temp_f: parseInt(params.get('temp_f') || params.get('tempF') || params.get('t') || '205', 10),
+            grind: params.get('grind') || params.get('g'),
             total_time_sec: parseInt(params.get('total_time_sec') || params.get('time_sec') || '210', 10),
             bloom_water: parseInt(params.get('bloom_water') || '60', 10),
             bloom_time_sec: parseInt(params.get('bloom_time_sec') || '45', 10),
@@ -267,14 +305,22 @@ export function parseRecipePayload(input) {
     }
   }
 
-  // 3. Check for path /r/<id> matching verified catalog
+  // 3. Check for path /r/<id> matching verified or registered catalog
   if (raw.includes('/r/')) {
     const slug = raw.split('/r/')[1].split(/[?#]/)[0].toLowerCase().trim();
     if (slug) {
-      const match = VERIFIED_BEAN_CATALOG.find(b => {
-        const idMatch = b && b.id && slug ? (b.id.toLowerCase().includes(slug) || slug.includes(b.id.toLowerCase())) : false;
-        const nameMatch = b && b.beanName && slug ? b.beanName.toLowerCase().replace(/[\s_-]+/g, '').includes(slug.replace(/[\s_-]+/g, '')) : false;
-        return idMatch || nameMatch;
+      const cleanSlug = slug.replace(/[^a-z0-9]/g, '');
+      const allCoffees = getRegisteredCoffees ? getRegisteredCoffees(VERIFIED_BEAN_CATALOG) : VERIFIED_BEAN_CATALOG;
+      const match = allCoffees.find(b => {
+        if (!b) return false;
+        const cleanId = (b.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const cleanUpc = (b.upc || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const cleanName = (b.beanName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        
+        const idMatch = cleanId && (cleanId === cleanSlug || cleanId.includes(cleanSlug) || cleanSlug.includes(cleanId));
+        const upcMatch = cleanUpc && (cleanUpc === cleanSlug);
+        const nameMatch = cleanName && (cleanName === cleanSlug || cleanSlug.includes(cleanName) || cleanName.includes(cleanSlug));
+        return idMatch || upcMatch || nameMatch;
       });
       if (match) {
         return normalizeRecipeBean({
@@ -284,7 +330,7 @@ export function parseRecipePayload(input) {
           brewer: match.brewMethod,
           ratio: match.recommendedRatio,
           dose: 18.8,
-          water: Math.round(18.8 * match.recommendedRatio),
+          water: Math.round(18.8 * (match.recommendedRatio || 16)),
           temp_f: match.tempF,
           grind: match.recommendedGrind,
           total_time_sec: 210,

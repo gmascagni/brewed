@@ -15,7 +15,10 @@ import {
   Scale,
   Check,
   X,
-  ArrowRight
+  ArrowRight,
+  ListChecks,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { 
   playTimerStartChime, 
@@ -95,6 +98,12 @@ export default function MultiPhaseTimer({
   const [tasteFeedback, setTasteFeedback] = useState(null); // 'sour' | 'sweet' | 'bitter'
   const [isSavedToLog, setIsSavedToLog] = useState(false);
   const [isEvaluationSkipped, setIsEvaluationSkipped] = useState(false);
+
+  // Step 00: Pre-Brew Preparation Checklist State (Option 1)
+  const [isPreBrewDismissed, setIsPreBrewDismissed] = useState(false);
+  const [checkedPreBrewTasks, setCheckedPreBrewTasks] = useState({});
+  const [cupWarmSecondsLeft, setCupWarmSecondsLeft] = useState(30);
+  const [isCupWarming, setIsCupWarming] = useState(false);
 
   // Closed-Loop Recipe Adjustment (Dial-In Engine) State
   const scheduledTotalDurationSec = useMemo(() => {
@@ -227,7 +236,282 @@ export default function MultiPhaseTimer({
     setIsRunning(false);
     setIsAnnouncing(false);
     setIsCompleted(false);
+    setIsPreBrewDismissed(false);
+    setCheckedPreBrewTasks({});
+    setIsCupWarming(false);
+    setCupWarmSecondsLeft(30);
   }, [activeMethod?.id, trackMode, dryDoseGrams]);
+
+  // 30-Second Cup Warm Mini-Timer countdown effect
+  useEffect(() => {
+    if (!isCupWarming) return;
+    const interval = setInterval(() => {
+      setCupWarmSecondsLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setIsCupWarming(false);
+          playCompletionChime(localMuted);
+          setCheckedPreBrewTasks(c => ({ ...c, warm_cup: true }));
+          return 30;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isCupWarming, localMuted]);
+
+  // Method-specific Pre-Brew Tasks generator
+  const preBrewTasks = useMemo(() => {
+    const methodId = activeMethod?.id || 'pour_over';
+
+    if (!isCoffee) {
+      return [
+        {
+          id: 'rinse_teapot',
+          title: 'Preheat Teapot / Gaiwan',
+          description: 'Swirl hot water in brewing vessel to eliminate cold thermal mass, then discard.',
+          tag: 'Thermal Stability'
+        },
+        {
+          id: 'warm_cup',
+          title: 'Pre-soak Tea Cup (30–45s)',
+          description: 'Fill drinking cup with hot water to maintain optimal steeping temperature upon serving.',
+          isTimer: true,
+          tag: 'Thermal Mass'
+        },
+        {
+          id: 'awaken_leaves',
+          title: 'Awaken Loose Leaves',
+          description: 'Place dry leaves into the warm teapot, gently swirl, and inhale the awakened aromatic notes.',
+          tag: 'Aroma'
+        },
+        {
+          id: 'dose_tare',
+          title: 'Tare Scale & Check Water Temp',
+          description: `Confirm kettle is at ${activeMethod?.tempF || 185}°F (${activeMethod?.tempC || 85}°C) and zero digital scale.`,
+          tag: 'Precision'
+        }
+      ];
+    }
+
+    if (['pour_over', 'chemex', 'classic_pour_over', 'drip_brewer', 'kalita_wave'].includes(methodId)) {
+      return [
+        {
+          id: 'rinse_filter',
+          title: 'Presoak & Rinse Paper Filter',
+          description: 'Rinse thoroughly with hot water to wash away wood pulp/cellulose taste, seat filter flush against dripper ribs, and preheat brewer cone.',
+          tag: 'Clean Extraction'
+        },
+        {
+          id: 'discard_rinse',
+          title: 'Discard Warm Rinse Water',
+          description: 'Empty carafe or mug completely before adding coffee grounds to prevent diluting brew yield and TDS.',
+          tag: 'Purity'
+        },
+        {
+          id: 'warm_cup',
+          title: 'Pre-soak Drinking Cup (30–45s)',
+          description: 'Fill your serving mug with hot water to prevent ~15°F thermal shock upon pouring. Use the 30s timer below!',
+          isTimer: true,
+          tag: 'Thermal Mass'
+        },
+        {
+          id: 'dose_tare',
+          title: 'Add Coffee Bed & Tare Scale',
+          description: `Add ${effectiveDose}g ${activeMethod?.grind || 'Medium-Fine'} grounds, level the bed, make a slight center divot, and zero digital scale.`,
+          tag: 'Precision'
+        }
+      ];
+    } else if (methodId === 'french_press') {
+      return [
+        {
+          id: 'preheat_carafe',
+          title: 'Preheat Glass Carafe / Beaker',
+          description: 'Swirl hot water inside the glass beaker to stabilize slurry temperature across the 4-minute steep.',
+          tag: 'Thermal Mass'
+        },
+        {
+          id: 'warm_cup',
+          title: 'Pre-soak Drinking Cup (30–45s)',
+          description: 'Fill drinking mug with hot water so full-immersion coffee stays piping hot upon decanting.',
+          isTimer: true,
+          tag: 'Thermal Mass'
+        },
+        {
+          id: 'discard_water',
+          title: 'Discard Warming Water',
+          description: 'Empty both the glass beaker and mug completely before adding coarse coffee grounds.',
+          tag: 'Purity'
+        },
+        {
+          id: 'dose_tare',
+          title: 'Dose Coarse Grounds & Tare Scale',
+          description: `Add ${effectiveDose}g coarse grounds to dry beaker, level grounds, and zero digital scale.`,
+          tag: 'Precision'
+        }
+      ];
+    } else if (methodId === 'aeropress') {
+      return [
+        {
+          id: 'rinse_filter',
+          title: 'Rinse Paper Micro-Filter',
+          description: 'Place paper disk in perforated cap and rinse with hot water into your mug to eliminate paper taste.',
+          tag: 'Clean Extraction'
+        },
+        {
+          id: 'warm_cup',
+          title: 'Preheat Mug & Invert Chamber',
+          description: 'Let hot rinse water warm your mug for 30s while inserting plunger 1cm into chamber.',
+          isTimer: true,
+          tag: 'Thermal Mass'
+        },
+        {
+          id: 'discard_rinse',
+          title: 'Discard Water & Position Brewer',
+          description: 'Dump warm water from mug. Place AeroPress securely on scale or set in inverted orientation.',
+          tag: 'Purity'
+        },
+        {
+          id: 'dose_tare',
+          title: 'Dose Medium-Fine Grounds & Tare',
+          description: `Add ${effectiveDose}g grounds with funnel, gently shake flat, and zero digital scale.`,
+          tag: 'Precision'
+        }
+      ];
+    } else if (methodId === 'espresso') {
+      return [
+        {
+          id: 'purge_grouphead',
+          title: 'Purge Group Head (2–3s)',
+          description: 'Flush hot water through the bare shower screen to clear spent oils and stabilize brew group temperature.',
+          tag: 'Temperature'
+        },
+        {
+          id: 'warm_cup',
+          title: 'Preheat Demitasse Cup',
+          description: 'Fill espresso demitasse with hot water from the wand to preserve crema elasticity and temperature.',
+          isTimer: true,
+          tag: 'Crema Quality'
+        },
+        {
+          id: 'dry_basket',
+          title: 'Wipe Filter Basket Bone Dry',
+          description: 'Use a dry microfiber cloth to dry the portafilter basket completely, preventing side-wall channeling.',
+          tag: 'Channel Prevention'
+        },
+        {
+          id: 'dose_tamp',
+          title: 'Dose, Distribute (WDT) & Tamp Level',
+          description: `Dose ${effectiveDose}g fine grounds, declump with WDT needle tool, and tamp level with 20–30 lbs pressure.`,
+          tag: 'Uniform Bed'
+        }
+      ];
+    } else if (methodId === 'moka_pot') {
+      return [
+        {
+          id: 'preheat_water',
+          title: 'Boil Kettle Water First',
+          description: 'Preheat filtered water in kettle before filling lower boiler to avoid baking the dry grounds on the stove.',
+          tag: 'Burn Prevention'
+        },
+        {
+          id: 'warm_cup',
+          title: 'Preheat Drinking Cup (30–45s)',
+          description: 'Warm serving mug with hot water to preserve bold body and aroma.',
+          isTimer: true,
+          tag: 'Thermal Mass'
+        },
+        {
+          id: 'fill_boiler',
+          title: 'Fill Boiler to Safety Valve',
+          description: 'Pour hot water into lower chamber just below the safety pressure valve.',
+          tag: 'Safety'
+        },
+        {
+          id: 'dose_funnel',
+          title: 'Fill Funnel Without Tamping',
+          description: `Add ${effectiveDose}g grounds flush with rim. Do not tamp or pack down tightly. Assemble with towel!`,
+          tag: 'Extraction'
+        }
+      ];
+    } else {
+      return [
+        {
+          id: 'warm_vessel',
+          title: 'Preheat Brewing Vessel',
+          description: 'Swirl hot water in brewer to eliminate cold thermal mass.',
+          tag: 'Thermal Stability'
+        },
+        {
+          id: 'warm_cup',
+          title: 'Preheat Drinking Cup (30–45s)',
+          description: 'Fill mug with hot water to preserve optimal drinking temperature.',
+          isTimer: true,
+          tag: 'Thermal Mass'
+        },
+        {
+          id: 'discard_water',
+          title: 'Discard Warming Water',
+          description: 'Empty vessel and cup completely prior to dosing.',
+          tag: 'Purity'
+        },
+        {
+          id: 'dose_tare',
+          title: 'Dose Coffee & Zero Scale',
+          description: `Measure ${effectiveDose}g dry grounds and tare digital scale.`,
+          tag: 'Precision'
+        }
+      ];
+    }
+  }, [activeMethod?.id, activeMethod?.name, activeMethod?.grind, activeMethod?.tempF, activeMethod?.tempC, isCoffee, effectiveDose]);
+
+  const completedPreBrewCount = useMemo(() => {
+    return preBrewTasks.filter(t => checkedPreBrewTasks[t.id]).length;
+  }, [preBrewTasks, checkedPreBrewTasks]);
+  const allPreBrewCompleted = completedPreBrewCount === preBrewTasks.length && preBrewTasks.length > 0;
+
+  const togglePreBrewTask = (taskId, e) => {
+    if (e) e.stopPropagation();
+    unlockAudio();
+    playMechanicalClick(localMuted);
+    setCheckedPreBrewTasks(prev => ({
+      ...prev,
+      [taskId]: !prev[taskId]
+    }));
+  };
+
+  const handleToggleCupWarm = (e) => {
+    if (e) e.stopPropagation();
+    unlockAudio();
+    playMechanicalClick(localMuted);
+    if (isCupWarming) {
+      setIsCupWarming(false);
+      setCupWarmSecondsLeft(30);
+    } else {
+      setCupWarmSecondsLeft(30);
+      setIsCupWarming(true);
+    }
+  };
+
+  const handleMarkAllPreBrew = (e) => {
+    if (e) e.stopPropagation();
+    unlockAudio();
+    playMechanicalClick(localMuted);
+    const allChecked = {};
+    preBrewTasks.forEach(t => {
+      allChecked[t.id] = true;
+    });
+    setCheckedPreBrewTasks(allChecked);
+  };
+
+  const handleResetPreBrew = (e) => {
+    if (e) e.stopPropagation();
+    unlockAudio();
+    playMechanicalClick(localMuted);
+    setCheckedPreBrewTasks({});
+    setIsCupWarming(false);
+    setCupWarmSecondsLeft(30);
+  };
 
   // Release wake lock safely on unmount
   useEffect(() => {
@@ -347,6 +631,9 @@ export default function MultiPhaseTimer({
       // Start or Resume action: Request screen wake lock & trigger start haptic vibration
       requestScreenWakeLock();
       hapticStart();
+
+      // Automatically collapse pre-brew preparation checklist once extraction begins
+      setIsPreBrewDismissed(true);
 
       if (!brewStartedTimeRef.current) {
         brewStartedTimeRef.current = Date.now();
@@ -496,6 +783,10 @@ export default function MultiPhaseTimer({
     announcedPhasesRef.current.clear();
     setTimeLeft(phases[0]?.durationSec || 60);
     setActualDrawdownSec(scheduledTotalDurationSec);
+    setIsPreBrewDismissed(false);
+    setCheckedPreBrewTasks({});
+    setIsCupWarming(false);
+    setCupWarmSecondsLeft(30);
   };
 
   const handleSaveToLog = () => {
@@ -675,6 +966,242 @@ export default function MultiPhaseTimer({
           </button>
         </div>
       </div>
+
+      {/* Step 00: Pre-Brew Preparation Checklist Card / Collapsible Bar (Option 1) */}
+      {!isCompleted && (
+        <div className="mb-6 relative z-10" data-testid="pre-brew-section">
+          {isPreBrewDismissed ? (
+            /* Collapsed Pill Bar */
+            <div
+              onClick={() => {
+                unlockAudio();
+                playMechanicalClick(localMuted);
+                setIsPreBrewDismissed(false);
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                  e.preventDefault();
+                  setIsPreBrewDismissed(false);
+                }
+              }}
+              className="flex items-center justify-between px-4 py-3 rounded-2xl bg-black/40 hover:bg-black/60 border border-white/10 hover:border-amber-400/40 transition-all cursor-pointer group shadow-md active:scale-[0.99]"
+              title="Expand Pre-Brew Preparation Checklist"
+              aria-label="Expand Pre-Brew Preparation Checklist"
+              data-testid="pre-brew-collapsed-pill"
+            >
+              <div className="flex items-center gap-2.5">
+                <span className="text-base">☕</span>
+                <div>
+                  <span className="text-xs font-mono font-bold text-cream-light group-hover:text-amber-300 transition-colors">
+                    Pre-Brew Preparation Checklist
+                  </span>
+                  <span className="hidden sm:inline text-[11px] text-stone-400 font-mono ml-2">
+                    (Filter rinse, cup warm, tare)
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-extrabold border ${
+                  allPreBrewCompleted
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm'
+                    : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                }`}>
+                  {allPreBrewCompleted ? 'ALL READY ✓' : `${completedPreBrewCount}/${preBrewTasks.length} READY`}
+                </span>
+                <span className="text-xs font-mono text-stone-400 group-hover:text-cream-light flex items-center gap-1">
+                  <span>View</span>
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* Expanded Pre-Brew Checklist Card (Option 1) */
+            <div 
+              className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#1A120B]/90 via-black/80 to-[#120D08]/95 border-2 border-amber-500/30 shadow-2xl space-y-4 backdrop-blur-md animate-fade-in relative overflow-hidden"
+              data-testid="pre-brew-card"
+            >
+              {/* Subtle card background glow */}
+              <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
+
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-white/10 pb-3 relative z-10">
+                <div>
+                  <div className="flex items-center gap-2 text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-400">
+                    <ListChecks className="w-4 h-4 text-amber-400" />
+                    <span>Step 00 • Pre-Brew Preparation Checklist</span>
+                  </div>
+                  <h4 className="font-serif text-lg sm:text-xl font-bold text-cream-light mt-0.5">
+                    Pre-Brew Setup for {activeMethod?.name || 'Pour Over'}
+                  </h4>
+                  <p className="text-[11px] text-stone-300 mt-0.5">
+                    Complete these essential preparation steps before starting extraction:
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 self-start sm:self-center">
+                  <span className={`px-3 py-1 rounded-xl text-xs font-mono font-extrabold border shadow-sm ${
+                    allPreBrewCompleted
+                      ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/50 animate-pulse'
+                      : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                  }`}>
+                    {allPreBrewCompleted ? 'ALL PREP READY ✓' : `${completedPreBrewCount}/${preBrewTasks.length} READY`}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      unlockAudio();
+                      playMechanicalClick(localMuted);
+                      setIsPreBrewDismissed(true);
+                    }}
+                    className="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/15 text-stone-300 hover:text-white border border-white/10 text-xs font-mono flex items-center gap-1 transition cursor-pointer active:scale-95"
+                    title="Collapse checklist to compact pill"
+                    aria-label="Collapse checklist"
+                  >
+                    <span>Hide</span>
+                    <ChevronUp className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Task Items List */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 relative z-10">
+                {preBrewTasks.map((task) => {
+                  const isChecked = !!checkedPreBrewTasks[task.id];
+                  return (
+                    <div
+                      key={task.id}
+                      onClick={() => togglePreBrewTask(task.id)}
+                      role="checkbox"
+                      aria-checked={isChecked}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === ' ' || e.key === 'Enter') {
+                          e.preventDefault();
+                          togglePreBrewTask(task.id);
+                        }
+                      }}
+                      className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between gap-2.5 relative group ${
+                        isChecked
+                          ? 'bg-emerald-500/10 border-emerald-500/40 shadow-md shadow-emerald-950/20'
+                          : 'bg-black/40 hover:bg-black/60 border-white/10 hover:border-amber-400/40'
+                      }`}
+                      data-testid={`pre-brew-task-${task.id}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Custom Checkbox Button */}
+                        <div
+                          className={`w-5 h-5 rounded-lg border flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
+                            isChecked
+                              ? 'bg-emerald-500 border-emerald-400 text-slate-950 font-black shadow-sm'
+                              : 'border-stone-500 group-hover:border-amber-400 bg-white/5'
+                          }`}
+                        >
+                          {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                        </div>
+
+                        <div className="space-y-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className={`text-xs font-bold font-mono transition-colors ${
+                              isChecked ? 'text-emerald-200 line-through' : 'text-cream-light group-hover:text-amber-300'
+                            }`}>
+                              {task.title}
+                            </span>
+                            {task.tag && (
+                              <span className="px-1.5 py-0.2 rounded-md bg-white/5 text-[9px] font-mono text-stone-400 border border-white/10 uppercase">
+                                {task.tag}
+                              </span>
+                            )}
+                          </div>
+
+                          <p className={`text-[11px] leading-relaxed transition-colors ${
+                            isChecked ? 'text-stone-400 line-through' : 'text-stone-300'
+                          }`}>
+                            {task.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Inline Cup Warming Countdown Widget */}
+                      {task.isTimer && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-1 pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2"
+                        >
+                          <div className="flex items-center gap-1.5 text-[10px] font-mono text-amber-300">
+                            <TimerIcon className="w-3.5 h-3.5 animate-pulse" />
+                            <span>Mug Warming Timer:</span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={handleToggleCupWarm}
+                            data-testid="cup-warm-timer-btn"
+                            className={`px-3 py-1.5 rounded-xl font-mono text-xs font-bold flex items-center gap-1.5 transition-all shadow cursor-pointer active:scale-95 ${
+                              isCupWarming
+                                ? 'bg-amber-500 text-espresso-950 animate-pulse border border-amber-300 shadow-amber-500/30'
+                                : isChecked
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
+                                : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40'
+                            }`}
+                            title={isCupWarming ? "Click to cancel warming timer" : "Start 30s Cup Warming countdown"}
+                          >
+                            {isCupWarming ? (
+                              <>
+                                <TimerIcon className="w-3.5 h-3.5 animate-spin" />
+                                <span>Warming: {cupWarmSecondsLeft}s (Cancel)</span>
+                              </>
+                            ) : (
+                              <>
+                                <span>⏱️</span>
+                                <span>{isChecked ? 'Re-Warm Cup (30s)' : 'Warm Cup (30s)'}</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Footer with quick action buttons & auto-collapse hint */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-white/10 text-xs font-mono text-stone-400 relative z-10">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px]">
+                    💡 <em>Starting the extraction timer below will automatically collapse this checklist.</em>
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {!allPreBrewCompleted ? (
+                    <button
+                      type="button"
+                      onClick={handleMarkAllPreBrew}
+                      data-testid="mark-all-pre-brew-btn"
+                      className="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white border border-white/10 text-[11px] transition cursor-pointer active:scale-95"
+                    >
+                      Mark All Done
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResetPreBrew}
+                      data-testid="reset-pre-brew-btn"
+                      className="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white border border-white/10 text-[11px] transition cursor-pointer active:scale-95"
+                    >
+                      Reset Prep
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Main Timer Display */}
       <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 my-6 relative z-10">

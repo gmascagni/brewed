@@ -679,8 +679,9 @@ fs.writeFileSync(path.join(infoRootDir, 'index.html'), partnerHtml);
 
 console.log('✓ Successfully prerendered /roasters, /roasters/partner, and /roasters/info!');
 
-// Prerender /demo/smart-bag-scanner, /scanner, /academy, /recipes, /learn, /shops, /local, and roaster routes
+// Prerender /demo/smart-bag-scanner, /scanner, /r, /academy, /recipes, /learn, /shops, /local, and roaster routes
 [
+  'r',
   'demo/smart-bag-scanner',
   'scanner',
   'scan',
