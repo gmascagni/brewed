@@ -184,19 +184,19 @@ export default function Header({
                 )}
               </button>
 
-              {/* Primary 2: DISCOVER */}
+              {/* Primary 2: ROASTERS */}
               <button
                 type="button"
-                onClick={() => onSelectView && onSelectView('discover')}
+                onClick={() => onSelectView && onSelectView('roasters')}
                 className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-sans font-semibold transition-all whitespace-nowrap cursor-pointer ${
                   isDiscoverActive
                     ? 'bg-amber-gold/15 text-[#14110F] shadow-xs border border-amber-gold/30'
                     : 'text-[#766A62] hover:text-[#14110F]'
                 }`}
-                title="Roaster Showcase • Discover Specialty Coffees, Artisan Roasters & Smart Bags"
+                title="Roaster Showcase • Specialty Roasters, Artisan Coffees & Smart Bags"
               >
                 <Compass className="w-3.5 h-3.5 text-[#C88A4B]" />
-                <span>Discover</span>
+                <span>Roasters</span>
                 {isDiscoverActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#2F663C] animate-pulse inline-block shrink-0" />
                 )}

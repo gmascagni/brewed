@@ -791,7 +791,7 @@ export default function App() {
             if (v === 'brew') {
               setCurrentArea('brew');
               navigate(currentStep > 1 && currentActiveMethod ? `/methods/${currentActiveMethod.id}` : '/');
-            } else if (v === 'discover') {
+            } else if (v === 'discover' || v === 'roasters') {
               setCurrentArea('discover');
               setSelectedRoasterSlug('methodical');
               navigate('/roasters');
@@ -870,7 +870,7 @@ export default function App() {
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#ECE6DC]">
                   <div>
                     <span className="text-[11px] font-mono uppercase tracking-widest font-extrabold text-[#A8622D] block">
-                      DISCOVER SPECIALTY COFFEE
+                      SPECIALTY ROASTERS & COFFEE
                     </span>
                     <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#14110F] mt-1">
                       Artisan Roasters & Single-Origin Vault
@@ -1482,7 +1482,7 @@ export default function App() {
             if (v === 'brew') {
               setCurrentArea('brew');
               navigate(currentStep > 1 && currentActiveMethod ? `/methods/${currentActiveMethod.id}` : '/');
-            } else if (v === 'discover') {
+            } else if (v === 'discover' || v === 'roasters') {
               setCurrentArea('discover');
               navigate('/roasters');
             } else if (v === 'cafes') {

@@ -48,27 +48,27 @@ export default function MobileBottomNav({
         <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Brew</span>
       </button>
 
-      {/* 2. Discover */}
+      {/* 2. Roasters */}
       <button
         type="button"
         onClick={() => {
           hapticTap();
-          if (onSelectView) onSelectView('discover');
+          if (onSelectView) onSelectView('roasters');
         }}
         className={`flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all active:scale-95 mobile-touch-target ${
           isDiscover
             ? 'text-[#C88A4B] font-bold'
             : 'hover:text-[#14110F]'
         }`}
-        title="Discover Coffees & Roasters"
-        aria-label="Discover Coffees & Roasters"
+        title="Specialty Roasters & Coffees"
+        aria-label="Specialty Roasters & Coffees"
       >
         <div className={`p-1 rounded-xl transition-all ${
           isDiscover ? 'bg-[#FAF0E6]' : ''
         }`}>
           <Compass className="w-5 h-5" />
         </div>
-        <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Discover</span>
+        <span className="text-[10px] font-sans font-semibold mt-0.5 tracking-tight">Roasters</span>
       </button>
 
       {/* 3. Cafés */}
