@@ -440,6 +440,7 @@ export const SHOWCASE_ROASTERS = [
     aliases: ['brookmill', 'brookmill-roasters', 'brookmill-roaster-alpharetta'],
     name: 'Brookmill Roaster',
     shortName: 'Brookmill',
+    ownerEmail: 'clpicke@live.com',
     isDemoExample: false,
     tagline: 'Artisan Small-Batch Roasting & Precision Dial-In Labs',
     founded: '2020',
@@ -565,7 +566,11 @@ function formatCustomRoasterAsShowcase(custom, coffees = []) {
   const monogram = name.charAt(0).toUpperCase() || 'R';
   const location = custom.location || 'Artisan Craft Roastery';
 
-  const formattedCoffees = coffees.map((c, idx) => {
+  const coffeesSource = (Array.isArray(coffees) && coffees.length > 0)
+    ? coffees
+    : (Array.isArray(custom.coffees) ? custom.coffees : []);
+
+  const formattedCoffees = coffeesSource.map((c, idx) => {
     const ratio = Number(c.recommendedRatio) || 16.5;
     const dose = 18.0;
     const waterGrams = Math.round(dose * ratio);
@@ -610,6 +615,8 @@ function formatCustomRoasterAsShowcase(custom, coffees = []) {
     slug,
     name,
     isCustomRoaster: true,
+    ownerEmail: custom.ownerEmail || null,
+    ownerUid: custom.ownerUid || null,
     logoImage: custom.logoImage || '',
     backgroundImage: custom.backgroundImage || custom.logoImage || '',
     tagline: custom.tagline || 'Artisan Specialty Roastery & Tasting Room',
@@ -625,7 +632,7 @@ function formatCustomRoasterAsShowcase(custom, coffees = []) {
     sourcingPhilosophy: custom.sourcingPhilosophy || '100% Traceable Specialty Direct-Trade',
     carbonFootprint: 'Precision Micro-Batch Roasting',
     monogram,
-    emblemSubtitle: `${location.toUpperCase()} • EXAMPLE ROASTERY (UNVERIFIED)`,
+    emblemSubtitle: `${location.toUpperCase()} • ARTISAN ROASTERY`,
     stats: [
       { label: 'Active Micro-Lots', value: `${formattedCoffees.length} Lots` },
       { label: 'Roast Style', value: 'Specialty Light-Med' },
@@ -886,18 +893,7 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
     const synthesized = formatCustomRoasterAsShowcase(customProfile, synthesizedCoffee);
     synthesized.shortName = getRoasterShortName(synthesized.name);
 
-    // Cache locally so subsequent clicks and actions retain this synthesized profile
-    try {
-      if (typeof window !== 'undefined') {
-        saveCustomRoasterProfile(customProfile);
-        if (synthesizedCoffee.length > 0) {
-          saveRoasterCoffee(synthesizedCoffee[0]);
-        }
-      }
-    } catch (err) {
-      console.warn('Could not auto-cache on-the-fly roaster:', err);
-    }
-
+    // Return synthesized in-memory showcase view without polluting persistent custom roasters
     return synthesized;
   }
 

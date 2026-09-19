@@ -48,6 +48,13 @@ import {
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
 import { printBrotherQlCoffee, printThermalSticker, printHtmlElementIsolated } from '../utils/printLabel';
+import {
+  checkRoasterBrandOwnership,
+  isDomainVerifiedRoaster,
+  extractDomainFromUrl,
+  getCoffeeProvenance,
+  PROVENANCE_TIERS
+} from '../utils/roasterVerification';
 
 export default function RoasterProfilePage({
   initialRoasterId = 'methodical',
@@ -107,17 +114,11 @@ export default function RoasterProfilePage({
     }));
   };
 
-  // Recognize authenticated roaster as verified brand owner
-  const isBrandOwner = Boolean(
-    currentUser && (
-      currentUser.role === 'roaster' || 
-      currentUser.isVerifiedRoaster || 
-      currentUser.accountType === 'roaster' ||
-      (roaster?.ownerEmail && currentUser?.email && roaster.ownerEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
-      (roaster?.ownerUid && currentUser?.uid && roaster.ownerUid === currentUser.uid) ||
-      (currentUser.roasterSlug && roaster?.slug && currentUser.roasterSlug === roaster.slug) ||
-      (currentUser.roasterName && roaster?.name && currentUser.roasterName.toLowerCase() === roaster.name.toLowerCase())
-    )
+  // Recognize authenticated brand owner via strict multi-tenant authorization
+  const isBrandOwner = Boolean(currentUser && checkRoasterBrandOwnership(roaster, currentUser));
+  const roasterDomain = extractDomainFromUrl(roaster?.website);
+  const isDomainVerified = Boolean(
+    roaster?.ownerEmail && roaster?.website && isDomainVerifiedRoaster(roaster.ownerEmail, roaster.website)
   );
 
   useEffect(() => {
@@ -267,9 +268,9 @@ export default function RoasterProfilePage({
             )}
 
             <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${isBrandOwner ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-              <span className={`text-[11px] font-mono font-bold uppercase tracking-wider ${isBrandOwner ? 'text-emerald-400' : 'text-amber-gold'}`}>
-                {isBrandOwner ? 'Verified Brand Owner' : 'Specialty Roaster Showcase'}
+              <span className={`w-2 h-2 rounded-full ${isBrandOwner ? 'bg-emerald-400 animate-pulse' : (isDomainVerified ? 'bg-emerald-400' : 'bg-amber-400')}`} />
+              <span className={`text-[11px] font-mono font-bold uppercase tracking-wider ${isBrandOwner || isDomainVerified ? 'text-emerald-400' : 'text-amber-gold'}`}>
+                {isBrandOwner ? 'Verified Brand Owner' : (isDomainVerified ? 'Domain-Verified Brand' : (roaster?.isCustomRoaster ? 'Artisan Roaster' : 'Specialty Showcase'))}
               </span>
             </div>
           </div>
@@ -387,11 +388,21 @@ export default function RoasterProfilePage({
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Verified Brand Owner</span>
               </button>
+            ) : isDomainVerified ? (
+              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-extrabold border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Domain-Verified Brand</span>
+              </span>
+            ) : roaster.isCustomRoaster ? (
+              <span className="px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 font-mono text-xs font-extrabold border border-sky-500/40 flex items-center gap-1.5 shadow-sm">
+                <Building className="w-3.5 h-3.5 text-sky-400" />
+                <span>Artisan Roaster (Self-Registered)</span>
+              </span>
             ) : (
               <>
                 <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-extrabold border border-amber-500/40 flex items-center gap-1.5 shadow-sm">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-gold" />
-                  <span>VERIFIED ROASTER PARTNER</span>
+                  <Store className="w-3.5 h-3.5 text-amber-gold" />
+                  <span>Curated Showcase Benchmark</span>
                 </span>
                 <button
                   type="button"
@@ -411,6 +422,17 @@ export default function RoasterProfilePage({
                   <Play className="w-3.5 h-3.5 text-red-400 fill-current" />
                   <span>Watch Video</span>
                 </button>
+                {onOpenRoasterInfo && roasterDomain && (
+                  <button
+                    type="button"
+                    onClick={onOpenRoasterInfo}
+                    className="px-3 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/15 flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                    title={`Claim official brand certification with @${roasterDomain}`}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-gold" />
+                    <span>Claim Profile (@{roasterDomain})</span>
+                  </button>
+                )}
               </>
             )}
 
@@ -502,10 +524,15 @@ export default function RoasterProfilePage({
             <div className="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/40 text-xs font-mono text-cream-soft/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 backdrop-blur-md shadow-lg">
               <div className="flex items-start sm:items-center gap-2.5">
                 <span className="px-2.5 py-1 rounded-md bg-amber-gold/20 text-amber-gold font-bold text-[10px] uppercase tracking-wider border border-amber-gold/40 shrink-0">
-                  Showcase Preview
+                  Curated Showcase
                 </span>
                 <span className="leading-relaxed">
-                  Featured roaster showcase demonstrating The Brew App Smart Bag ecosystem. Coffee dial-in recipes are tuned to roaster specifications.
+                  Featured roaster showcase demonstrating The Brew App Smart Bag ecosystem. Coffee dial-in recipes are curated from published barista guides. Unclaimed brand.
+                  {roasterDomain && (
+                    <span className="block text-cream-soft/70 mt-0.5">
+                      Are you on the team at {roaster.name}? Sign in with your @{roasterDomain} corporate email to claim verified ownership.
+                    </span>
+                  )}
                 </span>
               </div>
               {onOpenRoasterInfo && (
@@ -513,7 +540,7 @@ export default function RoasterProfilePage({
                   onClick={onOpenRoasterInfo}
                   className="text-amber-gold hover:underline font-bold text-xs flex items-center gap-1 whitespace-nowrap shrink-0 self-start sm:self-auto cursor-pointer"
                 >
-                  <span>Are you a roaster? Onboard your labels</span>
+                  <span>Claim with @{roasterDomain || 'domain'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               )}

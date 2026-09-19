@@ -1,4 +1,4 @@
-﻿/**
+/**
  * The Brew App — Canonical CoffeeProfile Domain Entity
  * 
  * Standardizes coffee bean representation across all subsystems:
@@ -85,7 +85,20 @@ export function createCoffeeProfile(input = {}) {
     tempF,
     tempC,
     brewMethod: method,
-    upc
+    upc,
+    // Provenance & Authentication Integrity
+    isAiExtracted: Boolean(input.isAiExtracted),
+    provenanceTier: input.provenanceTier || (input.isAiExtracted ? 'ai_vision' : (input.isOffMatch ? 'retail_match' : undefined)),
+    isOffMatch: Boolean(input.isOffMatch),
+    isDomainVerified: Boolean(input.isDomainVerified),
+    isCustom: Boolean(input.isCustom),
+    ownerEmail: input.ownerEmail || null,
+    ownerUid: input.ownerUid || null,
+    roasterProfile: input.roasterProfile || null,
+    extractionPhilosophy: input.extractionPhilosophy || null,
+    pourAgitation: input.pourAgitation || null,
+    varietal: input.varietal || null,
+    customPhases: input.customPhases || null
   };
 }
 

@@ -47,6 +47,7 @@ import { parseRecipePayload } from './utils/recipeParser';
 import { getAssetUrl } from './utils/assetUrl';
 import { getRecentBrews, JOURNAL_UPDATED_EVENT } from './utils/journalStorage';
 import { ChevronRight, ChevronLeft, Sparkles, Coffee, Clock, Play, BookOpen, Store } from 'lucide-react';
+import { getCoffeeProvenance } from './utils/roasterVerification';
 
 const DEFAULT_LOCAL_PROFILES = [];
 
@@ -406,6 +407,7 @@ export default function App() {
     if (!scannedBean) return;
     try {
       const existing = JSON.parse(localStorage.getItem('the_brew_app_journal_v1') || '[]');
+      const provenance = getCoffeeProvenance(scannedBean, scannedBean.roasterProfile || null, currentUser);
       const newEntry = {
         id: Date.now().toString(),
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -421,7 +423,9 @@ export default function App() {
         rating: 5,
         isFavorite: true,
         tastingNotes: scannedBean.tastingNotes || [],
-        notes: `${scannedBean.notes} (Origin: ${scannedBean.origin}, Altitude: ${scannedBean.elevation})`
+        notes: `${scannedBean.notes || ''} (Origin: ${scannedBean.origin || 'Specialty'}, Altitude: ${scannedBean.elevation || '1800+ MASL'})`,
+        provenanceTier: provenance.tier,
+        provenanceLabel: provenance.label
       };
       localStorage.setItem('the_brew_app_journal_v1', JSON.stringify([newEntry, ...existing]));
       setIsJournalOpen(true);
@@ -1200,36 +1204,51 @@ export default function App() {
               {/* STEP 04: GUIDED BREW TIMER & SENSORY EVALUATION */}
               {currentStep === 4 && (
                 <div id="step-4" className="animate-fade-in space-y-6">
-                  {(dialedInCoffee || selectedCoffee) && (
-                    <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-md shadow-lg">
+                  {(dialedInCoffee || selectedCoffee) && (() => {
+                    const activeCoffee = dialedInCoffee || selectedCoffee;
+                    const provenance = getCoffeeProvenance(activeCoffee, activeCoffee.roasterProfile || null, currentUser);
+                    return (
+                    <div className={`p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-md shadow-lg ${
+                      provenance.isAiDerived 
+                        ? 'bg-purple-950/20 border-purple-500/40' 
+                        : (provenance.isDomainVerified ? 'bg-emerald-950/20 border-emerald-500/40' : 'bg-amber-500/10 border-amber-500/30')
+                    }`}>
                       <div className="space-y-2">
                         <div className="flex items-center gap-3">
-                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                          <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                            provenance.isAiDerived ? 'bg-purple-400 animate-pulse' : (provenance.isDomainVerified ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400')
+                          }`} />
                           <div>
-                            <div className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-amber-gold font-bold flex items-center gap-1.5">
-                              <Sparkles className="w-3.5 h-3.5" />
-                              <span>{(dialedInCoffee || selectedCoffee).isBagRecipe ? 'Bag Recipe QR Dial-In Active' : 'Specialty Dial-In Active'}</span>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase border ${provenance.badgeColor}`}>
+                                {provenance.shortBadge || provenance.label}
+                              </span>
+                              {provenance.isAiDerived && (
+                                <span className="text-[10px] font-mono text-purple-300/80">
+                                  Derived via On-Device AI Vision • Personal Cellar
+                                </span>
+                              )}
                             </div>
-                            <div className="text-base sm:text-lg font-serif font-bold text-cream-light">
-                              {(dialedInCoffee || selectedCoffee).roaster || (dialedInCoffee || selectedCoffee).roasteryName || 'Artisan Roaster'} • {(dialedInCoffee || selectedCoffee).beanName || (dialedInCoffee || selectedCoffee).name}
+                            <div className="text-base sm:text-lg font-serif font-bold text-cream-light mt-1">
+                              {activeCoffee.roaster || activeCoffee.roasteryName || 'Artisan Roaster'} • {activeCoffee.beanName || activeCoffee.name}
                             </div>
                           </div>
                         </div>
 
                         {/* Roaster Tasting Notes */}
-                        {(dialedInCoffee || selectedCoffee).tastingNotes && (dialedInCoffee || selectedCoffee).tastingNotes.length > 0 && (
+                        {activeCoffee.tastingNotes && activeCoffee.tastingNotes.length > 0 && (
                           <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                             <span className="text-[10px] font-mono text-cream-soft/60 uppercase">Flavor Profile:</span>
-                            {(dialedInCoffee || selectedCoffee).tastingNotes.map((note, idx) => (
+                            {activeCoffee.tastingNotes.map((note, idx) => (
                               <span key={idx} className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-200 border border-amber-500/30 text-[11px] font-sans font-medium">
                                 {note}
                               </span>
                             ))}
                           </div>
                         )}
-                        {(dialedInCoffee || selectedCoffee).notes && (
+                        {activeCoffee.notes && (
                           <p className="text-xs text-cream-soft/80 italic font-sans max-w-xl line-clamp-2">
-                            "{(dialedInCoffee || selectedCoffee).notes}"
+                            "{activeCoffee.notes}"
                           </p>
                         )}
                       </div>
@@ -1241,19 +1260,20 @@ export default function App() {
                           <span className="text-cream-light font-bold">{dryDoseGrams}g : {calculatedTotalWaterMl}g</span>
                         </div>
                         <div className="flex items-center gap-2 text-[11px] text-cream-soft/80">
-                          {((dialedInCoffee || selectedCoffee).tempF || (dialedInCoffee || selectedCoffee).extraction?.tempF) && (
-                            <span>{(dialedInCoffee || selectedCoffee).tempF || (dialedInCoffee || selectedCoffee).extraction?.tempF}°F</span>
+                          {(activeCoffee.tempF || activeCoffee.extraction?.tempF) && (
+                            <span>{activeCoffee.tempF || activeCoffee.extraction?.tempF}°F</span>
                           )}
-                          {((dialedInCoffee || selectedCoffee).recommendedGrind || (dialedInCoffee || selectedCoffee).grindSize || (dialedInCoffee || selectedCoffee).extraction?.grind) && (
+                          {(activeCoffee.recommendedGrind || activeCoffee.grindSize || activeCoffee.extraction?.grind) && (
                             <>
                               <span>•</span>
-                              <span>{(dialedInCoffee || selectedCoffee).recommendedGrind || (dialedInCoffee || selectedCoffee).grindSize || (dialedInCoffee || selectedCoffee).extraction?.grind}</span>
+                              <span>{activeCoffee.recommendedGrind || activeCoffee.grindSize || activeCoffee.extraction?.grind}</span>
                             </>
                           )}
                         </div>
                       </div>
                     </div>
-                  )}
+                    );
+                  })()}
 
                   <MultiPhaseTimer
                     trackMode={trackMode}
@@ -1353,6 +1373,7 @@ export default function App() {
               }}
               onApplyRecipe={handleApplyScannedRecipe}
               onSaveToJournal={handleSaveScannedToJournal}
+              currentUser={currentUser}
               onOpenRoasterPortal={(code, bean) => {
                 setRoasterPrefillBarcode(typeof code === 'string' ? code : '');
                 setRoasterPrefillBean(bean || null);

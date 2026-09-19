@@ -36,6 +36,7 @@ import { getSavedGrinderId } from '../data/grinderProfiles';
 import { VERIFIED_BEAN_CATALOG } from '../data/verifiedBeans';
 export { VERIFIED_BEAN_CATALOG };
 import { parseRecipePayload } from '../utils/recipeParser';
+import { getCoffeeProvenance } from '../utils/roasterVerification';
 
 export default function BarcodeScannerModal({
   isOpen,
@@ -43,7 +44,9 @@ export default function BarcodeScannerModal({
   onApplyRecipe,
   onSaveToJournal,
   onOpenRoasterPortal,
-  onOpenRoasterInfo
+  onOpenRoasterInfo,
+  scannerInitialMode = 'barcode',
+  currentUser = null
 }) {
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState(null);
@@ -718,10 +721,14 @@ export default function BarcodeScannerModal({
 
   const handleSaveToCellar = () => {
     if (!matchedBean) return;
+    const beanWithProvenance = {
+      ...matchedBean,
+      provenanceTier: matchedBean.isAiExtracted ? 'ai_vision' : (matchedBean.provenanceTier || (matchedBean.id?.startsWith('off_') ? 'retail_match' : 'curated_showcase'))
+    };
     if (orchestrator) {
-      orchestrator.cellar(matchedBean);
+      orchestrator.cellar(beanWithProvenance);
     } else if (onSaveToJournal) {
-      onSaveToJournal(matchedBean);
+      onSaveToJournal(beanWithProvenance);
     }
     onClose();
   };
@@ -1221,15 +1228,20 @@ export default function BarcodeScannerModal({
           )}
 
           {/* Scanned Bean Result Card */}
-          {matchedBean && (
+          {matchedBean && (() => {
+            const provenance = getCoffeeProvenance(matchedBean, matchedBean.roasterProfile || null, currentUser);
+            return (
             <div className="p-5 sm:p-6 rounded-2xl bg-black/60 border-2 border-amber-gold/50 shadow-2xl space-y-4 animate-fade-in">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-gold text-[10px] font-mono font-bold uppercase border border-amber-500/30">
                     {matchedBean.roaster}
                   </span>
-                  <span className="px-2 py-0.5 rounded-md bg-white/[0.06] text-cream-soft/70 text-[10px] font-mono border border-white/10">
-                    Example Profile (Unverified)
+                  <span 
+                    className={`px-2.5 py-0.5 rounded-md font-mono text-[10px] font-bold border ${provenance.badgeColor}`}
+                    title={provenance.description}
+                  >
+                    {provenance.label}
                   </span>
                   <span className="text-[10px] text-cream-soft/50 font-mono">
                     Code: {scannedResult || matchedBean.upc}
@@ -1240,6 +1252,19 @@ export default function BarcodeScannerModal({
                   <span>Profile Ingested</span>
                 </span>
               </div>
+
+              {/* Computer Vision Derivation Notice */}
+              {provenance.isAiDerived && (
+                <div className="p-3 rounded-xl bg-purple-950/30 border border-purple-500/35 text-xs font-mono space-y-1 text-purple-200">
+                  <div className="flex items-center gap-1.5 text-purple-300 font-bold text-[11px] uppercase tracking-wider">
+                    <Cpu className="w-3.5 h-3.5 text-purple-400" />
+                    <span>On-Device Computer Vision Derivation</span>
+                  </div>
+                  <p className="text-[11px] text-purple-200/80 leading-relaxed">
+                    Extraction parameters mathematically derived on-device from printed altitude & process. Unverified by {matchedBean.roaster || 'the roaster'}. Stored in your personal tasting cellar.
+                  </p>
+                </div>
+              )}
 
               <div>
                 <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream-light">
@@ -1381,7 +1406,8 @@ export default function BarcodeScannerModal({
                 </button>
               </div>
             </div>
-          )}
+            );
+          })()}
 
           {/* Manual Barcode Input Form */}
           <form onSubmit={handleManualSubmit} className="flex items-center gap-2 pt-2">

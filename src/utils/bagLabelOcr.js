@@ -461,6 +461,8 @@ export function generateTargetBrewRecipe(metadata, grinderId = 'generic_stepped'
 
   return {
     ...metadata,
+    id: metadata.id || `ocr_${(metadata.origin || 'origin').toLowerCase().replace(/[^a-z0-9]/g, '_')}_${Date.now()}`,
+    provenanceTier: 'ai_vision',
     recommendedRatio: ratio,
     dryDoseGrams: doseGrams,
     waterGrams: waterGrams,
