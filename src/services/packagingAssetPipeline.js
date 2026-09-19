@@ -345,7 +345,165 @@ export async function generateBrotherQlStickerCanvas(rawCoffee = {}) {
 }
 
 /**
- * Downloads the Brother QL-600 1.1" x 2.4" label as a 300-DPI PNG file.
+ * Generates a 300-DPI Minimal QR label for Brother QL-600 / QL-800 (DK-1209, 1.1" x 2.4" / 29mm x 62mm).
+ * Optimized specifically for high-contrast scanability, generous quiet zone, and clean bag branding.
+ * 
+ * @param {Object} rawCoffee - Coffee profile or raw bean object
+ * @returns {Promise<HTMLCanvasElement>}
+ */
+export async function generateBrotherQlMinimalStickerCanvas(rawCoffee = {}) {
+  const coffee = createCoffeeProfile(rawCoffee);
+  const targetUrl = coffee.packaging?.customUrl?.trim() || generateSmartBagUrl(coffee, null, { compact: true });
+
+  // 1464 x 685 px (Exact 2x 300 DPI high-resolution rendering of Brother DK-1209: 62mm x 29mm / 2.44" x 1.14")
+  const canvas = document.createElement('canvas');
+  canvas.width = 1464;
+  canvas.height = 685;
+  const ctx = canvas.getContext('2d');
+
+  // 1. Crisp white thermal background
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, 1464, 685);
+
+  // 2. Clean outer hairline boundary
+  ctx.strokeStyle = '#1C1917';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(12, 12, 1440, 661);
+
+  // LEFT COLUMN: MINIMALIST BRAND & RECIPE IDENTIFIER (Occupies x = 48 to 820)
+  const leftX = 48;
+
+  // Header Badge Pill (Top Left)
+  ctx.fillStyle = '#1C1917';
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(leftX, 40, 290, 42, 8);
+    ctx.fill();
+  } else {
+    ctx.fillRect(leftX, 40, 290, 42);
+  }
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = 'bold 20px monospace, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('THEBREW.APP • SMART BAG', leftX + 16, 68);
+
+  // Secondary Origin Tagline
+  ctx.fillStyle = '#78716C';
+  ctx.font = 'bold 20px monospace, sans-serif';
+  const roastPill = (coffee.roastLevel || 'LIGHT').toUpperCase();
+  const originTag = `${roastPill} • ${(coffee.origin || 'SINGLE ORIGIN').toUpperCase()}`;
+  ctx.fillText(originTag.length > 26 ? `${originTag.slice(0, 24)}…` : originTag, leftX + 316, 68);
+
+  // Bean Name (Prominent & Elegant)
+  ctx.fillStyle = '#0C0A09';
+  ctx.font = 'bold 46px Georgia, "Times New Roman", serif';
+  const beanText = coffee.beanName || 'Single Origin Lot';
+  ctx.fillText(beanText.length > 24 ? `${beanText.slice(0, 22)}…` : beanText, leftX, 140);
+
+  // Roaster Brand Subtitle
+  ctx.fillStyle = '#44403C';
+  ctx.font = 'bold 28px -apple-system, sans-serif';
+  const roasterText = coffee.roaster || 'Specialty Roaster';
+  ctx.fillText(roasterText.length > 30 ? `${roasterText.slice(0, 28)}…` : roasterText, leftX, 184);
+
+  // High-Contrast Recipe Formula Pill (Inverted Dark Bar for Instant Glanceability)
+  const pillY = 216;
+  const pillH = 110;
+  const pillW = 750;
+  ctx.fillStyle = '#F5F5F4';
+  ctx.strokeStyle = '#D6D3D1';
+  ctx.lineWidth = 3;
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(leftX, pillY, pillW, pillH, 16);
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    ctx.fillRect(leftX, pillY, pillW, pillH);
+    ctx.strokeRect(leftX, pillY, pillW, pillH);
+  }
+
+  // 3 Primary Specs inside Formula Box: RATIO, TEMP, METHOD
+  const specRatio = `1:${coffee.extraction?.ratio || '16.5'}`;
+  const specTemp = `${coffee.extraction?.tempF || '202'}°F`;
+  const specMethod = String(coffee.extraction?.method || 'Pour Over').replace(/_/g, ' ').toUpperCase();
+
+  ctx.fillStyle = '#78716C';
+  ctx.font = 'bold 15px monospace, sans-serif';
+  ctx.fillText('RATIO', leftX + 24, pillY + 34);
+  ctx.fillText('WATER TEMP', leftX + 240, pillY + 34);
+  ctx.fillText('BREWER METHOD', leftX + 480, pillY + 34);
+
+  ctx.fillStyle = '#92400E';
+  ctx.font = 'bold 40px monospace, sans-serif';
+  ctx.fillText(specRatio, leftX + 24, pillY + 84);
+
+  ctx.fillStyle = '#1C1917';
+  ctx.font = 'bold 40px monospace, sans-serif';
+  ctx.fillText(specTemp, leftX + 240, pillY + 84);
+
+  ctx.font = 'bold 28px -apple-system, sans-serif';
+  ctx.fillText(specMethod.length > 13 ? `${specMethod.slice(0, 11)}…` : specMethod, leftX + 480, pillY + 80);
+
+  // Tasting Notes (Italic Serif)
+  const notesStr = (coffee.tastingNotes || []).slice(0, 3).join(' • ');
+  if (notesStr) {
+    ctx.fillStyle = '#78716C';
+    ctx.font = 'italic 22px Georgia, serif';
+    ctx.fillText(`Flavor: ${notesStr}`, leftX, 368);
+  }
+
+  // "SCAN FOR BARISTA TIMER" Callout Banner
+  const calloutY = 406;
+  ctx.fillStyle = '#1C1917';
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(leftX, calloutY, pillW, 72, 12);
+    ctx.fill();
+  } else {
+    ctx.fillRect(leftX, calloutY, pillW, 72);
+  }
+  ctx.fillStyle = '#F59E0B'; // Amber Gold
+  ctx.font = 'bold 24px monospace, sans-serif';
+  ctx.fillText('⚡ SCAN FOR RECIPE & ACTIVE TIMER', leftX + 24, calloutY + 46);
+
+  // Footer: Human-readable direct link + LOT ID
+  ctx.fillStyle = '#57534E';
+  ctx.font = 'bold 20px monospace, sans-serif';
+  const displayShort = targetUrl.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+  const formattedLink = displayShort.length > 32 ? `${displayShort.slice(0, 30)}…` : displayShort;
+  ctx.fillText(formattedLink, leftX, 606);
+
+  ctx.textAlign = 'right';
+  ctx.fillText(`LOT: ${coffee.packaging?.upc || 'DK1209'}`, leftX + pillW, 606);
+  ctx.textAlign = 'left';
+
+  // RIGHT COLUMN: OVERSIZED HIGH-RESOLUTION QR CODE (560 x 560 px)
+  const qrSize = 560;
+  const qrX = 848;
+  const qrY = 32;
+
+  const errorLevel = targetUrl.length > 45 ? 'L' : 'M';
+  const qrCanvas = document.createElement('canvas');
+  await QRCode.toCanvas(qrCanvas, targetUrl, {
+    width: qrSize,
+    margin: 1,
+    errorCorrectionLevel: errorLevel,
+    color: { dark: '#000000', light: '#FFFFFF' }
+  });
+  ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+  // Scan instruction badge below QR
+  ctx.fillStyle = '#1C1917';
+  ctx.font = 'bold 20px monospace, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('AIM PHONE CAMERA', qrX + qrSize / 2, qrY + qrSize + 40);
+
+  return canvas;
+}
+
+/**
+ * Downloads the Brother QL-600 1.1" x 2.4" full spec label as a 300-DPI PNG file.
  * 
  * @param {Object} rawCoffee
  */
@@ -357,6 +515,24 @@ export async function downloadBrotherQlStickerPng(rawCoffee = {}) {
   const a = document.createElement('a');
   a.href = canvas.toDataURL('image/png');
   a.download = `smart_bag_brother_ql_600_1.1x2.4_${slug}_300dpi.png`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+/**
+ * Downloads the Brother QL-600 / QL-800 Minimal QR 1.1" x 2.4" label as a 300-DPI PNG file.
+ * 
+ * @param {Object} rawCoffee
+ */
+export async function downloadBrotherQlMinimalStickerPng(rawCoffee = {}) {
+  const coffee = createCoffeeProfile(rawCoffee);
+  const canvas = await generateBrotherQlMinimalStickerCanvas(coffee);
+  const slug = slugify(coffee.beanName || 'coffee');
+
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = `smart_bag_brother_ql_dk1209_minimal_${slug}_300dpi.png`;
   document.body.appendChild(a);
   a.click();
   a.remove();

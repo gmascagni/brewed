@@ -10,6 +10,7 @@ import { createCoffeeProfile } from '../models/coffeeProfile';
 import { 
   downloadCompleteStickerPng, 
   downloadBrotherQlStickerPng,
+  downloadBrotherQlMinimalStickerPng,
   downloadVectorQrSvg, 
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
@@ -172,6 +173,17 @@ export function AppOrchestratorProvider({
     }
   }, [showToast]);
 
+  const downloadBrotherQlMinimalSticker = useCallback(async (rawCoffee) => {
+    try {
+      showToast('Rendering Brother QL DK-1209 Minimal thermal label...');
+      await downloadBrotherQlMinimalStickerPng(rawCoffee);
+      showToast('Downloaded Brother QL Minimal label to Downloads!');
+    } catch (err) {
+      console.warn('Error downloading Brother QL Minimal label:', err);
+      showToast('Could not render Brother QL Minimal label. Please try again.');
+    }
+  }, [showToast]);
+
   const downloadVector = useCallback(async (rawCoffee) => {
     try {
       await downloadVectorQrSvg(rawCoffee);
@@ -234,6 +246,7 @@ export function AppOrchestratorProvider({
     // Direct Packaging Downloads
     downloadSticker,
     downloadBrotherQlSticker,
+    downloadBrotherQlMinimalSticker,
     downloadVector,
     downloadQr
   };

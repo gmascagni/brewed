@@ -44,6 +44,7 @@ import { generateSmartBagUrl } from '../data/roasterRegistry';
 import { 
   downloadCompleteStickerPng, 
   downloadBrotherQlStickerPng,
+  downloadBrotherQlMinimalStickerPng,
   downloadVectorQrSvg, 
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
@@ -1764,7 +1765,12 @@ function CoffeePackagingLabel({
     e.stopPropagation();
     setIsDownloading(true);
     try {
-      if (layout === 'brother_ql') {
+      if (layout === 'brother_ql_minimal') {
+        await downloadBrotherQlMinimalStickerPng({
+          ...coffee,
+          roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
+        });
+      } else if (layout === 'brother_ql') {
         await downloadBrotherQlStickerPng({
           ...coffee,
           roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
@@ -1784,7 +1790,12 @@ function CoffeePackagingLabel({
 
   const handlePrint = async (e) => {
     e.stopPropagation();
-    if (layout === 'brother_ql') {
+    if (layout === 'brother_ql_minimal') {
+      await printBrotherQlCoffee({
+        ...coffee,
+        roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
+      }, { minimal: true, layout: 'brother_ql_minimal' });
+    } else if (layout === 'brother_ql') {
       await printBrotherQlCoffee({
         ...coffee,
         roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
@@ -1802,7 +1813,7 @@ function CoffeePackagingLabel({
       await printBrotherQlCoffee({
         ...coffee,
         roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
-      });
+      }, { minimal: true, layout: 'brother_ql_minimal' });
     }
   };
 
@@ -1919,6 +1930,114 @@ function CoffeePackagingLabel({
             disabled={isDownloading}
             className="flex-1 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-white font-mono text-[10px] font-bold flex items-center justify-center gap-1 shadow transition cursor-pointer"
             title="Download 300 DPI composite sticker PNG"
+          >
+            <Download className="w-3 h-3 text-amber-400" />
+            <span>{isDownloading ? 'Exporting...' : 'Save PNG'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="py-1.5 px-2 rounded-lg bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-800 font-mono text-[10px] font-bold flex items-center gap-1 transition cursor-pointer"
+            title="Print label direct"
+          >
+            <Printer className="w-3 h-3" />
+            <span>Print</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="py-1.5 px-2 rounded-lg bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-800 font-mono text-[10px] font-bold flex items-center gap-1 transition cursor-pointer"
+            title="Copy scannable recipe URL"
+          >
+            {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+          </button>
+
+          {onEnlarge && (
+            <button
+              type="button"
+              onClick={() => onEnlarge(coffee)}
+              className="py-1.5 px-2 rounded-lg bg-stone-100 hover:bg-stone-200 border border-stone-300 text-stone-800 font-mono text-[10px] font-bold flex items-center gap-1 transition cursor-pointer"
+              title="Enlarge label proof"
+            >
+              <Maximize2 className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Brother QL-600 Minimal Thermal Label (1.1" x 2.4" / DK-1209)
+  if (layout === 'brother_ql_minimal') {
+    return (
+      <div className={`w-full max-w-md mx-auto flex flex-col justify-between rounded-2xl bg-white text-stone-900 p-3.5 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 group ${isEnlarged ? 'scale-100' : ''}`}>
+        <div className="flex items-stretch justify-between gap-3 h-full">
+          {/* Left Column: High Contrast Minimal Details */}
+          <div className="flex-1 min-w-0 pr-1 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-1.5 mb-1">
+                <span className="text-[7.5px] font-mono uppercase tracking-wider font-black bg-stone-900 text-white px-1.5 py-0.5 rounded">
+                  THEBREW.APP
+                </span>
+                <span className="text-[7.5px] font-mono text-stone-600 uppercase tracking-tight truncate font-bold">
+                  {coffee.origin || 'SMART BAG'}
+                </span>
+              </div>
+              <h3 className="font-serif text-base sm:text-lg font-black text-stone-950 truncate leading-tight tracking-tight">
+                {coffee.beanName}
+              </h3>
+              <p className="text-[10.5px] text-stone-600 font-bold truncate font-mono uppercase tracking-wider mt-0.5">
+                {roaster?.name || coffee.roaster || 'Specialty Roastery'}
+              </p>
+            </div>
+
+            {/* Dial-in Formula Pill */}
+            <div className="bg-stone-100 border border-stone-300 rounded-md px-2 py-1 my-1">
+              <span className="text-[8.5px] font-mono font-black text-stone-900 tracking-tight block">
+                RATIO 1:{coffee.recommendedRatio || 16.5} • {coffee.tempF || 202}°F • {(coffee.brewMethod || 'pour_over').replace(/_/g, ' ').toUpperCase()}
+              </span>
+            </div>
+
+            {/* Flavor Notes & Scan Banner */}
+            <div>
+              {coffee.tastingNotes && coffee.tastingNotes.length > 0 && (
+                <p className="text-[9px] font-serif italic text-stone-700 truncate mb-0.5">
+                  Notes: {coffee.tastingNotes.slice(0, 3).join(', ')}
+                </p>
+              )}
+              <div className="flex items-center justify-between text-[7px] font-mono text-stone-600 pt-1 border-t border-stone-200">
+                <span className="font-extrabold text-stone-900 uppercase">⚡ SCAN TO BREW</span>
+                <span className="truncate">{upc}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Giant High-Contrast QR Code */}
+          <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-lg border-2 border-stone-800 h-full aspect-square w-28 h-28 sm:w-32 sm:h-32 shadow-sm">
+            {qrDataUrl ? (
+              <img
+                src={qrDataUrl}
+                alt={`Smart Bag QR for ${coffee.beanName}`}
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-stone-400 font-mono text-[9px]">
+                Generating...
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Action Toolbar */}
+        <div className="pt-2.5 mt-2.5 border-t border-stone-200 flex items-center justify-between gap-1.5">
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className="flex-1 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-white font-mono text-[10px] font-bold flex items-center justify-center gap-1 shadow transition cursor-pointer"
+            title="Download Brother QL-600 Minimal 300 DPI label PNG"
           >
             <Download className="w-3 h-3 text-amber-400" />
             <span>{isDownloading ? 'Exporting...' : 'Save PNG'}</span>
@@ -2228,7 +2347,9 @@ function PackagingLabelProofModal({
   const handlePrintModal = async () => {
     setIsPrinting(true);
     try {
-      if (layout === 'brother_ql') {
+      if (layout === 'brother_ql_minimal') {
+        await printBrotherQlCoffee(coffeePayload, { minimal: true, layout: 'brother_ql_minimal' });
+      } else if (layout === 'brother_ql') {
         await printBrotherQlCoffee(coffeePayload);
       } else {
         await printThermalSticker(coffeePayload);
@@ -2243,7 +2364,9 @@ function PackagingLabelProofModal({
   const handleDownloadModal = async () => {
     setIsSaving(true);
     try {
-      if (layout === 'brother_ql') {
+      if (layout === 'brother_ql_minimal') {
+        await downloadBrotherQlMinimalStickerPng(coffeePayload);
+      } else if (layout === 'brother_ql') {
         await downloadBrotherQlStickerPng(coffeePayload);
       } else {
         await downloadCompleteStickerPng(coffeePayload);
@@ -2282,23 +2405,35 @@ function PackagingLabelProofModal({
         </div>
 
         {/* Layout Switcher */}
-        <div className="flex items-center justify-center gap-1.5 p-1 bg-black/50 rounded-xl border border-white/10 text-xs font-mono">
+        <div className="flex flex-wrap items-center justify-center gap-1.5 p-1 bg-black/50 rounded-xl border border-white/10 text-xs font-mono">
+          <button
+            type="button"
+            onClick={() => handleSelectLayout('brother_ql_minimal')}
+            className={`flex-1 min-w-[110px] py-1.5 px-2 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+              layout === 'brother_ql_minimal'
+                ? 'bg-amber-gold text-espresso-950 shadow'
+                : 'text-cream-soft hover:text-white'
+            }`}
+            title="Brother QL DK-1209 Minimal High-Contrast (62mm x 29mm / 2.44in x 1.14in)"
+          >
+            <span>QL Minimal</span>
+          </button>
           <button
             type="button"
             onClick={() => handleSelectLayout('brother_ql')}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+            className={`flex-1 min-w-[110px] py-1.5 px-2 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
               layout === 'brother_ql'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-white'
             }`}
-            title="Brother QL-600 / QL-800 thermal roll label (DK-1209: 62mm x 29mm / 2.44in x 1.14in)"
+            title="Brother QL-600 / QL-800 full-spec thermal roll label (DK-1209: 62mm x 29mm / 2.44in x 1.14in)"
           >
-            <span>Brother QL (DK-1209)</span>
+            <span>QL Full Spec</span>
           </button>
           <button
             type="button"
             onClick={() => handleSelectLayout('thermal')}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+            className={`flex-1 min-w-[90px] py-1.5 px-2 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
               layout === 'thermal'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-white'
@@ -2309,7 +2444,7 @@ function PackagingLabelProofModal({
           <button
             type="button"
             onClick={() => handleSelectLayout('badge')}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+            className={`flex-1 min-w-[90px] py-1.5 px-2 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
               layout === 'badge'
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-white'
@@ -2332,7 +2467,7 @@ function PackagingLabelProofModal({
         </div>
 
         {/* Brother QL Driver & Print Instructions Notice */}
-        {layout === 'brother_ql' && (
+        {(layout === 'brother_ql' || layout === 'brother_ql_minimal') && (
           <div className="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs font-mono text-cyan-200 text-left space-y-1">
             <div className="flex items-center gap-1.5 font-bold text-cyan-300">
               <Printer className="w-4 h-4 text-cyan-400 shrink-0" />

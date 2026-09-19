@@ -45,6 +45,7 @@ import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 import { 
   downloadCompleteStickerPng, 
   downloadBrotherQlStickerPng,
+  downloadBrotherQlMinimalStickerPng,
   downloadVectorQrSvg, 
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
@@ -286,7 +287,7 @@ export default function RoasterPortalModal({
       recommendedGrind,
       upc
     };
-    const isBrotherLayout = qrLayout === 'brother_ql';
+    const isBrotherLayout = qrLayout === 'brother_ql' || qrLayout === 'brother_ql_minimal';
     const targetUrl = customUrl.trim() || generateSmartBagUrl(coffee, null, { compact: isBrotherLayout });
     setActiveTargetUrl(targetUrl);
 
@@ -514,7 +515,9 @@ export default function RoasterPortalModal({
       ownerUid: currentUser?.uid || ''
     };
 
-    if (qrLayout === 'brother_ql') {
+    if (qrLayout === 'brother_ql_minimal') {
+      await printBrotherQlCoffee(coffee, { minimal: true, layout: 'brother_ql_minimal' });
+    } else if (qrLayout === 'brother_ql') {
       await printBrotherQlCoffee(coffee);
     } else if (stickerRef.current) {
       await printHtmlElementIsolated(stickerRef.current, {
@@ -523,7 +526,7 @@ export default function RoasterPortalModal({
         title: `${coffee.beanName || 'Coffee'} Label`
       });
     } else {
-      await printBrotherQlCoffee(coffee);
+      await printBrotherQlCoffee(coffee, { minimal: true, layout: 'brother_ql_minimal' });
     }
   };
 
@@ -555,6 +558,34 @@ export default function RoasterPortalModal({
     }
   };
 
+  const handleDownloadBrotherQlMinimalPng = async () => {
+    if (!checkBarcodeOwnership()) return;
+    const coffee = selectedCoffeeForSticker || {
+      roaster: roasterName || 'Specialty Roaster',
+      location: location || 'Artisan Small Batch',
+      beanName: beanName || 'Single Origin Lot',
+      origin: origin || 'Single Origin',
+      process: process || 'Washed',
+      elevation: elevation || '1,850 MASL',
+      roastLevel: roastLevel || 'Light',
+      tastingNotes: tastingNotesInput ? tastingNotesInput.split(',').map(s => s.trim()).filter(Boolean) : ['Peach', 'Jasmine', 'Honey'],
+      brewMethod: brewMethod || 'pour_over',
+      recommendedRatio: Number(recommendedRatio) || 16.5,
+      tempF: Number(tempF) || 202,
+      recommendedGrind: recommendedGrind || 'Medium-Fine',
+      upc: upc || 'LOT-2026-CERTIFIED',
+      customUrl: customUrl.trim(),
+      ownerEmail: currentUser?.email || '',
+      ownerUid: currentUser?.uid || ''
+    };
+
+    if (orchestrator?.downloadBrotherQlMinimalSticker) {
+      await orchestrator.downloadBrotherQlMinimalSticker(coffee);
+    } else {
+      await downloadBrotherQlMinimalStickerPng(coffee);
+    }
+  };
+
   const handleDownloadFullStickerPng = async () => {
     if (!checkBarcodeOwnership()) return;
     const coffee = selectedCoffeeForSticker || {
@@ -575,6 +606,11 @@ export default function RoasterPortalModal({
       ownerEmail: currentUser?.email || '',
       ownerUid: currentUser?.uid || ''
     };
+
+    if (qrLayout === 'brother_ql_minimal') {
+      await handleDownloadBrotherQlMinimalPng();
+      return;
+    }
 
     if (qrLayout === 'brother_ql') {
       if (orchestrator?.downloadBrotherQlSticker) {
@@ -1277,6 +1313,20 @@ export default function RoasterPortalModal({
 
                     <button
                       type="button"
+                      onClick={() => setQrLayout('brother_ql_minimal')}
+                      className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition font-bold ${
+                        qrLayout === 'brother_ql_minimal'
+                          ? 'bg-amber-gold text-espresso-950 shadow'
+                          : 'bg-white/[0.06] text-cream-soft hover:text-white'
+                      }`}
+                      title="Brother QL DK-1209 Minimal High-Contrast Label (62mm x 29mm / 2.44in x 1.14in)"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      <span>Brother QL Minimal (DK-1209)</span>
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => setQrLayout('brother_ql')}
                       className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition font-bold ${
                         qrLayout === 'brother_ql'
@@ -1286,7 +1336,7 @@ export default function RoasterPortalModal({
                       title="Brother QL-600 / QL-800 thermal roll label (DK-1209: 62mm x 29mm / 2.44in x 1.14in)"
                     >
                       <Printer className="w-3.5 h-3.5" />
-                      <span>Brother QL (DK-1209 • 62x29mm)</span>
+                      <span>Brother QL Full (DK-1209)</span>
                     </button>
                   </div>
 
@@ -1622,8 +1672,69 @@ export default function RoasterPortalModal({
                   </div>
                 )}
 
+                {/* LAYOUT 5: BROTHER QL DK-1209 MINIMAL HIGH-CONTRAST LABEL */}
+                {qrLayout === 'brother_ql_minimal' && (
+                  <div 
+                    ref={stickerRef}
+                    className="w-full max-w-lg h-56 rounded-xl bg-white text-stone-900 p-3 shadow-2xl border-2 border-stone-800 flex items-stretch justify-between gap-3 relative overflow-hidden select-none"
+                  >
+                    {/* Left Details Column */}
+                    <div className="flex-1 flex flex-col justify-between h-full min-w-0 pr-1">
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-[8px] font-mono uppercase tracking-wider font-black bg-stone-900 text-white px-1.5 py-0.5 rounded">
+                            THEBREW.APP
+                          </span>
+                          <span className="text-[8px] font-mono text-stone-600 uppercase tracking-tight truncate font-bold">
+                            {selectedCoffeeForSticker?.origin || origin || 'SMART BAG'}
+                          </span>
+                        </div>
+                        <h3 className="font-serif text-lg font-black text-stone-950 truncate leading-tight tracking-tight">
+                          {selectedCoffeeForSticker?.beanName || beanName || 'Single Origin Lot'}
+                        </h3>
+                        <p className="text-[11px] text-stone-600 font-bold truncate font-mono uppercase tracking-wider mt-0.5">
+                          {selectedCoffeeForSticker?.roaster || roasterName || 'Specialty Roastery'}
+                        </p>
+                      </div>
+
+                      {/* Dial-In Formula Pill */}
+                      <div className="bg-stone-100 border border-stone-300 rounded-md px-2 py-1 my-1">
+                        <span className="text-[9px] font-mono font-black text-stone-900 tracking-tight block">
+                          RATIO 1:{selectedCoffeeForSticker?.recommendedRatio || recommendedRatio} • {selectedCoffeeForSticker?.tempF || tempF}°F • {(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ').toUpperCase()}
+                        </span>
+                      </div>
+
+                      {/* Flavor Notes & Scan Banner */}
+                      <div>
+                        <p className="text-[9.5px] font-serif italic text-stone-700 truncate mb-0.5">
+                          Notes: {tastingNotesInput ? tastingNotesInput : 'Peach, Jasmine, Honey'}
+                        </p>
+                        <div className="flex items-center justify-between text-[8px] font-mono text-stone-600 pt-1 border-t border-stone-200">
+                          <span className="font-extrabold text-stone-900 uppercase">⚡ SCAN TO BREW</span>
+                          <span className="truncate">{selectedCoffeeForSticker?.upc || upc || 'DK-1209 SPEC'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right QR Column: Giant High-Contrast QR Code */}
+                    <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-lg border-2 border-stone-800 h-full aspect-square shadow-sm">
+                      {qrDataUrl ? (
+                        <img
+                          src={qrDataUrl}
+                          alt="Brother QL Minimal QR Code"
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-stone-400 font-mono text-[9px]">
+                          Generating...
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Brother QL Driver & Print Instructions Notice */}
-                {qrLayout === 'brother_ql' && (
+                {(qrLayout === 'brother_ql' || qrLayout === 'brother_ql_minimal') && (
                   <div className="w-full max-w-lg mx-auto p-3 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs font-mono text-cyan-200 text-left space-y-1">
                     <div className="flex items-center gap-1.5 font-bold text-cyan-300">
                       <Printer className="w-4 h-4 text-cyan-400 shrink-0" />
@@ -1642,13 +1753,29 @@ export default function RoasterPortalModal({
               {/* Action Buttons for QR Studio */}
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <button
-                  onClick={qrLayout === 'brother_ql' ? handleDownloadBrotherQlPng : handleDownloadFullStickerPng}
+                  onClick={
+                    qrLayout === 'brother_ql_minimal'
+                      ? handleDownloadBrotherQlMinimalPng
+                      : qrLayout === 'brother_ql'
+                      ? handleDownloadBrotherQlPng
+                      : handleDownloadFullStickerPng
+                  }
                   className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-gold/20 hover:scale-105 active:scale-95 transition"
-                  title={qrLayout === 'brother_ql' ? 'Download 300 DPI Brother QL-600 (DK-1209: 62mm x 29mm / 2.44" x 1.14") thermal label PNG' : 'Download complete 300 DPI composite packaging sticker PNG ready to email or upload to your printer'}
+                  title={
+                    qrLayout === 'brother_ql_minimal'
+                      ? 'Download 300 DPI Brother QL-600 Minimal (DK-1209: 62mm x 29mm / 2.44" x 1.14") thermal label PNG'
+                      : qrLayout === 'brother_ql'
+                      ? 'Download 300 DPI Brother QL-600 (DK-1209: 62mm x 29mm / 2.44" x 1.14") thermal label PNG'
+                      : 'Download complete 300 DPI composite packaging sticker PNG ready to email or upload to your printer'
+                  }
                 >
                   <Download className="w-4 h-4 text-espresso-950" />
                   <span>
-                    {qrLayout === 'brother_ql' ? 'Download Brother QL (62x29mm PNG)' : 'Download Complete Sticker (PNG)'}
+                    {qrLayout === 'brother_ql_minimal'
+                      ? 'Download Brother QL Minimal (PNG)'
+                      : qrLayout === 'brother_ql'
+                      ? 'Download Brother QL Full (PNG)'
+                      : 'Download Complete Sticker (PNG)'}
                   </span>
                 </button>
 

@@ -6,19 +6,24 @@
  * hidden <iframe> with exact @page dimensions matching the physical roll.
  */
 
-import { generateBrotherQlStickerCanvas, generateCompositeStickerCanvas } from '../services/packagingAssetPipeline';
+import { generateBrotherQlStickerCanvas, generateBrotherQlMinimalStickerCanvas, generateCompositeStickerCanvas } from '../services/packagingAssetPipeline';
 
 /**
- * Prints a Brother QL-600 (DK-1209, 1.1" x 2.4" / 29mm x 62mm) thermal label.
+ * Prints a Brother QL-600 / QL-800 (DK-1209, 1.1" x 2.4" / 29mm x 62mm) thermal label.
+ * Supports both full spec and minimal QR layouts.
  * Renders the 300-DPI high-contrast canvas to an isolated iframe to guarantee
  * Chrome previews and prints exactly 1 sheet of paper.
  * 
  * @param {Object} rawCoffee - Coffee profile object
+ * @param {Object} options - Print options { minimal: boolean, layout: string }
  * @returns {Promise<void>}
  */
-export async function printBrotherQlCoffee(rawCoffee = {}) {
+export async function printBrotherQlCoffee(rawCoffee = {}, options = {}) {
+  const isMinimal = options.minimal || options.layout === 'brother_ql_minimal';
   // 1. Generate the 300-DPI high-contrast pixel-perfect canvas
-  const canvas = await generateBrotherQlStickerCanvas(rawCoffee);
+  const canvas = isMinimal
+    ? await generateBrotherQlMinimalStickerCanvas(rawCoffee)
+    : await generateBrotherQlStickerCanvas(rawCoffee);
   const dataUrl = canvas.toDataURL('image/png');
 
   return new Promise((resolve) => {
