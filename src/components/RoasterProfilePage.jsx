@@ -1762,6 +1762,9 @@ function CoffeePackagingLabel({
         ...coffee,
         roaster: roaster?.name || coffee.roaster || 'Specialty Roastery'
       });
+    } else if (onEnlarge) {
+      // Open proof modal with Brother QL format & options
+      onEnlarge(coffee);
     } else if (labelRef.current) {
       await printHtmlElementIsolated(labelRef.current, {
         width: '3in',
@@ -2163,7 +2166,20 @@ function PackagingLabelProofModal({
   onClose,
   onBrewCoffee
 }) {
-  const [layout, setLayout] = useState('thermal'); // 'thermal' | 'badge' | 'brother_ql'
+  const [layout, setLayout] = useState(() => {
+    try {
+      return localStorage.getItem('the_brew_app_label_layout') || 'brother_ql';
+    } catch {
+      return 'brother_ql';
+    }
+  });
+
+  const handleSelectLayout = (newLayout) => {
+    setLayout(newLayout);
+    try {
+      localStorage.setItem('the_brew_app_label_layout', newLayout);
+    } catch {}
+  };
   const [isPrinting, setIsPrinting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -2242,7 +2258,19 @@ function PackagingLabelProofModal({
         <div className="flex items-center justify-center gap-1.5 p-1 bg-black/50 rounded-xl border border-white/10 text-xs font-mono">
           <button
             type="button"
-            onClick={() => setLayout('thermal')}
+            onClick={() => handleSelectLayout('brother_ql')}
+            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+              layout === 'brother_ql'
+                ? 'bg-amber-gold text-espresso-950 shadow'
+                : 'text-cream-soft hover:text-white'
+            }`}
+            title="Brother QL-600 / QL-800 thermal roll label (DK-1209: 62mm x 29mm / 2.44in x 1.14in)"
+          >
+            <span>Brother QL (DK-1209)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSelectLayout('thermal')}
             className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
               layout === 'thermal'
                 ? 'bg-amber-gold text-espresso-950 shadow'
@@ -2253,7 +2281,7 @@ function PackagingLabelProofModal({
           </button>
           <button
             type="button"
-            onClick={() => setLayout('badge')}
+            onClick={() => handleSelectLayout('badge')}
             className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
               layout === 'badge'
                 ? 'bg-amber-gold text-espresso-950 shadow'
@@ -2261,18 +2289,6 @@ function PackagingLabelProofModal({
             }`}
           >
             <span>Luxury Badge</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setLayout('brother_ql')}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
-              layout === 'brother_ql'
-                ? 'bg-amber-gold text-espresso-950 shadow'
-                : 'text-cream-soft hover:text-white'
-            }`}
-            title="Brother QL-600 / QL-800 thermal roll label (DK-1209: 62mm x 29mm / 2.44in x 1.14in)"
-          >
-            <span>Brother QL (DK-1209)</span>
           </button>
         </div>
 

@@ -65,7 +65,20 @@ export default function RoasterPortalModal({
   );
 
   const [activeTab, setActiveTab] = useState(() => (prefilledBarcode || prefilledBean ? 'onboard' : 'video')); // 'video' | 'onboard' | 'sticker' | 'catalog' | 'telemetry'
-  const [qrLayout, setQrLayout] = useState('thermal'); // 'thermal' | 'badge' | 'minimal' | 'brother_ql'
+  const [qrLayout, setQrLayoutState] = useState(() => {
+    try {
+      return localStorage.getItem('the_brew_app_label_layout') || 'brother_ql';
+    } catch {
+      return 'brother_ql';
+    }
+  });
+
+  const setQrLayout = (newLayout) => {
+    setQrLayoutState(newLayout);
+    try {
+      localStorage.setItem('the_brew_app_label_layout', newLayout);
+    } catch {}
+  };
   const [qrColor, setQrColor] = useState('black'); // 'black' | 'espresso' | 'gold'
   const [qrEcc, setQrEcc] = useState('H'); // 'H' (30%) | 'Q' (25%) | 'M' (15%) | 'L' (7%)
   const [registeredCoffees, setRegisteredCoffees] = useState([]);
