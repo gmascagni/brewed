@@ -4,21 +4,41 @@
 import QRCode from 'qrcode';
 import { doc, setDoc, deleteDoc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase.js';
-import { deduplicateCoffees, normalizeRoasterKey } from './roasterShowcaseData.js';
+import { deduplicateCoffees, normalizeRoasterKey, SHOWCASE_ROASTERS } from './roasterShowcaseData.js';
 
 const STORAGE_KEY = 'thebrewapp_roaster_registry_v1';
 
 /**
- * Retrieve all registered coffees (built-in verified catalog + user/roaster registered)
+ * Extract all coffees from built-in showcase roasters
+ */
+function getBuiltinShowcaseCoffees() {
+  const showcaseCoffees = [];
+  if (Array.isArray(SHOWCASE_ROASTERS)) {
+    SHOWCASE_ROASTERS.forEach((roaster) => {
+      (roaster.coffees || []).forEach((coffee) => {
+        showcaseCoffees.push({
+          ...coffee,
+          roaster: coffee.roaster || roaster.name,
+          roasterSlug: roaster.slug || roaster.id
+        });
+      });
+    });
+  }
+  return showcaseCoffees;
+}
+
+/**
+ * Retrieve all registered coffees (built-in verified catalog + showcase roasters + user/roaster registered)
  */
 export function getRegisteredCoffees(builtinCatalog = []) {
+  const showcaseCoffees = getBuiltinShowcaseCoffees();
   try {
     const raw = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
     const customList = raw ? JSON.parse(raw) : [];
-    return deduplicateCoffees([...customList, ...builtinCatalog]);
+    return deduplicateCoffees([...customList, ...showcaseCoffees, ...builtinCatalog]);
   } catch (err) {
     console.warn('Error reading roaster registry from localStorage:', err);
-    return deduplicateCoffees([...builtinCatalog]);
+    return deduplicateCoffees([...showcaseCoffees, ...builtinCatalog]);
   }
 }
 

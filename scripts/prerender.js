@@ -26,51 +26,61 @@ const spa404Html = `<!doctype html>
     <script type="text/javascript">
       // GitHub Pages Single Page App Redirect
       // Preserves deep subpaths, roaster slugs, and query parameters on GitHub Pages static hosting
-      var l = window.location;
+      (function() {
+        var l = window.location;
 
-      // Do not redirect static assets or media (prevents executing 404 HTML as JS module)
-      if (/\\.(js|css|png|jpg|jpeg|svg|webp|json|woff2|ico|wav|mp3|zip)$/i.test(l.pathname)) {
-        return;
-      }
-
-      // Loop prevention: avoid endless redirection cycles
-      var redirectKey = 'thebrew_last_404_url';
-      var lastRedirect = sessionStorage.getItem(redirectKey);
-      if (lastRedirect === l.href) {
-        sessionStorage.removeItem(redirectKey);
-        return;
-      }
-      sessionStorage.setItem(redirectKey, l.href);
-
-      var pathSegmentsToKeep = l.pathname.startsWith('/brewed') ? 1 : 0;
-      var repoBase = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
-      var rawRoute = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/');
-      var routePath = rawRoute.replace(/&/g, '~and~');
-      var search = l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '';
-
-      // Direct roasters route recovery: redirect to physical /roasters/ folder with query parameter
-      if (rawRoute.indexOf('roasters/') === 0) {
-        var roasterSlug = rawRoute.split('/')[1] || '';
-        if (roasterSlug && !['showcase', 'partner', 'info', 'registered'].includes(roasterSlug.toLowerCase())) {
-          var queryPrefix = l.search ? l.search + '&roaster=' + encodeURIComponent(roasterSlug) : '?roaster=' + encodeURIComponent(roasterSlug);
-          l.replace(
-            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-            repoBase + '/roasters/' + queryPrefix + l.hash
-          );
+        // Do not redirect static assets or media (prevents executing 404 HTML as JS module)
+        if (/\\.(js|css|png|jpg|jpeg|svg|webp|json|woff2|ico|wav|mp3|zip)$/i.test(l.pathname)) {
           return;
         }
-      }
 
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        repoBase + '/?/' + routePath + search + l.hash
-      );
+        // Loop prevention: avoid endless redirection cycles
+        try {
+          var redirectKey = 'thebrew_last_404_url';
+          var lastRedirect = sessionStorage.getItem(redirectKey);
+          if (lastRedirect === l.href) {
+            sessionStorage.removeItem(redirectKey);
+            return;
+          }
+          sessionStorage.setItem(redirectKey, l.href);
+        } catch (storageErr) {
+          // Ignore storage restrictions in private browsing
+        }
+
+        var pathSegmentsToKeep = l.pathname.startsWith('/brewed') ? 1 : 0;
+        var repoBase = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
+        var rawRoute = l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/');
+        var routePath = rawRoute.replace(/&/g, '~and~');
+        var search = l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '';
+
+        // Direct roasters route recovery: redirect to physical /roasters/ folder with query parameter
+        if (rawRoute.indexOf('roasters/') === 0) {
+          var roasterSlug = rawRoute.split('/')[1] || '';
+          if (roasterSlug && !['showcase', 'partner', 'info', 'registered'].includes(roasterSlug.toLowerCase())) {
+            var queryPrefix = l.search ? l.search + '&roaster=' + encodeURIComponent(roasterSlug) : '?roaster=' + encodeURIComponent(roasterSlug);
+            l.replace(
+              l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+              repoBase + '/roasters/' + queryPrefix + l.hash
+            );
+            return;
+          }
+        }
+
+        var targetUrl = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          repoBase + '/?/' + routePath + search + l.hash;
+
+        l.replace(targetUrl);
+      })();
     </script>
   </head>
-  <body style="background: #0A0604; color: #E7E5E4; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
-    <div style="text-align: center; padding: 24px;">
+  <body style="background: #0A0604; color: #E7E5E4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+    <div style="text-align: center; padding: 24px; max-width: 420px;">
       <div style="width: 36px; height: 36px; border: 3px solid #D4A373; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
-      <p style="font-family: monospace; font-size: 13px; color: #D4A373; letter-spacing: 0.05em;">Connecting to Roaster Portfolio...</p>
+      <p style="font-family: monospace; font-size: 14px; color: #D4A373; letter-spacing: 0.05em; margin: 0 0 6px 0;">Connecting to The Brew App...</p>
+      <p style="font-size: 12px; color: #A1A1AA; margin: 0 0 16px 0;">Dialing in your roast extraction parameters</p>
+      <noscript>
+        <p style="font-size: 13px; color: #E7E5E4;"><a href="/" style="color: #D4A373; text-decoration: underline;">Click here to continue to The Brew App</a></p>
+      </noscript>
     </div>
     <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
   </body>
@@ -716,19 +726,30 @@ const baseSubPaths = [
 const beanSlugs = new Set();
 (VERIFIED_BEAN_CATALOG || []).forEach(b => {
   if (b.id) {
-    const slug = b.id.replace(/^sku_/, '').replace(/_/g, '-');
-    beanSlugs.add(`r/${slug}`);
+    beanSlugs.add(`r/${b.id}`);
+    beanSlugs.add(`r/${b.id.replace(/_/g, '-')}`);
+    beanSlugs.add(`r/${b.id.replace(/^sku_/, '')}`);
+    beanSlugs.add(`r/${b.id.replace(/^sku_/, '').replace(/_/g, '-')}`);
+  }
+  if (b.upc) {
+    beanSlugs.add(`r/${b.upc}`);
   }
   if (b.beanName) {
     const nameSlug = b.beanName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     beanSlugs.add(`r/${nameSlug}`);
   }
 });
-Object.values(SHOWCASE_ROASTERS || {}).forEach(r => {
+const allShowcaseList = Array.isArray(SHOWCASE_ROASTERS) ? SHOWCASE_ROASTERS : Object.values(SHOWCASE_ROASTERS || {});
+allShowcaseList.forEach(r => {
   (r.coffees || []).forEach(c => {
     if (c.id) {
-      const slug = c.id.replace(/^sku_/, '').replace(/_/g, '-');
-      beanSlugs.add(`r/${slug}`);
+      beanSlugs.add(`r/${c.id}`);
+      beanSlugs.add(`r/${c.id.replace(/_/g, '-')}`);
+      beanSlugs.add(`r/${c.id.replace(/^sku_/, '')}`);
+      beanSlugs.add(`r/${c.id.replace(/^sku_/, '').replace(/_/g, '-')}`);
+    }
+    if (c.upc) {
+      beanSlugs.add(`r/${c.upc}`);
     }
     if (c.beanName) {
       const nameSlug = c.beanName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');

@@ -140,7 +140,7 @@ export function normalizeRecipeBean(data) {
   ];
 
   return {
-    id: `recipe_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    id: data.id || `recipe_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     isBagRecipe: true,
     roaster,
     beanName: coffee,
@@ -245,7 +245,7 @@ export function parseRecipePayload(input) {
           const coffeeIdQuery = params.get('c') || params.get('coffeeId');
           if (coffeeIdQuery) {
             const cleanQuery = coffeeIdQuery.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const registeredList = getRegisteredCoffees ? getRegisteredCoffees(VERIFIED_BEAN_CATALOG) : VERIFIED_BEAN_CATALOG;
+            const registeredList = getAllAvailableCoffees();
             const match = registeredList.find(b => {
               if (!b) return false;
               const cleanId = (b.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -256,25 +256,7 @@ export function parseRecipePayload(input) {
                   || (cleanName && (cleanName === cleanQuery || cleanQuery.includes(cleanName) || cleanName.includes(cleanQuery)));
             });
             if (match) {
-              return normalizeRecipeBean({
-                roaster: match.roaster,
-                coffee: match.beanName,
-                roast: match.roastLevel,
-                brewer: match.brewMethod,
-                ratio: match.recommendedRatio,
-                dose: 18.8,
-                water: Math.round(18.8 * (match.recommendedRatio || 16)),
-                temp_f: match.tempF,
-                grind: match.recommendedGrind,
-                total_time_sec: 210,
-                bloom_water: 60,
-                bloom_time_sec: 45,
-                notes: match.notes,
-                tasting_notes: match.tastingNotes,
-                origin: match.origin,
-                process: match.process,
-                elevation: match.elevation
-              });
+              return formatMatchedCoffeeRecipe(match);
             }
           }
 
@@ -310,7 +292,7 @@ export function parseRecipePayload(input) {
     const slug = raw.split('/r/')[1].split(/[?#]/)[0].toLowerCase().trim();
     if (slug) {
       const cleanSlug = slug.replace(/[^a-z0-9]/g, '');
-      const allCoffees = getRegisteredCoffees ? getRegisteredCoffees(VERIFIED_BEAN_CATALOG) : VERIFIED_BEAN_CATALOG;
+      const allCoffees = getAllAvailableCoffees();
       const match = allCoffees.find(b => {
         if (!b) return false;
         const cleanId = (b.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -323,28 +305,75 @@ export function parseRecipePayload(input) {
         return idMatch || upcMatch || nameMatch;
       });
       if (match) {
-        return normalizeRecipeBean({
-          roaster: match.roaster,
-          coffee: match.beanName,
-          roast: match.roastLevel,
-          brewer: match.brewMethod,
-          ratio: match.recommendedRatio,
-          dose: 18.8,
-          water: Math.round(18.8 * (match.recommendedRatio || 16)),
-          temp_f: match.tempF,
-          grind: match.recommendedGrind,
-          total_time_sec: 210,
-          bloom_water: 60,
-          bloom_time_sec: 45,
-          notes: match.notes,
-          tasting_notes: match.tastingNotes,
-          origin: match.origin,
-          process: match.process,
-          elevation: match.elevation
-        });
+        return formatMatchedCoffeeRecipe(match);
       }
     }
   }
 
   return null;
+}
+
+/**
+ * Retrieve all registered, showcase, and verified catalog coffees
+ */
+export function getAllAvailableCoffees() {
+  return getRegisteredCoffees ? getRegisteredCoffees(VERIFIED_BEAN_CATALOG) : VERIFIED_BEAN_CATALOG;
+}
+
+/**
+ * Normalizes a matched catalog coffee into authentic dial-in parameters
+ */
+export function formatMatchedCoffeeRecipe(match) {
+  if (!match) return null;
+
+  const ratio = parseFloat(match.recommendedRatio) || 16.0;
+  const dose = parseFloat(match.dryDoseGrams) || 18.8;
+  const water = parseFloat(match.waterGrams) || Math.round(dose * ratio);
+
+  let totalTimeSec = 210;
+  if (match.totalTimeSec) {
+    totalTimeSec = parseInt(match.totalTimeSec, 10);
+  } else if (match.brewTime) {
+    const mMatch = String(match.brewTime).match(/(\d+)\s*m(?:in)?\s*(\d*)\s*s?/i);
+    if (mMatch) {
+      totalTimeSec = parseInt(mMatch[1], 10) * 60 + (mMatch[2] ? parseInt(mMatch[2], 10) : 0);
+    }
+  }
+
+  let bloomWater = 60;
+  let bloomTimeSec = 45;
+  if (match.bloomWater) {
+    bloomWater = parseInt(match.bloomWater, 10);
+  } else if (match.pourSchedule?.[0]?.water) {
+    const bwMatch = String(match.pourSchedule[0].water).match(/(\d+)/);
+    if (bwMatch) bloomWater = parseInt(bwMatch[1], 10);
+  }
+  if (match.bloomTimeSec) {
+    bloomTimeSec = parseInt(match.bloomTimeSec, 10);
+  } else if (match.pourSchedule?.[0]?.time) {
+    const btMatch = String(match.pourSchedule[0].time).match(/0:00\s*-\s*0:(\d+)/);
+    if (btMatch) bloomTimeSec = parseInt(btMatch[1], 10);
+  }
+
+  return normalizeRecipeBean({
+    id: match.id,
+    roaster: match.roaster,
+    coffee: match.beanName,
+    roast: match.roastLevel,
+    brewer: match.brewMethod,
+    ratio: ratio,
+    dose: dose,
+    water: water,
+    temp_f: match.tempF,
+    temp_c: match.tempC,
+    grind: match.recommendedGrind,
+    total_time_sec: totalTimeSec,
+    bloom_water: bloomWater,
+    bloom_time_sec: bloomTimeSec,
+    notes: match.notes || match.description,
+    tasting_notes: match.tastingNotes,
+    origin: match.origin,
+    process: match.process,
+    elevation: match.elevation
+  });
 }
