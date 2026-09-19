@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import StepIndicator from './components/StepIndicator';
@@ -11,22 +11,25 @@ import MultiPhaseTimer from './components/MultiPhaseTimer';
 import KnowledgeBaseDrawer from './components/KnowledgeBaseDrawer';
 import DiagnosticsDrawer from './components/DiagnosticsDrawer';
 import BrewJournal from './components/BrewJournal';
-import RecipeBuilderModal from './components/RecipeBuilderModal';
 import UserProfileDashboard from './components/UserProfileDashboard';
 import GlobalSearchModal from './components/GlobalSearchModal';
 import AuthModal from './components/AuthModal';
-import CommunityHubModal from './components/CommunityHubModal';
 import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
 import ShopDrawer from './components/ShopDrawer';
 import WorldNewsSection from './components/WorldNewsSection';
-import BarcodeScannerModal from './components/BarcodeScannerModal';
-import WaterChemistryModal from './components/WaterChemistryModal';
-import RoasterPortalModal from './components/RoasterPortalModal';
 import RoasterInfoPage from './components/RoasterInfoPage';
 import RoasterProfilePage from './components/RoasterProfilePage';
-import CoffeeVideoAcademyModal from './components/CoffeeVideoAcademyModal';
 import ConsumerDiscoveryFeed from './components/ConsumerDiscoveryFeed';
 import CafePartnerPortal from './components/CafePartnerPortal';
+
+// Code-split heavy on-demand modals with React.lazy
+const BarcodeScannerModal = lazy(() => import('./components/BarcodeScannerModal'));
+const WaterChemistryModal = lazy(() => import('./components/WaterChemistryModal'));
+const RoasterPortalModal = lazy(() => import('./components/RoasterPortalModal'));
+const CoffeeVideoAcademyModal = lazy(() => import('./components/CoffeeVideoAcademyModal'));
+const RecipeBuilderModal = lazy(() => import('./components/RecipeBuilderModal'));
+const CommunityHubModal = lazy(() => import('./components/CommunityHubModal'));
+const VersionHistoryModal = lazy(() => import('./components/VersionHistoryModal'));
 import LearnSection from './components/LearnSection';
 import RecipeExplorer from './components/RecipeExplorer';
 import BrewCoffeeSelector from './components/BrewCoffeeSelector';
@@ -139,6 +142,7 @@ export default function App() {
   const [isRoasterInfoOpen, setIsRoasterInfoOpen] = useState(false);
   const [roasterPrefillBarcode, setRoasterPrefillBarcode] = useState('');
   const [roasterPrefillBean, setRoasterPrefillBean] = useState(null);
+  const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
   
   // Primary 5 Logical Application Areas: 'brew' | 'discover' | 'cafes' | 'learn' | 'my_coffee'
   const [currentArea, setCurrentArea] = useState(() => {
@@ -1310,24 +1314,97 @@ export default function App() {
             }}
           />
 
-          {/* Community Hub Modal */}
-          <CommunityHubModal
-            isOpen={isCommunityOpen}
-            onClose={() => setIsCommunityOpen(false)}
-            trackMode={trackMode}
-            currentUser={currentUser}
-            onOpenAuth={handleOpenAuth}
-            onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
-            onSelectRecipe={(recipe) => {
-              const allMethods = BREW_METHODS.coffee;
-              const match = allMethods.find(m => m.id === recipe.methodId);
-              if (match) {
-                handleSelectMethodFromGrid(match);
-              }
-              if (recipe.ratio) setCustomRatio(recipe.ratio);
-              setIsCommunityOpen(false);
-            }}
-          />
+          {/* Code-Split Lazy Loaded Interactive Modals */}
+          <Suspense fallback={null}>
+            {/* Community Hub Modal */}
+            <CommunityHubModal
+              isOpen={isCommunityOpen}
+              onClose={() => setIsCommunityOpen(false)}
+              trackMode={trackMode}
+              currentUser={currentUser}
+              onOpenAuth={handleOpenAuth}
+              onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
+              onSelectRecipe={(recipe) => {
+                const allMethods = BREW_METHODS.coffee;
+                const match = allMethods.find(m => m.id === recipe.methodId);
+                if (match) {
+                  handleSelectMethodFromGrid(match);
+                }
+                if (recipe.ratio) setCustomRatio(recipe.ratio);
+                setIsCommunityOpen(false);
+              }}
+            />
+
+            {/* Recipe Builder Modal */}
+            <RecipeBuilderModal
+              isOpen={isRecipeBuilderOpen}
+              onClose={() => setIsRecipeBuilderOpen(false)}
+              trackMode={trackMode}
+            />
+
+            {/* Native Camera Barcode & QR Scanner Modal */}
+            <BarcodeScannerModal
+              isOpen={isScannerOpen}
+              onClose={() => {
+                setIsScannerOpen(false);
+                if (location.pathname.includes('smart-bag-scanner') || location.pathname.startsWith('/demo') || location.pathname.startsWith('/scanner') || location.pathname.startsWith('/scan')) {
+                  navigate('/', { replace: true });
+                }
+              }}
+              onApplyRecipe={handleApplyScannedRecipe}
+              onSaveToJournal={handleSaveScannedToJournal}
+              onOpenRoasterPortal={(code, bean) => {
+                setRoasterPrefillBarcode(typeof code === 'string' ? code : '');
+                setRoasterPrefillBean(bean || null);
+                setIsRoasterPortalOpen(true);
+              }}
+              onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
+            />
+
+            {/* Specialty Roaster Partner Portal & Smart Bag Packaging Generator Modal */}
+            <RoasterPortalModal
+              isOpen={isRoasterPortalOpen}
+              onClose={() => {
+                setIsRoasterPortalOpen(false);
+                setRoasterPrefillBarcode('');
+                setRoasterPrefillBean(null);
+              }}
+              prefilledBarcode={roasterPrefillBarcode}
+              prefilledBean={roasterPrefillBean}
+              onSelectBeanToBrew={handleApplyScannedRecipe}
+              onNavigateToRoaster={(slug) => {
+                setCurrentArea('discover');
+                setSelectedRoasterSlug(slug);
+                navigate(`/roasters/${slug}`);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              currentUser={currentUser}
+              onOpenAuth={handleOpenAuth}
+            />
+
+            {/* Coffee Water Chemistry Lab Modal */}
+            <WaterChemistryModal
+              isOpen={isWaterLabOpen}
+              onClose={() => setIsWaterLabOpen(false)}
+            />
+
+            {/* YouTube-Powered Coffee Video Academy & Masterclass Hub */}
+            <CoffeeVideoAcademyModal
+              isOpen={isVideoAcademyOpen}
+              onClose={() => {
+                setIsVideoAcademyOpen(false);
+                setSelectedAcademyVideoId(null);
+              }}
+              onBrewWithVideo={handleBrewWithVideo}
+              initialVideoId={selectedAcademyVideoId}
+            />
+
+            {/* Version Control & Build History Modal */}
+            <VersionHistoryModal
+              isOpen={isVersionHistoryOpen}
+              onClose={() => setIsVersionHistoryOpen(false)}
+            />
+          </Suspense>
 
           {/* Barista User Profile Modal */}
           <UserProfileDashboard
@@ -1341,13 +1418,6 @@ export default function App() {
               setIsRoasterPortalOpen(true);
             }}
             onLogout={() => setCurrentUser(null)}
-          />
-
-          {/* Recipe Builder Modal */}
-          <RecipeBuilderModal
-            isOpen={isRecipeBuilderOpen}
-            onClose={() => setIsRecipeBuilderOpen(false)}
-            trackMode={trackMode}
           />
 
           {/* Sign In / Auth Modal */}
@@ -1372,25 +1442,6 @@ export default function App() {
             trackMode={trackMode}
           />
 
-          {/* Native Camera Barcode & QR Scanner Modal */}
-          <BarcodeScannerModal
-            isOpen={isScannerOpen}
-            onClose={() => {
-              setIsScannerOpen(false);
-              if (location.pathname.includes('smart-bag-scanner') || location.pathname.startsWith('/demo') || location.pathname.startsWith('/scanner') || location.pathname.startsWith('/scan')) {
-                navigate('/', { replace: true });
-              }
-            }}
-            onApplyRecipe={handleApplyScannedRecipe}
-            onSaveToJournal={handleSaveScannedToJournal}
-            onOpenRoasterPortal={(code, bean) => {
-              setRoasterPrefillBarcode(typeof code === 'string' ? code : '');
-              setRoasterPrefillBean(bean || null);
-              setIsRoasterPortalOpen(true);
-            }}
-            onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
-          />
-
           {/* Specialty Roaster Partner Information & Contact HQ Page */}
           <RoasterInfoPage
             isOpen={isRoasterInfoOpen}
@@ -1401,44 +1452,6 @@ export default function App() {
             }}
           />
 
-          {/* Specialty Roaster Partner Portal & Smart Bag Packaging Generator Modal */}
-          <RoasterPortalModal
-            isOpen={isRoasterPortalOpen}
-            onClose={() => {
-              setIsRoasterPortalOpen(false);
-              setRoasterPrefillBarcode('');
-              setRoasterPrefillBean(null);
-            }}
-            prefilledBarcode={roasterPrefillBarcode}
-            prefilledBean={roasterPrefillBean}
-            onSelectBeanToBrew={handleApplyScannedRecipe}
-            onNavigateToRoaster={(slug) => {
-              setCurrentArea('discover');
-              setSelectedRoasterSlug(slug);
-              navigate(`/roasters/${slug}`);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            currentUser={currentUser}
-            onOpenAuth={handleOpenAuth}
-          />
-
-          {/* Coffee Water Chemistry Lab Modal */}
-          <WaterChemistryModal
-            isOpen={isWaterLabOpen}
-            onClose={() => setIsWaterLabOpen(false)}
-          />
-
-          {/* YouTube-Powered Coffee Video Academy & Masterclass Hub */}
-          <CoffeeVideoAcademyModal
-            isOpen={isVideoAcademyOpen}
-            onClose={() => {
-              setIsVideoAcademyOpen(false);
-              setSelectedAcademyVideoId(null);
-            }}
-            onBrewWithVideo={handleBrewWithVideo}
-            initialVideoId={selectedAcademyVideoId}
-          />
-
         </main>
 
         {/* Contact HQ Email & App Footer */}
@@ -1447,6 +1460,7 @@ export default function App() {
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
           onOpenRoasterShowcase={handleOpenRoasterShowcase}
           onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
+          onOpenVersionHistory={() => setIsVersionHistoryOpen(true)}
         />
 
         {/* Mobile Sticky 1-Thumb Bottom Navigation Bar */}

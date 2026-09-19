@@ -76,18 +76,20 @@ export default function RoasterProfilePage({
   const [coffeeViewMode, setCoffeeViewMode] = useState('specs'); // 'specs' | 'labels' | 'split'
   const [cardLabelFlipMap, setCardLabelFlipMap] = useState({});
   const [activeLabelModalCoffee, setActiveLabelModalCoffee] = useState(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
-  // Keyboard accessibility: close label modal on Escape key
+  // Keyboard accessibility: close modals on Escape key
   useEffect(() => {
-    if (!activeLabelModalCoffee) return;
+    if (!activeLabelModalCoffee && !isVideoModalOpen) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         setActiveLabelModalCoffee(null);
+        setIsVideoModalOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeLabelModalCoffee]);
+  }, [activeLabelModalCoffee, isVideoModalOpen]);
 
   let orchestrator = null;
   try {
@@ -399,6 +401,15 @@ export default function RoasterProfilePage({
                 >
                   <Store className="w-3.5 h-3.5 text-amber-400" />
                   <span>Showcase Roaster Profile</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsVideoModalOpen(true)}
+                  className="px-3 py-1 rounded-full bg-red-600/20 hover:bg-red-600/30 text-red-300 font-mono text-xs font-bold border border-red-500/40 flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                  title="Watch 60-Second Video Demo Walkthrough"
+                >
+                  <Play className="w-3.5 h-3.5 text-red-400 fill-current" />
+                  <span>Watch Video</span>
                 </button>
               </>
             )}
@@ -1521,6 +1532,59 @@ export default function RoasterProfilePage({
             if (orchestrator) orchestrator.brew(payload);
           }}
         />
+      )}
+
+      {/* 60-Second Video Walkthrough Theater Modal */}
+      {isVideoModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer animate-fade-in"
+          onClick={() => setIsVideoModalOpen(false)}
+        >
+          <div 
+            className="relative max-w-sm w-full bg-[#14110E] border border-amber-gold/50 rounded-3xl overflow-hidden shadow-2xl flex flex-col cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/40 gap-2">
+              <span className="text-xs font-mono font-bold text-amber-gold flex items-center gap-1.5">
+                <Play className="w-3.5 h-3.5 fill-current text-red-400" />
+                <span>60s Partner & Smart Bag Walkthrough</span>
+              </span>
+              <button 
+                type="button"
+                onClick={() => setIsVideoModalOpen(false)} 
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white transition cursor-pointer"
+                title="Close Video (Esc)"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="relative aspect-[9/16] w-full bg-black flex items-center justify-center">
+              <video
+                src={getAssetUrl('/videos/smart_bag_scan_demo.mp4')}
+                controls
+                autoPlay
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-cover"
+              >
+                <source src={getAssetUrl('/videos/smart_bag_scan_demo.mp4')} type="video/mp4" />
+                <source src={getAssetUrl('/videos/roasters_and_cafes_partner_walkthrough.mp4')} type="video/mp4" />
+                Your browser does not support HTML5 video playback.
+              </video>
+            </div>
+            <div className="p-3.5 bg-black/60 text-center border-t border-white/10 space-y-2">
+              <p className="text-xs text-stone-200 font-mono font-bold">From 300 DPI Label to Dialed-In Extraction</p>
+              <p className="text-[11px] text-amber-gold/80 font-mono">Camera Barcode Scan • Live Water Slurry Timer</p>
+              <button
+                type="button"
+                onClick={() => setIsVideoModalOpen(false)}
+                className="w-full py-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs font-bold border border-white/10 transition cursor-pointer"
+              >
+                Close Video
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>

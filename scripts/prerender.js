@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { BREW_METHODS } from '../src/data/brewData.js';
+import { VERIFIED_BEAN_CATALOG } from '../src/data/verifiedBeans.js';
+import { SHOWCASE_ROASTERS } from '../src/data/roasterShowcaseData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -680,7 +682,7 @@ fs.writeFileSync(path.join(infoRootDir, 'index.html'), partnerHtml);
 console.log('✓ Successfully prerendered /roasters, /roasters/partner, and /roasters/info!');
 
 // Prerender /demo/smart-bag-scanner, /scanner, /r, /academy, /recipes, /learn, /shops, /local, and roaster routes
-[
+const baseSubPaths = [
   'r',
   'demo/smart-bag-scanner',
   'scanner',
@@ -708,7 +710,34 @@ console.log('✓ Successfully prerendered /roasters, /roasters/partner, and /roa
   'roasters/stumptown-coffee-roasters',
   'roasters/heart',
   'roasters/proud-mary'
-].forEach((subPath) => {
+];
+
+// Dynamically generate prerender paths for all catalog coffees under /r/{slug}
+const beanSlugs = new Set();
+(VERIFIED_BEAN_CATALOG || []).forEach(b => {
+  if (b.id) {
+    const slug = b.id.replace(/^sku_/, '').replace(/_/g, '-');
+    beanSlugs.add(`r/${slug}`);
+  }
+  if (b.beanName) {
+    const nameSlug = b.beanName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    beanSlugs.add(`r/${nameSlug}`);
+  }
+});
+Object.values(SHOWCASE_ROASTERS || {}).forEach(r => {
+  (r.coffees || []).forEach(c => {
+    if (c.id) {
+      const slug = c.id.replace(/^sku_/, '').replace(/_/g, '-');
+      beanSlugs.add(`r/${slug}`);
+    }
+    if (c.beanName) {
+      const nameSlug = c.beanName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      beanSlugs.add(`r/${nameSlug}`);
+    }
+  });
+});
+
+[...baseSubPaths, ...Array.from(beanSlugs)].forEach((subPath) => {
   const targetDistDir = path.join(distDir, ...subPath.split('/'));
   const targetRootDir = path.join(rootDir, ...subPath.split('/'));
   fs.mkdirSync(targetDistDir, { recursive: true });
@@ -716,7 +745,7 @@ console.log('✓ Successfully prerendered /roasters, /roasters/partner, and /roa
   fs.writeFileSync(path.join(targetDistDir, 'index.html'), templateHtml);
   fs.writeFileSync(path.join(targetRootDir, 'index.html'), templateHtml);
 });
-console.log('✓ Successfully prerendered /demo/smart-bag-scanner, /scanner, /academy, /recipes, /learn, /shops, and roaster showcase routes!');
+console.log(`✓ Successfully prerendered static routes and ${beanSlugs.size} /r/ smart sticker routes!`);
 
 // Mirror /static and all prerendered directories into /brewed for GitHub Pages subpath compatibility
 const brewedDir = path.join(distDir, 'brewed');
@@ -732,6 +761,12 @@ const distRoasters = path.join(distDir, 'roasters');
 const brewedRoasters = path.join(brewedDir, 'roasters');
 if (fs.existsSync(distRoasters)) {
   fs.cpSync(distRoasters, brewedRoasters, { recursive: true });
+}
+
+const distR = path.join(distDir, 'r');
+const brewedR = path.join(brewedDir, 'r');
+if (fs.existsSync(distR)) {
+  fs.cpSync(distR, brewedR, { recursive: true });
 }
 
 const distZip = path.join(distDir, 'coffee_brew_timer.zip');

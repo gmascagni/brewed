@@ -26,7 +26,7 @@ export default function AuthModal({
   const [username, setUsername] = useState(currentUser?.username || '');
   const [displayName, setDisplayName] = useState(currentUser?.displayName || '');
   const [bio, setBio] = useState(currentUser?.bio || '');
-  const [avatar, setAvatar] = useState((currentUser?.avatar && currentUser.avatar !== '/') ? currentUser.avatar : (currentUser?.role === 'roaster' || initialRole === 'roaster') ? '/avatar_roast_master_emblem.jpg' : AVATAR_PRESETS[0].url);
+  const [avatar, setAvatar] = useState((currentUser?.avatar && currentUser.avatar !== '/') ? currentUser.avatar : (currentUser?.role === 'roaster' || initialRole === 'roaster') ? '/avatar_roast_beans.jpg' : AVATAR_PRESETS[0].url);
   const [activeAvatarFailed, setActiveAvatarFailed] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +50,7 @@ export default function AuthModal({
       if (initialRole === 'roaster' || currentUser?.role === 'roaster') {
         setAccountType('roaster');
         if (!avatar || avatar === AVATAR_PRESETS[0].url) {
-          setAvatar('/avatar_roast_master_emblem.jpg');
+          setAvatar('/avatar_roast_beans.jpg');
         }
       } else {
         setAccountType(currentUser?.role || 'user');
@@ -158,7 +158,7 @@ export default function AuthModal({
               email: cleanEmail,
               location: '',
               story: bio.trim() || `Specialty coffee roaster crafted with precision. Verified brand profile on The Brew App.`,
-              logo: avatar || '/avatar_roast_master_emblem.jpg',
+              logo: avatar || '/avatar_roast_beans.jpg',
               ownerEmail: cleanEmail,
               ownerUid: roasterUser.uid
             }, roasterUser);
@@ -212,7 +212,7 @@ export default function AuthModal({
           roasterName: roasterName.trim() || currentUser.roasterName,
           displayName: displayName.trim() || roasterName.trim() || cleanEmail.split('@')[0],
           bio: bio.trim() || currentUser.bio,
-          avatar: avatar || currentUser.avatar || '/avatar_roast_master_emblem.jpg',
+          avatar: avatar || currentUser.avatar || '/avatar_roast_beans.jpg',
           role: 'roaster',
           isVerifiedRoaster: true
         };

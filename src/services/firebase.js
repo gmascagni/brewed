@@ -137,7 +137,7 @@ export async function registerRoasterAccount({ email, password, roasterName, dis
     roasterName: cleanRoasterName,
     roasterSlug: slug,
     isVerifiedRoaster: true,
-    avatar: '/avatar_roast_master_emblem.jpg',
+    avatar: '/avatar_roast_beans.jpg',
     createdAt: new Date().toISOString()
   };
 
@@ -238,7 +238,7 @@ export async function signInRoasterAccount({ email, password }) {
     roasterName,
     roasterSlug: slug,
     isVerifiedRoaster: true,
-    avatar: '/avatar_roast_master_emblem.jpg'
+    avatar: '/avatar_roast_beans.jpg'
   };
 }
 

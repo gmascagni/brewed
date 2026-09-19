@@ -3,7 +3,7 @@ import { Mail, ExternalLink, Store, Tv } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 import { getAssetUrl } from '../utils/assetUrl';
 
-export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpenRoasterShowcase, onOpenVideoAcademy }) {
+export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpenRoasterShowcase, onOpenVideoAcademy, onOpenVersionHistory }) {
   const isCoffee = trackMode === 'coffee';
   const emailAddress = 'clay@thebrew.app';
 
@@ -20,6 +20,19 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
           <span>© {new Date().getFullYear()} The Brew App. All rights reserved.</span>
           <span className="hidden sm:inline text-[#A89F91]">•</span>
           <span className="text-[#A89F91]">Digital Trail Labs LLC</span>
+          {onOpenVersionHistory && (
+            <>
+              <span className="hidden sm:inline text-[#A89F91]">•</span>
+              <button
+                type="button"
+                onClick={onOpenVersionHistory}
+                className="px-2 py-0.5 rounded-full bg-[#ECE6DC] hover:bg-[#D69550]/20 text-[#A25A24] text-[10px] font-mono font-bold border border-[#D8CFC4] transition cursor-pointer self-start sm:self-auto"
+                title="View Release & Version History"
+              >
+                v1.5.0
+              </button>
+            </>
+          )}
         </div>
 
         {/* Action Group */}
