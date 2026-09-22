@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Coffee, QrCode, ArrowRight, Trash2 } from 'lucide-react';
+import { Download, Coffee, QrCode, ArrowRight, Trash2, Plus, Edit3 } from 'lucide-react';
 import { exportRoasterCatalogJson } from '../../data/roasterRegistry';
 
 export default function RoasterCatalogTab({
@@ -7,6 +7,8 @@ export default function RoasterCatalogTab({
   currentUser,
   setActiveTab,
   setSelectedCoffeeForSticker,
+  onStartNewLot = null,
+  onEditCoffee = null,
   orchestrator,
   onSelectBeanToBrew,
   onClose,
@@ -25,6 +27,16 @@ export default function RoasterCatalogTab({
         </div>
 
         <div className="flex items-center gap-2">
+          {onStartNewLot && (
+            <button
+              onClick={onStartNewLot}
+              className="px-3.5 py-1.5 rounded-lg bg-amber-gold hover:bg-amber-400 text-espresso-950 font-mono text-xs font-bold flex items-center gap-1.5 shadow transition cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>+ Add New Coffee Lot</span>
+            </button>
+          )}
+
           <button
             onClick={exportRoasterCatalogJson}
             className="px-3 py-1.5 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] text-cream-light font-mono text-xs flex items-center gap-1.5 border border-white/15 cursor-pointer"
@@ -45,10 +57,11 @@ export default function RoasterCatalogTab({
             Click "Onboard Coffee & Recipe" to register your first lot, set your barista dial-in recipe, and generate your Smart Bag QR sticker.
           </p>
           <button
-            onClick={() => setActiveTab('onboard')}
-            className="px-4 py-2 rounded-xl bg-amber-gold text-espresso-950 font-mono text-xs font-bold uppercase cursor-pointer"
+            onClick={onStartNewLot || (() => setActiveTab('onboard'))}
+            className="px-4 py-2 rounded-xl bg-amber-gold text-espresso-950 font-mono text-xs font-bold uppercase cursor-pointer inline-flex items-center gap-1.5 shadow"
           >
-            Onboard First Coffee
+            <Plus className="w-3.5 h-3.5" />
+            <span>Onboard First Coffee</span>
           </button>
         </div>
       ) : (
@@ -84,18 +97,31 @@ export default function RoasterCatalogTab({
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2">
-                <button
-                  onClick={() => {
-                    setSelectedCoffeeForSticker(c);
-                    setActiveTab('sticker');
-                  }}
-                  className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-[11px] font-mono text-cream-light flex items-center gap-1 border border-white/10 cursor-pointer"
-                  title="Open Smart Bag QR Studio"
-                >
-                  <QrCode className="w-3.5 h-3.5 text-amber-gold" />
-                  <span>QR Studio</span>
-                </button>
+              <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => {
+                      setSelectedCoffeeForSticker(c);
+                      setActiveTab('sticker');
+                    }}
+                    className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-[11px] font-mono text-cream-light flex items-center gap-1 border border-white/10 cursor-pointer"
+                    title="Open Smart Bag QR Studio"
+                  >
+                    <QrCode className="w-3.5 h-3.5 text-amber-gold" />
+                    <span>QR Studio</span>
+                  </button>
+
+                  {onEditCoffee && (
+                    <button
+                      onClick={() => onEditCoffee(c)}
+                      className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-[11px] font-mono text-amber-gold flex items-center gap-1 border border-amber-gold/30 cursor-pointer transition"
+                      title="Edit Lot Details, Grind & Recipe"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Edit Lot</span>
+                    </button>
+                  )}
+                </div>
 
                 <div className="flex items-center gap-1.5">
                   <button

@@ -25,16 +25,20 @@ export default function MyCoffeeHub({
   cupCount,
   cupMl,
   customRatio,
+  customWaterMl = null,
+  customGrind = null,
   unitSystem = 'imperial',
   currentUser,
   onOpenAuth,
   onOpenScanner,
   onOpenRecipeBuilder,
   onSelectRecipeToBrew,
+  onSelectRecipe,
   onBrewAgain,
   onOpenRoasterPortal,
   initialTab = 'journal'
 }) {
+  const handleRecipeSelect = onSelectRecipeToBrew || onSelectRecipe;
   const [activeTab, setActiveTab] = useState(initialTab); // 'journal' | 'recipes' | 'profile' | 'tools'
 
   const handleTabChange = (tabId) => {
@@ -140,6 +144,8 @@ export default function MyCoffeeHub({
               cupCount={cupCount}
               cupMl={cupMl}
               customRatio={customRatio}
+              customGrind={customGrind}
+              customWaterMl={customWaterMl}
               unitSystem={unitSystem}
               onOpenScanner={onOpenScanner}
               onBrewAgain={onBrewAgain}
@@ -153,7 +159,7 @@ export default function MyCoffeeHub({
             <RecipeExplorer
               trackMode={trackMode}
               onOpenRecipeBuilder={onOpenRecipeBuilder}
-              onSelectRecipe={onSelectRecipeToBrew}
+              onSelectRecipe={handleRecipeSelect}
             />
           </div>
         )}

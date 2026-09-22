@@ -39,6 +39,7 @@ import V60ProTipModal from './V60ProTipModal';
 import { logBrewSession } from '../utils/journalStorage';
 import { getSavedGrinderId, getGrinderSetting } from '../data/grinderProfiles';
 import { calculateClosedLoopDialIn, formatSecondsToMmSs, METHOD_DRAWDOWN_TARGETS } from '../utils/dialInEngine';
+import { resolveGrindId } from './GrindVisualGuide';
 
 export default function MultiPhaseTimer({ 
   trackMode, 
@@ -52,7 +53,8 @@ export default function MultiPhaseTimer({
   dialedInCoffee = null,
   totalWaterMl = null,
   customRatio = null,
-  onApplyNextBrewTweak = null
+  onApplyNextBrewTweak = null,
+  customGrind = null
 }) {
   const isCoffee = trackMode === 'coffee';
 
@@ -71,8 +73,8 @@ export default function MultiPhaseTimer({
 
   // Scaled dynamic phases based on active dose
   const phases = useMemo(() => {
-    return rawPhases.map((phase, idx) => {
-      const isBloom = idx === 0 || (phase.name && phase.name.toLowerCase().includes('bloom'));
+    return rawPhases.map((phase) => {
+      const isBloom = Boolean(phase.name && phase.name.toLowerCase().includes('bloom'));
       if (isBloom && isCoffee) {
         return {
           ...phase,
@@ -128,7 +130,7 @@ export default function MultiPhaseTimer({
     const savedGrinderId = getSavedGrinderId();
     const ratio = customRatio || activeMethod?.ratio || 16;
     const tempF = dialedInCoffee?.tempF || activeMethod?.tempF || 204;
-    const currentGrind = dialedInCoffee?.recommendedGrind || activeMethod?.grind || 'Medium-Fine';
+    const currentGrind = dialedInCoffee?.recommendedGrind || dialedInCoffee?.grindSetting || customGrind || activeMethod?.grind || 'Medium-Fine';
 
     return calculateClosedLoopDialIn({
       methodId: activeMethod?.id || 'pour_over',
@@ -139,7 +141,7 @@ export default function MultiPhaseTimer({
       currentGrindSetting: currentGrind,
       grinderId: savedGrinderId
     });
-  }, [isCompleted, tasteFeedback, actualDrawdownSec, customRatio, activeMethod, dialedInCoffee]);
+  }, [isCompleted, tasteFeedback, actualDrawdownSec, customRatio, activeMethod, dialedInCoffee, customGrind]);
 
   // Local muted state synced with prop
   const [localMuted, setLocalMuted] = useState(isMuted ?? false);
@@ -206,7 +208,7 @@ export default function MultiPhaseTimer({
   const activePhase = phases[currentPhaseIndex] || phases[0] || defaultPhases[0];
   const totalPhaseTime = activePhase?.durationSec || 60;
 
-  const isBloomPhase = (currentPhaseIndex === 0 || activePhase?.name?.toLowerCase().includes('bloom')) && isCoffee;
+  const isBloomPhase = Boolean(activePhase?.name?.toLowerCase().includes('bloom')) && isCoffee;
 
   const targetPhaseWaterMl = (() => {
     if (!isCoffee) return null;
@@ -214,10 +216,18 @@ export default function MultiPhaseTimer({
       return bloomMetrics.targetWaterGrams;
     }
     if (activePhase?.waterGrams) {
+      // If totalWaterMl was customized/scaled, scale step water proportionally if applicable
+      if (totalWaterMl && rawPhases.length > 0) {
+        const maxStepWater = Math.max(...rawPhases.map(p => Number(p.waterGrams) || 0));
+        if (maxStepWater > 0 && Math.abs(totalWaterMl - maxStepWater) > 1) {
+          return Math.round((Number(activePhase.waterGrams) / maxStepWater) * totalWaterMl);
+        }
+      }
       return activePhase.waterGrams;
     }
-    if (activePhase?.waterMultiplier && effectiveDose) {
-      return Math.round(effectiveDose * (activeMethod?.ratio || 16) * (activePhase.waterMultiplier || 1));
+    if (activePhase?.waterMultiplier) {
+      const baseWater = totalWaterMl || (effectiveDose * (customRatio || activeMethod?.ratio || 16));
+      return Math.round(baseWater * (activePhase.waterMultiplier || 1));
     }
     return null;
   })();
@@ -294,6 +304,8 @@ export default function MultiPhaseTimer({
       ];
     }
 
+    const activeGrindStr = dialedInCoffee?.recommendedGrind || dialedInCoffee?.grindSetting || customGrind || activeMethod?.grind || 'Medium-Fine';
+
     if (['pour_over', 'chemex', 'classic_pour_over', 'drip_brewer', 'kalita_wave'].includes(methodId)) {
       return [
         {
@@ -318,7 +330,7 @@ export default function MultiPhaseTimer({
         {
           id: 'dose_tare',
           title: 'Add Coffee Bed & Tare Scale',
-          description: `Add ${effectiveDose}g ${activeMethod?.grind || 'Medium-Fine'} grounds, level the bed, make a slight center divot, and zero digital scale.`,
+          description: `Add ${effectiveDose}g ${activeGrindStr} grounds, level the bed, make a slight center divot, and zero digital scale.`,
           tag: 'Precision'
         }
       ];
@@ -463,7 +475,7 @@ export default function MultiPhaseTimer({
         }
       ];
     }
-  }, [activeMethod?.id, activeMethod?.name, activeMethod?.grind, activeMethod?.tempF, activeMethod?.tempC, isCoffee, effectiveDose]);
+  }, [activeMethod?.id, activeMethod?.name, activeMethod?.grind, activeMethod?.tempF, activeMethod?.tempC, isCoffee, effectiveDose, customGrind, dialedInCoffee]);
 
   const completedPreBrewCount = useMemo(() => {
     return preBrewTasks.filter(t => checkedPreBrewTasks[t.id]).length;
@@ -791,7 +803,9 @@ export default function MultiPhaseTimer({
 
   const handleSaveToLog = () => {
     const savedGrinderId = getSavedGrinderId();
-    const grindSetting = getGrinderSetting(savedGrinderId, activeMethod?.id === 'espresso' ? 'extra_fine' : activeMethod?.id === 'french_press' ? 'coarse' : 'medium_fine');
+    const effectiveGrind = dialedInCoffee?.recommendedGrind || dialedInCoffee?.grindSetting || customGrind || activeMethod?.grind || 'Medium-Fine';
+    const resolvedGrindId = resolveGrindId(effectiveGrind, activeMethod?.id);
+    const grindSetting = getGrinderSetting(savedGrinderId, resolvedGrindId);
     const ratio = customRatio || activeMethod?.ratio || 16;
     const water = totalWaterMl || Math.round(effectiveDose * ratio);
     const remedyText = dialInDiagnosis?.recommendationText || (tasteFeedback === 'sour'
@@ -812,7 +826,7 @@ export default function MultiPhaseTimer({
       waterMl: water,
       ratio: ratio,
       tempF: dialInDiagnosis?.recipePatch?.tempF || activeMethod?.tempF || 202,
-      grindName: activeMethod?.grind || 'Medium-Fine',
+      grindName: effectiveGrind,
       grinderModel: grindSetting.grinderName,
       grinderSetting: grindSetting.setting,
       tasteFeedback: tasteFeedback || 'skipped',

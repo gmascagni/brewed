@@ -8,29 +8,23 @@ import {
   getGrinderSetting 
 } from '../data/grinderProfiles';
 
-export default function GrindVisualGuide({ activeMethod }) {
-  const [selectedGrindId, setSelectedGrindId] = useState('medium_fine');
+import { resolveGrindId } from '../utils/grindUtils';
+export { resolveGrindId };
+
+export default function GrindVisualGuide({ activeMethod, targetGrind = null, recipeName = null, onSelectGrind = null }) {
+  const [selectedGrindId, setSelectedGrindId] = useState(() => resolveGrindId(targetGrind || activeMethod?.grind, activeMethod?.id));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedGrinderId, setSelectedGrinderId] = useState(getSavedGrinderId);
 
-  // Automatically sync preselected grind when activeMethod changes
+  // Automatically sync preselected grind when activeMethod or targetGrind changes
   useEffect(() => {
-    if (!activeMethod) return;
-    const methodId = activeMethod.id;
-    if (methodId === 'french_press') setSelectedGrindId('coarse');
-    else if (methodId === 'espresso') setSelectedGrindId('extra_fine');
-    else if (methodId === 'moka_pot') setSelectedGrindId('fine');
-    else if (methodId === 'drip_brewer') setSelectedGrindId('medium');
-    else if (methodId === 'pour_over' || methodId === 'classic_pour_over') setSelectedGrindId('medium_fine');
-    else if (methodId === 'aeropress') setSelectedGrindId('medium_fine');
-    else if (activeMethod.grind) {
-      const g = activeMethod.grind.toLowerCase();
-      if (g.includes('coarse')) setSelectedGrindId('coarse');
-      else if (g.includes('extra fine')) setSelectedGrindId('extra_fine');
-      else if (g.includes('fine')) setSelectedGrindId('fine');
-      else if (g.includes('medium')) setSelectedGrindId('medium');
+    const grindToResolve = targetGrind || activeMethod?.grind;
+    const resolvedId = resolveGrindId(grindToResolve, activeMethod?.id);
+    setSelectedGrindId(resolvedId);
+    if (onSelectGrind) {
+      onSelectGrind(resolvedId);
     }
-  }, [activeMethod]);
+  }, [activeMethod, targetGrind]);
 
   const handleGrinderChange = (e) => {
     const nextId = e.target.value;
@@ -61,13 +55,20 @@ export default function GrindVisualGuide({ activeMethod }) {
             Burr Grinder Settings & Macro Texture Photos
           </h3>
           <p className="text-xs md:text-sm text-cream-soft/70 mt-1">
-            Preselected for {activeMethod?.name || 'Your Method'} • Click any Burr Grinder setting to inspect high-definition macro photos
+            Preselected for {recipeName ? `Recipe: ${recipeName}` : (activeMethod?.name || 'Your Method')} • Click any Burr Grinder setting to inspect high-definition macro photos
           </p>
         </div>
 
-        <span className="text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/40 shadow-inner">
-          Auto-Matched: {activeGrind.name}
-        </span>
+        <div className="flex flex-col sm:items-end gap-1">
+          <span className="text-xs font-extrabold px-3.5 py-1.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/40 shadow-inner">
+            {targetGrind ? `Recipe Target: ${activeGrind.name}` : `Auto-Matched: ${activeGrind.name}`}
+          </span>
+          {recipeName && (
+            <span className="text-[10px] font-mono text-amber-300/80">
+              Matched from {recipeName}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Interactive Grinder Model Dial-In Setting Banner */}
@@ -133,7 +134,10 @@ export default function GrindVisualGuide({ activeMethod }) {
           return (
             <div
               key={item.id}
-              onClick={() => setSelectedGrindId(item.id)}
+              onClick={() => {
+                setSelectedGrindId(item.id);
+                if (onSelectGrind) onSelectGrind(item.id);
+              }}
               className={`p-4 rounded-2xl border text-center transition-all duration-300 hover:-translate-y-1 shadow-xl cursor-pointer flex flex-col justify-between group ${
                 isSelected
                   ? 'btn-tactile-amber text-espresso-950 scale-105 font-extrabold ring-2 ring-amber-gold'

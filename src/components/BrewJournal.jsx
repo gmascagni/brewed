@@ -16,6 +16,8 @@ export default function BrewJournal({
   cupCount,
   cupMl,
   customRatio,
+  customWaterMl = null,
+  customGrind = null,
   unitSystem,
   onOpenScanner,
   isInline = false,
@@ -25,7 +27,7 @@ export default function BrewJournal({
   const isMetric = unitSystem === 'metric';
 
   // Calculations for auto-filling current parameters
-  const totalWaterMl = cupCount * cupMl;
+  const totalWaterMl = customWaterMl !== null && customWaterMl !== undefined ? customWaterMl : (cupCount * cupMl);
   const ratio = customRatio || activeMethod?.ratio || 15;
   const dryDoseGrams = totalWaterMl / ratio;
   const totalWaterOz = (totalWaterMl / 29.5735).toFixed(1);
@@ -85,7 +87,7 @@ export default function BrewJournal({
       doseStr: defaultDoseStr,
       waterStr: defaultWaterStr,
       ratioStr: `1 : ${ratio}`,
-      grindStr: activeMethod?.grind || 'Medium-Fine',
+      grindStr: customGrind || activeMethod?.grind || 'Medium-Fine',
       tempStr: defaultTempStr,
       rating,
       isFavorite,

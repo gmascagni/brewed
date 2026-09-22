@@ -147,13 +147,13 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
                 {currentActiveVideo.description}
               </p>
 
-              {currentActiveVideo.keyTakeaways && (
+              {currentActiveVideo?.keyTakeaways && (
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 shadow-inner">
                   <div className="text-xs font-mono font-extrabold text-amber-gold uppercase tracking-wider mb-2.5">
                     Key Technique Takeaways:
                   </div>
                   <ul className="space-y-2 text-xs text-cream-soft/90 font-medium">
-                    {currentActiveVideo.keyTakeaways.map((takeaway, i) => (
+                    {(currentActiveVideo.keyTakeaways || []).map((takeaway, i) => (
                       <li key={i} className="flex items-center gap-2.5">
                         <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                         <span>{takeaway}</span>
@@ -167,7 +167,7 @@ export default function MasterclassHub({ trackMode, activeMethod, activeVideo, s
 
           {/* Video Masterclasses Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredVideos.map((item) => {
+            {(filteredVideos || []).map((item) => {
               const isBookmarked = bookmarkedIds.includes(item.id);
               const isActive = currentActiveVideo?.id === item.id;
 

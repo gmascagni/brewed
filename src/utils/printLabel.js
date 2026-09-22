@@ -9,10 +9,10 @@
 import { generateBrotherQlStickerCanvas, generateBrotherQlMinimalStickerCanvas, generateCompositeStickerCanvas } from '../services/packagingAssetPipeline';
 
 /**
- * Prints a Brother QL-600 / QL-800 (DK-1209, 1.1" x 2.4" / 29mm x 62mm) thermal label.
+ * Prints a Brother QL-600 / QL-800 / QL-1100 (DK-1202, 2.4" x 3.9" / 62mm x 100mm) thermal label.
  * Supports both full spec and minimal QR layouts.
  * Renders the 300-DPI high-contrast canvas to an isolated iframe to guarantee
- * Chrome previews and prints exactly 1 sheet of paper.
+ * Chrome previews and prints exactly 1 sheet of paper with zero margins.
  * 
  * @param {Object} rawCoffee - Coffee profile object
  * @param {Object} options - Print options { minimal: boolean, layout: string }
@@ -48,9 +48,9 @@ export async function printBrotherQlCoffee(rawCoffee = {}, options = {}) {
       return;
     }
 
-    const title = `${rawCoffee.beanName || 'Coffee'} - Brother QL-600 Label`;
+    const title = `${rawCoffee.beanName || 'Coffee'} - Brother QL DK-1202 Label`;
 
-    // 3. Write isolated document with strict 2.4" x 1.1" @page size and zero margins
+    // 3. Write isolated document with strict 100mm x 62mm (DK-1202) @page size and zero margins
     doc.open();
     doc.write(`
       <!DOCTYPE html>
@@ -60,29 +60,29 @@ export async function printBrotherQlCoffee(rawCoffee = {}, options = {}) {
         <title>${title}</title>
         <style>
           @page {
-            size: 62mm 29mm;
+            size: 100mm 62mm;
             margin: 0mm;
           }
           @media print {
             @page {
-              size: 62mm 29mm;
+              size: 100mm 62mm;
               margin: 0mm;
             }
             html, body {
               margin: 0 !important;
               padding: 0 !important;
-              width: 62mm !important;
-              height: 29mm !important;
+              width: 100mm !important;
+              height: 62mm !important;
               overflow: hidden !important;
               background: #ffffff !important;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
             img {
-              width: 62mm !important;
-              height: 29mm !important;
-              max-width: 62mm !important;
-              max-height: 29mm !important;
+              width: 100mm !important;
+              height: 62mm !important;
+              max-width: 100mm !important;
+              max-height: 62mm !important;
               display: block !important;
               margin: 0 !important;
               padding: 0 !important;
@@ -94,21 +94,21 @@ export async function printBrotherQlCoffee(rawCoffee = {}, options = {}) {
           html, body {
             margin: 0;
             padding: 0;
-            width: 62mm;
-            height: 29mm;
+            width: 100mm;
+            height: 62mm;
             overflow: hidden;
             background: #ffffff;
           }
           img {
-            width: 62mm;
-            height: 29mm;
+            width: 100mm;
+            height: 62mm;
             display: block;
             object-fit: contain;
           }
         </style>
       </head>
       <body>
-        <img id="label-img" src="${dataUrl}" alt="Brother QL Label" />
+        <img id="label-img" src="${dataUrl}" alt="Brother QL DK-1202 Label" />
       </body>
       </html>
     `);

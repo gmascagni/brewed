@@ -254,7 +254,28 @@ export const GRIND_VISUAL_GUIDE = [
 
 export const COFFEE_BELT_OVERVIEW = {
   title: 'The Coffee Belt',
+  geographicBand: '23.5° N (Tropic of Cancer) to 23.5° S (Tropic of Capricorn)',
+  idealClimate: 'Equatorial & Subtropical (18°C–24°C / 64°F–75°F)',
+  geologicalSignificance: 'Coffee shrubs flourish exclusively in a tropical equatorial corridor encircling the globe between the Tropics of Cancer and Capricorn. Here, nutrient-dense volcanic loam, high-altitude diurnal temperature shifts, and consistent tropical wet-dry rainfall cycles allow Arabica cherries to mature slowly, generating dense seed sugars and complex fruit acids.',
   description: 'Coffee beans grow worldwide in a tropical zone called the "Coffee Belt," positioned between the Tropics of Cancer (23.5° N) and Capricorn (23.5° S).',
+  keyFactors: [
+    {
+      factor: 'Elevation & Air Pressure',
+      detail: 'Grown between 1,000m and 2,200m+. Lower oxygen and cooler mountain nights slow cherry ripening, producing denser beans with pronounced sweetness and citric acidity.'
+    },
+    {
+      factor: 'Volcanic Soil Loam',
+      detail: 'Rich in potassium, magnesium, and phosphorus with superior drainage, volcanic soils feed deep taproots that impart crisp minerality and sparkling acidity.'
+    },
+    {
+      factor: 'Equatorial Rainfall Cycles',
+      detail: 'Defined rainy seasons trigger simultaneous flowering, followed by dry sunny harvest windows critical for clean raised-bed solar dehydration.'
+    },
+    {
+      factor: 'Shade Canopy & Biodiversity',
+      detail: 'Canopy-shaded agroforestry buffers fragile Arabica from harsh ultraviolet radiation, fostering balanced soil microbiology and organic leaf mulch.'
+    }
+  ],
   macroRegions: [
     {
       name: 'Latin America',

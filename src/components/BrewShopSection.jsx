@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Sparkles, ShieldCheck, Star } from 'lucide-react';
+import { ShoppingBag, Sparkles, ShieldCheck, Star, Zap, Crown, SlidersHorizontal } from 'lucide-react';
 import ProductCard from './ProductCard';
-import { PRODUCTS_DATA, PRODUCT_CATEGORIES } from '../data/productsData';
+import { PRODUCTS_DATA, PRODUCT_CATEGORIES, PRODUCT_TIERS } from '../data/productsData';
 
 export default function BrewShopSection({ trackMode = 'coffee', activeMethod }) {
   const isCoffee = trackMode === 'coffee';
   const [activeCategory, setActiveCategory] = useState('all');
+  const [activeTier, setActiveTier] = useState('all');
 
   // STAGE 1 FILTER: 100% STRICT TRACK ISOLATION (Only show items where product.track === active trackMode)
   const trackProducts = PRODUCTS_DATA.filter(product => product.track === trackMode);
@@ -14,6 +15,11 @@ export default function BrewShopSection({ trackMode = 'coffee', activeMethod }) 
   const categoriesForTrack = PRODUCT_CATEGORIES[trackMode] || PRODUCT_CATEGORIES.coffee;
 
   const displayProducts = trackProducts.filter((product) => {
+    // Tier filter (best, good, budget)
+    if (activeTier !== 'all' && product.tier !== activeTier) {
+      return false;
+    }
+
     if (activeCategory === 'all') return true;
     if (activeCategory === 'method_kit') {
       return product.methodIds && activeMethod && product.methodIds.includes(activeMethod.id);
@@ -24,7 +30,7 @@ export default function BrewShopSection({ trackMode = 'coffee', activeMethod }) 
     return product.category === activeCategory;
   });
 
-  const finalProducts = displayProducts.length > 0 ? displayProducts : trackProducts;
+  const finalProducts = displayProducts;
 
   return (
     <section className={`mt-14 p-7 md:p-10 lg:p-12 rounded-3xl shadow-2xl transition-all duration-500 relative border ${
@@ -69,7 +75,7 @@ export default function BrewShopSection({ trackMode = 'coffee', activeMethod }) 
       </div>
 
       {/* Filter Category Tabs Bar */}
-      <div className="mb-8 overflow-x-auto pb-2 no-scrollbar">
+      <div className="mb-4 overflow-x-auto pb-2 no-scrollbar">
         <div className="flex items-center space-x-3">
           {categoriesForTrack.map((cat) => {
             const isSelected = activeCategory === cat.id;
@@ -92,9 +98,49 @@ export default function BrewShopSection({ trackMode = 'coffee', activeMethod }) 
         </div>
       </div>
 
+      {/* Budget Tier Selector (Best / Good / Budget) */}
+      <div className="mb-8 flex flex-wrap items-center gap-2 p-2.5 rounded-2xl bg-black/40 border border-white/[0.08] max-w-fit">
+        <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 font-bold px-2 flex items-center gap-1">
+          <SlidersHorizontal className="w-3 h-3 text-amber-gold" />
+          <span>Budget Tier:</span>
+        </span>
+        {PRODUCT_TIERS.map((tier) => {
+          const isSelected = activeTier === tier.id;
+          return (
+            <button
+              key={tier.id}
+              type="button"
+              onClick={() => setActiveTier(tier.id)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all border ${
+                isSelected
+                  ? tier.id === 'best'
+                    ? 'bg-amber-400/20 text-amber-300 border-amber-400/60 shadow-sm'
+                    : tier.id === 'budget'
+                    ? 'bg-emerald-400/20 text-emerald-300 border-emerald-400/60 shadow-sm'
+                    : 'bg-white/20 text-cream-light border-white/40 shadow-sm'
+                  : 'bg-transparent text-stone-400 border-transparent hover:text-stone-200 hover:bg-white/5'
+              }`}
+            >
+              {tier.label}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {finalProducts.map((product) => (
+        {finalProducts.length === 0 ? (
+          <div className="col-span-full py-12 text-center text-stone-400 font-sans">
+            <p className="text-sm">No equipment found matching this category and price tier.</p>
+            <button
+              type="button"
+              onClick={() => { setActiveCategory('all'); setActiveTier('all'); }}
+              className="mt-3 text-xs font-mono font-bold text-amber-gold hover:underline"
+            >
+              Reset Filters
+            </button>
+          </div>
+        ) : finalProducts.map((product) => (
           <ProductCard
             key={product.id}
             product={product}

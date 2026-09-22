@@ -45,22 +45,22 @@ export default function UniversityHub() {
                 {COFFEE_BELT_OVERVIEW.title}
               </h4>
               <p className="text-xs text-[#766A62]">
-                {COFFEE_BELT_OVERVIEW.geographicBand}
+                {COFFEE_BELT_OVERVIEW?.geographicBand || 'Tropics of Cancer & Capricorn (23.5° N - 23.5° S)'}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-xs font-mono font-semibold text-[#766A62] bg-[#FAF7F2] px-3 py-1.5 rounded-lg border border-[#ECE6DC]">
             <Sun className="w-4 h-4 text-[#D69550]" />
-            <span>Microclimates: {COFFEE_BELT_OVERVIEW.idealClimate}</span>
+            <span>Microclimates: {COFFEE_BELT_OVERVIEW?.idealClimate || 'Equatorial & Subtropical'}</span>
           </div>
         </div>
 
         <p className="text-xs md:text-sm text-[#574C45] leading-relaxed mb-6 font-sans">
-          {COFFEE_BELT_OVERVIEW.geologicalSignificance}
+          {COFFEE_BELT_OVERVIEW?.geologicalSignificance || COFFEE_BELT_OVERVIEW?.description || ''}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {COFFEE_BELT_OVERVIEW.keyFactors.map((f, idx) => (
+          {(COFFEE_BELT_OVERVIEW?.keyFactors || []).map((f, idx) => (
             <div key={idx} className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC]">
               <div className="text-xs font-bold text-[#A8622D] uppercase tracking-wider mb-1">
                 {f.factor}

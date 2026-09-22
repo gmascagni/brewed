@@ -14,21 +14,24 @@ import { useNavigate } from 'react-router-dom';
 import QRCode from 'qrcode';
 import {
   getCustomRoasterCoffees,
+  getRoasterOwnedBrandsAndCoffees,
   saveRoasterCoffee,
   deleteRoasterCoffee,
   generateSmartBagUrl,
-  saveCustomRoasterProfile
+  saveCustomRoasterProfile,
+  getCustomRoasters
 } from '../data/roasterRegistry';
 import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 import { 
   downloadCompleteStickerPng, 
-  downloadBrotherQlStickerPng,
-  downloadBrotherQlMinimalStickerPng,
+  downloadBrotherQlStickerPng, 
+  downloadBrotherQlMinimalStickerPng, 
   downloadVectorQrSvg, 
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
 import { printBrotherQlCoffee, printHtmlElementIsolated } from '../utils/printLabel';
 import RoasterVideoTab from './portal/RoasterVideoTab';
+import RoasterProfileTab from './portal/RoasterProfileTab';
 import RoasterOnboardTab from './portal/RoasterOnboardTab';
 import RoasterStickerStudioTab from './portal/RoasterStickerStudioTab';
 import RoasterCatalogTab from './portal/RoasterCatalogTab';
@@ -40,6 +43,7 @@ export default function RoasterPortalModal({
   onClose,
   prefilledBarcode = '',
   prefilledBean = null,
+  initialTab = null,
   onSelectBeanToBrew,
   onNavigateToRoaster = null,
   currentUser = null,
@@ -49,7 +53,14 @@ export default function RoasterPortalModal({
     currentUser && (currentUser.role === 'roaster' || currentUser.isVerifiedRoaster) && currentUser.email
   );
 
-  const [activeTab, setActiveTab] = useState(() => (prefilledBarcode || prefilledBean ? 'onboard' : 'video'));
+  const [activeTab, setActiveTab] = useState(() => {
+    if (initialTab) return initialTab;
+    if (prefilledBarcode) return 'onboard';
+    if (prefilledBean) return 'sticker';
+    if (currentUser && (currentUser.role === 'roaster' || currentUser.isVerifiedRoaster)) return 'catalog';
+    return 'video';
+  });
+  const [editingCoffeeId, setEditingCoffeeId] = useState(null);
   const [qrLayout, setQrLayoutState] = useState(() => {
     try {
       return localStorage.getItem('the_brew_app_label_layout') || 'brother_ql';
@@ -77,12 +88,21 @@ export default function RoasterPortalModal({
 
   const navigate = useNavigate();
 
-  // Form State for Onboarding
+  // Form State for Onboarding & Profile
   const [roasterName, setRoasterName] = useState('');
+  const [headRoaster, setHeadRoaster] = useState('');
+  const [tagline, setTagline] = useState('');
+  const [foundedYear, setFoundedYear] = useState('');
   const [location, setLocation] = useState('');
   const [website, setWebsite] = useState('');
   const [logoImage, setLogoImage] = useState('');
   const [logoFileName, setLogoFileName] = useState('');
+  const [originStory, setOriginStory] = useState('');
+  const [roasterMachines, setRoasterMachines] = useState('');
+  const [sourcingPhilosophy, setSourcingPhilosophy] = useState('');
+  const [roastingPhilosophy, setRoastingPhilosophy] = useState('');
+
+  // Bean & Recipe Details
   const [beanName, setBeanName] = useState('');
   const [origin, setOrigin] = useState('');
   const [varietal, setVarietal] = useState('');
@@ -91,6 +111,8 @@ export default function RoasterPortalModal({
 
   const [formError, setFormError] = useState(null);
   const [saveToast, setSaveToast] = useState(null);
+  const [profileFormError, setProfileFormError] = useState(null);
+  const [profileSaveToast, setProfileSaveToast] = useState(null);
   const modalBodyRef = useRef(null);
 
   const handleWebsiteChange = (e) => {
@@ -197,11 +219,55 @@ export default function RoasterPortalModal({
 
   const stickerRef = useRef(null);
 
-  // Load custom registered coffees from registry on open (filtered to authenticated roaster)
+  // Load custom registered coffees and roaster profile on open
   useEffect(() => {
     if (isOpen) {
-      const list = isRoasterAuthenticated ? getCustomRoasterCoffees(currentUser?.email) : [];
+      const { primaryRoaster: ownedBrand, ownedCoffees: brandLots } = getRoasterOwnedBrandsAndCoffees(currentUser);
+      const list = isRoasterAuthenticated ? brandLots : (currentUser?.email ? getCustomRoasterCoffees(currentUser.email) : []);
       setRegisteredCoffees(list);
+
+      // Set initial tab if specified
+      if (initialTab) {
+        setActiveTab(initialTab);
+      }
+
+      // Check for existing custom roaster profile matching authenticated user or current roasterName
+      const allCustomRoasters = getCustomRoasters();
+      const userEmail = currentUser?.email?.toLowerCase();
+      const userSlug = currentUser?.roasterSlug || (currentUser?.roasterName ? currentUser.roasterName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : '');
+      const existingProfile = ownedBrand || allCustomRoasters.find(r => 
+        (userEmail && r.ownerEmail && r.ownerEmail.toLowerCase() === userEmail) ||
+        (userSlug && r.slug === userSlug)
+      );
+
+      if (existingProfile) {
+        if (existingProfile.name) setRoasterName(existingProfile.name);
+        if (existingProfile.headRoaster) setHeadRoaster(existingProfile.headRoaster);
+        if (existingProfile.tagline) setTagline(existingProfile.tagline);
+        if (existingProfile.founded || existingProfile.foundedYear) {
+          setFoundedYear(existingProfile.founded || existingProfile.foundedYear);
+        }
+        if (existingProfile.location) setLocation(existingProfile.location);
+        if (existingProfile.website) setWebsite(existingProfile.website);
+        if (existingProfile.logoImage) setLogoImage(existingProfile.logoImage);
+        if (existingProfile.originStory) {
+          const storyText = Array.isArray(existingProfile.originStory) 
+            ? existingProfile.originStory.join('\n\n') 
+            : String(existingProfile.originStory);
+          setOriginStory(storyText);
+        }
+        if (existingProfile.roasterMachines) setRoasterMachines(existingProfile.roasterMachines);
+        if (existingProfile.sourcingPhilosophy) setSourcingPhilosophy(existingProfile.sourcingPhilosophy);
+        if (existingProfile.roastingPhilosophy) setRoastingPhilosophy(existingProfile.roastingPhilosophy);
+      } else {
+        if (currentUser?.roasterName && !roasterName) {
+          setRoasterName(currentUser.roasterName);
+        }
+        if (currentUser?.displayName && !headRoaster) {
+          setHeadRoaster(currentUser.displayName);
+        }
+      }
+
       if (prefilledBean) {
         if (prefilledBean.roaster) setRoasterName(prefilledBean.roaster);
         if (prefilledBean.location) setLocation(prefilledBean.location);
@@ -214,21 +280,37 @@ export default function RoasterPortalModal({
         if (prefilledBean.recommendedGrind) setRecommendedGrind(prefilledBean.recommendedGrind);
         if (prefilledBean.upc) setUpc(prefilledBean.upc);
         if (prefilledBean.customUrl) setCustomUrl(prefilledBean.customUrl);
+        if (prefilledBean.id) setEditingCoffeeId(prefilledBean.id);
+        if (prefilledBean.origin) setOrigin(prefilledBean.origin);
+        if (prefilledBean.varietal) setVarietal(prefilledBean.varietal);
+        if (prefilledBean.process) setProcess(prefilledBean.process);
+        if (prefilledBean.elevation) setElevation(prefilledBean.elevation);
+        if (prefilledBean.roastLevel) setRoastLevel(prefilledBean.roastLevel);
+        if (prefilledBean.tastingNotes) {
+          setTastingNotesInput(
+            Array.isArray(prefilledBean.tastingNotes) ? prefilledBean.tastingNotes.join(', ') : String(prefilledBean.tastingNotes)
+          );
+        }
         setSelectedCoffeeForSticker(prefilledBean);
-        setActiveTab('sticker');
+        if (!initialTab) {
+          setActiveTab('sticker');
+        }
       } else if (prefilledBarcode) {
         setUpc(prefilledBarcode);
-        setActiveTab('onboard');
+        if (!initialTab) setActiveTab('onboard');
       } else if (list.length > 0 && !selectedCoffeeForSticker) {
         setSelectedCoffeeForSticker(list[0]);
       }
     }
-  }, [isOpen, prefilledBarcode, prefilledBean, isRoasterAuthenticated, currentUser]);
+  }, [isOpen, prefilledBarcode, prefilledBean, initialTab, isRoasterAuthenticated, currentUser]);
 
-  // Pre-fill roastery brand name from authenticated roaster account
+  // Pre-fill roastery brand name and head roaster from authenticated roaster account
   useEffect(() => {
     if (currentUser?.roasterName && !roasterName) {
       setRoasterName(currentUser.roasterName);
+    }
+    if (currentUser?.displayName && !headRoaster) {
+      setHeadRoaster(currentUser.displayName);
     }
   }, [currentUser]);
 
@@ -293,7 +375,65 @@ export default function RoasterPortalModal({
     setUpc(`LOT-${new Date().getFullYear()}-${randomSuffix}`);
   };
 
-  const handleSaveCoffee = (e) => {
+  const handleStartNewLot = () => {
+    setEditingCoffeeId(null);
+    setBeanName('');
+    setOrigin('');
+    setVarietal('');
+    setProcess('Washed');
+    setElevation('1,850 MASL');
+    setRoastLevel('Light');
+    setTastingNotesInput('Peach, Jasmine, Honey');
+    setBrewMethod('pour_over');
+    setRecommendedRatio(16.5);
+    setTempF(202);
+    setRecommendedGrind('Medium-Fine (650µm)');
+    setBrewTime('3m 15s');
+    setRoasterNotes('');
+    const randomSuffix = Math.floor(100000 + Math.random() * 900000).toString();
+    setUpc(`LOT-${new Date().getFullYear()}-${randomSuffix}`);
+    setCustomUrl('');
+    setFormError(null);
+    setActiveTab('onboard');
+    if (modalBodyRef.current) {
+      modalBodyRef.current.scrollTo({ top: 220, behavior: 'smooth' });
+    }
+  };
+
+  const handleEditCoffee = (coffee) => {
+    if (!coffee) return;
+    setEditingCoffeeId(coffee.id);
+    if (coffee.roaster) setRoasterName(coffee.roaster);
+    if (coffee.location) setLocation(coffee.location);
+    if (coffee.website) setWebsite(coffee.website);
+    if (coffee.logoImage) setLogoImage(coffee.logoImage);
+    setBeanName(coffee.beanName || '');
+    setOrigin(coffee.origin || '');
+    setVarietal(coffee.varietal || '');
+    setProcess(coffee.process || 'Washed');
+    setElevation(coffee.elevation || '1,850 MASL');
+    setRoastLevel(coffee.roastLevel || 'Light');
+    setTastingNotesInput(
+      Array.isArray(coffee.tastingNotes)
+        ? coffee.tastingNotes.join(', ')
+        : (coffee.tastingNotes || '')
+    );
+    setBrewMethod(coffee.brewMethod || 'pour_over');
+    setRecommendedRatio(coffee.recommendedRatio || 16.5);
+    setTempF(coffee.tempF || 202);
+    setRecommendedGrind(coffee.recommendedGrind || 'Medium-Fine (650µm)');
+    setBrewTime(coffee.brewTime || '3m 15s');
+    setRoasterNotes(coffee.notes || '');
+    setUpc(coffee.upc || '');
+    setCustomUrl(coffee.customUrl || '');
+    setFormError(null);
+    setActiveTab('onboard');
+    if (modalBodyRef.current) {
+      modalBodyRef.current.scrollTo({ top: 220, behavior: 'smooth' });
+    }
+  };
+
+  const handleSaveCoffee = (e, { andAddAnother = false } = {}) => {
     if (e && e.preventDefault) e.preventDefault();
     setFormError(null);
 
@@ -301,7 +441,7 @@ export default function RoasterPortalModal({
     const trimmedBean = beanName.trim();
 
     if (!trimmedRoaster) {
-      setFormError('Please enter your Roastery Brand name.');
+      setFormError('Please enter your Roastery / Brand name.');
       if (modalBodyRef.current) modalBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -327,8 +467,10 @@ export default function RoasterPortalModal({
       .map((s) => s.trim())
       .filter(Boolean);
 
+    const coffeeId = editingCoffeeId || `roaster_${Date.now()}`;
+
     const newCoffee = {
-      id: `roaster_${Date.now()}`,
+      id: coffeeId,
       ownerEmail: currentUser?.email || '',
       ownerUid: currentUser?.uid || '',
       roaster: trimmedRoaster,
@@ -355,13 +497,24 @@ export default function RoasterPortalModal({
 
     saveRoasterCoffee(newCoffee, currentUser);
 
+    const slug = trimmedRoaster.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const foundersList = headRoaster.trim() ? headRoaster.split(',').map(s => s.trim()).filter(Boolean) : [];
+
     saveCustomRoasterProfile({
       name: trimmedRoaster,
-      slug: trimmedRoaster.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+      slug,
+      headRoaster: headRoaster.trim(),
+      founders: foundersList,
+      tagline: tagline.trim(),
+      founded: foundedYear.trim(),
       location: location.trim(),
       website: normalizedWebsite,
       logoImage: logoImage || '',
       backgroundImage: logoImage || '',
+      originStory: originStory.trim(),
+      roasterMachines: roasterMachines.trim(),
+      sourcingPhilosophy: sourcingPhilosophy.trim(),
+      roastingPhilosophy: roastingPhilosophy.trim(),
       ownerEmail: currentUser?.email || '',
       ownerUid: currentUser?.uid || ''
     }, currentUser);
@@ -369,14 +522,87 @@ export default function RoasterPortalModal({
     const updated = getCustomRoasterCoffees(currentUser?.email);
     setRegisteredCoffees(updated);
     setSelectedCoffeeForSticker(newCoffee);
-    setActiveTab('sticker');
+
+    if (andAddAnother) {
+      setEditingCoffeeId(null);
+      setBeanName('');
+      setOrigin('');
+      setVarietal('');
+      setProcess('Washed');
+      setElevation('1,850 MASL');
+      setRoastLevel('Light');
+      setTastingNotesInput('Peach, Jasmine, Honey');
+      setBrewMethod('pour_over');
+      setRecommendedRatio(16.5);
+      setTempF(202);
+      setRecommendedGrind('Medium-Fine (650µm)');
+      setBrewTime('3m 15s');
+      setRoasterNotes('');
+      const randomSuffix = Math.floor(100000 + Math.random() * 900000).toString();
+      setUpc(`LOT-${new Date().getFullYear()}-${randomSuffix}`);
+      setCustomUrl('');
+      setSaveToast(`Saved "${trimmedBean}"! Enter your next coffee lot below.`);
+      if (modalBodyRef.current) {
+        modalBodyRef.current.scrollTo({ top: 220, behavior: 'smooth' });
+      }
+    } else {
+      setEditingCoffeeId(null);
+      setActiveTab('sticker');
+      if (modalBodyRef.current) {
+        modalBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      setSaveToast(`Saved "${trimmedBean}" to your Roaster Registry! Smart Bag QR Studio ready.`);
+    }
+
+    setTimeout(() => setSaveToast(null), 4000);
+  };
+
+  const handleSaveRoasterProfile = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setProfileFormError(null);
+
+    const trimmedRoaster = roasterName.trim();
+    if (!trimmedRoaster) {
+      setProfileFormError('Please enter your Roastery Brand name.');
+      if (modalBodyRef.current) modalBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    let normalizedWebsite = website.trim();
+    if (normalizedWebsite && !/^https?:\/\//i.test(normalizedWebsite)) {
+      normalizedWebsite = `https://${normalizedWebsite}`;
+    }
+
+    const slug = trimmedRoaster.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const foundersList = headRoaster.trim() ? headRoaster.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+    const profileRecord = {
+      name: trimmedRoaster,
+      slug,
+      headRoaster: headRoaster.trim(),
+      founders: foundersList,
+      tagline: tagline.trim(),
+      founded: foundedYear.trim(),
+      location: location.trim(),
+      website: normalizedWebsite,
+      logoImage: logoImage || '',
+      backgroundImage: logoImage || '',
+      originStory: originStory.trim(),
+      roasterMachines: roasterMachines.trim(),
+      sourcingPhilosophy: sourcingPhilosophy.trim(),
+      roastingPhilosophy: roastingPhilosophy.trim(),
+      ownerEmail: currentUser?.email || '',
+      ownerUid: currentUser?.uid || ''
+    };
+
+    saveCustomRoasterProfile(profileRecord, currentUser);
 
     if (modalBodyRef.current) {
       modalBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    setSaveToast(`Saved "${trimmedBean}" to your Roaster Registry! Smart Bag QR Studio ready.`);
-    setTimeout(() => setSaveToast(null), 4000);
+    setProfileSaveToast(`Saved "${trimmedRoaster}" brand profile and craft story!`);
+    setTimeout(() => setProfileSaveToast(null), 4000);
   };
 
   const handleDelete = (id) => {
@@ -653,13 +879,22 @@ export default function RoasterPortalModal({
     };
 
     try {
+      const foundersList = headRoaster.trim() ? headRoaster.split(',').map(s => s.trim()).filter(Boolean) : [];
       saveCustomRoasterProfile({
         name: rName,
         slug,
+        headRoaster: headRoaster.trim(),
+        founders: foundersList,
+        tagline: tagline.trim(),
+        founded: foundedYear.trim(),
         location: location.trim(),
         website: website.trim(),
         logoImage: logoImage || '',
         backgroundImage: logoImage || '',
+        originStory: originStory.trim(),
+        roasterMachines: roasterMachines.trim(),
+        sourcingPhilosophy: sourcingPhilosophy.trim(),
+        roastingPhilosophy: roastingPhilosophy.trim(),
         ownerEmail: currentUser?.email || '',
         ownerUid: currentUser?.uid || ''
       }, currentUser);
@@ -694,9 +929,9 @@ export default function RoasterPortalModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center p-3 sm:p-6 pt-14 sm:pt-20 pb-12 overflow-y-auto bg-black/85 backdrop-blur-md animate-fade-in">
       <div 
-        className="relative w-full max-w-4xl bg-espresso-950/95 border border-[#A66E38]/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+        className="relative w-full max-w-4xl bg-espresso-950/95 border border-[#A66E38]/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto sm:my-2"
         role="dialog"
         aria-modal="true"
         aria-labelledby="roaster-portal-title"
@@ -736,69 +971,160 @@ export default function RoasterPortalModal({
           className="flex items-center gap-2 px-4 sm:px-6 py-3 border-b border-white/10 bg-black/20 overflow-x-auto overflow-y-hidden no-scrollbar text-xs font-mono shrink-0 select-none [&::-webkit-scrollbar]:hidden"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          <button
-            onClick={() => setActiveTab('video')}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
-              activeTab === 'video'
-                ? 'bg-amber-gold text-espresso-950 shadow'
-                : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-            }`}
-          >
-            <Play className="w-3.5 h-3.5 shrink-0" />
-            <span>1. Walkthrough Video (How It Works)</span>
-          </button>
+          {isRoasterAuthenticated ? (
+            <>
+              <button
+                onClick={() => setActiveTab('catalog')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'catalog'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Store className="w-3.5 h-3.5 shrink-0" />
+                <span>1. Your Registered Lots ({registeredCoffees.length})</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('onboard')}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
-              activeTab === 'onboard'
-                ? 'bg-amber-gold text-espresso-950 shadow'
-                : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-            }`}
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>2. Onboard Coffee & Recipe</span>
-            {!isRoasterAuthenticated && <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />}
-          </button>
+              <button
+                onClick={() => setActiveTab('sticker')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'sticker'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <QrCode className="w-3.5 h-3.5 shrink-0" />
+                <span>2. Packaging Studio & QR</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('sticker')}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
-              activeTab === 'sticker'
-                ? 'bg-amber-gold text-espresso-950 shadow'
-                : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-            }`}
-          >
-            <QrCode className="w-3.5 h-3.5 shrink-0" />
-            <span>3. Smart Bag QR Studio</span>
-            {!isRoasterAuthenticated && <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />}
-          </button>
+              <button
+                onClick={() => setActiveTab('onboard')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'onboard'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>3. Onboard Coffee & Recipe</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('catalog')}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
-              activeTab === 'catalog'
-                ? 'bg-amber-gold text-espresso-950 shadow'
-                : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-            }`}
-          >
-            <Store className="w-3.5 h-3.5 shrink-0" />
-            <span>4. Registered Coffees ({registeredCoffees.length})</span>
-            {!isRoasterAuthenticated && <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />}
-          </button>
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'profile'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Store className="w-3.5 h-3.5 shrink-0" />
+                <span>4. Roastery Brand Profile & Story</span>
+              </button>
 
-          <button
-            onClick={() => setActiveTab('telemetry')}
-            className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
-              activeTab === 'telemetry'
-                ? 'bg-amber-gold text-espresso-950 shadow'
-                : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 shrink-0" />
-            <span>5. Telemetry & Analytics</span>
-            {!isRoasterAuthenticated && <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />}
-          </button>
+              <button
+                onClick={() => setActiveTab('telemetry')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'telemetry'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <span>5. Telemetry & Analytics</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('video')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'video'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Play className="w-3.5 h-3.5 shrink-0" />
+                <span>6. Walkthrough Video</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setActiveTab('video')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-2 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'video'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Play className="w-3.5 h-3.5 shrink-0" />
+                <span>1. Walkthrough Video (How It Works)</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'profile'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Store className="w-3.5 h-3.5 shrink-0" />
+                <span>2. Roastery Brand Profile & Story</span>
+                <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />
+              </button>
+
+              <button
+                onClick={() => setActiveTab('onboard')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'onboard'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>3. Onboard Coffee & Recipe</span>
+                <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />
+              </button>
+
+              <button
+                onClick={() => setActiveTab('sticker')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'sticker'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <QrCode className="w-3.5 h-3.5 shrink-0" />
+                <span>4. Smart Bag QR Studio</span>
+                <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />
+              </button>
+
+              <button
+                onClick={() => setActiveTab('catalog')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'catalog'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Store className="w-3.5 h-3.5 shrink-0" />
+                <span>5. Registered Coffees ({registeredCoffees.length})</span>
+                <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />
+              </button>
+
+              <button
+                onClick={() => setActiveTab('telemetry')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'telemetry'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <span>6. Telemetry & Analytics</span>
+                <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />
+              </button>
+            </>
+          )}
         </div>
 
         {/* Modal Body */}
@@ -834,12 +1160,52 @@ export default function RoasterPortalModal({
             />
           )}
 
-          {/* TAB 1: ONBOARD FORM (Gated to authenticated roasters) */}
+          {/* TAB 2: ROASTERY BRAND PROFILE & STORY (Gated to authenticated roasters) */}
+          {isRoasterAuthenticated && activeTab === 'profile' && (
+            <RoasterProfileTab
+              roasterName={roasterName}
+              setRoasterName={setRoasterName}
+              headRoaster={headRoaster}
+              setHeadRoaster={setHeadRoaster}
+              tagline={tagline}
+              setTagline={setTagline}
+              foundedYear={foundedYear}
+              setFoundedYear={setFoundedYear}
+              location={location}
+              setLocation={setLocation}
+              website={website}
+              handleWebsiteChange={handleWebsiteChange}
+              handleWebsiteBlur={handleWebsiteBlur}
+              logoImage={logoImage}
+              logoFileName={logoFileName}
+              handleLogoUpload={handleLogoUpload}
+              handleRemoveLogo={handleRemoveLogo}
+              originStory={originStory}
+              setOriginStory={setOriginStory}
+              roasterMachines={roasterMachines}
+              setRoasterMachines={setRoasterMachines}
+              sourcingPhilosophy={sourcingPhilosophy}
+              setSourcingPhilosophy={setSourcingPhilosophy}
+              roastingPhilosophy={roastingPhilosophy}
+              setRoastingPhilosophy={setRoastingPhilosophy}
+              handleSaveProfile={handleSaveRoasterProfile}
+              onViewShowcase={handleNavigateToPortfolio}
+              formError={profileFormError}
+              saveToast={profileSaveToast}
+            />
+          )}
+
+          {/* TAB 3: ONBOARD FORM (Gated to authenticated roasters) */}
           {isRoasterAuthenticated && activeTab === 'onboard' && (
             <RoasterOnboardTab
               formError={formError}
+              editingCoffeeId={editingCoffeeId}
+              onStartNewLot={handleStartNewLot}
               roasterName={roasterName}
               setRoasterName={setRoasterName}
+              headRoaster={headRoaster}
+              setHeadRoaster={setHeadRoaster}
+              onSwitchToProfileTab={() => setActiveTab('profile')}
               location={location}
               setLocation={setLocation}
               website={website}
@@ -930,6 +1296,8 @@ export default function RoasterPortalModal({
               currentUser={currentUser}
               setActiveTab={setActiveTab}
               setSelectedCoffeeForSticker={setSelectedCoffeeForSticker}
+              onStartNewLot={handleStartNewLot}
+              onEditCoffee={handleEditCoffee}
               orchestrator={orchestrator}
               onSelectBeanToBrew={onSelectBeanToBrew}
               onClose={onClose}

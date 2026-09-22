@@ -472,7 +472,7 @@ export default function AuthModal({
                 return (
                   <div className="space-y-2 mb-4">
                     <label className="block text-stone-400 font-bold uppercase tracking-wider text-[10px]">
-                      {accountType === 'roaster' ? 'Saved Roastery Accounts:' : 'Saved Local Profiles:'}
+                      {accountType === 'roaster' ? 'Saved Roastery / Café Accounts:' : 'Saved Local Profiles:'}
                     </label>
                     <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
                       {relevantUsers.map((u) => (
@@ -542,12 +542,12 @@ export default function AuthModal({
                     }`}
                   >
                     <Store className="w-3.5 h-3.5" />
-                    <span>Specialty Roaster</span>
+                    <span>Specialty Roaster / Café</span>
                   </button>
                 </div>
                 <div className="mt-1.5 px-1 text-[11px] text-stone-400 font-mono">
                   {accountType === 'roaster'
-                    ? '🛡️ Verified Roaster Account: Authenticate to own recipes, publish brand water specs, and print packaging smart barcodes.'
+                    ? '🛡️ Verified Roaster & Café Account: Authenticate to manage coffee lots, publish custom brew specs, and print packaging smart barcodes.'
                     : '☕ Home Barista: On-device local storage for logging brews, journal entries, and custom ratios.'}
                 </div>
               </div>
@@ -558,7 +558,7 @@ export default function AuthModal({
                   {accountType === 'roaster' ? (
                     <>
                       <Store className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Specialty Coffee Roaster</span>
+                      <span>Specialty Roaster / Café Partner</span>
                     </>
                   ) : (
                     <>
@@ -575,14 +575,14 @@ export default function AuthModal({
               {accountType === 'roaster' && (mode === 'signup' || mode === 'edit') && (
                 <div>
                   <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">
-                    Roastery / Brand Name <span className="text-amber-gold">*</span>
+                    Roastery / Café Brand Name <span className="text-amber-gold">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={roasterName}
                     onChange={(e) => setRoasterName(e.target.value)}
-                    placeholder="E.g., Brookmill Coffee Roasters"
+                    placeholder="E.g., Brookmill Coffee Roasters or Lumen Coffee Bar"
                     className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light font-bold focus:outline-none focus:border-amber-gold"
                   />
                 </div>
@@ -591,14 +591,14 @@ export default function AuthModal({
               {/* EMAIL FIELD */}
               <div>
                 <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">
-                  {accountType === 'roaster' ? 'Roaster Work / Brand Email' : 'Email / Identifier'} <span className="text-amber-gold">*</span>
+                  {accountType === 'roaster' ? 'Roaster / Café Work Email' : 'Email / Identifier'} <span className="text-amber-gold">*</span>
                 </label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={accountType === 'roaster' ? "roaster@yourbrand.com or roaster@gmail.com" : "yourname@domain.com"}
+                  placeholder={accountType === 'roaster' ? "roaster@yourbrand.com or cafe@yourbrand.com" : "yourname@domain.com"}
                   className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
                 />
                 {accountType === 'roaster' && (
@@ -634,13 +634,13 @@ export default function AuthModal({
                 <>
                   <div>
                     <label className="block text-stone-300 font-bold uppercase tracking-wider mb-1">
-                      {accountType === 'roaster' ? 'Head Roaster / Contact Name' : 'Display Name'}
+                      {accountType === 'roaster' ? 'Head Roaster / Lead Barista Name' : 'Display Name'}
                     </label>
                     <input
                       type="text"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder={accountType === 'roaster' ? "E.g., Master Roaster Alex" : "E.g., Sarah Parker"}
+                      placeholder={accountType === 'roaster' ? "E.g., Master Roaster Alex or Head Barista Sam" : "E.g., Sarah Parker"}
                       className="w-full p-3 rounded-xl bg-black/50 border border-white/10 text-cream-light focus:outline-none focus:border-amber-gold"
                     />
                   </div>
@@ -664,7 +664,7 @@ export default function AuthModal({
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-cream-light uppercase tracking-wider text-[11px] flex items-center gap-1.5">
                         <Image className="w-4 h-4 text-amber-gold" />
-                        <span>{accountType === 'roaster' ? 'Roastery Brand Badge / Avatar' : 'Choose Profile Icon Avatar'}</span>
+                        <span>{accountType === 'roaster' ? 'Roastery / Café Brand Badge' : 'Choose Profile Icon Avatar'}</span>
                       </span>
                       <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-amber-gold flex items-center justify-center bg-black/40 shadow-sm shrink-0">
                         {!activeAvatarFailed && avatar && avatar !== '/' ? (
@@ -726,11 +726,11 @@ export default function AuthModal({
                 {isSubmitting ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Authenticating Roaster...</span>
+                    <span>Authenticating Roaster / Café...</span>
                   </>
                 ) : (
                   accountType === 'roaster'
-                    ? (mode === 'signup' ? 'Create Verified Roaster Account' : mode === 'login' ? 'Sign In as Roaster' : 'Save Roaster Profile')
+                    ? (mode === 'signup' ? 'Create Roaster / Café Account' : mode === 'login' ? 'Sign In to Roaster / Café Portal' : 'Save Roaster / Café Profile')
                     : (mode === 'edit' ? 'Save Profile Changes' : mode === 'signup' ? 'Save Profile to Device' : 'Use Profile')
                 )}
               </button>

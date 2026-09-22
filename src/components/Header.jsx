@@ -314,27 +314,41 @@ export default function Header({
 
           {/* Direct User / Roaster Profile Header Button */}
           {currentUser ? (
-            <button
-              type="button"
-              onClick={onOpenProfile}
-              className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-[#ECE6DC] bg-[#FAF7F2] hover:bg-[#FAF0E6] hover:border-[#D69550] transition-all cursor-pointer shadow-xs active:scale-95 group"
-              title={`Signed in as ${currentUser.displayName || currentUser.username} • Click to open Profile`}
-              aria-label="Open My Profile"
-            >
-              <div className="w-5 h-5 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center text-[#A25A24] text-[10px] font-bold font-mono overflow-hidden">
-                {currentUser.avatar && currentUser.avatar !== '/' ? (
-                  <img src={currentUser.avatar} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <span>{currentUser.displayName ? currentUser.displayName[0] : (currentUser.username ? currentUser.username[1] || currentUser.username[0] : 'B')}</span>
-                )}
-              </div>
-              <span className="font-sans font-bold text-xs text-[#14110F] max-w-[110px] truncate hidden md:inline">
-                {currentUser.displayName || currentUser.username}
-              </span>
-              <span className="text-[9px] font-mono text-[#A25A24] font-bold uppercase hidden lg:inline">
-                {currentUser.role === 'roaster' ? 'Roaster' : 'Profile'}
-              </span>
-            </button>
+            <div className="hidden sm:flex items-center gap-1.5">
+              {Boolean(currentUser.role === 'roaster' || currentUser.isVerifiedRoaster) && onOpenRoasterPortal && (
+                <button
+                  type="button"
+                  onClick={onOpenRoasterPortal}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-[#FAF0E6] hover:bg-amber-100 text-[#A25A24] font-mono font-bold text-xs shadow-xs transition-all cursor-pointer active:scale-95"
+                  title="Open Roaster Portal to manage lots, recipes & packaging QR stickers"
+                >
+                  <Store className="w-3.5 h-3.5 text-[#A25A24]" />
+                  <span className="hidden xl:inline">Roaster Portal</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={onOpenProfile}
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-[#ECE6DC] bg-[#FAF7F2] hover:bg-[#FAF0E6] hover:border-[#D69550] transition-all cursor-pointer shadow-xs active:scale-95 group"
+                title={`Signed in as ${currentUser.displayName || currentUser.username} • Click to open Profile`}
+                aria-label="Open My Profile"
+              >
+                <div className="w-5 h-5 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center text-[#A25A24] text-[10px] font-bold font-mono overflow-hidden">
+                  {currentUser.avatar && currentUser.avatar !== '/' ? (
+                    <img src={currentUser.avatar} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{currentUser.displayName ? currentUser.displayName[0] : (currentUser.username ? currentUser.username[1] || currentUser.username[0] : 'B')}</span>
+                  )}
+                </div>
+                <span className="font-sans font-bold text-xs text-[#14110F] max-w-[110px] truncate hidden md:inline">
+                  {currentUser.displayName || currentUser.username}
+                </span>
+                <span className="text-[9px] font-mono text-[#A25A24] font-bold uppercase hidden lg:inline">
+                  {currentUser.role === 'roaster' ? 'Roaster' : 'Profile'}
+                </span>
+              </button>
+            </div>
           ) : (
             <button
               type="button"

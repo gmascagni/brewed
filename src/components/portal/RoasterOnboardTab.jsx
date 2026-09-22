@@ -6,13 +6,20 @@ import {
   Trash2,
   Coffee,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  Edit3,
+  Plus
 } from 'lucide-react';
 
 export default function RoasterOnboardTab({
   formError,
+  editingCoffeeId = null,
+  onStartNewLot = null,
   roasterName,
   setRoasterName,
+  headRoaster = '',
+  setHeadRoaster = null,
+  onSwitchToProfileTab = null,
   location,
   setLocation,
   website,
@@ -54,6 +61,26 @@ export default function RoasterOnboardTab({
 }) {
   return (
     <form onSubmit={handleSaveCoffee} noValidate className="space-y-6 animate-fade-in">
+      {/* Active Edit Mode Indicator Banner */}
+      {editingCoffeeId && (
+        <div className="p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-between gap-3 text-xs font-mono">
+          <div className="flex items-center gap-2 text-amber-gold font-bold">
+            <Edit3 className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Editing Existing Lot: <strong className="text-white">{beanName || 'Coffee Lot'}</strong></span>
+          </div>
+          {onStartNewLot && (
+            <button
+              type="button"
+              onClick={onStartNewLot}
+              className="px-3 py-1 rounded-xl bg-white/10 hover:bg-white/20 text-cream-light font-bold flex items-center gap-1 transition cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5 text-amber-gold" />
+              <span>+ Switch to New Lot</span>
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Form Validation Warning */}
       {formError && (
         <div className="p-4 rounded-2xl bg-red-950/70 border border-red-500/50 text-red-200 text-xs font-mono flex items-center gap-2.5 shadow-xl animate-shake">
@@ -64,12 +91,24 @@ export default function RoasterOnboardTab({
 
       {/* Roastery Information Card */}
       <div className="p-4 sm:p-5 rounded-2xl bg-black/30 border border-white/10 space-y-4">
-        <div className="flex items-center gap-2 text-amber-gold font-mono text-xs uppercase font-bold tracking-wider">
-          <Store className="w-4 h-4" />
-          <span>1. Roastery Credentials</span>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-amber-gold font-mono text-xs uppercase font-bold tracking-wider">
+            <Store className="w-4 h-4" />
+            <span>1. Roastery Credentials & Leadership</span>
+          </div>
+
+          {onSwitchToProfileTab && (
+            <button
+              type="button"
+              onClick={onSwitchToProfileTab}
+              className="text-[11px] font-mono text-amber-gold hover:underline cursor-pointer flex items-center gap-1"
+            >
+              <span>Edit Origin Story & Craft →</span>
+            </button>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
           <div>
             <label className="block text-cream-soft/70 font-mono mb-1">Roastery Brand *</label>
             <input
@@ -78,7 +117,18 @@ export default function RoasterOnboardTab({
               value={roasterName}
               onChange={(e) => setRoasterName(e.target.value)}
               placeholder="e.g. Methodical Coffee"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold font-sans"
+            />
+          </div>
+
+          <div>
+            <label className="block text-cream-soft/70 font-mono mb-1">Head Roaster / Founder</label>
+            <input
+              type="text"
+              value={headRoaster}
+              onChange={(e) => setHeadRoaster && setHeadRoaster(e.target.value)}
+              placeholder="e.g. Christian Picken"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold font-sans"
             />
           </div>
 
@@ -89,7 +139,7 @@ export default function RoasterOnboardTab({
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="e.g. Greenville, SC"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold font-sans"
             />
           </div>
 
@@ -106,11 +156,8 @@ export default function RoasterOnboardTab({
               onChange={handleWebsiteChange}
               onBlur={handleWebsiteBlur}
               placeholder="https://methodicalcoffee.com"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold font-mono"
             />
-            <span className="block mt-1 text-[10px] text-cream-soft/50 font-mono">
-              Tip: Enter bare domain (e.g. methodicalcoffee.com) or full https:// URL
-            </span>
           </div>
         </div>
 
@@ -379,22 +426,48 @@ export default function RoasterOnboardTab({
       )}
 
       {/* Submit Action Bar */}
-      <div className="flex items-center justify-end gap-3 pt-2">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-soft font-mono text-xs font-bold cursor-pointer"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          onClick={handleSaveCoffee}
-          className="px-6 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-gold/20 hover:scale-105 active:scale-95 transition cursor-pointer"
-        >
-          <span>Save to Registry & Open QR Studio</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+        <div>
+          {editingCoffeeId && onStartNewLot && (
+            <button
+              type="button"
+              onClick={onStartNewLot}
+              className="text-xs font-mono text-amber-gold hover:underline cursor-pointer flex items-center gap-1"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Cancel editing & start a new lot</span>
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center justify-end gap-2.5">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-soft font-mono text-xs font-bold cursor-pointer"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => handleSaveCoffee(e, { andAddAnother: true })}
+            className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-cream-light font-mono text-xs font-bold flex items-center gap-1.5 border border-white/15 cursor-pointer transition"
+            title="Save this coffee to your registry and immediately begin entering the next lot"
+          >
+            <Plus className="w-3.5 h-3.5 text-amber-gold" />
+            <span>Save & Add Another Lot</span>
+          </button>
+
+          <button
+            type="submit"
+            onClick={(e) => handleSaveCoffee(e, { andAddAnother: false })}
+            className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-gold/20 hover:scale-105 active:scale-95 transition cursor-pointer"
+          >
+            <span>{editingCoffeeId ? 'Update Lot & Recipe' : 'Save Lot & Open QR Studio'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </form>
   );

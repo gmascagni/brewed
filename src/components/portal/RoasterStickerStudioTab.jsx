@@ -139,10 +139,10 @@ export default function RoasterStickerStudioTab({
                   ? 'bg-amber-gold text-espresso-950 shadow'
                   : 'bg-white/[0.06] text-cream-soft hover:text-white'
               }`}
-              title="Brother QL DK-1209 Minimal High-Contrast Label (62mm x 29mm / 2.44in x 1.14in)"
+              title="Brother QL DK-1202 Minimal High-Contrast Label (100mm x 62mm / 3.94in x 2.44in)"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Brother QL Minimal (DK-1209)</span>
+              <span>Brother QL Minimal (DK-1202)</span>
             </button>
 
             <button
@@ -153,10 +153,10 @@ export default function RoasterStickerStudioTab({
                   ? 'bg-amber-gold text-espresso-950 shadow'
                   : 'bg-white/[0.06] text-cream-soft hover:text-white'
               }`}
-              title="Brother QL-600 / QL-800 thermal roll label (DK-1209: 62mm x 29mm / 2.44in x 1.14in)"
+              title="Brother QL-600 / QL-800 / QL-1100 thermal roll label (DK-1202: 100mm x 62mm / 3.94in x 2.44in)"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Brother QL Full (DK-1209)</span>
+              <span>Brother QL Full (DK-1202)</span>
             </button>
           </div>
 
@@ -412,36 +412,39 @@ export default function RoasterStickerStudioTab({
           </div>
         )}
 
-        {/* LAYOUT 4: BROTHER QL-600 COMPACT THERMAL LABEL (1.1" x 2.4" / DK-1209) */}
+        {/* LAYOUT 4: BROTHER QL MULTIPURPOSE THERMAL LABEL (2.4" x 3.9" / 100mm x 62mm / DK-1202) */}
         {qrLayout === 'brother_ql' && (
           <div 
             ref={stickerRef}
-            className="w-full max-w-lg h-56 rounded-xl bg-white text-stone-900 p-3 shadow-2xl border-2 border-stone-800 flex items-stretch justify-between gap-3 relative overflow-hidden select-none"
+            className="w-full max-w-xl h-60 rounded-xl bg-white text-stone-900 p-4 shadow-2xl border-2 border-stone-800 flex items-stretch justify-between gap-4 relative overflow-hidden select-none"
           >
             {/* Left Details Column */}
             <div className="flex-1 flex flex-col justify-between h-full min-w-0 pr-1">
               <div>
-                <div className="flex items-center gap-1.5 mb-1">
+                <div className="flex items-center gap-2 mb-1">
                   <span className="text-[8px] font-mono uppercase tracking-wider font-extrabold bg-stone-900 text-white px-1.5 py-0.5 rounded">
                     THEBREW.APP
                   </span>
-                  <span className="text-[8px] font-mono text-stone-500 uppercase tracking-tight truncate">
+                  <span className="text-[8px] font-mono text-stone-600 uppercase tracking-tight truncate font-bold">
                     {selectedCoffeeForSticker?.roastLevel || roastLevel || 'Light'} Roast
                   </span>
+                  <span className="text-[8px] font-mono text-stone-400 uppercase tracking-tight truncate ml-auto font-semibold">
+                    DK-1202 • 100×62mm
+                  </span>
                 </div>
-                <h4 className="font-serif text-base font-bold text-stone-950 truncate leading-tight">
+                <h4 className="font-serif text-lg font-bold text-stone-950 truncate leading-tight">
                   {selectedCoffeeForSticker?.roaster || roasterName || 'Specialty Roaster'}
                 </h4>
-                <p className="text-xs text-stone-700 font-medium truncate font-sans">
+                <p className="text-xs text-stone-800 font-semibold truncate font-sans">
                   {selectedCoffeeForSticker?.beanName || beanName || 'Single Origin Lot'}
                 </p>
-                <p className="text-[9px] text-amber-800 font-serif italic truncate mt-0.5">
+                <p className="text-[10px] text-amber-900 font-serif italic truncate mt-0.5">
                   {tastingNotesInput ? tastingNotesInput : 'Peach, Jasmine, Honey'}
                 </p>
               </div>
 
-              {/* 4-Cell Dial-In Matrix */}
-              <div className="grid grid-cols-4 gap-1 py-1 px-1.5 bg-stone-100 rounded-md border border-stone-200 text-[8px] font-mono">
+              {/* 5-Cell Dial-In Matrix */}
+              <div className="grid grid-cols-5 gap-1 py-1.5 px-2 bg-stone-100 rounded-md border border-stone-200 text-[8px] font-mono">
                 <div>
                   <span className="text-stone-500 block text-[7px] uppercase leading-none">Ratio</span>
                   <span className="font-bold text-amber-800">
@@ -466,17 +469,23 @@ export default function RoasterStickerStudioTab({
                     {selectedCoffeeForSticker?.recommendedGrind || recommendedGrind || 'Med-Fine'}
                   </span>
                 </div>
+                <div>
+                  <span className="text-stone-500 block text-[7px] uppercase leading-none">Water</span>
+                  <span className="font-bold text-cyan-800 truncate block">
+                    140 TDS
+                  </span>
+                </div>
               </div>
 
               {/* Footer Info */}
               <div className="flex items-center justify-between text-[8px] font-mono text-stone-500 pt-1 border-t border-stone-200">
-                <span className="truncate">{selectedCoffeeForSticker?.upc || upc || 'DK-1209 SPEC'}</span>
-                <span className="font-bold text-stone-800">Scan for Recipe</span>
+                <span className="truncate">{selectedCoffeeForSticker?.upc || upc || 'DK-1202 SPEC'}</span>
+                <span className="font-bold text-stone-900 uppercase">⚡ Scan for Dialed-in Recipe</span>
               </div>
             </div>
 
             {/* Right QR Column: Maximized Full-Height QR Code */}
-            <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-lg border border-stone-300 h-full aspect-square">
+            <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1.5 rounded-lg border border-stone-300 h-full aspect-square">
               {qrDataUrl ? (
                 <img
                   src={qrDataUrl}
@@ -492,52 +501,55 @@ export default function RoasterStickerStudioTab({
           </div>
         )}
 
-        {/* LAYOUT 5: BROTHER QL DK-1209 MINIMAL HIGH-CONTRAST LABEL */}
+        {/* LAYOUT 5: BROTHER QL DK-1202 MINIMAL HIGH-CONTRAST LABEL */}
         {qrLayout === 'brother_ql_minimal' && (
           <div 
             ref={stickerRef}
-            className="w-full max-w-lg h-56 rounded-xl bg-white text-stone-900 p-3 shadow-2xl border-2 border-stone-800 flex items-stretch justify-between gap-3 relative overflow-hidden select-none"
+            className="w-full max-w-xl h-60 rounded-xl bg-white text-stone-900 p-4 shadow-2xl border-2 border-stone-800 flex items-stretch justify-between gap-4 relative overflow-hidden select-none"
           >
             {/* Left Details Column */}
             <div className="flex-1 flex flex-col justify-between h-full min-w-0 pr-1">
               <div>
-                <div className="flex items-center gap-1.5 mb-1">
+                <div className="flex items-center gap-2 mb-1">
                   <span className="text-[8px] font-mono uppercase tracking-wider font-black bg-stone-900 text-white px-1.5 py-0.5 rounded">
                     THEBREW.APP
                   </span>
                   <span className="text-[8px] font-mono text-stone-600 uppercase tracking-tight truncate font-bold">
                     {selectedCoffeeForSticker?.origin || origin || 'SMART BAG'}
                   </span>
+                  <span className="text-[8px] font-mono text-stone-400 uppercase tracking-tight truncate ml-auto font-semibold">
+                    DK-1202 • 100×62mm
+                  </span>
                 </div>
-                <h3 className="font-serif text-lg font-black text-stone-950 truncate leading-tight tracking-tight">
+                <h3 className="font-serif text-xl font-black text-stone-950 truncate leading-tight tracking-tight">
                   {selectedCoffeeForSticker?.beanName || beanName || 'Single Origin Lot'}
                 </h3>
-                <p className="text-[11px] text-stone-600 font-bold truncate font-mono uppercase tracking-wider mt-0.5">
+                <p className="text-xs text-stone-700 font-bold truncate font-mono uppercase tracking-wider mt-0.5">
                   {selectedCoffeeForSticker?.roaster || roasterName || 'Specialty Roastery'}
                 </p>
               </div>
 
               {/* Dial-In Formula Pill */}
-              <div className="bg-stone-100 border border-stone-300 rounded-md px-2 py-1 my-1">
-                <span className="text-[9px] font-mono font-black text-stone-900 tracking-tight block">
-                  RATIO 1:{selectedCoffeeForSticker?.recommendedRatio || recommendedRatio} • {selectedCoffeeForSticker?.tempF || tempF}°F • {(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ').toUpperCase()}
+              <div className="bg-stone-100 border border-stone-300 rounded-md px-2.5 py-1.5 my-1">
+                <span className="text-[10px] font-mono font-black text-stone-900 tracking-tight block">
+                  RATIO 1:{selectedCoffeeForSticker?.recommendedRatio || recommendedRatio} • {selectedCoffeeForSticker?.tempF || tempF}°F • {(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ').toUpperCase()} • 140 TDS WATER
                 </span>
               </div>
 
               {/* Flavor Notes & Scan Banner */}
               <div>
-                <p className="text-[9.5px] font-serif italic text-stone-700 truncate mb-0.5">
+                <p className="text-[10px] font-serif italic text-stone-700 truncate mb-0.5">
                   Notes: {tastingNotesInput ? tastingNotesInput : 'Peach, Jasmine, Honey'}
                 </p>
                 <div className="flex items-center justify-between text-[8px] font-mono text-stone-600 pt-1 border-t border-stone-200">
                   <span className="font-extrabold text-stone-900 uppercase">⚡ SCAN TO BREW</span>
-                  <span className="truncate">{selectedCoffeeForSticker?.upc || upc || 'DK-1209 SPEC'}</span>
+                  <span className="truncate">{selectedCoffeeForSticker?.upc || upc || 'DK-1202 SPEC'}</span>
                 </div>
               </div>
             </div>
 
             {/* Right QR Column: Giant High-Contrast QR Code */}
-            <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-lg border-2 border-stone-800 h-full aspect-square shadow-sm">
+            <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1.5 rounded-lg border-2 border-stone-800 h-full aspect-square shadow-sm">
               {qrDataUrl ? (
                 <img
                   src={qrDataUrl}
@@ -555,15 +567,16 @@ export default function RoasterStickerStudioTab({
 
         {/* Brother QL Driver & Print Instructions Notice */}
         {(qrLayout === 'brother_ql' || qrLayout === 'brother_ql_minimal') && (
-          <div className="w-full max-w-lg mx-auto p-3 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs font-mono text-cyan-200 text-left space-y-1">
+          <div className="w-full max-w-xl mx-auto p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs font-mono text-cyan-200 text-left space-y-1.5">
             <div className="flex items-center gap-1.5 font-bold text-cyan-300">
               <Printer className="w-4 h-4 text-cyan-400 shrink-0" />
-              <span>Brother QL-600 / QL-800 Direct Print Instructions:</span>
+              <span>Brother QL-600 / QL-800 / QL-1100 Direct Thermal Instructions:</span>
             </div>
             <p className="text-[11px] text-cyan-100/90 leading-relaxed font-sans">
-              1. In your browser print dialog, set <strong>Paper size: 62mm x 29mm (2.44" x 1.14" / DK-1209)</strong>.<br />
-              2. Set <strong>Margins: None</strong>.<br />
-              3. If you had a previous printer size mismatch error, cancel any stuck jobs in Windows before reprinting.
+              1. In your Brother printer or browser print dialog, select <strong>Paper size: 62mm x 100mm (2.4" x 3.9" / DK-1202)</strong>.<br />
+              2. Set <strong>Orientation: Landscape</strong> (or Brother QL automatic cut).<br />
+              3. Set <strong>Margins: None</strong>.<br />
+              4. The larger DK-1202 format provides 2.5x more surface area than DK-1209, accommodating full dial-in metrics and an oversized scannable QR code.
             </p>
           </div>
         )}
@@ -582,9 +595,9 @@ export default function RoasterStickerStudioTab({
           className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold flex items-center gap-2 shadow-lg shadow-amber-gold/20 hover:scale-105 active:scale-95 transition cursor-pointer"
           title={
             qrLayout === 'brother_ql_minimal'
-              ? 'Download 300 DPI Brother QL-600 Minimal (DK-1209: 62mm x 29mm / 2.44" x 1.14") thermal label PNG'
+              ? 'Download 300 DPI Brother QL Minimal (DK-1202: 100mm x 62mm / 3.94" x 2.44") thermal label PNG'
               : qrLayout === 'brother_ql'
-              ? 'Download 300 DPI Brother QL-600 (DK-1209: 62mm x 29mm / 2.44" x 1.14") thermal label PNG'
+              ? 'Download 300 DPI Brother QL Full (DK-1202: 100mm x 62mm / 3.94" x 2.44") thermal label PNG'
               : 'Download complete 300 DPI composite packaging sticker PNG ready to email or upload to your printer'
           }
         >

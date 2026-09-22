@@ -51,7 +51,13 @@ export default function ProductCard({ product, activeMethod, trackMode, isMethod
 
           {/* Badge Top Left */}
           {product.badge && (
-            <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold border border-amber-gold/30 shadow">
+            <div className={`absolute top-3 left-3 px-3 py-1 rounded-full backdrop-blur-md text-[10px] font-mono font-extrabold uppercase tracking-widest border shadow ${
+              product.tier === 'best'
+                ? 'bg-amber-950/90 text-amber-300 border-amber-400/50'
+                : product.tier === 'budget'
+                ? 'bg-emerald-950/90 text-emerald-300 border-emerald-400/50'
+                : 'bg-black/80 text-amber-gold border-amber-gold/30'
+            }`}>
               {product.badge}
             </div>
           )}

@@ -359,7 +359,7 @@ export function CoffeePackagingLabel({
     );
   }
 
-  // Brother QL-600 Minimal Thermal Label (1.1" x 2.4" / DK-1209)
+  // Brother QL Minimal Thermal Label (2.4" x 3.9" / 100mm x 62mm / DK-1202)
   if (layout === 'brother_ql_minimal') {
     return (
       <div className={`w-full max-w-md mx-auto flex flex-col justify-between rounded-2xl bg-white text-stone-900 p-3.5 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 group ${isEnlarged ? 'scale-100' : ''}`}>
@@ -384,7 +384,7 @@ export function CoffeePackagingLabel({
 
             <div className="bg-stone-100 border border-stone-300 rounded-md px-2 py-1 my-1">
               <span className="text-[8.5px] font-mono font-black text-stone-900 tracking-tight block">
-                RATIO 1:{coffee.recommendedRatio || 16.5} • {coffee.tempF || 202}°F • {(coffee.brewMethod || 'pour_over').replace(/_/g, ' ').toUpperCase()}
+                RATIO 1:{coffee.recommendedRatio || 16.5} • {coffee.tempF || 202}°F • {(coffee.brewMethod || 'pour_over').replace(/_/g, ' ').toUpperCase()} • 140 TDS
               </span>
             </div>
 
@@ -422,7 +422,7 @@ export function CoffeePackagingLabel({
             onClick={handleDownload}
             disabled={isDownloading}
             className="flex-1 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-white font-mono text-[10px] font-bold flex items-center justify-center gap-1 shadow transition cursor-pointer"
-            title="Download Brother QL-600 Minimal 300 DPI label PNG"
+            title="Download Brother QL DK-1202 Minimal 300 DPI label PNG"
           >
             <Download className="w-3 h-3 text-amber-400" />
             <span>{isDownloading ? 'Exporting...' : 'Save PNG'}</span>
@@ -462,19 +462,22 @@ export function CoffeePackagingLabel({
     );
   }
 
-  // Brother QL-600 Compact Thermal Label (1.1" x 2.4" / DK-1209)
+  // Brother QL Multipurpose Thermal Label (2.4" x 3.9" / 100mm x 62mm / DK-1202)
   if (layout === 'brother_ql') {
     return (
       <div className={`w-full max-w-md mx-auto flex flex-col justify-between rounded-2xl bg-white text-stone-900 p-3.5 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 group ${isEnlarged ? 'scale-100' : ''}`}>
         <div className="flex items-stretch justify-between gap-2.5 h-full">
           <div className="flex-1 min-w-0 pr-1 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-1 mb-0.5">
+              <div className="flex items-center gap-1.5 mb-0.5">
                 <span className="text-[7px] font-mono uppercase tracking-wider font-extrabold bg-stone-900 text-white px-1.5 py-0.5 rounded">
                   THEBREW.APP
                 </span>
                 <span className="text-[7px] font-mono text-stone-500 uppercase tracking-tight truncate">
                   {roastText} Roast
+                </span>
+                <span className="text-[7px] font-mono text-stone-400 uppercase tracking-tight truncate ml-auto font-semibold">
+                  DK-1202 • 100×62mm
                 </span>
               </div>
               <h4 className="font-serif text-sm font-bold text-stone-950 truncate leading-tight">
@@ -485,23 +488,27 @@ export function CoffeePackagingLabel({
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-1 py-1 px-1.5 bg-stone-100 rounded-md border border-stone-200 text-[8px] font-mono my-1">
+            <div className="grid grid-cols-3 gap-1 py-1 px-1.5 bg-stone-100 rounded-md border border-stone-200 text-[7.5px] font-mono my-1">
               <div>
-                <span className="text-stone-500 block text-[7px] uppercase leading-none">Ratio</span>
+                <span className="text-stone-500 block text-[6.5px] uppercase leading-none">Ratio</span>
                 <span className="font-bold text-amber-800">1:{coffee.recommendedRatio || 16.5}</span>
               </div>
               <div>
-                <span className="text-stone-500 block text-[7px] uppercase leading-none">Temp</span>
+                <span className="text-stone-500 block text-[6.5px] uppercase leading-none">Temp</span>
                 <span className="font-bold text-stone-900">{coffee.tempF || 202}°F</span>
               </div>
               <div>
-                <span className="text-stone-500 block text-[7px] uppercase leading-none">Method</span>
+                <span className="text-stone-500 block text-[6.5px] uppercase leading-none">Water</span>
+                <span className="font-bold text-cyan-800">140 TDS</span>
+              </div>
+              <div>
+                <span className="text-stone-500 block text-[6.5px] uppercase leading-none">Method</span>
                 <span className="font-bold text-stone-900 capitalize truncate block">
                   {(coffee.brewMethod || 'pour_over').replace(/_/g, ' ')}
                 </span>
               </div>
-              <div>
-                <span className="text-stone-500 block text-[7px] uppercase leading-none">Grind</span>
+              <div className="col-span-2">
+                <span className="text-stone-500 block text-[6.5px] uppercase leading-none">Grind</span>
                 <span className="font-bold text-stone-900 truncate block">
                   {(coffee.recommendedGrind || 'Med-Fine').split('(')[0]}
                 </span>
@@ -510,7 +517,7 @@ export function CoffeePackagingLabel({
 
             <div className="flex items-center justify-between text-[7px] font-mono text-stone-500 pt-0.5 border-t border-stone-200">
               <span className="truncate">{upc}</span>
-              <span className="font-bold text-stone-800">Scan Recipe</span>
+              <span className="font-bold text-stone-800 uppercase">⚡ Scan Recipe</span>
             </div>
           </div>
 
@@ -535,7 +542,7 @@ export function CoffeePackagingLabel({
             onClick={handleDownload}
             disabled={isDownloading}
             className="flex-1 py-1.5 px-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-white font-mono text-[10px] font-bold flex items-center justify-center gap-1 shadow transition cursor-pointer"
-            title="Download Brother QL-600 300 DPI label PNG"
+            title="Download Brother QL DK-1202 Full 300 DPI label PNG"
           >
             <Download className="w-3 h-3 text-amber-400" />
             <span>{isDownloading ? 'Exporting...' : 'Save PNG'}</span>
@@ -759,8 +766,8 @@ export default function PackagingLabelProofModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-      <div className="relative max-w-lg w-full bg-[#120B08] border border-amber-gold/40 rounded-3xl p-6 shadow-2xl space-y-5">
+    <div className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md flex items-start justify-center p-4 pt-14 sm:pt-20 pb-12 overflow-y-auto animate-fade-in">
+      <div className="relative max-w-lg w-full bg-[#120B08] border border-amber-gold/40 rounded-3xl p-6 shadow-2xl space-y-5 my-auto sm:my-2">
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-gold flex items-center justify-center border border-amber-gold/40">
@@ -794,7 +801,7 @@ export default function PackagingLabelProofModal({
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-white'
             }`}
-            title="Brother QL DK-1209 Minimal High-Contrast (62mm x 29mm / 2.44in x 1.14in)"
+            title="Brother QL DK-1202 Minimal High-Contrast (100mm x 62mm / 3.94in x 2.44in)"
           >
             <span>QL Minimal</span>
           </button>
@@ -806,7 +813,7 @@ export default function PackagingLabelProofModal({
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-white'
             }`}
-            title="Brother QL-600 / QL-800 full-spec thermal roll label (DK-1209: 62mm x 29mm / 2.44in x 1.14in)"
+            title="Brother QL-600 / QL-800 / QL-1100 full-spec thermal roll label (DK-1202: 100mm x 62mm / 3.94in x 2.44in)"
           >
             <span>QL Full Spec</span>
           </button>
@@ -851,12 +858,13 @@ export default function PackagingLabelProofModal({
           <div className="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/40 text-xs font-mono text-cyan-200 text-left space-y-1">
             <div className="flex items-center gap-1.5 font-bold text-cyan-300">
               <Printer className="w-4 h-4 text-cyan-400 shrink-0" />
-              <span>Brother QL-600 / QL-800 Direct Print Instructions:</span>
+              <span>Brother QL-600 / QL-800 / QL-1100 Direct Print Instructions:</span>
             </div>
             <p className="text-[11px] text-cyan-100/90 leading-relaxed font-sans">
-              1. In your browser print dialog, set <strong>Paper size: 62mm x 29mm (2.44" x 1.14" / DK-1209)</strong>.<br />
-              2. Set <strong>Margins: None</strong>.<br />
-              3. If you had a previous printer size error, cancel any stuck jobs in Windows before reprinting.
+              1. In your browser print dialog, set <strong>Paper size: 62mm x 100mm (2.4" x 3.9" / DK-1202)</strong>.<br />
+              2. Set <strong>Orientation: Landscape</strong>.<br />
+              3. Set <strong>Margins: None</strong>.<br />
+              4. If you had a previous printer size error, cancel any stuck jobs in Windows before reprinting.
             </p>
           </div>
         )}

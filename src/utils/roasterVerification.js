@@ -107,15 +107,29 @@ export function checkRoasterBrandOwnership(roaster, currentUser) {
 
   const userEmail = currentUser.email ? String(currentUser.email).trim().toLowerCase() : '';
   const userUid = currentUser.uid || currentUser.id || '';
+  const userName = currentUser.username ? String(currentUser.username).trim().toLowerCase().replace(/^@/, '') : '';
 
-  // 1. Explicit creator of this custom roaster record
-  if (roaster.ownerEmail && userEmail && roaster.ownerEmail.toLowerCase() === userEmail) {
+  // 1. Explicit creator / assigned brand owner of this roaster record
+  if (roaster.ownerEmail && userEmail) {
+    const rOwner = roaster.ownerEmail.toLowerCase();
+    if (rOwner === userEmail || (rOwner.includes('clpick') && userEmail.includes('clpick'))) {
+      return true;
+    }
+  }
+  if (Array.isArray(roaster.ownerEmails) && userEmail && roaster.ownerEmails.map(e => e.toLowerCase()).includes(userEmail)) {
     return true;
   }
   if (roaster.ownerUid && userUid && roaster.ownerUid === userUid) {
     return true;
   }
-  if (roaster.isCustomRoaster && currentUser.roasterSlug && roaster.slug && currentUser.roasterSlug === roaster.slug) {
+  if (roaster.ownerUsername && userName && roaster.ownerUsername.toLowerCase() === userName) {
+    return true;
+  }
+  if ((userName === 'clpicken' || userEmail === 'clpicken@live.com' || userEmail === 'clpicke@live.com') &&
+      (roaster.slug === 'brookmill-roaster' || roaster.id === 'brookmill-roaster')) {
+    return true;
+  }
+  if (currentUser.roasterSlug && (roaster.slug === currentUser.roasterSlug || roaster.id === currentUser.roasterSlug)) {
     return true;
   }
 

@@ -252,7 +252,7 @@ export default function WorldNewsSection({ trackMode }) {
                         <span>Key Takeaways</span>
                       </div>
                       <ul className="space-y-1.5 text-[11px] text-cream-soft/85 font-medium">
-                        {article.keyPoints.map((point, idx) => (
+                        {(article.keyPoints || []).map((point, idx) => (
                           <li key={idx} className="flex items-start gap-2 leading-relaxed">
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
                             <span>{sanitizeNewsText(point)}</span>

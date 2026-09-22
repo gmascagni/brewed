@@ -164,9 +164,9 @@ export function AppOrchestratorProvider({
 
   const downloadBrotherQlSticker = useCallback(async (rawCoffee) => {
     try {
-      showToast('Rendering Brother QL-600 (1.1" x 2.4") thermal label...');
+      showToast('Rendering Brother QL DK-1202 (2.4" x 3.9") thermal label...');
       await downloadBrotherQlStickerPng(rawCoffee);
-      showToast('Downloaded Brother QL label to Downloads!');
+      showToast('Downloaded Brother QL DK-1202 label to Downloads!');
     } catch (err) {
       console.warn('Error downloading Brother QL label:', err);
       showToast('Could not render Brother QL label. Please try again.');
@@ -175,9 +175,9 @@ export function AppOrchestratorProvider({
 
   const downloadBrotherQlMinimalSticker = useCallback(async (rawCoffee) => {
     try {
-      showToast('Rendering Brother QL DK-1209 Minimal thermal label...');
+      showToast('Rendering Brother QL DK-1202 Minimal thermal label...');
       await downloadBrotherQlMinimalStickerPng(rawCoffee);
-      showToast('Downloaded Brother QL Minimal label to Downloads!');
+      showToast('Downloaded Brother QL DK-1202 Minimal label to Downloads!');
     } catch (err) {
       console.warn('Error downloading Brother QL Minimal label:', err);
       showToast('Could not render Brother QL Minimal label. Please try again.');

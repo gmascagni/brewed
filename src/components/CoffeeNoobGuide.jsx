@@ -20,13 +20,14 @@ import {
   Award,
   ExternalLink,
   Star,
-  ShoppingBag
+  ShoppingBag,
+  Crown
 } from 'lucide-react';
-import { PRODUCTS_DATA, AMAZON_AFFILIATE_TAG } from '../data/productsData';
+import { PRODUCTS_DATA, AMAZON_AFFILIATE_TAG, PRODUCT_TIERS, METHOD_TIERED_PRODUCTS } from '../data/productsData';
 import { trackEvent } from '../utils/analytics';
 import { getAssetUrl } from '../utils/assetUrl';
 
-// Map of brew methods to authentic Amazon affiliate equipment
+// Map of brew methods to authentic Amazon affiliate equipment (fallback)
 const METHOD_PRODUCT_MAP = {
   french_press: 'bodum_french_press',
   aeropress: 'aeropress_original',
@@ -302,9 +303,88 @@ function NoobProductCallout({ productId, label = "Recommended Gear", whyNoobsLov
   );
 }
 
+/**
+ * Tiered Equipment Callout: Best, Good, and Budget options with toggle
+ */
+function MethodTieredHardwareCallout({ methodId, methodName }) {
+  const tiered = METHOD_TIERED_PRODUCTS[methodId];
+  const [activeTier, setActiveTier] = useState('good');
+  if (!tiered) return null;
+
+  const currentProductId = tiered[activeTier] || tiered.good || tiered.best;
+  const currentProduct = PRODUCTS_DATA.find(p => p.id === currentProductId);
+  if (!currentProduct) return null;
+
+  return (
+    <div className="pt-4 border-t border-[#ECE6DC] mt-4 space-y-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div>
+          <span className="text-xs font-sans font-bold text-[#A25A24] uppercase tracking-wider flex items-center gap-1.5">
+            <ShoppingBag className="w-4 h-4 text-[#C88A4B]" />
+            <span>Equipment Options for {methodName}:</span>
+          </span>
+          <p className="text-xs text-[#766A62] mt-0.5">
+            Select your preferred price tier — from high-end enthusiast picks to smart budget value.
+          </p>
+        </div>
+
+        {/* 3-Tier Budget Switcher */}
+        <div className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-xl border border-[#ECE6DC] shrink-0 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setActiveTier('best')}
+            className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+              activeTier === 'best'
+                ? 'bg-[#14110F] text-amber-300 shadow-xs'
+                : 'text-[#766A62] hover:text-[#14110F]'
+            }`}
+          >
+            👑 Best
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTier('good')}
+            className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+              activeTier === 'good'
+                ? 'bg-[#14110F] text-cream-light shadow-xs'
+                : 'text-[#766A62] hover:text-[#14110F]'
+            }`}
+          >
+            ⭐ Good
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTier('budget')}
+            className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+              activeTier === 'budget'
+                ? 'bg-[#166534] text-emerald-100 shadow-xs'
+                : 'text-[#766A62] hover:text-[#14110F]'
+            }`}
+          >
+            💡 Budget
+          </button>
+        </div>
+      </div>
+
+      <NoobProductCallout
+        productId={currentProductId}
+        label={
+          activeTier === 'best'
+            ? `👑 Enthusiast Choice • ${methodName}`
+            : activeTier === 'budget'
+            ? `💡 Best Value Entry • ${methodName}`
+            : `⭐ Barista Standard • ${methodName}`
+        }
+        whyNoobsLoveIt={currentProduct.whyWeRecommend}
+      />
+    </div>
+  );
+}
+
 export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }) {
   const [activeTab, setActiveTab] = useState('pillars');
   const [selectedMethodId, setSelectedMethodId] = useState('french_press');
+  const [activeGearTier, setActiveGearTier] = useState('all');
 
   const selectedMethod = NOOB_BREW_METHODS.find(m => m.id === selectedMethodId) || NOOB_BREW_METHODS[0];
 
@@ -730,7 +810,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                   <span>The Pros (Why you'll love it)</span>
                 </div>
                 <ul className="space-y-2.5 text-sm font-sans text-[#14532D]">
-                  {selectedMethod.pros.map((pro, idx) => (
+                  {(selectedMethod.pros || []).map((pro, idx) => (
                     <li key={idx} className="flex items-start gap-2 leading-relaxed">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                       <span>{pro}</span>
@@ -746,7 +826,7 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
                   <span>The Cons (What to watch out for)</span>
                 </div>
                 <ul className="space-y-2.5 text-sm font-sans text-[#881337]">
-                  {selectedMethod.cons.map((con, idx) => (
+                  {(selectedMethod.cons || []).map((con, idx) => (
                     <li key={idx} className="flex items-start gap-2 leading-relaxed">
                       <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                       <span>{con}</span>
@@ -756,25 +836,19 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
               </div>
             </div>
 
-            {/* Recommended Hardware Callout */}
-            {METHOD_PRODUCT_MAP[selectedMethod.id] && (
-              <div className="pt-2">
-                <span className="text-sm font-sans font-bold text-[#A25A24] uppercase tracking-wider block mb-2">
-                  Tested & Recommended Equipment:
-                </span>
-                <NoobProductCallout
-                  productId={METHOD_PRODUCT_MAP[selectedMethod.id]}
-                  label={`Recommended ${selectedMethod.name}`}
-                  whyNoobsLoveIt="Durable construction, proven extraction consistency, barista benchmark"
-                />
-                {selectedMethod.id === 'pour_over' && (
-                  <NoobProductCallout
-                    productId="v60_paper_filters"
-                    label="Essential V60 Filters"
-                    whyNoobsLoveIt="Japanese oxygen-bleached tabbed paper filters for clean cup"
-                  />
-                )}
-              </div>
+            {/* Tiered Equipment Callout (Best / Good / Budget) */}
+            {(METHOD_TIERED_PRODUCTS[selectedMethod.id] || METHOD_PRODUCT_MAP[selectedMethod.id]) && (
+              <MethodTieredHardwareCallout
+                methodId={selectedMethod.id}
+                methodName={selectedMethod.name}
+              />
+            )}
+            {selectedMethod.id === 'pour_over' && (
+              <NoobProductCallout
+                productId="v60_paper_filters"
+                label="Essential Paper Filters"
+                whyNoobsLoveIt="Authentic Japanese tabbed oxygen-bleached filters for crisp sediment-free extraction"
+              />
             )}
 
             {/* Action Bar */}
@@ -1140,11 +1214,44 @@ export default function CoffeeNoobGuide({ onOpenWaterLab, onSelectMethodToBrew }
 
           {/* Full Catalog of Tested Products */}
           <div className="space-y-5 pt-4">
-            <h4 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
-              All Recommended Equipment by Category
-            </h4>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#ECE6DC] pb-4">
+              <div>
+                <h4 className="font-editorial text-2xl sm:text-3xl font-bold text-[#14110F]">
+                  Recommended Equipment Catalog
+                </h4>
+                <p className="text-xs sm:text-sm text-[#766A62] mt-0.5">
+                  Filter by your budget tier to discover battle-tested specialty gear with direct Amazon links.
+                </p>
+              </div>
+
+              {/* Budget Tier Filter Pills */}
+              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] shrink-0">
+                {PRODUCT_TIERS.map((tier) => {
+                  const isSelected = activeGearTier === tier.id;
+                  return (
+                    <button
+                      key={tier.id}
+                      type="button"
+                      onClick={() => setActiveGearTier(tier.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                        isSelected
+                          ? tier.id === 'best'
+                            ? 'bg-[#14110F] text-amber-300 shadow-xs'
+                            : tier.id === 'budget'
+                            ? 'bg-[#166534] text-emerald-100 shadow-xs'
+                            : 'bg-[#14110F] text-white shadow-xs'
+                          : 'text-[#766A62] hover:text-[#14110F]'
+                      }`}
+                    >
+                      {tier.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {PRODUCTS_DATA.filter(p => p.track === 'coffee').map(product => (
+              {PRODUCTS_DATA.filter(p => p.track === 'coffee' && (activeGearTier === 'all' || p.tier === activeGearTier)).map(product => (
                 <div key={product.id} className="p-5 sm:p-6 rounded-2xl bg-white border border-[#ECE6DC] shadow-subtle hover:border-[#D69550] transition-all flex flex-col justify-between">
                   <div className="space-y-3.5">
                     <div className="aspect-[4/3] w-full rounded-xl overflow-hidden bg-[#FAF7F2] p-2 flex items-center justify-center border border-[#ECE6DC]">

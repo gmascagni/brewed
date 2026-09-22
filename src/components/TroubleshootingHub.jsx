@@ -113,7 +113,7 @@ export default function TroubleshootingHub({ trackMode }) {
                 Actionable Remedies:
               </div>
               <div className="space-y-2.5">
-                {selectedGuide.remedies.map((remedy, i) => (
+                {(selectedGuide?.remedies || []).map((remedy, i) => (
                   <div key={i} className="p-3 rounded-2xl bg-white/5 border border-white/10 text-xs text-cream-soft font-medium flex items-start gap-3 shadow-inner">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
                     <span>{remedy}</span>

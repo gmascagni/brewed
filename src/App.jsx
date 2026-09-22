@@ -49,6 +49,21 @@ import { getRecentBrews, JOURNAL_UPDATED_EVENT } from './utils/journalStorage';
 import { ChevronRight, ChevronLeft, Sparkles, Coffee, Clock, Play, BookOpen, Store } from 'lucide-react';
 import { getCoffeeProvenance } from './utils/roasterVerification';
 
+// Pre-configured Verified Roaster Profile for CL Pickens (Brookmill Roaster)
+export const CL_PICKEN_ROASTER_USER = {
+  uid: 'user_clpicken',
+  email: 'clpicken@live.com',
+  username: '@clpicken',
+  displayName: 'CL Pickens',
+  role: 'roaster',
+  isVerifiedRoaster: true,
+  accountType: 'roaster',
+  roasterName: 'Brookmill Coffee Roasters',
+  roasterSlug: 'brookmill-roaster',
+  avatar: '/avatar_roast_beans.jpg',
+  bio: 'Founder & Head Artisan Roaster at Brookmill Coffee Roasters in Alpharetta, GA. Dialing in precision extraction profiles.'
+};
+
 const DEFAULT_LOCAL_PROFILES = [];
 
 export default function App() {
@@ -66,11 +81,16 @@ export default function App() {
   const [usersList, setUsersList] = useState(() => {
     try {
       const saved = localStorage.getItem('the_brew_app_local_users');
-      const list = saved ? JSON.parse(saved) : [];
+      let list = saved ? JSON.parse(saved) : [];
       // Clean up any historical fake personas
-      return list.filter((u) => u && u.username !== '@barista_pro' && u.email !== 'alex@specialtybrew.org');
+      list = list.filter((u) => u && u.username !== '@barista_pro' && u.email !== 'alex@specialtybrew.org');
+      // Ensure CL Pickens Brookmill Roaster profile is always available
+      if (!list.some((u) => u && (u.username === '@clpicken' || u.email === 'clpicken@live.com' || u.roasterSlug === 'brookmill-roaster'))) {
+        list.unshift(CL_PICKEN_ROASTER_USER);
+      }
+      return list;
     } catch {
-      return [];
+      return [CL_PICKEN_ROASTER_USER];
     }
   });
 
@@ -82,11 +102,11 @@ export default function App() {
       if (user && (user.username === '@barista_pro' || user.email === 'alex@specialtybrew.org')) {
         localStorage.removeItem('the_brew_app_active_user');
         localStorage.removeItem('the_brew_app_current_user');
-        return null;
+        return CL_PICKEN_ROASTER_USER;
       }
-      return user;
+      return user || CL_PICKEN_ROASTER_USER;
     } catch {
-      return null;
+      return CL_PICKEN_ROASTER_USER;
     }
   });
 
@@ -143,6 +163,7 @@ export default function App() {
   const [isRoasterInfoOpen, setIsRoasterInfoOpen] = useState(false);
   const [roasterPrefillBarcode, setRoasterPrefillBarcode] = useState('');
   const [roasterPrefillBean, setRoasterPrefillBean] = useState(null);
+  const [roasterPortalInitialTab, setRoasterPortalInitialTab] = useState(null);
   const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
   
   // Primary 5 Logical Application Areas: 'brew' | 'discover' | 'cafes' | 'learn' | 'my_coffee'
@@ -197,6 +218,7 @@ export default function App() {
   const [isVideoAcademyOpen, setIsVideoAcademyOpen] = useState(false);
   const [selectedAcademyVideoId, setSelectedAcademyVideoId] = useState(null);
   const [dialedInCoffee, setDialedInCoffee] = useState(null);
+  const [customGrind, setCustomGrind] = useState(null);
 
   // Primary Action Throughout App: Start a Brew
   const handleStartBrew = (initialMethod = null, initialCoffee = null) => {
@@ -204,6 +226,8 @@ export default function App() {
     if (initialCoffee) {
       setSelectedCoffee(initialCoffee);
       setDialedInCoffee(initialCoffee);
+      if (initialCoffee.recommendedRatio) setCustomRatio(Number(initialCoffee.recommendedRatio));
+      if (initialCoffee.recommendedGrind) setCustomGrind(initialCoffee.recommendedGrind);
     }
     if (initialMethod) {
       setActiveMethod(initialMethod);
@@ -276,6 +300,7 @@ export default function App() {
     setSelectedCoffee(bean);
     setDialedInCoffee(bean);
     if (bean.recommendedRatio) setCustomRatio(Number(bean.recommendedRatio));
+    if (bean.recommendedGrind || bean.grindSetting) setCustomGrind(bean.recommendedGrind || bean.grindSetting);
     if (bean.brewMethod) {
       const allMethods = BREW_METHODS.coffee;
       const match = allMethods.find(m => m.id === bean.brewMethod || m.id.includes(bean.brewMethod));
@@ -287,65 +312,130 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handlers for Scanned / Roaster Dial-In Actions
-  const handleApplyScannedRecipe = (scannedBean) => {
-    if (!scannedBean) return;
+  // Unified Handler for Applying Any Recipe (Curated Master, User Custom, or Scanned Bean)
+  const handleApplyRecipe = (recipe, targetStep = 3) => {
+    if (!recipe) return;
 
-    // 1. Immediately switch to Brew area and close overlays
+    // 1. Switch to Brew area and close modal overlays
     setCurrentArea('brew');
     setIsScannerOpen(false);
     setIsRoasterPortalOpen(false);
+    setIsCommunityOpen(false);
+    setIsSearchOpen(false);
 
-    // 2. Extract ratio, dose, and water volume
-    const ratio = Number(scannedBean.recommendedRatio || scannedBean.extraction?.ratio || 16);
-    setCustomRatio(ratio);
-
-    const waterAmount = Number(scannedBean.waterGrams || (scannedBean.dryDoseGrams ? Math.round(scannedBean.dryDoseGrams * ratio) : 320));
-    setCustomWaterMl(waterAmount);
-    setCupCount(1);
-    setCupMl(waterAmount);
-
-    // 3. Resolve target brew method (prioritize exact ID before fuzzy substring match)
-    const targetMethodId = scannedBean.brewMethod || scannedBean.extraction?.method || 'pour_over';
+    // 2. Resolve method (support exact ID and fuzzy alias)
+    const targetMethodId = recipe.methodId || recipe.brewMethod || recipe.extraction?.method || 'pour_over';
     const allMethods = BREW_METHODS.coffee;
     let targetMethod = allMethods.find(m => m.id === targetMethodId) ||
                        allMethods.find(m => m.id.includes(targetMethodId) || targetMethodId.includes(m.id)) ||
                        allMethods[0];
 
-    // If custom phases were provided in the recipe (e.g. roaster bloom specs), attach them
-    if (scannedBean.customPhases && scannedBean.customPhases.length > 0) {
+    // 3. Extract ratio, dose, and water volume mathematically
+    const ratio = Number(recipe.ratio || recipe.recommendedRatio || recipe.extraction?.ratio || targetMethod.ratio || 16);
+
+    let waterAmount = Number(recipe.waterAmountMl || recipe.waterGrams);
+    if (!waterAmount || isNaN(waterAmount) || waterAmount <= 0) {
+      const dose = Number(recipe.dryDoseGrams || recipe.doseGrams);
+      if (dose && dose > 0) {
+        waterAmount = Math.round(dose * ratio);
+      } else {
+        waterAmount = targetMethod.defaultCupMl || 240;
+      }
+    }
+
+    const doseAmount = Number(recipe.dryDoseGrams || recipe.doseGrams) || (Math.round((waterAmount / ratio) * 10) / 10);
+
+    setCustomRatio(ratio);
+    setCustomWaterMl(waterAmount);
+    setCupCount(1);
+    setCupMl(waterAmount);
+
+    // 4. Map recipe steps or custom phases to targetMethod phases
+    if (recipe.steps && Array.isArray(recipe.steps) && recipe.steps.length > 0) {
       targetMethod = {
         ...targetMethod,
-        phases: scannedBean.customPhases
+        phases: recipe.steps.map((s, idx) => ({
+          name: s.action || `Pour Phase ${s.order || idx + 1}`,
+          durationSec: Number(s.durationSec) || 45,
+          waterGrams: s.waterMl !== undefined ? Number(s.waterMl) : null,
+          instruction: s.action || `Phase ${s.order || idx + 1} extraction`
+        }))
+      };
+    } else if (recipe.customPhases && Array.isArray(recipe.customPhases) && recipe.customPhases.length > 0) {
+      targetMethod = {
+        ...targetMethod,
+        phases: recipe.customPhases
       };
     }
 
     setActiveMethod(prev => prev?.id === targetMethod.id ? { ...prev, ...targetMethod } : targetMethod);
-    setSelectedCoffee(scannedBean);
-    setDialedInCoffee(scannedBean);
 
-    // 4. Advance straight to Step 4 (Guided Brew Timer) and navigate URL
-    setCurrentStep(4);
+    // 5. Build coffee & dial-in context
+    const grindVal = recipe.grindSetting || recipe.recommendedGrind || targetMethod.grind;
+    const tempCVal = recipe.waterTempC || recipe.tempC || targetMethod.tempC;
+    const tempFVal = recipe.tempF || (tempCVal ? Math.round((tempCVal * 9/5) + 32) : targetMethod.tempF);
+
+    if (grindVal) {
+      setCustomGrind(grindVal);
+    }
+
+    const recipeCoffeeContext = {
+      beanName: recipe.beanName || recipe.title || 'Selected Recipe Lot',
+      roaster: recipe.roasterName || recipe.roaster || recipe.technique || 'Specialty Recipe',
+      recommendedGrind: grindVal,
+      grindSetting: grindVal,
+      tempC: tempCVal,
+      tempF: tempFVal,
+      recommendedRatio: ratio,
+      dryDoseGrams: doseAmount,
+      waterAmountMl: waterAmount,
+      waterGrams: waterAmount,
+      tastingNotes: recipe.tastingNotes || [],
+      recipeId: recipe.id,
+      recipeTitle: recipe.title,
+      description: recipe.description
+    };
+
+    setSelectedCoffee(recipeCoffeeContext);
+    setDialedInCoffee(recipeCoffeeContext);
+
+    // 6. Advance step and navigate route
+    setCurrentStep(targetStep);
     navigate(`/methods/${targetMethod.id}`);
 
-    // 5. Smooth scroll down to the timer
+    // 7. Smooth scroll down to active step
     setTimeout(() => {
-      const timerEl = document.getElementById('step-4') || document.querySelector('main');
-      if (timerEl) timerEl.scrollIntoView({ behavior: 'smooth' });
+      const el = document.getElementById(`step-${targetStep}`) || document.querySelector('main');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
     }, 150);
+
+    trackEvent('recipe_applied', {
+      recipe_id: recipe.id,
+      title: recipe.title || recipe.beanName,
+      method: targetMethod.id,
+      ratio,
+      waterAmount,
+      doseAmount
+    });
+  };
+
+  // Handlers for Scanned / Roaster Dial-In Actions
+  const handleApplyScannedRecipe = (scannedBean) => {
+    if (!scannedBean) return;
+    handleApplyRecipe(scannedBean, 4);
 
     trackEvent('dial_in_recipe_applied', {
       roaster: scannedBean.roaster,
       bean: scannedBean.beanName,
-      method: targetMethod.id,
-      ratio
+      method: scannedBean.brewMethod || 'pour_over',
+      ratio: scannedBean.recommendedRatio || 16
     });
 
     recordTelemetryEvent('bean_dial_in', {
       roaster: scannedBean.roaster,
       beanName: scannedBean.beanName,
-      methodId: targetMethod.id,
-      ratio
+      methodId: scannedBean.brewMethod || 'pour_over',
+      ratio: Number(scannedBean.recommendedRatio || 16)
     });
   };
 
@@ -478,14 +568,18 @@ export default function App() {
     setCustomRatio(parsedRatio);
     setCustomWaterMl(parsedWater);
     setCupCount(1);
-    setCupMl(parsedWater);
-
-    setDialedInCoffee({
+    const brewCoffeeContext = {
       beanName: entry.beanName,
       roaster: entry.roaster,
       recommendedGrind: entry.grindStr,
-      tempF: parseInt(entry.tempStr) || 202
-    });
+      grindSetting: entry.grindStr,
+      tempF: parseInt(entry.tempStr) || 202,
+      recommendedRatio: parsedRatio
+    };
+
+    setDialedInCoffee(brewCoffeeContext);
+    setSelectedCoffee(brewCoffeeContext);
+    if (entry.grindStr) setCustomGrind(entry.grindStr);
 
     setCurrentStep(4);
     navigate(`/methods/${targetMethod.id}`);
@@ -541,7 +635,14 @@ export default function App() {
       const found = allMethods.find(m => m.id === methodId);
 
       if (found) {
-        setActiveMethod(prev => (prev?.id === found.id ? prev : found));
+        setActiveMethod(prev => {
+          if (prev?.id === found.id) return prev;
+          setCupMl(found.defaultCupMl || 240);
+          if (found.id === 'espresso') setCupCount(1);
+          setCustomRatio(null);
+          setCustomWaterMl(null);
+          return found;
+        });
 
         // Update Dynamic SEO & JSON-LD Structured Data
         updatePageSeo(
@@ -657,6 +758,8 @@ export default function App() {
         const allMethods = BREW_METHODS.coffee;
         const found = allMethods.find(m => m.id === methodParam) || allMethods[0];
         setActiveMethod(found);
+        setCupMl(found.defaultCupMl || 240);
+        if (found.id === 'espresso') setCupCount(1);
         if (ratioParam) setCustomRatio(ratioParam);
         setCurrentStep(2);
       } else {
@@ -682,8 +785,13 @@ export default function App() {
       navigate(`/methods/${method.id}`);
     } else {
       setActiveMethod(method);
+      setCupMl(method.defaultCupMl || 240);
+      if (method.id === 'espresso') {
+        setCupCount(1);
+      }
       setCustomRatio(null);
       setCustomWaterMl(null);
+      setCustomGrind(null);
       if (setActiveVideo) setActiveVideo(null);
     }
     trackEvent('select_method', { method_id: method.id, method_name: method.name });
@@ -693,9 +801,7 @@ export default function App() {
     const allMethods = BREW_METHODS.coffee;
     const match = allMethods.find(m => m.id === brewerId || (brewerId === 'pour_over' && (m.id === 'pour_over' || m.id === 'classic_pour_over'))) || allMethods[0];
     if (match) {
-      setActiveMethod(match);
-      setCustomRatio(null);
-      setCustomWaterMl(null);
+      handleSelectMethodFromGrid(match);
       trackEvent('select_hero_brewer', { brewer_id: brewerId, method_name: match.name });
     }
   };
@@ -720,7 +826,7 @@ export default function App() {
     : (methods.length > 0 ? methods[0] : null);
 
   // Calculated Water Volume & Dose
-  const effectiveRatio = customRatio !== null ? customRatio : (currentActiveMethod?.ratio || 15);
+  const effectiveRatio = customRatio !== null ? customRatio : (selectedCoffee?.recommendedRatio ? Number(selectedCoffee.recommendedRatio) : (currentActiveMethod?.ratio || 15));
   const calculatedTotalWaterMl = customWaterMl !== null ? customWaterMl : (cupCount * cupMl);
   const dryDoseGrams = calculatedTotalWaterMl > 0 ? Math.round((calculatedTotalWaterMl / effectiveRatio) * 10) / 10 : 0;
 
@@ -836,7 +942,7 @@ export default function App() {
       </header>
 
       {/* Main Workspace Container */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 pb-24 md:pb-8 relative z-10">
+      <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 pb-24 md:pb-8 relative">
 
         <main className="mt-4 space-y-10">
 
@@ -986,27 +1092,17 @@ export default function App() {
               onOpenAuth={handleOpenAuth}
               onLogout={() => setCurrentUser(null)}
               onBrewAgain={(entry) => handleBrewAgain(entry)}
-              onSelectRecipe={(recipe) => {
-                const allMethods = BREW_METHODS.coffee;
-                const match = allMethods.find(m => m.id === recipe.methodId || m.id.includes(recipe.methodId)) || allMethods[0];
-                setActiveMethod(match);
-                if (recipe.ratio) setCustomRatio(recipe.ratio);
-                const waterAmount = Number(recipe.waterGrams || (recipe.doseGrams ? Math.round(recipe.doseGrams * (recipe.ratio || 16)) : 320));
-                setCustomWaterMl(waterAmount);
-                setCupCount(1);
-                setCupMl(waterAmount);
-                setCurrentArea('brew');
-                setCurrentStep(4);
-                navigate(`/methods/${match.id}`);
-                setTimeout(() => {
-                  const timerEl = document.getElementById('step-4') || document.querySelector('main');
-                  if (timerEl) timerEl.scrollIntoView({ behavior: 'smooth' });
-                }, 150);
-              }}
+              onSelectRecipe={(recipe) => handleApplyRecipe(recipe, 3)}
+              onSelectRecipeToBrew={(recipe) => handleApplyRecipe(recipe, 3)}
               onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
               onSelectBeanToBrew={(bean) => handleSelectBeanToBrew(bean)}
               onOpenScanner={() => setIsScannerOpen(true)}
               activeMethod={currentActiveMethod}
+              cupCount={cupCount}
+              cupMl={cupMl}
+              customRatio={customRatio}
+              customGrind={customGrind}
+              customWaterMl={calculatedTotalWaterMl}
               unitSystem={unitSystem}
             />
           )}
@@ -1154,10 +1250,17 @@ export default function App() {
                       if (coffee) {
                         setDialedInCoffee(coffee);
                         if (coffee.recommendedRatio) setCustomRatio(Number(coffee.recommendedRatio));
+                        if (coffee.recommendedGrind || coffee.grindSetting) setCustomGrind(coffee.recommendedGrind || coffee.grindSetting);
                       }
                       setCurrentStep(3);
                     }}
-                    onNextStep={() => setCurrentStep(3)}
+                    onNextStep={() => {
+                      if (selectedCoffee?.recommendedRatio) setCustomRatio(Number(selectedCoffee.recommendedRatio));
+                      if (selectedCoffee?.recommendedGrind || selectedCoffee?.grindSetting) {
+                        setCustomGrind(selectedCoffee.recommendedGrind || selectedCoffee.grindSetting);
+                      }
+                      setCurrentStep(3);
+                    }}
                     onPrevStep={() => {
                       setCurrentStep(1);
                       navigate('/');
@@ -1178,7 +1281,7 @@ export default function App() {
                     methods={methods}
                     activeMethod={currentActiveMethod}
                     setActiveMethod={(m) => {
-                      setActiveMethod(m);
+                      handleSelectMethodFromGrid(m);
                       navigate(`/methods/${m.id}`);
                     }}
                     cupCount={cupCount}
@@ -1189,13 +1292,15 @@ export default function App() {
                     setCustomRatio={setCustomRatio}
                     customWaterMl={customWaterMl}
                     setCustomWaterMl={setCustomWaterMl}
+                    customGrind={customGrind}
+                    onSelectGrind={(grindId) => setCustomGrind(grindId)}
                     unitSystem={unitSystem}
                     setUnitSystem={setUnitSystem}
                     isMuted={isMuted}
                     setIsMuted={setIsMuted}
                     onNextStep={() => setCurrentStep(4)}
                     onPrevStep={() => setCurrentStep(2)}
-                    selectedCoffee={selectedCoffee}
+                    selectedCoffee={selectedCoffee || dialedInCoffee}
                     onOpenWaterLab={() => setIsWaterLabOpen(true)}
                   />
                 </div>
@@ -1287,6 +1392,7 @@ export default function App() {
                     dialedInCoffee={dialedInCoffee || selectedCoffee}
                     totalWaterMl={calculatedTotalWaterMl}
                     customRatio={effectiveRatio}
+                    customGrind={customGrind}
                     onApplyNextBrewTweak={handleApplyNextBrewTweak}
                   />
                 </div>
@@ -1303,6 +1409,8 @@ export default function App() {
             cupCount={cupCount}
             cupMl={cupMl}
             customRatio={customRatio}
+            customGrind={customGrind}
+            customWaterMl={calculatedTotalWaterMl}
             unitSystem={unitSystem}
             onOpenScanner={() => setIsScannerOpen(true)}
           />
@@ -1315,14 +1423,7 @@ export default function App() {
               handleSelectMethodFromGrid(method);
             }}
             onSelectRecipe={(recipe) => {
-              const allMethods = BREW_METHODS.coffee;
-              const match = allMethods.find(m => m.id === recipe.methodId);
-              if (match) {
-                handleSelectMethodFromGrid(match);
-              }
-              if (recipe.ratio) setCustomRatio(recipe.ratio);
-              setCurrentStep(2);
-              setIsSearchOpen(false);
+              handleApplyRecipe(recipe, 3);
             }}
             onSelectOrigin={(origin) => {
               setCurrentStep(3);
@@ -1345,13 +1446,7 @@ export default function App() {
               onOpenAuth={handleOpenAuth}
               onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
               onSelectRecipe={(recipe) => {
-                const allMethods = BREW_METHODS.coffee;
-                const match = allMethods.find(m => m.id === recipe.methodId);
-                if (match) {
-                  handleSelectMethodFromGrid(match);
-                }
-                if (recipe.ratio) setCustomRatio(recipe.ratio);
-                setIsCommunityOpen(false);
+                handleApplyRecipe(recipe, 3);
               }}
             />
 
@@ -1389,9 +1484,11 @@ export default function App() {
                 setIsRoasterPortalOpen(false);
                 setRoasterPrefillBarcode('');
                 setRoasterPrefillBean(null);
+                setRoasterPortalInitialTab(null);
               }}
               prefilledBarcode={roasterPrefillBarcode}
               prefilledBean={roasterPrefillBean}
+              initialTab={roasterPortalInitialTab}
               onSelectBeanToBrew={handleApplyScannedRecipe}
               onNavigateToRoaster={(slug) => {
                 setCurrentArea('discover');
@@ -1427,16 +1524,34 @@ export default function App() {
             />
           </Suspense>
 
-          {/* Barista User Profile Modal */}
+          {/* Barista & Roaster User Profile Modal */}
           <UserProfileDashboard
             isOpen={isProfileOpen}
             onClose={() => setIsProfileOpen(false)}
             trackMode={trackMode}
             currentUser={currentUser}
             onOpenAuth={handleOpenAuth}
-            onOpenRoasterPortal={() => {
+            onOpenRoasterPortal={(bean = null, initialTab = 'catalog') => {
               setIsProfileOpen(false);
+              setRoasterPrefillBean(bean || null);
+              if (bean?.upc) setRoasterPrefillBarcode(bean.upc);
+              setRoasterPortalInitialTab(initialTab);
               setIsRoasterPortalOpen(true);
+            }}
+            onNavigateToRoaster={(slug) => {
+              setIsProfileOpen(false);
+              setCurrentArea('discover');
+              setSelectedRoasterSlug(slug);
+              navigate(`/roasters/${slug}`);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onSelectBeanToBrew={(coffee) => {
+              setIsProfileOpen(false);
+              handleSelectBeanToBrew(coffee);
+            }}
+            onOpenWaterLab={() => {
+              setIsProfileOpen(false);
+              setIsWaterLabOpen(true);
             }}
             onLogout={() => setCurrentUser(null)}
           />

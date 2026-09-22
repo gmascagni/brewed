@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CupSoda, Scale, Sliders, CheckCircle2, Sparkles, Thermometer, Clock, ChevronRight, ChevronLeft, Volume2, VolumeX, Lightbulb, Gauge, RotateCcw, FlaskConical, ChevronDown, ChevronUp, Coffee } from 'lucide-react';
 import V60ProTipModal from './V60ProTipModal';
 import GrindVisualGuide from './GrindVisualGuide';
@@ -17,6 +17,7 @@ export default function PrecisionCalculator({
   setCustomRatio,
   customWaterMl,
   setCustomWaterMl,
+  customGrind = null,
   unitSystem,
   setUnitSystem,
   isMuted,
@@ -24,7 +25,8 @@ export default function PrecisionCalculator({
   onPrevStep,
   onNextStep,
   selectedCoffee = null,
-  onOpenWaterLab = null
+  onOpenWaterLab = null,
+  onSelectGrind = null
 }) {
   const isCoffee = trackMode === 'coffee';
   const isTea = trackMode === 'tea';
@@ -33,9 +35,16 @@ export default function PrecisionCalculator({
   const [isProTipOpen, setIsProTipOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
+  // Auto-sync ratio when selectedCoffee has a recommended ratio
+  useEffect(() => {
+    if (selectedCoffee?.recommendedRatio) {
+      setCustomRatio(Number(selectedCoffee.recommendedRatio));
+    }
+  }, [selectedCoffee]);
+
   // Math Calculations for Coffee & Tea
   const totalWaterMl = customWaterMl !== null ? customWaterMl : (cupCount * cupMl);
-  const currentRatio = customRatio || activeMethod?.ratio || (isCoffee ? 15 : 50);
+  const currentRatio = customRatio || (selectedCoffee?.recommendedRatio ? Number(selectedCoffee.recommendedRatio) : null) || activeMethod?.ratio || (isCoffee ? 15 : 50);
   const dryDoseGrams = totalWaterMl / currentRatio;
 
   // Conversion helpers for Imperial
@@ -45,12 +54,99 @@ export default function PrecisionCalculator({
   const waterDisplay = isMetric ? `${totalWaterMl} mL` : `${totalWaterOz} fl oz`;
   const doseDisplay = isMetric ? `${dryDoseGrams.toFixed(1)} g` : `${dryDoseOz} oz (${dryDoseGrams.toFixed(1)}g)`;
 
-  const CUP_VOLUMES = [
-    { label: isMetric ? 'Small Cup (200 mL)' : 'Small Cup (6.7 fl oz)', ml: 200 },
-    { label: isMetric ? 'Standard Mug (240 mL)' : 'Standard Mug (8 fl oz)', ml: 240 },
-    { label: isMetric ? 'Large Mug (300 mL)' : 'Large Mug (10.1 fl oz)', ml: 300 },
-    { label: isMetric ? 'Travel Tumbler (360 mL)' : 'Travel Tumbler (12.2 fl oz)', ml: 360 }
-  ];
+  const CUP_VOLUMES = (() => {
+    if (activeMethod?.id === 'espresso') {
+      return [
+        { label: isMetric ? 'Single Shot (18 mL)' : 'Single Shot (0.6 fl oz)', ml: 18 },
+        { label: isMetric ? 'Double Shot (36 mL)' : 'Double Shot (1.2 fl oz)', ml: 36 },
+        { label: isMetric ? 'Lungo (45 mL)' : 'Lungo (1.5 fl oz)', ml: 45 },
+        { label: isMetric ? 'Double Long (72 mL)' : 'Double Long (2.4 fl oz)', ml: 72 }
+      ];
+    }
+    if (activeMethod?.id === 'cold_brew') {
+      return [
+        { label: isMetric ? 'Single Glass (250 mL)' : 'Single Glass (8.5 fl oz)', ml: 250 },
+        { label: isMetric ? 'Standard Jar (350 mL)' : 'Standard Jar (11.8 fl oz)', ml: 350 },
+        { label: isMetric ? 'Pitcher (700 mL)' : 'Pitcher (23.7 fl oz)', ml: 700 },
+        { label: isMetric ? '1-Liter Batch (1000 mL)' : '1-Liter Batch (33.8 fl oz)', ml: 1000 }
+      ];
+    }
+    if (activeMethod?.id === 'moka_pot') {
+      return [
+        { label: isMetric ? '1-Cup Moka (60 mL)' : '1-Cup Moka (2.0 fl oz)', ml: 60 },
+        { label: isMetric ? '2-Cup Moka (120 mL)' : '2-Cup Moka (4.1 fl oz)', ml: 120 },
+        { label: isMetric ? '3-Cup Moka (180 mL)' : '3-Cup Moka (6.1 fl oz)', ml: 180 },
+        { label: isMetric ? '6-Cup Moka (300 mL)' : '6-Cup Moka (10.1 fl oz)', ml: 300 }
+      ];
+    }
+    return [
+      { label: isMetric ? 'Small Cup (200 mL)' : 'Small Cup (6.7 fl oz)', ml: 200 },
+      { label: isMetric ? 'Standard Mug (240 mL)' : 'Standard Mug (8 fl oz)', ml: 240 },
+      { label: isMetric ? 'Large Mug (300 mL)' : 'Large Mug (10.1 fl oz)', ml: 300 },
+      { label: isMetric ? 'Travel Tumbler (360 mL)' : 'Travel Tumbler (12.2 fl oz)', ml: 360 }
+    ];
+  })();
+
+  const ratioConfig = (() => {
+    if (!isCoffee) {
+      return {
+        min: 20,
+        max: 70,
+        step: 1,
+        presets: [
+          { ratio: 30, label: '1:30 (Gongfu)' },
+          { ratio: 50, label: '1:50 (Western Mug)' },
+          { ratio: 60, label: '1:60 (Delicate)' }
+        ]
+      };
+    }
+    if (activeMethod?.id === 'espresso') {
+      return {
+        min: 1.5,
+        max: 3.0,
+        step: 0.1,
+        presets: [
+          { ratio: 1.5, label: '1:1.5 (Ristretto)' },
+          { ratio: 2.0, label: '1:2.0 (Normale ⭐)' },
+          { ratio: 2.5, label: '1:2.5 (Lungo)' }
+        ]
+      };
+    }
+    if (activeMethod?.id === 'cold_brew') {
+      return {
+        min: 4,
+        max: 12,
+        step: 1,
+        presets: [
+          { ratio: 6, label: '1:6 (Concentrate)' },
+          { ratio: 8, label: '1:8 (Standard ⭐)' },
+          { ratio: 10, label: '1:10 (Light)' }
+        ]
+      };
+    }
+    if (activeMethod?.id === 'moka_pot') {
+      return {
+        min: 7,
+        max: 12,
+        step: 0.5,
+        presets: [
+          { ratio: 8, label: '1:8 (Intense)' },
+          { ratio: 10, label: '1:10 (Classic ⭐)' },
+          { ratio: 12, label: '1:12 (Smooth)' }
+        ]
+      };
+    }
+    return {
+      min: 12,
+      max: 18,
+      step: 0.5,
+      presets: [
+        { ratio: 15, label: '1:15 (Intense)' },
+        { ratio: 16, label: '1:16 (Golden Ratio ⭐)' },
+        { ratio: 17, label: '1:17 (Mellow)' }
+      ]
+    };
+  })();
 
   const handleCupCountChange = (count) => {
     hapticTap();
@@ -184,6 +280,9 @@ export default function PrecisionCalculator({
                 <span className="text-stone-400 text-xs ml-2">
                   • {selectedCoffee.roaster || selectedCoffee.origin || 'Artisan Selection'} ({selectedCoffee.roastLevel || 'Specialty'} Roast)
                 </span>
+                <div className="text-[11px] font-mono text-amber-gold/90 mt-0.5">
+                  Dial-In Specs: 1:{selectedCoffee.recommendedRatio || currentRatio} Ratio • {selectedCoffee.recommendedGrind || activeMethod?.grind || 'Standard'} Grind
+                </div>
               </div>
             </div>
             {onPrevStep && (
@@ -335,9 +434,9 @@ export default function PrecisionCalculator({
             <div className="flex items-center gap-2 mb-3">
               <input
                 type="range"
-                min={isCoffee ? "10" : "20"}
-                max={isCoffee ? "20" : "70"}
-                step="1"
+                min={ratioConfig.min}
+                max={ratioConfig.max}
+                step={ratioConfig.step}
                 value={currentRatio}
                 onChange={(e) => setCustomRatio(parseFloat(e.target.value))}
                 className="w-full h-2.5 bg-black/60 rounded-lg appearance-none cursor-pointer"
@@ -347,67 +446,28 @@ export default function PrecisionCalculator({
             {/* Quick Ratio Preset Pills Bar */}
             <div className="flex items-center space-x-2 pt-1 overflow-x-auto no-scrollbar">
               <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 font-bold mr-1 flex-shrink-0">Presets:</span>
-              {isCoffee ? (
-                <>
+              {ratioConfig.presets.map((preset) => {
+                const isSelected = Math.abs(currentRatio - preset.ratio) < 0.05;
+                const isStar = preset.label.includes('⭐');
+                return (
                   <button
+                    key={preset.ratio}
                     type="button"
-                    onClick={() => setCustomRatio(15)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
-                      currentRatio === 15 ? 'bg-amber-gold/30 text-amber-gold border-amber-gold' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
+                    onClick={() => setCustomRatio(preset.ratio)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 flex items-center gap-1 ${
+                      isSelected
+                        ? isStar
+                          ? 'bg-amber-400 text-espresso-950 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.4)]'
+                          : isCoffee
+                            ? 'bg-amber-gold/30 text-amber-gold border-amber-gold'
+                            : 'bg-sage-300 text-slate-950 border-sage-300'
+                        : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
                     }`}
                   >
-                    1:15 (Intense)
+                    <span>{preset.label}</span>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setCustomRatio(16)}
-                    className={`px-3 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 flex items-center gap-1 ${
-                      currentRatio === 16 ? 'bg-amber-400 text-espresso-950 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
-                    }`}
-                  >
-                    <span>1:16 (Golden Ratio ⭐)</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCustomRatio(17)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
-                      currentRatio === 17 ? 'bg-amber-gold/30 text-amber-gold border-amber-gold' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
-                    }`}
-                  >
-                    1:17 (Mellow)
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setCustomRatio(30)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
-                      currentRatio === 30 ? 'bg-sage-300 text-slate-950 border-sage-300' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
-                    }`}
-                  >
-                    1:30 (Gongfu)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCustomRatio(50)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
-                      currentRatio === 50 ? 'bg-sage-300 text-slate-950 border-sage-300' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
-                    }`}
-                  >
-                    1:50 (Standard)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCustomRatio(60)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-extrabold border transition-all flex-shrink-0 ${
-                      currentRatio === 60 ? 'bg-sage-300 text-slate-950 border-sage-300' : 'bg-black/40 text-stone-400 border-white/10 hover:text-cream-light'
-                    }`}
-                  >
-                    1:60 (Light)
-                  </button>
-                </>
-              )}
+                );
+              })}
             </div>
 
           </div>
@@ -533,7 +593,12 @@ export default function PrecisionCalculator({
 
       {/* 2. Interactive Burr Grinder Dial-In Guide (Inlined directly in Step 3) */}
       {isCoffee && (
-        <GrindVisualGuide activeMethod={activeMethod} />
+        <GrindVisualGuide 
+          activeMethod={activeMethod} 
+          targetGrind={customGrind || selectedCoffee?.recommendedGrind || selectedCoffee?.grindSetting || activeMethod?.grind}
+          recipeName={selectedCoffee?.beanName || selectedCoffee?.recipeTitle || selectedCoffee?.title}
+          onSelectGrind={onSelectGrind}
+        />
       )}
 
       {/* 3. Progressive Disclosure: Advanced Extraction & Water Settings Accordion */}

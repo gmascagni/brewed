@@ -4,7 +4,8 @@
 import QRCode from 'qrcode';
 import { doc, setDoc, deleteDoc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase.js';
-import { deduplicateCoffees, normalizeRoasterKey, SHOWCASE_ROASTERS } from './roasterShowcaseData.js';
+import { deduplicateCoffees, normalizeRoasterKey, SHOWCASE_ROASTERS, getAllShowcaseRoasters } from './roasterShowcaseData.js';
+import { checkRoasterBrandOwnership } from '../utils/roasterVerification.js';
 
 const STORAGE_KEY = 'thebrewapp_roaster_registry_v1';
 
@@ -43,15 +44,146 @@ export function getRegisteredCoffees(builtinCatalog = []) {
 }
 
 /**
- * Get only custom coffees registered via the Roaster Portal.
+ * Resolves all roaster brands and lots/coffees owned by the specified user session.
+ * Connects showcase roasters (e.g. Brookmill Coffee Roasters) and custom roaster profiles
+ * with all associated default and custom coffee lots.
+ */
+export function getRoasterOwnedBrandsAndCoffees(currentUser) {
+  if (!currentUser) {
+    return { ownedRoasters: [], primaryRoaster: null, ownedCoffees: [] };
+  }
+
+  // 1. Gather all potential roasters: builtins + custom
+  const allShowcase = typeof getAllShowcaseRoasters === 'function' ? getAllShowcaseRoasters() : (SHOWCASE_ROASTERS || []);
+  const allCustom = getCustomRoasters();
+
+  const roasterMap = new Map();
+  [...allShowcase, ...allCustom].forEach((r) => {
+    if (!r) return;
+    const key = r.slug || r.id || r.name;
+    if (key && !roasterMap.has(key)) {
+      roasterMap.set(key, r);
+    }
+  });
+
+  const allRoasters = Array.from(roasterMap.values());
+
+  // 2. Identify roasters owned by currentUser
+  const ownedRoasters = allRoasters.filter((r) => {
+    if (checkRoasterBrandOwnership(r, currentUser)) return true;
+    if (currentUser.roasterSlug && (r.slug === currentUser.roasterSlug || r.id === currentUser.roasterSlug)) return true;
+    if (currentUser.roasterName && r.name && r.name.toLowerCase() === currentUser.roasterName.toLowerCase()) return true;
+    return false;
+  });
+
+  // Fallback: If user has roaster credentials but no matching record found, synthesize profile
+  if (ownedRoasters.length === 0 && (currentUser.role === 'roaster' || currentUser.isVerifiedRoaster)) {
+    const fallbackName = currentUser.roasterName || currentUser.displayName || 'Specialty Roastery';
+    const fallbackSlug = currentUser.roasterSlug || fallbackName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    ownedRoasters.push({
+      id: fallbackSlug,
+      slug: fallbackSlug,
+      name: fallbackName,
+      location: currentUser.location || 'Specialty Coffee Roastery',
+      ownerEmail: currentUser.email,
+      ownerUsername: currentUser.username,
+      coffees: []
+    });
+  }
+
+  const primaryRoaster = ownedRoasters[0] || null;
+
+  // 3. Gather coffees for owned roasters
+  let customCoffees = [];
+  try {
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
+    customCoffees = raw ? JSON.parse(raw) : [];
+  } catch {}
+
+  const ownedCoffeesMap = new Map();
+
+  // First add all default coffees belonging to owned roasters
+  ownedRoasters.forEach((roaster) => {
+    (roaster.coffees || []).forEach((coffee) => {
+      const coffeeId = coffee.id || `coffee_${coffee.beanName}`;
+      ownedCoffeesMap.set(coffeeId, {
+        ...coffee,
+        id: coffeeId,
+        roaster: coffee.roaster || roaster.name,
+        roasterSlug: coffee.roasterSlug || roaster.slug,
+        ownerEmail: roaster.ownerEmail || currentUser.email,
+        ownerUid: roaster.ownerUid || currentUser.uid || currentUser.username
+      });
+    });
+  });
+
+  // Next, merge/override with custom coffees saved by this user or for this roaster
+  const userEmail = currentUser.email ? String(currentUser.email).trim().toLowerCase() : '';
+  const ownedSlugs = new Set(ownedRoasters.map((r) => r.slug));
+  const ownedNames = new Set(ownedRoasters.map((r) => r.name.toLowerCase()));
+
+  customCoffees.forEach((c) => {
+    const cEmail = c.ownerEmail ? String(c.ownerEmail).trim().toLowerCase() : '';
+    const matchesEmail = userEmail && cEmail === userEmail;
+    const matchesSlug = c.roasterSlug && ownedSlugs.has(c.roasterSlug);
+    const matchesName = c.roaster && ownedNames.has(c.roaster.toLowerCase());
+
+    if (matchesEmail || matchesSlug || matchesName) {
+      ownedCoffeesMap.set(c.id, {
+        ...c,
+        roaster: c.roaster || primaryRoaster?.name || 'Specialty Roastery',
+        roasterSlug: c.roasterSlug || primaryRoaster?.slug || 'specialty-roastery'
+      });
+    }
+  });
+
+  const ownedCoffees = Array.from(ownedCoffeesMap.values());
+
+  return {
+    ownedRoasters,
+    primaryRoaster,
+    ownedCoffees
+  };
+}
+
+/**
+ * Get custom and owned coffees registered via the Roaster Portal.
  * Optionally filtered by ownerEmail for authenticated roaster multi-tenant security.
  */
-export function getCustomRoasterCoffees(filterOwnerEmail = null) {
+export function getCustomRoasterCoffees(filterOwnerEmail = null, currentUser = null) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    if (currentUser && (currentUser.role === 'roaster' || currentUser.isVerifiedRoaster)) {
+      const { ownedCoffees } = getRoasterOwnedBrandsAndCoffees(currentUser);
+      if (ownedCoffees.length > 0) return ownedCoffees;
+    }
+
+    const raw = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
     const list = raw ? JSON.parse(raw) : [];
+
     if (filterOwnerEmail) {
       const cleanEmail = String(filterOwnerEmail).trim().toLowerCase();
+      // If the email matches a known roaster owner in showcase, include their coffees
+      const showcase = typeof getAllShowcaseRoasters === 'function' ? getAllShowcaseRoasters() : SHOWCASE_ROASTERS;
+      const matchingRoasters = (showcase || []).filter(
+        (r) =>
+          (r.ownerEmail && r.ownerEmail.toLowerCase() === cleanEmail) ||
+          (Array.isArray(r.ownerEmails) && r.ownerEmails.map((e) => e.toLowerCase()).includes(cleanEmail))
+      );
+
+      const combined = new Map();
+      matchingRoasters.forEach((r) => {
+        (r.coffees || []).forEach((c) => {
+          combined.set(c.id, { ...c, roaster: r.name, roasterSlug: r.slug, ownerEmail: cleanEmail });
+        });
+      });
+      list
+        .filter((c) => c.ownerEmail && c.ownerEmail.toLowerCase() === cleanEmail)
+        .forEach((c) => {
+          combined.set(c.id, c);
+        });
+
+      if (combined.size > 0) return Array.from(combined.values());
+
       return list.filter(
         (c) => c.ownerEmail && String(c.ownerEmail).trim().toLowerCase() === cleanEmail
       );
@@ -200,10 +332,17 @@ export function saveCustomRoasterProfile(profile, currentUser = null) {
     ? String(profile.ownerEmail).trim().toLowerCase() 
     : null;
 
+  const headRoaster = profile.headRoaster || profile.founderName || '';
+  const founders = Array.isArray(profile.founders) && profile.founders.length > 0
+    ? profile.founders
+    : (headRoaster ? headRoaster.split(',').map(s => s.trim()).filter(Boolean) : []);
+
   const record = {
     ...profile,
     id: slug,
     slug,
+    headRoaster,
+    founders,
     ownerEmail,
     ownerUid: currentUser?.uid || currentUser?.username || profile.ownerUid || null,
     updatedAt: new Date().toISOString()
@@ -374,7 +513,7 @@ export function generateSmartBagUrl(coffee, baseUrl, options = {}) {
   const params = new URLSearchParams();
   params.set('roaster', roasterSlug);
 
-  // If compact mode is requested (e.g. for small thermal labels like Brother QL-600 / DK-1209),
+  // If compact mode is requested (e.g. for small thermal labels like Brother QL / DK-1202),
   // use ultra-short URL format (thebrew.app/r/{code}) to guarantee low module density (Version 2–4).
   if (options.compact) {
     // 1. Direct Short URL if registered ID, shortCode, or UPC exists

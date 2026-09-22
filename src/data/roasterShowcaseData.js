@@ -438,15 +438,19 @@ export const SHOWCASE_ROASTERS = [
     id: 'brookmill-roaster',
     slug: 'brookmill-roaster',
     aliases: ['brookmill', 'brookmill-roasters', 'brookmill-roaster-alpharetta'],
-    name: 'Brookmill Roaster',
+    name: 'Brookmill Coffee Roasters',
     shortName: 'Brookmill',
-    ownerEmail: 'clpicke@live.com',
+    ownerEmail: 'clpicken@live.com',
+    ownerEmails: ['clpicken@live.com', 'clpicke@live.com'],
+    ownerUsername: 'clpicken',
+    ownerUid: 'user_clpicken',
     isDemoExample: false,
     tagline: 'Artisan Small-Batch Roasting & Precision Dial-In Labs',
     founded: '2020',
     city: 'Alpharetta',
     state: 'Georgia',
     country: 'USA',
+    location: 'Alpharetta, GA',
     website: 'https://thebrew.app/roasters/brookmill-roaster',
     shopUrl: 'https://thebrew.app/roasters/brookmill-roaster',
     brandColor: '#8C5A32',
@@ -556,7 +560,7 @@ export const SHOWCASE_ROASTERS = [
 import { getCustomRoasters, getCustomRoasterCoffees, saveCustomRoasterProfile, saveRoasterCoffee } from './roasterRegistry.js';
 
 
-function formatCustomRoasterAsShowcase(custom, coffees = []) {
+export function formatCustomRoasterAsShowcase(custom, coffees = []) {
   const name = custom.name || custom.roaster || 'Specialty Roastery';
   const slug = String(custom.slug || custom.id || name || 'specialty-roastery')
     .toLowerCase()
@@ -620,7 +624,13 @@ function formatCustomRoasterAsShowcase(custom, coffees = []) {
     logoImage: custom.logoImage || '',
     backgroundImage: custom.backgroundImage || custom.logoImage || '',
     tagline: custom.tagline || 'Artisan Specialty Roastery & Tasting Room',
-    founded: custom.founded || 'Specialty Craft',
+    headRoaster: custom.headRoaster || custom.founderName || '',
+    founders: Array.isArray(custom.founders) && custom.founders.length > 0
+      ? custom.founders
+      : (custom.headRoaster
+          ? custom.headRoaster.split(',').map(s => s.trim()).filter(Boolean)
+          : (custom.founderName ? [custom.founderName.trim()] : [])),
+    founded: custom.founded || custom.foundedYear || 'Specialty Craft',
     city: custom.city || location.split(',')[0]?.trim() || 'Artisan',
     state: custom.state || location.split(',')[1]?.trim() || '',
     country: custom.country || 'USA',
@@ -639,10 +649,21 @@ function formatCustomRoasterAsShowcase(custom, coffees = []) {
       { label: 'Smart Bag QR', value: 'Active' },
       { label: 'Quality Grade', value: 'SCA 86+' }
     ],
-    originStory: [
-      `${name} is an artisan coffee roastery based in ${location}. We source and roast with uncompromising dedication to origin terroir, seasonal freshness, and ethical grower relationships.`,
-      `Every bag we package features certified dial-in specifications so coffee lovers can experience our beans at peak potential.`
-    ],
+    originStory: (() => {
+      if (Array.isArray(custom.originStory) && custom.originStory.length > 0) {
+        return custom.originStory;
+      }
+      if (typeof custom.originStory === 'string' && custom.originStory.trim()) {
+        return custom.originStory.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+      }
+      if (typeof custom.story === 'string' && custom.story.trim()) {
+        return custom.story.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+      }
+      return [
+        `${name} is an artisan coffee roastery based in ${location}. We source and roast with uncompromising dedication to origin terroir, seasonal freshness, and ethical grower relationships.`,
+        `Every bag we package features certified dial-in specifications so coffee lovers can experience our beans at peak potential.`
+      ];
+    })(),
     roastingPhilosophy: 
       custom.roastingPhilosophy || 
       `We calibrate each roast profile to preserve the sweet enzymatic aromatics and sparkling acidity coaxed from the soil.`,
@@ -763,6 +784,12 @@ export function getAllShowcaseRoasters() {
     if (sr.slug) seenKeys.add(normalizeRoasterKey(sr.slug));
     if (sr.name) seenKeys.add(normalizeRoasterKey(sr.name));
 
+    // Check if there is an authenticated custom profile that claimed or updated this showcase roaster
+    const matchingCustomProfile = customRoasters.find((cr) => {
+      const crKey = normalizeRoasterKey(cr.id) || normalizeRoasterKey(cr.slug) || normalizeRoasterKey(cr.name);
+      return crKey === canonical;
+    });
+
     // Merge in any custom coffees registered for this showcase roaster
     const matchingCustomCoffees = allCustomCoffees.filter(
       (c) => c.roaster && normalizeRoasterKey(c.roaster) === canonical
@@ -770,11 +797,50 @@ export function getAllShowcaseRoasters() {
 
     const mergedCoffees = deduplicateCoffees([...(sr.coffees || []), ...matchingCustomCoffees]);
 
-    roastersList.push({
-      ...sr,
-      shortName: sr.shortName || getRoasterShortName(sr.name),
-      coffees: mergedCoffees
-    });
+    if (matchingCustomProfile) {
+      // Merge custom profile on top of showcase defaults!
+      const merged = {
+        ...sr,
+        ...matchingCustomProfile,
+        id: sr.id,
+        slug: sr.slug,
+        name: matchingCustomProfile.name || sr.name,
+        headRoaster: matchingCustomProfile.headRoaster || matchingCustomProfile.founderName || sr.headRoaster,
+        founders: (matchingCustomProfile.founders && matchingCustomProfile.founders.length > 0)
+          ? matchingCustomProfile.founders
+          : (matchingCustomProfile.headRoaster
+              ? matchingCustomProfile.headRoaster.split(',').map(s => s.trim()).filter(Boolean)
+              : sr.founders),
+        originStory: (() => {
+          if (Array.isArray(matchingCustomProfile.originStory) && matchingCustomProfile.originStory.length > 0) {
+            return matchingCustomProfile.originStory;
+          }
+          if (typeof matchingCustomProfile.originStory === 'string' && matchingCustomProfile.originStory.trim()) {
+            return matchingCustomProfile.originStory.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+          }
+          return sr.originStory;
+        })(),
+        roasterMachines: matchingCustomProfile.roasterMachines || sr.roasterMachines,
+        sourcingPhilosophy: matchingCustomProfile.sourcingPhilosophy || sr.sourcingPhilosophy,
+        roastingPhilosophy: matchingCustomProfile.roastingPhilosophy || sr.roastingPhilosophy,
+        tagline: matchingCustomProfile.tagline || sr.tagline,
+        founded: matchingCustomProfile.founded || matchingCustomProfile.foundedYear || sr.founded,
+        location: matchingCustomProfile.location || sr.location,
+        website: matchingCustomProfile.website || sr.website,
+        logoImage: matchingCustomProfile.logoImage || sr.logoImage,
+        ownerEmail: matchingCustomProfile.ownerEmail || sr.ownerEmail,
+        ownerUid: matchingCustomProfile.ownerUid || sr.ownerUid,
+        shortName: matchingCustomProfile.name ? getRoasterShortName(matchingCustomProfile.name) : sr.shortName,
+        coffees: mergedCoffees
+      };
+      roastersList.push(merged);
+    } else {
+      roastersList.push({
+        ...sr,
+        shortName: sr.shortName || getRoasterShortName(sr.name),
+        coffees: mergedCoffees
+      });
+    }
   });
 
   // 2. Process custom registered roaster profiles (e.g. from Roaster Studio or Firestore)
