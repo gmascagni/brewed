@@ -766,8 +766,9 @@ export default function PackagingLabelProofModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md flex items-start justify-center p-4 pt-14 sm:pt-20 pb-12 overflow-y-auto animate-fade-in">
-      <div className="relative max-w-lg w-full bg-[#120B08] border border-amber-gold/40 rounded-3xl p-6 shadow-2xl space-y-5 my-auto sm:my-2">
+    <div className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md overflow-y-auto animate-fade-in">
+      <div className="min-h-full flex items-start justify-center p-4 pt-12 sm:pt-16 pb-16">
+        <div className="relative max-w-lg w-full bg-[#120B08] border border-amber-gold/40 rounded-3xl p-6 shadow-2xl space-y-5">
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-gold flex items-center justify-center border border-amber-gold/40">
@@ -926,5 +927,6 @@ export default function PackagingLabelProofModal({
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }

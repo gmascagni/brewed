@@ -127,7 +127,7 @@ export default function UserProfileDashboard({
       role={isInline ? "region" : "dialog"} 
       aria-modal={!isInline} 
       aria-label="User Profile Dashboard" 
-      className={`relative max-w-3xl w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 p-6 md:p-8 shadow-2xl text-cream-light ${isInline ? 'my-2' : 'my-auto sm:my-2'}`}
+      className={`relative max-w-3xl w-full rounded-3xl bg-[#14110E] border-2 border-amber-gold/50 p-6 md:p-8 shadow-2xl text-cream-light ${isInline ? 'my-2' : ''}`}
     >
       {/* Modal Close Button */}
       {!isInline && (
@@ -668,8 +668,10 @@ export default function UserProfileDashboard({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center p-3 sm:p-6 pt-16 sm:pt-24 pb-12 overflow-y-auto bg-black/85 backdrop-blur-xl animate-fade-in">
-      {content}
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/85 backdrop-blur-xl animate-fade-in">
+      <div className="min-h-full flex items-start justify-center p-3 sm:p-6 pt-12 sm:pt-16 pb-16">
+        {content}
+      </div>
     </div>
   );
 }

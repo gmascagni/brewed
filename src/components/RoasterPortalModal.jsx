@@ -929,10 +929,11 @@ export default function RoasterPortalModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center p-3 sm:p-6 pt-14 sm:pt-20 pb-12 overflow-y-auto bg-black/85 backdrop-blur-md animate-fade-in">
-      <div 
-        className="relative w-full max-w-4xl bg-espresso-950/95 border border-[#A66E38]/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col my-auto sm:my-2"
-        role="dialog"
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/85 backdrop-blur-md animate-fade-in">
+      <div className="min-h-full flex items-start justify-center p-3 sm:p-6 pt-12 sm:pt-16 pb-16">
+        <div 
+          className="relative w-full max-w-4xl bg-espresso-950/95 border border-[#A66E38]/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+          role="dialog"
         aria-modal="true"
         aria-labelledby="roaster-portal-title"
       >
@@ -1324,5 +1325,6 @@ export default function RoasterPortalModal({
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }
