@@ -5,7 +5,7 @@ import QRCode from 'qrcode';
 import { doc, setDoc, deleteDoc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase.js';
 import { deduplicateCoffees, normalizeRoasterKey, SHOWCASE_ROASTERS, getAllShowcaseRoasters } from './roasterShowcaseData.js';
-import { checkRoasterBrandOwnership } from '../utils/roasterVerification.js';
+import { checkRoasterBrandOwnership, areEmailAliases } from '../utils/roasterVerification.js';
 
 const STORAGE_KEY = 'thebrewapp_roaster_registry_v1';
 
@@ -124,7 +124,7 @@ export function getRoasterOwnedBrandsAndCoffees(currentUser) {
 
   customCoffees.forEach((c) => {
     const cEmail = c.ownerEmail ? String(c.ownerEmail).trim().toLowerCase() : '';
-    const matchesEmail = userEmail && cEmail === userEmail;
+    const matchesEmail = userEmail && (cEmail === userEmail || areEmailAliases(cEmail, userEmail));
     const matchesSlug = c.roasterSlug && ownedSlugs.has(c.roasterSlug);
     const matchesName = c.roaster && ownedNames.has(c.roaster.toLowerCase());
 
@@ -132,7 +132,8 @@ export function getRoasterOwnedBrandsAndCoffees(currentUser) {
       ownedCoffeesMap.set(c.id, {
         ...c,
         roaster: c.roaster || primaryRoaster?.name || 'Specialty Roastery',
-        roasterSlug: c.roasterSlug || primaryRoaster?.slug || 'specialty-roastery'
+        roasterSlug: c.roasterSlug || primaryRoaster?.slug || 'specialty-roastery',
+        ownerEmail: matchesSlug || matchesName || areEmailAliases(cEmail, userEmail) ? (currentUser.email || c.ownerEmail) : c.ownerEmail
       });
     }
   });
@@ -219,7 +220,14 @@ export function saveRoasterCoffee(coffee, currentUser = null) {
   // Authorization Guard: Prevent tampering with another roaster's recipe
   if (existingCoffee && existingCoffee.ownerEmail && ownerEmail) {
     if (existingCoffee.ownerEmail.toLowerCase() !== ownerEmail.toLowerCase()) {
-      throw new Error(`Unauthorized: This recipe is registered to "${existingCoffee.ownerEmail}". Only the owner can modify it.`);
+      const isAlias = areEmailAliases(existingCoffee.ownerEmail, ownerEmail);
+      const isBrandOwner = currentUser && checkRoasterBrandOwnership(
+        { slug: existingCoffee.roasterSlug, name: existingCoffee.roaster, ownerEmail: existingCoffee.ownerEmail },
+        currentUser
+      );
+      if (!isAlias && !isBrandOwner) {
+        throw new Error(`Unauthorized: This recipe is registered to "${existingCoffee.ownerEmail}". Only the owner can modify it.`);
+      }
     }
   }
 
@@ -279,8 +287,17 @@ export function deleteRoasterCoffee(id, currentUser = null) {
   const target = existing.find((c) => c.id === id);
 
   if (target && target.ownerEmail && currentUser?.email) {
-    if (target.ownerEmail.toLowerCase() !== String(currentUser.email).trim().toLowerCase()) {
-      throw new Error(`Unauthorized: This coffee is owned by "${target.ownerEmail}". You cannot delete another roaster's coffee.`);
+    const userEmail = String(currentUser.email).trim().toLowerCase();
+    const targetEmail = target.ownerEmail.toLowerCase();
+    if (targetEmail !== userEmail) {
+      const isAlias = areEmailAliases(targetEmail, userEmail);
+      const isBrandOwner = currentUser && checkRoasterBrandOwnership(
+        { slug: target.roasterSlug, name: target.roaster, ownerEmail: target.ownerEmail },
+        currentUser
+      );
+      if (!isAlias && !isBrandOwner) {
+        throw new Error(`Unauthorized: This coffee is owned by "${target.ownerEmail}". You cannot delete another roaster's coffee.`);
+      }
     }
   }
 

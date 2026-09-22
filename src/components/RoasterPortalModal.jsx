@@ -30,6 +30,7 @@ import {
   downloadHighResQrPng 
 } from '../services/packagingAssetPipeline';
 import { printBrotherQlCoffee, printHtmlElementIsolated } from '../utils/printLabel';
+import { areEmailAliases } from '../utils/roasterVerification';
 import RoasterVideoTab from './portal/RoasterVideoTab';
 import RoasterProfileTab from './portal/RoasterProfileTab';
 import RoasterOnboardTab from './portal/RoasterOnboardTab';
@@ -668,11 +669,32 @@ export default function RoasterPortalModal({
       if (onOpenAuth) onOpenAuth({ role: 'roaster', mode: 'login' });
       return false;
     }
-    if (selectedCoffeeForSticker?.ownerEmail && selectedCoffeeForSticker.ownerEmail !== currentUser?.email) {
-      alert(`Authorization Protected: You are signed in as ${currentUser?.email}, but this coffee belongs to ${selectedCoffeeForSticker.ownerEmail}. Only the verified brand owner can generate packaging barcodes for this coffee.`);
-      return false;
+
+    if (!selectedCoffeeForSticker) return true;
+
+    // Brand-level authorization: If currentUser owns the roaster brand or the lot is in their owned lots, allow printing!
+    const { ownedRoasters, primaryRoaster, ownedCoffees } = getRoasterOwnedBrandsAndCoffees(currentUser);
+    const isOwnedLot = (ownedCoffees || []).some((c) => c.id === selectedCoffeeForSticker.id);
+    const isOwnedBrand =
+      (primaryRoaster && (
+        primaryRoaster.slug === selectedCoffeeForSticker.roasterSlug ||
+        (primaryRoaster.name && primaryRoaster.name.toLowerCase() === (selectedCoffeeForSticker.roaster || '').toLowerCase())
+      )) ||
+      (ownedRoasters || []).some((r) =>
+        r.slug === selectedCoffeeForSticker.roasterSlug ||
+        (r.name && r.name.toLowerCase() === (selectedCoffeeForSticker.roaster || '').toLowerCase())
+      );
+    const isDirectOwner =
+      !selectedCoffeeForSticker.ownerEmail ||
+      selectedCoffeeForSticker.ownerEmail.toLowerCase() === currentUser?.email?.toLowerCase() ||
+      areEmailAliases(selectedCoffeeForSticker.ownerEmail, currentUser?.email);
+
+    if (isOwnedLot || isOwnedBrand || isDirectOwner) {
+      return true;
     }
-    return true;
+
+    alert(`Authorization Protected: You are signed in as ${currentUser?.email}, but this coffee belongs to ${selectedCoffeeForSticker.ownerEmail}. Only the verified brand owner can generate packaging barcodes for this coffee.`);
+    return false;
   };
 
   const handlePrintSticker = async () => {

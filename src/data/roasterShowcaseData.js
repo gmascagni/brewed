@@ -441,7 +441,7 @@ export const SHOWCASE_ROASTERS = [
     name: 'Brookmill Coffee Roasters',
     shortName: 'Brookmill',
     ownerEmail: 'clpicken@live.com',
-    ownerEmails: ['clpicken@live.com', 'clpicke@live.com'],
+    ownerEmails: ['clpicken@live.com', 'clpicke@live.com', 'christian@brookmillcoffee.com'],
     ownerUsername: 'clpicken',
     ownerUid: 'user_clpicken',
     isDemoExample: false,

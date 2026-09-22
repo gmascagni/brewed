@@ -95,6 +95,21 @@ export function isDomainVerifiedRoaster(userEmail, roasterWebsite) {
   return false;
 }
 
+export const KNOWN_ROASTER_ALIASES = [
+  new Set(['clpicken@live.com', 'clpicke@live.com', 'christian@brookmillcoffee.com'])
+];
+
+/**
+ * Checks whether two email addresses are recognized aliases of the same individual/roaster
+ */
+export function areEmailAliases(emailA, emailB) {
+  if (!emailA || !emailB) return false;
+  const a = String(emailA).trim().toLowerCase();
+  const b = String(emailB).trim().toLowerCase();
+  if (a === b) return true;
+  return KNOWN_ROASTER_ALIASES.some((set) => set.has(a) && set.has(b));
+}
+
 /**
  * Determines whether the current logged-in user is the legitimate brand owner of a given roaster profile.
  * Enforces strict multi-tenant authorization:
@@ -112,11 +127,11 @@ export function checkRoasterBrandOwnership(roaster, currentUser) {
   // 1. Explicit creator / assigned brand owner of this roaster record
   if (roaster.ownerEmail && userEmail) {
     const rOwner = roaster.ownerEmail.toLowerCase();
-    if (rOwner === userEmail || (rOwner.includes('clpick') && userEmail.includes('clpick'))) {
+    if (rOwner === userEmail || (rOwner.includes('clpick') && userEmail.includes('clpick')) || areEmailAliases(rOwner, userEmail)) {
       return true;
     }
   }
-  if (Array.isArray(roaster.ownerEmails) && userEmail && roaster.ownerEmails.map(e => e.toLowerCase()).includes(userEmail)) {
+  if (Array.isArray(roaster.ownerEmails) && userEmail && roaster.ownerEmails.some(e => e.toLowerCase() === userEmail || areEmailAliases(e, userEmail))) {
     return true;
   }
   if (roaster.ownerUid && userUid && roaster.ownerUid === userUid) {
@@ -125,7 +140,8 @@ export function checkRoasterBrandOwnership(roaster, currentUser) {
   if (roaster.ownerUsername && userName && roaster.ownerUsername.toLowerCase() === userName) {
     return true;
   }
-  if ((userName === 'clpicken' || userEmail === 'clpicken@live.com' || userEmail === 'clpicke@live.com') &&
+  const brookmillEmails = ['clpicken@live.com', 'clpicke@live.com', 'christian@brookmillcoffee.com'];
+  if ((userName === 'clpicken' || brookmillEmails.includes(userEmail)) &&
       (roaster.slug === 'brookmill-roaster' || roaster.id === 'brookmill-roaster')) {
     return true;
   }
