@@ -139,7 +139,7 @@ export default function RoasterStickerStudioTab({
                   ? 'bg-amber-gold text-espresso-950 shadow'
                   : 'bg-white/[0.06] text-cream-soft hover:text-white'
               }`}
-              title="Brother QL DK-1202 Minimal High-Contrast Label (100mm x 62mm / 3.94in x 2.44in)"
+              title="Brother QL DK-1202 Minimal High-Contrast Label (2.4in x 3.9in / 62mm x 100mm)"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Brother QL Minimal (DK-1202)</span>
@@ -153,7 +153,7 @@ export default function RoasterStickerStudioTab({
                   ? 'bg-amber-gold text-espresso-950 shadow'
                   : 'bg-white/[0.06] text-cream-soft hover:text-white'
               }`}
-              title="Brother QL-600 / QL-800 / QL-1100 thermal roll label (DK-1202: 100mm x 62mm / 3.94in x 2.44in)"
+              title="Brother QL-600 / QL-800 / QL-1100 thermal roll label (DK-1202: 2.4in x 3.9in / 62mm x 100mm)"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Brother QL Full (DK-1202)</span>
@@ -429,7 +429,7 @@ export default function RoasterStickerStudioTab({
                     {selectedCoffeeForSticker?.roastLevel || roastLevel || 'Light'} Roast
                   </span>
                   <span className="text-[8px] font-mono text-stone-400 uppercase tracking-tight truncate ml-auto font-semibold">
-                    DK-1202 • 100×62mm
+                    DK-1202 • 2.4"×3.9" (62×100mm)
                   </span>
                 </div>
                 <h4 className="font-serif text-lg font-bold text-stone-950 truncate leading-tight">
@@ -518,7 +518,7 @@ export default function RoasterStickerStudioTab({
                     {selectedCoffeeForSticker?.origin || origin || 'SMART BAG'}
                   </span>
                   <span className="text-[8px] font-mono text-stone-400 uppercase tracking-tight truncate ml-auto font-semibold">
-                    DK-1202 • 100×62mm
+                    DK-1202 • 2.4"×3.9" (62×100mm)
                   </span>
                 </div>
                 <h3 className="font-serif text-xl font-black text-stone-950 truncate leading-tight tracking-tight">

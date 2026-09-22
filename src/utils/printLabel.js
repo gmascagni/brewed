@@ -50,7 +50,7 @@ export async function printBrotherQlCoffee(rawCoffee = {}, options = {}) {
 
     const title = `${rawCoffee.beanName || 'Coffee'} - Brother QL DK-1202 Label`;
 
-    // 3. Write isolated document with strict 100mm x 62mm (DK-1202) @page size and zero margins
+    // 3. Write isolated document with strict 62mm x 100mm landscape (DK-1202: 2.4" x 3.9") @page size and zero margins
     doc.open();
     doc.write(`
       <!DOCTYPE html>
@@ -60,12 +60,12 @@ export async function printBrotherQlCoffee(rawCoffee = {}, options = {}) {
         <title>${title}</title>
         <style>
           @page {
-            size: 100mm 62mm;
+            size: 62mm 100mm landscape;
             margin: 0mm;
           }
           @media print {
             @page {
-              size: 100mm 62mm;
+              size: 62mm 100mm landscape;
               margin: 0mm;
             }
             html, body {

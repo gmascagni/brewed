@@ -477,7 +477,7 @@ export function CoffeePackagingLabel({
                   {roastText} Roast
                 </span>
                 <span className="text-[7px] font-mono text-stone-400 uppercase tracking-tight truncate ml-auto font-semibold">
-                  DK-1202 • 100×62mm
+                  DK-1202 • 2.4"×3.9" (62×100mm)
                 </span>
               </div>
               <h4 className="font-serif text-sm font-bold text-stone-950 truncate leading-tight">
@@ -802,7 +802,7 @@ export default function PackagingLabelProofModal({
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-white'
             }`}
-            title="Brother QL DK-1202 Minimal High-Contrast (100mm x 62mm / 3.94in x 2.44in)"
+            title="Brother QL DK-1202 Minimal High-Contrast (2.4in x 3.9in / 62mm x 100mm)"
           >
             <span>QL Minimal</span>
           </button>
@@ -814,7 +814,7 @@ export default function PackagingLabelProofModal({
                 ? 'bg-amber-gold text-espresso-950 shadow'
                 : 'text-cream-soft hover:text-white'
             }`}
-            title="Brother QL-600 / QL-800 / QL-1100 full-spec thermal roll label (DK-1202: 100mm x 62mm / 3.94in x 2.44in)"
+            title="Brother QL-600 / QL-800 / QL-1100 full-spec thermal roll label (DK-1202: 2.4in x 3.9in / 62mm x 100mm)"
           >
             <span>QL Full Spec</span>
           </button>
