@@ -20,6 +20,14 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Roaster accounts collection: Multi-device roaster identity link
+    match /roaster_accounts/{email} {
+      allow read: if true;
+      allow create, update: if request.resource.data.email is string &&
+                               request.resource.data.email.size() > 0;
+      allow delete: if false;
+    }
+
     // Default deny for all other collections
     match /{document=**} {
       allow read, write: if false;

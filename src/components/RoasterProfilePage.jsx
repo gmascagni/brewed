@@ -33,7 +33,8 @@ export default function RoasterProfilePage({
   onOpenRoasterInfo,
   onOpenProfile,
   currentUser = null,
-  onOpenAuth = null
+  onOpenAuth = null,
+  activeCoffee = null
 }) {
   const [activeRoasterId, setActiveRoasterId] = useState(initialRoasterId);
   const roasterScrollRef = useRef(null);
@@ -202,6 +203,7 @@ export default function RoasterProfilePage({
       {/* 2. TOP STICKY NAVIGATION BAR */}
       <RoasterHeader
         onBackToApp={onBackToApp}
+        activeCoffee={activeCoffee || activeScannedCoffee}
         isBrandOwner={isBrandOwner}
         isDomainVerified={isDomainVerified}
         roaster={roaster}

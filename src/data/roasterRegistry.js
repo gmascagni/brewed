@@ -516,63 +516,61 @@ export function getSmartBagBaseUrl() {
 }
 
 /**
- * Generate a deep-link URL for a coffee profile that opens the Roaster's Portfolio page with dial-in parameters
+ * Generate a deep-link URL for a coffee profile that opens the app directly into the dialed-in recipe
  */
 export function generateSmartBagUrl(coffee, baseUrl, options = {}) {
   const base = (baseUrl || getSmartBagBaseUrl()).replace(/\/+$/, '');
-  if (!coffee) return `${base}/roasters/`;
+  if (!coffee) return `${base}/`;
 
-  const roasterSlug = String(coffee.roaster || 'methodical')
+  // Normalize roaster slug with full alias resolution
+  let roasterSlug = String(coffee.roasterSlug || coffee.roaster || 'methodical')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+  if (roasterSlug.includes('brookmill')) {
+    roasterSlug = 'brookmill-roaster';
+  }
 
   const params = new URLSearchParams();
+  // Essential flag: launches the brew app straight into the Recipe & Dial-In step (Step 3)
+  params.set('recipe', '1');
   params.set('roaster', roasterSlug);
 
-  // If compact mode is requested (e.g. for small thermal labels like Brother QL / DK-1202),
-  // use ultra-short URL format (thebrew.app/r/{code}) to guarantee low module density (Version 2–4).
-  if (options.compact) {
-    // 1. Direct Short URL if registered ID, shortCode, or UPC exists
-    const identifier = coffee.shortCode || coffee.id || coffee.upc;
-    if (identifier) {
-      return `${base}/r/${encodeURIComponent(identifier)}`;
-    }
-
-    // 2. Ultra-compact fallback with single-letter keys for custom one-off beans
-    const shortParams = new URLSearchParams();
-    if (roasterSlug) shortParams.set('r', roasterSlug);
-    if (coffee.beanName) shortParams.set('b', coffee.beanName);
-    if (coffee.brewMethod) shortParams.set('m', coffee.brewMethod);
-    if (coffee.recommendedRatio) shortParams.set('x', coffee.recommendedRatio.toString());
-    if (coffee.tempF) shortParams.set('t', coffee.tempF.toString());
-    if (coffee.recommendedGrind) shortParams.set('g', coffee.recommendedGrind.split('(')[0].trim());
-    return `${base}/r/?${shortParams.toString()}`;
+  const roasterDisplayName = coffee.roaster || (roasterSlug.includes('brookmill') ? 'Brookmill Coffee Roasters' : roasterSlug);
+  if (roasterDisplayName && roasterDisplayName !== roasterSlug) {
+    params.set('roasterName', roasterDisplayName);
   }
-
-  if (coffee.roaster && coffee.roaster !== roasterSlug) params.set('roasterName', coffee.roaster);
   if (coffee.beanName) params.set('bean', coffee.beanName);
   if (coffee.id) params.set('coffeeId', coffee.id);
-  if (coffee.brewMethod) params.set('method', coffee.brewMethod);
-  if (coffee.recommendedRatio) params.set('ratio', coffee.recommendedRatio.toString());
-  if (coffee.tempF) params.set('tempF', coffee.tempF.toString());
-  if (coffee.recommendedGrind) params.set('grind', coffee.recommendedGrind);
+
+  // Extract extraction dial-in specs reliably
+  const method = coffee.brewMethod || coffee.extraction?.method || 'pour_over';
+  const ratio = coffee.recommendedRatio || coffee.extraction?.ratio || 16.5;
+  const tempF = coffee.tempF || coffee.extraction?.tempF || 202;
+  const grind = coffee.recommendedGrind || coffee.extraction?.grind || 'Medium-Fine';
+
+  params.set('method', method);
+  params.set('ratio', ratio.toString());
+  params.set('tempF', tempF.toString());
+  params.set('grind', grind);
   if (coffee.upc) params.set('upc', coffee.upc);
-  if (coffee.origin) params.set('origin', coffee.origin);
-  if (coffee.process) params.set('process', coffee.process);
-  if (coffee.elevation) params.set('elevation', coffee.elevation);
-  if (coffee.roastLevel) params.set('roast', coffee.roastLevel);
-  if (coffee.tastingNotes && Array.isArray(coffee.tastingNotes) && coffee.tastingNotes.length > 0) {
-    params.set('notes', coffee.tastingNotes.join(', '));
-  } else if (coffee.notes) {
-    params.set('notes', coffee.notes);
+
+  if (!options.compact) {
+    if (coffee.origin) params.set('origin', coffee.origin);
+    if (coffee.process) params.set('process', coffee.process);
+    if (coffee.elevation) params.set('elevation', coffee.elevation);
+    if (coffee.roastLevel) params.set('roast', coffee.roastLevel);
   }
 
-  // Use the physical directory /roasters/ with query parameters.
-  // This guarantees that static web servers (GitHub Pages, Cloudflare, S3)
-  // immediately return HTTP 200 OK because roasters/index.html is a real physical file.
-  // This prevents 404 errors on smartphone cameras and third-party QR scanner apps.
-  return `${base}/roasters/?${params.toString()}`;
+  const rawNotes = coffee.tastingNotes && Array.isArray(coffee.tastingNotes) && coffee.tastingNotes.length > 0
+    ? coffee.tastingNotes.join(', ')
+    : (coffee.notes || '');
+  if (rawNotes) {
+    params.set('notes', rawNotes);
+  }
+
+  // Direct root path with query parameters launches the brew app straight into the recipe!
+  return `${base}/?${params.toString()}`;
 }
 
 

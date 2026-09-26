@@ -225,92 +225,72 @@ export function CoffeePackagingLabel({
         ref={labelRef}
         className={`w-full max-w-sm mx-auto flex flex-col justify-between rounded-3xl bg-white text-stone-900 p-5 sm:p-6 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 group ${isEnlarged ? 'scale-100' : ''}`}
       >
-        <div className="absolute top-2 left-2 text-[10px] font-mono text-stone-300 leading-none select-none">+</div>
-        <div className="absolute top-2 right-2 text-[10px] font-mono text-stone-300 leading-none select-none">+</div>
-        <div className="absolute bottom-2 left-2 text-[10px] font-mono text-stone-300 leading-none select-none">+</div>
-        <div className="absolute bottom-2 right-2 text-[10px] font-mono text-stone-300 leading-none select-none">+</div>
-
         <div className="space-y-3">
           <div className="flex items-center justify-between border-b border-stone-200 pb-2">
-            <div>
-              <span className="text-[8px] font-mono uppercase tracking-widest text-stone-500 font-bold block">
-                SPECIALTY ROASTERY • SMART BAG
-              </span>
-              <h4 className="font-serif text-sm font-bold text-stone-900 leading-tight">
-                {roaster?.name || coffee.roaster || 'Specialty Roastery'}
-              </h4>
-            </div>
-            <span className="px-2 py-0.5 rounded-full bg-stone-900 text-white font-mono text-[9px] font-bold uppercase tracking-wider">
+            <h4 className="font-serif text-base sm:text-lg font-black text-stone-900 leading-tight truncate">
+              {roaster?.name || coffee.roaster || 'Specialty Roastery'}
+            </h4>
+            <span className="px-2.5 py-0.5 rounded-full bg-stone-900 text-white font-mono text-[9px] font-bold uppercase tracking-wider shrink-0">
               {roastText}
             </span>
           </div>
 
           <div>
-            <h3 className="font-serif text-base sm:text-lg font-black text-stone-950 leading-snug">
+            <h3 className="font-serif text-lg sm:text-xl font-black text-stone-950 leading-snug">
               {coffee.beanName}
             </h3>
-            <p className="text-[11px] font-mono text-stone-600 mt-0.5 truncate">
+            <p className="text-xs font-mono text-stone-600 mt-0.5 truncate font-medium">
               {coffee.origin || 'Specialty Origin'} • {coffee.process || 'Washed'}
             </p>
           </div>
 
           {coffee.tastingNotes && coffee.tastingNotes.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {coffee.tastingNotes.slice(0, 3).map((note, i) => (
-                <span key={i} className="px-2 py-0.5 rounded bg-stone-100 border border-stone-300 text-[10px] font-mono text-stone-700 font-medium">
-                  {note}
-                </span>
-              ))}
-            </div>
+            <p className="text-xs font-serif italic text-amber-900 truncate">
+              Notes: {coffee.tastingNotes.slice(0, 3).join(', ')}
+            </p>
           )}
 
-          <div className="flex flex-col items-center justify-center p-2.5 bg-stone-50 rounded-2xl border border-stone-200 shadow-inner">
-            <div className="flex items-center justify-center gap-1.5 px-3 py-0.5 rounded-full bg-stone-900 text-white font-mono text-[9px] font-bold uppercase tracking-wider mb-2 shadow-sm">
-              <Sparkles className="w-3 h-3 text-amber-400" />
-              <span>Scan Me for Recipe</span>
-            </div>
-
+          <div className="flex flex-col items-center justify-center p-2 bg-white rounded-2xl border-2 border-stone-800 shadow-sm mx-auto w-fit">
             {qrDataUrl ? (
               <img
                 src={qrDataUrl}
                 alt={`Smart Bag QR for ${coffee.beanName}`}
-                className="w-32 h-32 sm:w-36 sm:h-36 object-contain rounded-lg p-1 bg-white border border-stone-200"
+                className="w-36 h-36 sm:w-40 sm:h-40 object-contain"
               />
             ) : (
-              <div className="w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-center text-stone-400 font-mono text-xs">
+              <div className="w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center text-stone-400 font-mono text-xs">
                 Generating QR...
               </div>
             )}
-
-            <span className="text-[8px] font-mono text-stone-500 uppercase tracking-wider mt-1.5 font-bold">
-              Aim phone camera to load timer
-            </span>
           </div>
 
-          <div className="grid grid-cols-4 gap-1 p-2 rounded-xl bg-stone-100 border border-stone-200 text-center font-mono">
+          <div className="grid grid-cols-4 gap-1.5 p-2 rounded-xl bg-stone-100 border border-stone-300 text-center font-mono">
             <div>
-              <span className="text-[8px] uppercase text-stone-500 block">Ratio</span>
-              <span className="text-[11px] font-bold text-amber-900">1:{coffee.recommendedRatio || 16.5}</span>
+              <span className="text-[8px] uppercase text-stone-500 font-bold block">Ratio</span>
+              <span className="text-xs font-black text-amber-900">1:{coffee.recommendedRatio || 16.5}</span>
             </div>
             <div>
-              <span className="text-[8px] uppercase text-stone-500 block">Temp</span>
-              <span className="text-[11px] font-bold text-stone-900">{coffee.tempF || 202}°F</span>
+              <span className="text-[8px] uppercase text-stone-500 font-bold block">Temp</span>
+              <span className="text-xs font-black text-stone-900">{coffee.tempF || 202}°F</span>
             </div>
             <div>
-              <span className="text-[8px] uppercase text-stone-500 block">Method</span>
-              <span className="text-[10px] font-bold text-stone-900 truncate block capitalize">
+              <span className="text-[8px] uppercase text-stone-500 font-bold block">Method</span>
+              <span className="text-[11px] font-bold text-stone-900 truncate block capitalize">
                 {(coffee.brewMethod || 'pour_over').replace(/_/g, ' ').split(' ')[0]}
               </span>
             </div>
             <div>
-              <span className="text-[8px] uppercase text-stone-500 block">Grind</span>
-              <span className="text-[10px] font-bold text-stone-900 truncate block">
+              <span className="text-[8px] uppercase text-stone-500 font-bold block">Grind</span>
+              <span className="text-[11px] font-bold text-stone-900 truncate block">
                 {(coffee.recommendedGrind || 'Med-Fine').split(' ')[0]}
               </span>
             </div>
           </div>
 
-          <BarcodeStripes value={upc} />
+          {/* FULL-WIDTH BOTTOM BANNER: SCAN FOR RECIPE */}
+          <div className="w-full bg-stone-950 text-white font-black text-center py-2.5 rounded-xl text-xs sm:text-sm tracking-wider uppercase shadow-md mt-1">
+            SCAN FOR RECIPE
+          </div>
         </div>
 
         <div className="pt-3 mt-3 border-t border-stone-200 flex items-center justify-between gap-1.5">
@@ -366,42 +346,37 @@ export function CoffeePackagingLabel({
         <div className="flex items-stretch justify-between gap-3 h-full">
           <div className="flex-1 min-w-0 pr-1 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-1.5 mb-1">
-                <span className="text-[7.5px] font-mono uppercase tracking-wider font-black bg-stone-900 text-white px-1.5 py-0.5 rounded">
-                  THEBREW.APP
-                </span>
-                <span className="text-[7.5px] font-mono text-stone-600 uppercase tracking-tight truncate font-bold">
-                  {coffee.origin || 'SMART BAG'}
-                </span>
-              </div>
-              <h3 className="font-serif text-base sm:text-lg font-black text-stone-950 truncate leading-tight tracking-tight">
+              <h4 className="font-serif text-base sm:text-lg font-black text-stone-950 truncate leading-tight">
+                {roaster?.name || coffee.roaster || 'Specialty Roastery'}
+              </h4>
+              <h3 className="font-serif text-lg sm:text-xl font-black text-stone-950 truncate leading-tight tracking-tight mt-0.5">
                 {coffee.beanName}
               </h3>
-              <p className="text-[10.5px] text-stone-600 font-bold truncate font-mono uppercase tracking-wider mt-0.5">
-                {roaster?.name || coffee.roaster || 'Specialty Roastery'}
+              <p className="text-xs text-stone-600 font-mono font-bold uppercase tracking-wider truncate mt-0.5">
+                {coffee.origin || 'SINGLE ORIGIN'} • {roastText}
               </p>
             </div>
 
-            <div className="bg-stone-100 border border-stone-300 rounded-md px-2 py-1 my-1">
-              <span className="text-[8.5px] font-mono font-black text-stone-900 tracking-tight block">
-                RATIO 1:{coffee.recommendedRatio || 16.5} • {coffee.tempF || 202}°F • {(coffee.brewMethod || 'pour_over').replace(/_/g, ' ').toUpperCase()} • 140 TDS
-              </span>
-            </div>
-
-            <div>
-              {coffee.tastingNotes && coffee.tastingNotes.length > 0 && (
-                <p className="text-[9px] font-serif italic text-stone-700 truncate mb-0.5">
-                  Notes: {coffee.tastingNotes.slice(0, 3).join(', ')}
-                </p>
-              )}
-              <div className="flex items-center justify-between text-[7px] font-mono text-stone-600 pt-1 border-t border-stone-200">
-                <span className="font-extrabold text-stone-900 uppercase">⚡ SCAN TO BREW</span>
-                <span className="truncate">{upc}</span>
+            <div className="bg-stone-100 border border-stone-300 rounded-md p-2 my-1 space-y-1">
+              <div className="flex items-center justify-between text-[11px] font-mono font-black text-stone-900">
+                <span className="text-amber-900">RATIO 1:{coffee.recommendedRatio || 16.5}</span>
+                <span>{coffee.tempF || 202}°F</span>
+                <span className="capitalize">{(coffee.brewMethod || 'pour_over').replace(/_/g, ' ')}</span>
+              </div>
+              <div className="text-[10px] font-mono text-stone-600 flex justify-between pt-1 border-t border-stone-200">
+                <span>GRIND: {(coffee.recommendedGrind || 'Med-Fine').split('(')[0]}</span>
+                <span>140 TDS</span>
               </div>
             </div>
+
+            {coffee.tastingNotes && coffee.tastingNotes.length > 0 && (
+              <p className="text-[10.5px] font-serif italic text-stone-700 truncate">
+                Notes: {coffee.tastingNotes.slice(0, 3).join(', ')}
+              </p>
+            )}
           </div>
 
-          <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-lg border-2 border-stone-800 h-full aspect-square w-28 h-28 sm:w-32 sm:h-32 shadow-sm">
+          <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-xl border-2 border-stone-800 w-28 h-28 sm:w-32 sm:h-32 my-auto shadow-sm">
             {qrDataUrl ? (
               <img
                 src={qrDataUrl}
@@ -416,7 +391,12 @@ export function CoffeePackagingLabel({
           </div>
         </div>
 
-        <div className="pt-2.5 mt-2.5 border-t border-stone-200 flex items-center justify-between gap-1.5">
+        {/* FULL-WIDTH BOTTOM BANNER: SCAN FOR RECIPE */}
+        <div className="w-full bg-stone-950 text-white font-black text-center py-2 rounded-lg text-xs sm:text-sm tracking-wider uppercase shadow-sm mt-2">
+          SCAN FOR RECIPE
+        </div>
+
+        <div className="pt-2 mt-2 border-t border-stone-200 flex items-center justify-between gap-1.5">
           <button
             type="button"
             onClick={handleDownload}
@@ -466,62 +446,51 @@ export function CoffeePackagingLabel({
   if (layout === 'brother_ql') {
     return (
       <div className={`w-full max-w-md mx-auto flex flex-col justify-between rounded-2xl bg-white text-stone-900 p-3.5 border-2 border-stone-800 shadow-2xl relative overflow-hidden select-none transition-all duration-300 hover:shadow-amber-gold/20 group ${isEnlarged ? 'scale-100' : ''}`}>
-        <div className="flex items-stretch justify-between gap-2.5 h-full">
+        <div className="flex items-stretch justify-between gap-3 h-full">
           <div className="flex-1 min-w-0 pr-1 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="text-[7px] font-mono uppercase tracking-wider font-extrabold bg-stone-900 text-white px-1.5 py-0.5 rounded">
-                  THEBREW.APP
-                </span>
-                <span className="text-[7px] font-mono text-stone-500 uppercase tracking-tight truncate">
-                  {roastText} Roast
-                </span>
-                <span className="text-[7px] font-mono text-stone-400 uppercase tracking-tight truncate ml-auto font-semibold">
-                  DK-1202 • 2.4"×3.9" (62×100mm)
-                </span>
-              </div>
-              <h4 className="font-serif text-sm font-bold text-stone-950 truncate leading-tight">
+              <h4 className="font-serif text-base sm:text-lg font-black text-stone-950 truncate leading-tight">
                 {roaster?.name || coffee.roaster || 'Specialty Roaster'}
               </h4>
-              <p className="text-[11px] text-stone-700 font-medium truncate font-sans">
+              <p className="text-sm text-stone-900 font-bold truncate font-sans">
                 {coffee.beanName}
               </p>
+              <p className="text-xs text-stone-600 font-mono font-bold uppercase tracking-wider truncate mt-0.5">
+                {roastText} ROAST • {coffee.origin || 'SINGLE ORIGIN'}
+              </p>
+              {coffee.tastingNotes && coffee.tastingNotes.length > 0 && (
+                <p className="text-xs text-amber-900 font-serif italic truncate mt-0.5">
+                  Notes: {coffee.tastingNotes.slice(0, 3).join(', ')}
+                </p>
+              )}
             </div>
 
-            <div className="grid grid-cols-3 gap-1 py-1 px-1.5 bg-stone-100 rounded-md border border-stone-200 text-[7.5px] font-mono my-1">
-              <div>
-                <span className="text-stone-500 block text-[6.5px] uppercase leading-none">Ratio</span>
-                <span className="font-bold text-amber-800">1:{coffee.recommendedRatio || 16.5}</span>
+            {/* 4-Cell Dial-In Grid */}
+            <div className="grid grid-cols-2 gap-1.5 py-1.5 my-1">
+              <div className="bg-stone-100 rounded-md p-1.5 border border-stone-200">
+                <span className="text-stone-500 block text-[8px] uppercase font-mono font-bold leading-none mb-0.5">Ratio</span>
+                <span className="font-mono font-black text-amber-900 text-xs block truncate">1:{coffee.recommendedRatio || 16.5}</span>
               </div>
-              <div>
-                <span className="text-stone-500 block text-[6.5px] uppercase leading-none">Temp</span>
-                <span className="font-bold text-stone-900">{coffee.tempF || 202}°F</span>
+              <div className="bg-stone-100 rounded-md p-1.5 border border-stone-200">
+                <span className="text-stone-500 block text-[8px] uppercase font-mono font-bold leading-none mb-0.5">Temp</span>
+                <span className="font-mono font-black text-stone-950 text-xs block truncate">{coffee.tempF || 202}°F</span>
               </div>
-              <div>
-                <span className="text-stone-500 block text-[6.5px] uppercase leading-none">Water</span>
-                <span className="font-bold text-cyan-800">140 TDS</span>
-              </div>
-              <div>
-                <span className="text-stone-500 block text-[6.5px] uppercase leading-none">Method</span>
-                <span className="font-bold text-stone-900 capitalize truncate block">
+              <div className="bg-stone-100 rounded-md p-1.5 border border-stone-200">
+                <span className="text-stone-500 block text-[8px] uppercase font-mono font-bold leading-none mb-0.5">Method</span>
+                <span className="font-sans font-bold text-stone-900 capitalize truncate block text-[10px]">
                   {(coffee.brewMethod || 'pour_over').replace(/_/g, ' ')}
                 </span>
               </div>
-              <div className="col-span-2">
-                <span className="text-stone-500 block text-[6.5px] uppercase leading-none">Grind</span>
-                <span className="font-bold text-stone-900 truncate block">
+              <div className="bg-stone-100 rounded-md p-1.5 border border-stone-200">
+                <span className="text-stone-500 block text-[8px] uppercase font-mono font-bold leading-none mb-0.5">Grind</span>
+                <span className="font-sans font-bold text-stone-900 truncate block text-[10px]">
                   {(coffee.recommendedGrind || 'Med-Fine').split('(')[0]}
                 </span>
               </div>
             </div>
-
-            <div className="flex items-center justify-between text-[7px] font-mono text-stone-500 pt-0.5 border-t border-stone-200">
-              <span className="truncate">{upc}</span>
-              <span className="font-bold text-stone-800 uppercase">⚡ Scan Recipe</span>
-            </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-lg border border-stone-300 h-full aspect-square w-28 h-28 sm:w-32 sm:h-32">
+          <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-xl border-2 border-stone-800 w-28 h-28 sm:w-32 sm:h-32 my-auto shadow-sm">
             {qrDataUrl ? (
               <img
                 src={qrDataUrl}
@@ -534,6 +503,11 @@ export function CoffeePackagingLabel({
               </div>
             )}
           </div>
+        </div>
+
+        {/* FULL-WIDTH BOTTOM BANNER: SCAN FOR RECIPE */}
+        <div className="w-full bg-stone-950 text-white font-black text-center py-2 rounded-lg text-xs sm:text-sm tracking-wider uppercase shadow-sm mt-2">
+          SCAN FOR RECIPE
         </div>
 
         <div className="pt-2.5 mt-2.5 border-t border-stone-200 flex items-center justify-between gap-1.5">

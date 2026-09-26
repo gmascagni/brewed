@@ -10,6 +10,7 @@ import { normalizeRoasterKey, getRoasterShortName } from '../../data/roasterShow
 
 export default function RoasterHeader({
   onBackToApp,
+  activeCoffee = null,
   isBrandOwner,
   isDomainVerified,
   roaster,
@@ -20,6 +21,10 @@ export default function RoasterHeader({
   copiedLink,
   handleSharePage
 }) {
+  const backLabel = activeCoffee?.beanName 
+    ? `Back to Recipe: ${activeCoffee.beanName.length > 20 ? `${activeCoffee.beanName.slice(0, 18)}…` : activeCoffee.beanName}`
+    : 'Brewing Station';
+
   return (
     <header className="sticky top-0 z-40 bg-[#0A0604]/85 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 py-3.5">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
@@ -29,10 +34,10 @@ export default function RoasterHeader({
             <button
               onClick={onBackToApp}
               className="py-1.5 px-3 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-cream-light hover:text-amber-gold border border-white/15 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow cursor-pointer"
-              title="Return to Brewing Station"
+              title={activeCoffee?.beanName ? `Return to recipe for ${activeCoffee.beanName}` : "Return to Brewing Station"}
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Brewing Station</span>
+              <span>{backLabel}</span>
             </button>
           )}
 

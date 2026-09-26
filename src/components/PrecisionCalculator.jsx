@@ -26,7 +26,8 @@ export default function PrecisionCalculator({
   onNextStep,
   selectedCoffee = null,
   onOpenWaterLab = null,
-  onSelectGrind = null
+  onSelectGrind = null,
+  onViewRoasterProfile = null
 }) {
   const isCoffee = trackMode === 'coffee';
   const isTea = trackMode === 'tea';
@@ -263,37 +264,70 @@ export default function PrecisionCalculator({
             : 'Calculates exact tea leaf weight (oz/g) and hot water volume (fl oz/mL). Adjust cup count, mug size, or fine-tune water volume directly below.'}
         </p>
 
-        {/* Active Selected Coffee Context Pill */}
+        {/* Active Selected Coffee Context Pill & Roaster Profile Action */}
         {selectedCoffee && (
-          <div className="mt-4 p-3 rounded-2xl bg-black/50 border border-white/10 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2.5">
-              <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-[#D2A06E] flex items-center justify-center">
-                <Coffee className="w-3.5 h-3.5" />
+          <div className="mt-4 p-4 rounded-2xl bg-gradient-to-r from-[#1A120B] via-[#120D0A] to-[#1A120B] border border-amber-500/30 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-[#D2A06E] flex items-center justify-center shrink-0 border border-amber-500/30">
+                <Coffee className="w-5 h-5" />
               </div>
-              <div>
-                <span className="text-[10px] font-mono text-[#E8AF72] uppercase tracking-wider block font-bold">
-                  Roaster Certified Dial-In Active • Selected Coffee
-                </span>
-                <span className="font-serif font-bold text-cream-light text-sm">
-                  {selectedCoffee.beanName || selectedCoffee.name}
-                </span>
-                <span className="text-stone-400 text-xs ml-2">
-                  • {selectedCoffee.roaster || selectedCoffee.origin || 'Artisan Selection'} ({selectedCoffee.roastLevel || 'Specialty'} Roast)
-                </span>
-                <div className="text-[11px] font-mono text-amber-gold/90 mt-0.5">
-                  Dial-In Specs: 1:{selectedCoffee.recommendedRatio || currentRatio} Ratio • {selectedCoffee.recommendedGrind || activeMethod?.grind || 'Standard'} Grind
+              <div className="space-y-0.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-mono text-[#E8AF72] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                    Roaster Dial-In Recipe Active
+                  </span>
+                  {selectedCoffee.roastLevel && (
+                    <span className="text-[10px] font-mono text-stone-400 uppercase">
+                      {selectedCoffee.roastLevel}
+                    </span>
+                  )}
                 </div>
+                <div className="flex flex-wrap items-baseline gap-2 pt-0.5">
+                  <span className="font-serif font-bold text-cream-light text-base sm:text-lg">
+                    {selectedCoffee.beanName || selectedCoffee.name}
+                  </span>
+                  <span className="text-stone-300 text-xs font-medium">
+                    by <strong className="text-amber-gold font-semibold">{selectedCoffee.roaster || selectedCoffee.origin || 'Specialty Roaster'}</strong>
+                  </span>
+                </div>
+                <div className="text-[11px] font-mono text-stone-400 flex flex-wrap items-center gap-2 pt-0.5">
+                  <span>Target: <strong className="text-amber-200">1:{selectedCoffee.recommendedRatio || currentRatio}</strong></span>
+                  <span>•</span>
+                  <span>Temp: <strong className="text-cream-light">{selectedCoffee.tempF || '202'}°F</strong></span>
+                  <span>•</span>
+                  <span>Grind: <strong className="text-cream-light">{selectedCoffee.recommendedGrind || activeMethod?.grind || 'Standard'}</strong></span>
+                </div>
+                {selectedCoffee.tastingNotes && selectedCoffee.tastingNotes.length > 0 && (
+                  <div className="text-[11px] text-amber-200/80 italic pt-0.5">
+                    Notes: {selectedCoffee.tastingNotes.slice(0, 4).join(', ')}
+                  </div>
+                )}
               </div>
             </div>
-            {onPrevStep && (
-              <button
-                type="button"
-                onClick={onPrevStep}
-                className="text-[11px] font-mono text-amber-gold hover:underline cursor-pointer"
-              >
-                Change Coffee →
-              </button>
-            )}
+
+            <div className="flex items-center gap-2 shrink-0 self-end md:self-center pt-2 md:pt-0">
+              {onViewRoasterProfile && (
+                <button
+                  type="button"
+                  onClick={() => onViewRoasterProfile(selectedCoffee)}
+                  className="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-gold hover:text-amber-200 border border-amber-500/40 text-xs font-mono font-bold flex items-center gap-1.5 transition cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+                  title={`Learn about ${selectedCoffee.roaster || 'this roaster'}`}
+                >
+                  <Coffee className="w-3.5 h-3.5" />
+                  <span>Learn About Roaster</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {onPrevStep && (
+                <button
+                  type="button"
+                  onClick={onPrevStep}
+                  className="px-3 py-2 text-[11px] font-mono text-stone-400 hover:text-stone-200 transition cursor-pointer"
+                >
+                  Change Coffee
+                </button>
+              )}
+            </div>
           </div>
         )}
 

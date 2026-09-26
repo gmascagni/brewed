@@ -195,7 +195,7 @@ export default function RoasterStickerStudioTab({
       </div>
 
       {/* The Live Physical Label Previews */}
-      <div className="flex justify-center p-6 bg-stone-900/60 rounded-3xl border border-dashed border-white/20">
+      <div className="flex flex-col items-center justify-center p-6 bg-stone-900/60 rounded-3xl border border-dashed border-white/20 gap-4">
 
         {/* LAYOUT 1: ARTISAN THERMAL STICKER (2" x 3") */}
         {qrLayout === 'thermal' && (
@@ -203,21 +203,13 @@ export default function RoasterStickerStudioTab({
             ref={stickerRef}
             className="w-full max-w-sm rounded-2xl bg-white text-stone-950 p-6 shadow-2xl border-2 border-stone-800 text-center space-y-3 font-sans relative overflow-hidden"
           >
-            {/* Header Branding */}
-            <div className="border-b border-stone-800 pb-2 text-left flex justify-between items-baseline">
-              <div>
-                <span className="text-[10px] font-mono tracking-wider uppercase font-bold text-stone-500 block">
-                  SPECIALTY COFFEE ROASTERY
-                </span>
-                <h3 className="font-serif text-xl font-bold tracking-tight text-stone-900 leading-tight">
-                  {selectedCoffeeForSticker?.roaster || roasterName || 'Specialty Roaster'}
-                </h3>
-                <span className="text-[11px] text-stone-600 font-medium">
-                  {selectedCoffeeForSticker?.location || location || 'Artisan Small Batch'}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="px-2 py-0.5 rounded bg-stone-900 text-white font-mono text-[9px] font-bold uppercase tracking-wider">
+            {/* Roaster Name & Roast Level */}
+            <div className="border-b border-stone-300 pb-2 text-left flex justify-between items-baseline">
+              <h3 className="font-serif text-xl font-black tracking-tight text-stone-900 leading-tight truncate">
+                {selectedCoffeeForSticker?.roaster || roasterName || 'Specialty Roaster'}
+              </h3>
+              <div className="text-right shrink-0">
+                <span className="px-2.5 py-0.5 rounded-full bg-stone-900 text-white font-mono text-[9px] font-bold uppercase tracking-wider">
                   {selectedCoffeeForSticker?.roastLevel || roastLevel}
                 </span>
               </div>
@@ -225,27 +217,21 @@ export default function RoasterStickerStudioTab({
 
             {/* Coffee Profile */}
             <div className="text-left space-y-0.5 pt-0.5">
-              <h4 className="font-serif text-lg font-bold text-stone-950 leading-tight">
+              <h4 className="font-serif text-lg sm:text-xl font-black text-stone-950 leading-tight">
                 {selectedCoffeeForSticker?.beanName || beanName || 'Single Origin Lot'}
               </h4>
-              <p className="text-xs text-stone-600 font-medium">
-                {selectedCoffeeForSticker?.origin || origin || 'Single Origin'} • {selectedCoffeeForSticker?.process || process} • {selectedCoffeeForSticker?.elevation || elevation}
+              <p className="text-xs text-stone-600 font-mono font-medium">
+                {selectedCoffeeForSticker?.origin || origin || 'Single Origin'} • {selectedCoffeeForSticker?.process || process || 'Washed'}
               </p>
               {(selectedCoffeeForSticker?.tastingNotes?.length > 0 || tastingNotesInput) && (
-                <p className="text-[11px] text-amber-900/90 font-serif italic pt-0.5">
+                <p className="text-xs text-amber-900 font-serif italic pt-0.5 truncate">
                   Notes: {(selectedCoffeeForSticker?.tastingNotes || tastingNotesInput.split(',').map(s => s.trim())).slice(0, 4).join(', ')}
                 </p>
               )}
             </div>
 
             {/* Real High-Resolution QR Code */}
-            <div className="p-3 bg-white border border-stone-200 rounded-2xl flex flex-col items-center justify-center shadow-inner mx-auto w-fit">
-              {/* Prominent "Scan Me for Recipe" Callout Badge */}
-              <div className="flex items-center justify-center gap-1.5 px-3.5 py-1 rounded-full bg-stone-900 text-white font-mono text-[10px] font-bold uppercase tracking-wider mb-2.5 shadow-md border border-stone-700">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Scan Me for Recipe</span>
-              </div>
-
+            <div className="p-2.5 bg-white border-2 border-stone-800 rounded-2xl flex flex-col items-center justify-center shadow-sm mx-auto w-fit">
               {qrDataUrl ? (
                 <img
                   src={qrDataUrl}
@@ -257,39 +243,39 @@ export default function RoasterStickerStudioTab({
                   Generating QR...
                 </div>
               )}
-              <span className="text-[9px] font-mono text-stone-600 font-bold uppercase tracking-wider mt-1.5">
-                Aim phone camera to brew
-              </span>
             </div>
 
             {/* Dial-in Parameters */}
-            <div className="grid grid-cols-3 gap-1.5 py-2 px-2.5 rounded-xl bg-stone-100 border border-stone-200 text-[10px] font-mono">
+            <div className="grid grid-cols-4 gap-1.5 py-2 px-2.5 rounded-xl bg-stone-100 border border-stone-300 text-center font-mono">
               <div>
-                <span className="text-stone-500 block text-[8px] uppercase">Ratio</span>
-                <span className="font-bold text-amber-800">
+                <span className="text-stone-500 font-bold block text-[8px] uppercase">Ratio</span>
+                <span className="font-black text-amber-900 text-xs">
                   1:{selectedCoffeeForSticker?.recommendedRatio || recommendedRatio}
                 </span>
               </div>
               <div>
-                <span className="text-stone-500 block text-[8px] uppercase">Water Temp</span>
-                <span className="font-bold text-stone-800">
+                <span className="text-stone-500 font-bold block text-[8px] uppercase">Temp</span>
+                <span className="font-black text-stone-900 text-xs">
                   {selectedCoffeeForSticker?.tempF || tempF}°F
                 </span>
               </div>
               <div>
-                <span className="text-stone-500 block text-[8px] uppercase">Method</span>
-                <span className="font-bold text-stone-800 capitalize">
-                  {(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ')}
+                <span className="text-stone-500 font-bold block text-[8px] uppercase">Method</span>
+                <span className="font-bold text-stone-900 capitalize text-[11px] truncate block">
+                  {(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ').split(' ')[0]}
+                </span>
+              </div>
+              <div>
+                <span className="text-stone-500 font-bold block text-[8px] uppercase">Grind</span>
+                <span className="font-bold text-stone-900 text-[11px] truncate block">
+                  {(selectedCoffeeForSticker?.recommendedGrind || recommendedGrind || 'Med-Fine').split(' ')[0]}
                 </span>
               </div>
             </div>
 
-            {/* Footer Tagline */}
-            <div className="text-[9px] font-mono text-stone-500 pt-2 border-t border-stone-200 flex justify-between items-center">
-              <span>thebrew.app dial-in</span>
-              <span className="uppercase font-bold tracking-wider text-[8px] text-stone-700">
-                {selectedCoffeeForSticker?.upc || upc || 'Smart Bag Certified'}
-              </span>
+            {/* FULL-WIDTH BOTTOM BANNER: SCAN FOR RECIPE */}
+            <div className="w-full bg-stone-950 text-white font-black text-center py-2.5 rounded-xl text-xs sm:text-sm tracking-wider uppercase shadow-md mt-1">
+              SCAN FOR RECIPE
             </div>
           </div>
         )}
@@ -416,87 +402,74 @@ export default function RoasterStickerStudioTab({
         {qrLayout === 'brother_ql' && (
           <div 
             ref={stickerRef}
-            className="w-full max-w-xl h-60 rounded-xl bg-white text-stone-900 p-4 shadow-2xl border-2 border-stone-800 flex items-stretch justify-between gap-4 relative overflow-hidden select-none"
+            className="w-full max-w-xl rounded-xl bg-white text-stone-900 p-4 shadow-2xl border-2 border-stone-800 flex flex-col justify-between relative overflow-hidden select-none"
           >
-            {/* Left Details Column */}
-            <div className="flex-1 flex flex-col justify-between h-full min-w-0 pr-1">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[8px] font-mono uppercase tracking-wider font-extrabold bg-stone-900 text-white px-1.5 py-0.5 rounded">
-                    THEBREW.APP
-                  </span>
-                  <span className="text-[8px] font-mono text-stone-600 uppercase tracking-tight truncate font-bold">
-                    {selectedCoffeeForSticker?.roastLevel || roastLevel || 'Light'} Roast
-                  </span>
-                  <span className="text-[8px] font-mono text-stone-400 uppercase tracking-tight truncate ml-auto font-semibold">
-                    DK-1202 • 2.4"×3.9" (62×100mm)
-                  </span>
+            {/* Top & Middle: Left Details + Right Maximized QR */}
+            <div className="flex items-stretch justify-between gap-4">
+              <div className="flex-1 flex flex-col justify-between min-w-0 pr-1">
+                <div>
+                  <h4 className="font-serif text-xl sm:text-2xl font-black text-stone-950 truncate leading-tight">
+                    {selectedCoffeeForSticker?.roaster || roasterName || 'Specialty Roaster'}
+                  </h4>
+                  <p className="text-lg text-stone-900 font-black truncate font-serif mt-0.5">
+                    {selectedCoffeeForSticker?.beanName || beanName || 'Single Origin Lot'}
+                  </p>
+                  <p className="text-xs text-stone-600 font-mono font-bold uppercase tracking-wider truncate mt-0.5">
+                    {(selectedCoffeeForSticker?.roastLevel || roastLevel || 'Light').replace(/\s*roast\s*/i, '').trim()} ROAST • {selectedCoffeeForSticker?.origin || origin || 'SINGLE ORIGIN'}
+                  </p>
+                  <p className="text-xs text-amber-900 font-serif italic truncate mt-0.5">
+                    {tastingNotesInput ? `Notes: ${tastingNotesInput}` : 'Notes: Peach, Jasmine, Honey'}
+                  </p>
                 </div>
-                <h4 className="font-serif text-lg font-bold text-stone-950 truncate leading-tight">
-                  {selectedCoffeeForSticker?.roaster || roasterName || 'Specialty Roaster'}
-                </h4>
-                <p className="text-xs text-stone-800 font-semibold truncate font-sans">
-                  {selectedCoffeeForSticker?.beanName || beanName || 'Single Origin Lot'}
-                </p>
-                <p className="text-[10px] text-amber-900 font-serif italic truncate mt-0.5">
-                  {tastingNotesInput ? tastingNotesInput : 'Peach, Jasmine, Honey'}
-                </p>
-              </div>
 
-              {/* 5-Cell Dial-In Matrix */}
-              <div className="grid grid-cols-5 gap-1 py-1.5 px-2 bg-stone-100 rounded-md border border-stone-200 text-[8px] font-mono">
-                <div>
-                  <span className="text-stone-500 block text-[7px] uppercase leading-none">Ratio</span>
-                  <span className="font-bold text-amber-800">
-                    1:{selectedCoffeeForSticker?.recommendedRatio || recommendedRatio}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-stone-500 block text-[7px] uppercase leading-none">Temp</span>
-                  <span className="font-bold text-stone-900">
-                    {selectedCoffeeForSticker?.tempF || tempF}°F
-                  </span>
-                </div>
-                <div>
-                  <span className="text-stone-500 block text-[7px] uppercase leading-none">Method</span>
-                  <span className="font-bold text-stone-900 capitalize truncate block">
-                    {(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ')}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-stone-500 block text-[7px] uppercase leading-none">Grind</span>
-                  <span className="font-bold text-stone-900 truncate block">
-                    {selectedCoffeeForSticker?.recommendedGrind || recommendedGrind || 'Med-Fine'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-stone-500 block text-[7px] uppercase leading-none">Water</span>
-                  <span className="font-bold text-cyan-800 truncate block">
-                    140 TDS
-                  </span>
+                {/* 4-Card Dial-In Matrix */}
+                <div className="grid grid-cols-2 gap-1.5 py-1.5 my-1">
+                  <div className="bg-stone-100 rounded-lg p-2 border border-stone-300">
+                    <span className="text-stone-500 block text-[9px] uppercase font-mono font-bold leading-none mb-1">Water Ratio</span>
+                    <span className="font-mono font-black text-amber-900 text-sm sm:text-base block truncate">
+                      1:{selectedCoffeeForSticker?.recommendedRatio || recommendedRatio}
+                    </span>
+                  </div>
+                  <div className="bg-stone-100 rounded-lg p-2 border border-stone-300">
+                    <span className="text-stone-500 block text-[9px] uppercase font-mono font-bold leading-none mb-1">Brew Temp</span>
+                    <span className="font-mono font-black text-stone-950 text-sm sm:text-base block truncate">
+                      {selectedCoffeeForSticker?.tempF || tempF}°F
+                    </span>
+                  </div>
+                  <div className="bg-stone-100 rounded-lg p-2 border border-stone-300">
+                    <span className="text-stone-500 block text-[9px] uppercase font-mono font-bold leading-none mb-1">Method</span>
+                    <span className="font-sans font-bold text-stone-900 capitalize truncate block text-xs sm:text-sm">
+                      {(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <div className="bg-stone-100 rounded-lg p-2 border border-stone-300">
+                    <span className="text-stone-500 block text-[9px] uppercase font-mono font-bold leading-none mb-1">Grind Size</span>
+                    <span className="font-sans font-bold text-stone-900 truncate block text-xs sm:text-sm">
+                      {(selectedCoffeeForSticker?.recommendedGrind || recommendedGrind || 'Med-Fine').split('(')[0]}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* Footer Info */}
-              <div className="flex items-center justify-between text-[8px] font-mono text-stone-500 pt-1 border-t border-stone-200">
-                <span className="truncate">{selectedCoffeeForSticker?.upc || upc || 'DK-1202 SPEC'}</span>
-                <span className="font-bold text-stone-900 uppercase">⚡ Scan for Dialed-in Recipe</span>
+              {/* Right QR Column: Maximized Full-Height QR Code */}
+              <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-xl border-2 border-stone-800 w-36 h-36 sm:w-44 sm:h-44 my-auto">
+                {qrDataUrl ? (
+                  <img
+                    src={qrDataUrl}
+                    alt="Brother QL Smart Bag QR Code"
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-stone-400 font-mono text-xs">
+                    Generating...
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Right QR Column: Maximized Full-Height QR Code */}
-            <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1.5 rounded-lg border border-stone-300 h-full aspect-square">
-              {qrDataUrl ? (
-                <img
-                  src={qrDataUrl}
-                  alt="Brother QL Smart Bag QR Code"
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-stone-400 font-mono text-[9px]">
-                  Generating...
-                </div>
-              )}
+            {/* FULL-WIDTH BOTTOM BANNER: SCAN FOR RECIPE (In Big Bold Letters) */}
+            <div className="w-full bg-stone-950 text-white font-black text-center py-2.5 sm:py-3 rounded-lg text-sm sm:text-base tracking-wider uppercase shadow-sm mt-2">
+              SCAN FOR RECIPE
             </div>
           </div>
         )}
@@ -505,62 +478,61 @@ export default function RoasterStickerStudioTab({
         {qrLayout === 'brother_ql_minimal' && (
           <div 
             ref={stickerRef}
-            className="w-full max-w-xl h-60 rounded-xl bg-white text-stone-900 p-4 shadow-2xl border-2 border-stone-800 flex items-stretch justify-between gap-4 relative overflow-hidden select-none"
+            className="w-full max-w-xl rounded-xl bg-white text-stone-900 p-4 shadow-2xl border-2 border-stone-800 flex flex-col justify-between relative overflow-hidden select-none"
           >
-            {/* Left Details Column */}
-            <div className="flex-1 flex flex-col justify-between h-full min-w-0 pr-1">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[8px] font-mono uppercase tracking-wider font-black bg-stone-900 text-white px-1.5 py-0.5 rounded">
-                    THEBREW.APP
-                  </span>
-                  <span className="text-[8px] font-mono text-stone-600 uppercase tracking-tight truncate font-bold">
-                    {selectedCoffeeForSticker?.origin || origin || 'SMART BAG'}
-                  </span>
-                  <span className="text-[8px] font-mono text-stone-400 uppercase tracking-tight truncate ml-auto font-semibold">
-                    DK-1202 • 2.4"×3.9" (62×100mm)
-                  </span>
+            {/* Top & Middle: Left Details + Right Maximized QR */}
+            <div className="flex items-stretch justify-between gap-4">
+              <div className="flex-1 flex flex-col justify-between min-w-0 pr-1">
+                <div>
+                  <h4 className="font-serif text-xl sm:text-2xl font-black text-stone-950 truncate leading-tight">
+                    {selectedCoffeeForSticker?.roaster || roasterName || 'Specialty Roastery'}
+                  </h4>
+                  <h3 className="font-serif text-lg sm:text-xl font-black text-stone-950 leading-tight tracking-tight mt-0.5">
+                    {selectedCoffeeForSticker?.beanName || beanName || 'Single Origin Lot'}
+                  </h3>
+                  <p className="text-xs text-stone-600 font-mono font-bold uppercase tracking-wider truncate mt-0.5">
+                    {selectedCoffeeForSticker?.origin || origin || 'SINGLE ORIGIN'} • {(selectedCoffeeForSticker?.roastLevel || roastLevel || 'Light').toUpperCase()}
+                  </p>
                 </div>
-                <h3 className="font-serif text-xl font-black text-stone-950 truncate leading-tight tracking-tight">
-                  {selectedCoffeeForSticker?.beanName || beanName || 'Single Origin Lot'}
-                </h3>
-                <p className="text-xs text-stone-700 font-bold truncate font-mono uppercase tracking-wider mt-0.5">
-                  {selectedCoffeeForSticker?.roaster || roasterName || 'Specialty Roastery'}
-                </p>
-              </div>
 
-              {/* Dial-In Formula Pill */}
-              <div className="bg-stone-100 border border-stone-300 rounded-md px-2.5 py-1.5 my-1">
-                <span className="text-[10px] font-mono font-black text-stone-900 tracking-tight block">
-                  RATIO 1:{selectedCoffeeForSticker?.recommendedRatio || recommendedRatio} • {selectedCoffeeForSticker?.tempF || tempF}°F • {(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ').toUpperCase()} • 140 TDS WATER
-                </span>
-              </div>
+                {/* Dial-In Formula Box */}
+                <div className="bg-stone-100 border border-stone-300 rounded-lg p-2.5 my-1.5 space-y-1">
+                  <div className="flex items-center justify-between text-xs font-mono font-black text-stone-900">
+                    <span className="text-amber-900">RATIO 1:{selectedCoffeeForSticker?.recommendedRatio || recommendedRatio}</span>
+                    <span>{selectedCoffeeForSticker?.tempF || tempF}°F</span>
+                    <span className="capitalize">{(selectedCoffeeForSticker?.brewMethod || brewMethod || 'pour_over').replace(/_/g, ' ')}</span>
+                  </div>
+                  <div className="text-[11px] font-mono text-stone-600 flex justify-between pt-1 border-t border-stone-200">
+                    <span>GRIND: {(selectedCoffeeForSticker?.recommendedGrind || recommendedGrind || 'Med-Fine').split('(')[0]}</span>
+                    <span>140 TDS WATER</span>
+                  </div>
+                </div>
 
-              {/* Flavor Notes & Scan Banner */}
-              <div>
-                <p className="text-[10px] font-serif italic text-stone-700 truncate mb-0.5">
+                {/* Flavor Notes */}
+                <p className="text-xs font-serif italic text-stone-700 truncate">
                   Notes: {tastingNotesInput ? tastingNotesInput : 'Peach, Jasmine, Honey'}
                 </p>
-                <div className="flex items-center justify-between text-[8px] font-mono text-stone-600 pt-1 border-t border-stone-200">
-                  <span className="font-extrabold text-stone-900 uppercase">⚡ SCAN TO BREW</span>
-                  <span className="truncate">{selectedCoffeeForSticker?.upc || upc || 'DK-1202 SPEC'}</span>
-                </div>
+              </div>
+
+              {/* Right QR Column: Giant High-Contrast QR Code */}
+              <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1 rounded-xl border-2 border-stone-800 w-36 h-36 sm:w-44 sm:h-44 my-auto">
+                {qrDataUrl ? (
+                  <img
+                    src={qrDataUrl}
+                    alt="Brother QL Minimal QR Code"
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-stone-400 font-mono text-xs">
+                    Generating...
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Right QR Column: Giant High-Contrast QR Code */}
-            <div className="flex flex-col items-center justify-center flex-shrink-0 bg-white p-1.5 rounded-lg border-2 border-stone-800 h-full aspect-square shadow-sm">
-              {qrDataUrl ? (
-                <img
-                  src={qrDataUrl}
-                  alt="Brother QL Minimal QR Code"
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-stone-400 font-mono text-[9px]">
-                  Generating...
-                </div>
-              )}
+            {/* FULL-WIDTH BOTTOM BANNER: SCAN FOR RECIPE (In Big Bold Letters) */}
+            <div className="w-full bg-stone-950 text-white font-black text-center py-2.5 sm:py-3 rounded-lg text-sm sm:text-base tracking-wider uppercase shadow-sm mt-2">
+              SCAN FOR RECIPE
             </div>
           </div>
         )}

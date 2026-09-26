@@ -254,6 +254,18 @@ export default function RoasterVideoPlayer({ onOpenLiveDemo = null, onStartOnboa
         </div>
 
         <div className="flex items-center gap-2">
+          {/* YouTube Channel / Playlist Link */}
+          <a
+            href="https://www.youtube.com/@TheBrewapp/playlists"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-xl bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-300 hover:text-white transition flex items-center gap-1.5 text-xs font-mono cursor-pointer"
+            title="Watch all videos and walkthroughs on our YouTube Channel (@TheBrewapp)"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">YouTube Playlist</span>
+          </a>
+
           {/* Mute Toggle */}
           <button
             type="button"

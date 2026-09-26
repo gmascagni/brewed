@@ -21,6 +21,7 @@ import RoasterInfoPage from './components/RoasterInfoPage';
 import RoasterProfilePage from './components/RoasterProfilePage';
 import ConsumerDiscoveryFeed from './components/ConsumerDiscoveryFeed';
 import CafePartnerPortal from './components/CafePartnerPortal';
+import { getShowcaseRoaster, normalizeRoasterKey } from './data/roasterShowcaseData';
 
 // Code-split heavy on-demand modals with React.lazy
 const BarcodeScannerModal = lazy(() => import('./components/BarcodeScannerModal'));
@@ -43,6 +44,7 @@ import { initGA, trackEvent } from './utils/analytics';
 import { recordTelemetryEvent } from './utils/telemetry';
 import { getMethodJsonLd, updatePageSeo } from './utils/seo';
 import { syncCloudCatalog } from './data/roasterRegistry';
+import { signOutRoasterAccount } from './services/firebase';
 import { parseRecipePayload } from './utils/recipeParser';
 import { getAssetUrl } from './utils/assetUrl';
 import { getRecentBrews, JOURNAL_UPDATED_EVENT } from './utils/journalStorage';
@@ -102,11 +104,11 @@ export default function App() {
       if (user && (user.username === '@barista_pro' || user.email === 'alex@specialtybrew.org')) {
         localStorage.removeItem('the_brew_app_active_user');
         localStorage.removeItem('the_brew_app_current_user');
-        return CL_PICKEN_ROASTER_USER;
+        return null;
       }
-      return user || CL_PICKEN_ROASTER_USER;
+      return user || null;
     } catch {
-      return CL_PICKEN_ROASTER_USER;
+      return null;
     }
   });
 
@@ -156,6 +158,11 @@ export default function App() {
     }
     setIsAuthModalOpen(true);
   };
+
+  const handleLogout = () => {
+    signOutRoasterAccount().catch(() => {});
+    setCurrentUser(null);
+  };
   const [isLocalCoffeeOpen, setIsLocalCoffeeOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isWaterLabOpen, setIsWaterLabOpen] = useState(false);
@@ -164,14 +171,13 @@ export default function App() {
   const [roasterPrefillBarcode, setRoasterPrefillBarcode] = useState('');
   const [roasterPrefillBean, setRoasterPrefillBean] = useState(null);
   const [roasterPortalInitialTab, setRoasterPortalInitialTab] = useState(null);
-  const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
-  
-  // Primary 5 Logical Application Areas: 'brew' | 'discover' | 'cafes' | 'learn' | 'my_coffee'
   const [currentArea, setCurrentArea] = useState(() => {
     if (typeof window !== 'undefined') {
       const p = window.location.pathname.replace(/^\/brewed/, '');
       const search = window.location.search || '';
-      if (p.startsWith('/roasters') || p.startsWith('/roaster') || p.startsWith('/discover') || search.includes('roaster=') || search.includes('slug=')) {
+      const params = new URLSearchParams(search);
+      const hasRecipeParams = params.has('recipe') || params.has('bean') || params.has('coffee') || params.has('method');
+      if (!hasRecipeParams && (p.startsWith('/roasters') || p.startsWith('/roaster') || p.startsWith('/discover') || search.includes('slug='))) {
         return 'discover';
       }
       if (p.startsWith('/shops') || p.startsWith('/cafes') || p.startsWith('/local')) {
@@ -219,6 +225,25 @@ export default function App() {
   const [selectedAcademyVideoId, setSelectedAcademyVideoId] = useState(null);
   const [dialedInCoffee, setDialedInCoffee] = useState(null);
   const [customGrind, setCustomGrind] = useState(null);
+  const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
+
+  // Track whether any full-screen modal overlay is active
+  const isAnyModalOpen = Boolean(
+    isJournalOpen ||
+    isSearchOpen ||
+    isProfileOpen ||
+    isCommunityOpen ||
+    isRecipeBuilderOpen ||
+    isAuthModalOpen ||
+    isLocalCoffeeOpen ||
+    isScannerOpen ||
+    isWaterLabOpen ||
+    isRoasterPortalOpen ||
+    isRoasterInfoOpen ||
+    isVersionHistoryOpen ||
+    isVideoAcademyOpen ||
+    isMobileToolsOpen
+  );
 
   // Primary Action Throughout App: Start a Brew
   const handleStartBrew = (initialMethod = null, initialCoffee = null) => {
@@ -420,9 +445,16 @@ export default function App() {
   };
 
   // Handlers for Scanned / Roaster Dial-In Actions
-  const handleApplyScannedRecipe = (scannedBean) => {
+  // Handlers for Scanned / Roaster Dial-In Actions
+  // Experience Design: The scanned barcode immediately launches into the dialed-in Recipe (Step 3).
+  // The recipe includes an option for the consumer to click on the roaster profile and learn about the roaster.
+  const handleApplyScannedRecipe = (scannedBean, options = { showRoasterFirst: false }) => {
     if (!scannedBean) return;
-    handleApplyRecipe(scannedBean, 4);
+
+    setDialedInCoffee(scannedBean);
+    setSelectedCoffee(scannedBean);
+    if (scannedBean.recommendedRatio) setCustomRatio(Number(scannedBean.recommendedRatio));
+    if (scannedBean.recommendedGrind) setCustomGrind(scannedBean.recommendedGrind);
 
     trackEvent('dial_in_recipe_applied', {
       roaster: scannedBean.roaster,
@@ -437,6 +469,42 @@ export default function App() {
       methodId: scannedBean.brewMethod || 'pour_over',
       ratio: Number(scannedBean.recommendedRatio || 16)
     });
+
+    // Optional legacy opt-in for Roaster Story First UX
+    if (options.showRoasterFirst && scannedBean.roaster) {
+      const rawSlug = scannedBean.roasterSlug || 
+                      scannedBean.roaster.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const roasterObj = getShowcaseRoaster(rawSlug) || getShowcaseRoaster(scannedBean.roaster);
+      const targetSlug = roasterObj?.slug || roasterObj?.id || rawSlug;
+
+      setCurrentArea('discover');
+      setSelectedRoasterSlug(targetSlug);
+      navigate(`/roasters/${targetSlug}?bean=${encodeURIComponent(scannedBean.beanName || '')}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Direct recipe launch: Land immediately on Step 3 (Recipe & Dial-In)
+    handleApplyRecipe(scannedBean, 3);
+  };
+
+  // Handler for clicking the roaster profile from a recipe to learn about the roaster
+  const handleViewRoasterProfile = (coffeeOrRoaster) => {
+    if (!coffeeOrRoaster) return;
+    const roasterName = typeof coffeeOrRoaster === 'string'
+      ? coffeeOrRoaster
+      : (coffeeOrRoaster.roaster || coffeeOrRoaster.roasterName || coffeeOrRoaster.roasterSlug || 'methodical');
+    const slug = typeof coffeeOrRoaster === 'object' && coffeeOrRoaster.roasterSlug
+      ? coffeeOrRoaster.roasterSlug
+      : normalizeRoasterKey(roasterName);
+    const roasterObj = getShowcaseRoaster(slug) || getShowcaseRoaster(roasterName);
+    const targetSlug = roasterObj?.slug || roasterObj?.id || slug;
+
+    setCurrentArea('discover');
+    setSelectedRoasterSlug(targetSlug);
+    const beanName = typeof coffeeOrRoaster === 'object' && coffeeOrRoaster.beanName ? coffeeOrRoaster.beanName : '';
+    navigate(`/roasters/${targetSlug}${beanName ? `?bean=${encodeURIComponent(beanName)}` : ''}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Handler for applying closed-loop dial-in engine tweaks to next brew
@@ -613,13 +681,14 @@ export default function App() {
     const rawPath = location.pathname;
     const path = rawPath.startsWith('/brewed') ? (rawPath.replace(/^\/brewed/, '') || '/') : rawPath;
 
-    // Inbound Recipe Link Detection (?recipe=... or /r/<id> or direct query params on home)
+    // Inbound Recipe Link Detection (?recipe=... or /r/<id> or direct query params on home or scanned bag)
     const isRoasterRoute = path.startsWith('/roasters') || path.startsWith('/roaster');
     const fullUrl = typeof window !== 'undefined' ? window.location.href : `${location.pathname}${location.search}${location.hash}`;
+    const searchParams = new URLSearchParams(location.search || (typeof window !== 'undefined' ? window.location.search : ''));
     const inboundRecipe = !isRoasterRoute ? parseRecipePayload(fullUrl) : null;
     if (inboundRecipe && lastInboundUrlRef.current !== fullUrl) {
       lastInboundUrlRef.current = fullUrl;
-      handleApplyScannedRecipe(inboundRecipe);
+      handleApplyRecipe(inboundRecipe, 3);
       updatePageSeo(
         `${inboundRecipe.beanName} Recipe by ${inboundRecipe.roaster} | TheBrew.App`,
         `Pre-filled specialty coffee brew recipe for ${inboundRecipe.beanName} roasted by ${inboundRecipe.roaster}. Ratio 1:${inboundRecipe.recommendedRatio}, ${inboundRecipe.dryDoseGrams}g coffee, ${inboundRecipe.waterGrams}g water.`,
@@ -676,14 +745,13 @@ export default function App() {
           ? 'https://thebrew.app/guides/water-chemistry-gh-kh'
           : 'https://thebrew.app/guides/coffee-water-chemistry'
       );
-    } else if (path.startsWith('/roasters') || path.startsWith('/roaster') || path.startsWith('/discover') || (typeof window !== 'undefined' && (window.location.pathname.includes('/roasters') || window.location.search.includes('roaster=')))) {
+    } else if (isRoasterRoute || path.startsWith('/discover')) {
       setCurrentArea('discover');
       if (path === '/roasters/partner' || path === '/roasters/info') {
         setIsRoasterInfoOpen(true);
       } else {
         const fullPath = (typeof window !== 'undefined' ? window.location.pathname : path).replace(/^\/brewed/, '');
         const parts = fullPath.split('/').filter(Boolean);
-        const searchParams = new URLSearchParams(location.search || (typeof window !== 'undefined' ? window.location.search : ''));
         const querySlug = searchParams.get('roaster') || searchParams.get('slug');
         if (parts.length > 1 && !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(parts[1].toLowerCase())) {
           setSelectedRoasterSlug(parts[1]);
@@ -749,19 +817,40 @@ export default function App() {
       }
       const roasterParam = searchParams.get('roaster');
       const beanParam = searchParams.get('bean');
+      const recipeParam = searchParams.get('recipe');
       const stepParam = searchParams.get('step');
       if (stepParam) {
         setCurrentStep(parseInt(stepParam));
-      } else if (roasterParam || beanParam) {
+      } else if (recipeParam || roasterParam || beanParam) {
+        // Direct recipe deep link: Land directly on Step 3: Recipe & Dial-In!
         const methodParam = searchParams.get('method');
         const ratioParam = parseFloat(searchParams.get('ratio'));
         const allMethods = BREW_METHODS.coffee;
-        const found = allMethods.find(m => m.id === methodParam) || allMethods[0];
+        const found = allMethods.find(m => m.id === methodParam || m.id.includes(methodParam)) || allMethods[0];
         setActiveMethod(found);
         setCupMl(found.defaultCupMl || 240);
         if (found.id === 'espresso') setCupCount(1);
         if (ratioParam) setCustomRatio(ratioParam);
-        setCurrentStep(2);
+
+        const rName = searchParams.get('roasterName') || roasterParam || 'Specialty Roaster';
+        const rSlug = roasterParam || normalizeRoasterKey(rName);
+        const coffeeContext = {
+          beanName: beanParam || searchParams.get('coffee') || 'Scanned Bag Micro-Lot',
+          roaster: rName,
+          roasterSlug: rSlug,
+          recommendedRatio: ratioParam || found.ratio || 16.5,
+          recommendedGrind: searchParams.get('grind') || found.grind || 'Medium-Fine',
+          tempF: parseInt(searchParams.get('tempF') || searchParams.get('temp_f') || found.tempF || '202', 10),
+          brewMethod: found.id,
+          tastingNotes: searchParams.get('notes') ? searchParams.get('notes').split(',').map(s => s.trim()) : [],
+          roastLevel: searchParams.get('roast') || 'Medium Roast',
+          origin: searchParams.get('origin') || 'Specialty Single Origin',
+          isBagRecipe: true
+        };
+        setSelectedCoffee(coffeeContext);
+        setDialedInCoffee(coffeeContext);
+        if (coffeeContext.recommendedGrind) setCustomGrind(coffeeContext.recommendedGrind);
+        setCurrentStep(3);
       } else {
         setCurrentStep(1);
       }
@@ -864,7 +953,7 @@ export default function App() {
       </div>
       
       {/* 100% Bulletproof Sticky Top Header Container */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl transition-all duration-700 border-b border-[#ECE6DC] bg-[#FAF7F2]/95 shadow-xs">
+      <header className={`sticky top-0 ${isAnyModalOpen ? 'z-20 pointer-events-none' : 'z-40'} backdrop-blur-xl transition-all duration-300 border-b border-[#ECE6DC] bg-[#FAF7F2]/95 shadow-xs pt-1 sm:pt-2 pb-0.5`}>
         <Header
           onOpenJournal={() => setIsJournalOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
@@ -954,8 +1043,16 @@ export default function App() {
                 onBackToApp={() => {
                   setSelectedRoasterSlug(null);
                   setCurrentArea('brew');
-                  navigate('/');
+                  if (selectedCoffee || dialedInCoffee) {
+                    setCurrentStep(3);
+                    const mId = selectedCoffee?.brewMethod || dialedInCoffee?.brewMethod || currentActiveMethod?.id || 'pour_over';
+                    navigate(`/methods/${mId}`);
+                  } else {
+                    setCurrentStep(1);
+                    navigate('/');
+                  }
                 }}
+                activeCoffee={selectedCoffee || dialedInCoffee}
                 onBrewCoffee={(coffee) => {
                   handleSelectBeanToBrew(coffee);
                 }}
@@ -1090,7 +1187,7 @@ export default function App() {
               trackMode={trackMode}
               currentUser={currentUser}
               onOpenAuth={handleOpenAuth}
-              onLogout={() => setCurrentUser(null)}
+              onLogout={handleLogout}
               onBrewAgain={(entry) => handleBrewAgain(entry)}
               onSelectRecipe={(recipe) => handleApplyRecipe(recipe, 3)}
               onSelectRecipeToBrew={(recipe) => handleApplyRecipe(recipe, 3)}
@@ -1302,6 +1399,7 @@ export default function App() {
                     onPrevStep={() => setCurrentStep(2)}
                     selectedCoffee={selectedCoffee || dialedInCoffee}
                     onOpenWaterLab={() => setIsWaterLabOpen(true)}
+                    onViewRoasterProfile={handleViewRoasterProfile}
                   />
                 </div>
               )}
@@ -1313,7 +1411,7 @@ export default function App() {
                     const activeCoffee = dialedInCoffee || selectedCoffee;
                     const provenance = getCoffeeProvenance(activeCoffee, activeCoffee.roasterProfile || null, currentUser);
                     return (
-                    <div className={`p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-md shadow-lg ${
+                    <div className={`p-4 sm:p-5 rounded-2xl border flex flex-col lg:flex-row lg:items-center justify-between gap-4 backdrop-blur-md shadow-lg ${
                       provenance.isAiDerived 
                         ? 'bg-purple-950/20 border-purple-500/40' 
                         : (provenance.isDomainVerified ? 'bg-emerald-950/20 border-emerald-500/40' : 'bg-amber-500/10 border-amber-500/30')
@@ -1358,22 +1456,35 @@ export default function App() {
                         )}
                       </div>
 
-                      <div className="text-xs font-mono text-cream-soft bg-black/40 p-3 rounded-xl border border-white/10 flex flex-wrap sm:flex-col sm:items-end gap-2 self-start sm:self-center shrink-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-amber-gold font-bold">1:{effectiveRatio}</span>
-                          <span>•</span>
-                          <span className="text-cream-light font-bold">{dryDoseGrams}g : {calculatedTotalWaterMl}g</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-[11px] text-cream-soft/80">
-                          {(activeCoffee.tempF || activeCoffee.extraction?.tempF) && (
-                            <span>{activeCoffee.tempF || activeCoffee.extraction?.tempF}°F</span>
-                          )}
-                          {(activeCoffee.recommendedGrind || activeCoffee.grindSize || activeCoffee.extraction?.grind) && (
-                            <>
-                              <span>•</span>
-                              <span>{activeCoffee.recommendedGrind || activeCoffee.grindSize || activeCoffee.extraction?.grind}</span>
-                            </>
-                          )}
+                      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0 self-start lg:self-center">
+                        <button
+                          type="button"
+                          onClick={() => handleViewRoasterProfile(activeCoffee)}
+                          className="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-amber-200 text-xs font-mono font-bold flex items-center gap-1.5 transition cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+                          title={`Learn about ${activeCoffee.roaster || 'this roaster'}`}
+                        >
+                          <Coffee className="w-3.5 h-3.5" />
+                          <span>Learn About Roaster</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+
+                        <div className="text-xs font-mono text-cream-soft bg-black/40 p-3 rounded-xl border border-white/10 flex flex-wrap sm:flex-col sm:items-end gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-amber-gold font-bold">1:{effectiveRatio}</span>
+                            <span>•</span>
+                            <span className="text-cream-light font-bold">{dryDoseGrams}g : {calculatedTotalWaterMl}g</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-cream-soft/80">
+                            {(activeCoffee.tempF || activeCoffee.extraction?.tempF) && (
+                              <span>{activeCoffee.tempF || activeCoffee.extraction?.tempF}°F</span>
+                            )}
+                            {(activeCoffee.recommendedGrind || activeCoffee.grindSize || activeCoffee.extraction?.grind) && (
+                              <>
+                                <span>•</span>
+                                <span>{activeCoffee.recommendedGrind || activeCoffee.grindSize || activeCoffee.extraction?.grind}</span>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1553,7 +1664,7 @@ export default function App() {
               setIsProfileOpen(false);
               setIsWaterLabOpen(true);
             }}
-            onLogout={() => setCurrentUser(null)}
+            onLogout={handleLogout}
           />
 
           {/* Sign In / Auth Modal */}
@@ -1568,7 +1679,7 @@ export default function App() {
               setCurrentUser(updatedUser);
               setUsersList([updatedUser, ...usersList.filter((u) => u.username !== updatedUser.username)]);
             }}
-            onLogout={() => setCurrentUser(null)}
+            onLogout={handleLogout}
           />
 
           {/* Specialty Coffee Shop Finder Modal */}

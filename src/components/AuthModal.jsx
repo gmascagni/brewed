@@ -168,7 +168,9 @@ export default function AuthModal({
             onClose();
           } catch (err) {
             console.error('Roaster registration error:', err);
-            setErrorMessage(err.message || 'Could not register roaster account. Please try again.');
+            setErrorMessage(err.code === 'auth/email-already-in-use'
+              ? 'An account already exists with this email address. Please switch to "Sign In" and enter your password.'
+              : err.message || 'Could not register roaster account. Please try again.');
           } finally {
             setIsSubmitting(false);
           }
@@ -195,7 +197,7 @@ export default function AuthModal({
             onClose();
           } catch (err) {
             console.error('Roaster signin error:', err);
-            setErrorMessage(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password'
+            setErrorMessage(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'
               ? 'Invalid roaster email or password. Please verify your credentials.'
               : err.message || 'Authentication failed.');
           } finally {
@@ -480,9 +482,18 @@ export default function AuthModal({
                           key={u.username || u.email}
                           type="button"
                           onClick={() => {
-                            onSaveProfile(u);
-                            trackEvent(accountType === 'roaster' ? 'roaster_login' : 'user_login', { username: u.username });
-                            onClose();
+                            if (accountType === 'roaster') {
+                              setEmail(u.email || '');
+                              setErrorMessage('');
+                              setTimeout(() => {
+                                const pwdInput = document.querySelector('input[type="password"]');
+                                if (pwdInput) pwdInput.focus();
+                              }, 50);
+                            } else {
+                              onSaveProfile(u);
+                              trackEvent('user_login', { username: u.username });
+                              onClose();
+                            }
                           }}
                           className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all ${
                             currentUser?.username === u.username || currentUser?.email === u.email
@@ -497,7 +508,9 @@ export default function AuthModal({
                               <div className="font-mono text-[10px] text-stone-400">{u.email || u.username}</div>
                             </div>
                           </div>
-                          <span className="text-[10px] font-mono text-amber-gold font-bold">Use Profile →</span>
+                          <span className="text-[10px] font-mono text-amber-gold font-bold">
+                            {accountType === 'roaster' ? 'Enter Password →' : 'Use Profile →'}
+                          </span>
                         </button>
                       ))}
                     </div>

@@ -11,6 +11,7 @@ import {
   deleteDoc, 
   query, 
   where, 
+  limit,
   orderBy, 
   onSnapshot,
   enableIndexedDbPersistence
@@ -55,32 +56,7 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Register a new verified roaster using email and password
- */
-const LOCAL_ROASTER_KEY = 'the_brew_app_roaster_accounts';
-
-function getLocalRoasterAccounts() {
-  if (typeof window === 'undefined') return {};
-  try {
-    return JSON.parse(localStorage.getItem(LOCAL_ROASTER_KEY) || '{}');
-  } catch {
-    return {};
-  }
-}
-
-function saveLocalRoasterAccount(email, account) {
-  if (typeof window === 'undefined') return;
-  try {
-    const list = getLocalRoasterAccounts();
-    list[email.toLowerCase()] = account;
-    localStorage.setItem(LOCAL_ROASTER_KEY, JSON.stringify(list));
-  } catch (e) {
-    console.warn('Unable to persist local roaster account:', e);
-  }
-}
-
-/**
- * Register a new specialty roaster account with email and password
+ * Register a new specialty roaster account with email and password via Firebase Auth
  */
 export async function registerRoasterAccount({ email, password, roasterName, displayName }) {
   const cleanEmail = String(email || '').trim().toLowerCase();
@@ -91,40 +67,44 @@ export async function registerRoasterAccount({ email, password, roasterName, dis
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-  let firebaseUid = `roaster_${Date.now()}`;
+  if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+    throw new Error('Please enter a valid email address.');
+  }
+  if (!password || password.length < 6) {
+    throw new Error('Password must be at least 6 characters long.');
+  }
+  if (!cleanRoasterName) {
+    throw new Error('Please enter your Roastery / Brand Name.');
+  }
 
-  if (auth && password) {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
-      if (userCredential?.user) {
-        firebaseUid = userCredential.user.uid;
-        await updateProfile(userCredential.user, {
-          displayName: cleanDisplayName
-        }).catch(() => {});
-      }
-    } catch (authErr) {
-      // If user already exists in Firebase Auth, attempt sign-in
-      if (authErr.code === 'auth/email-already-in-use') {
-        try {
-          const signinCred = await signInWithEmailAndPassword(auth, cleanEmail, password);
-          if (signinCred?.user) {
-            firebaseUid = signinCred.user.uid;
-          }
-        } catch (signInErr) {
-          console.warn('Firebase roaster sign-in fallback:', signInErr);
+  if (!auth) {
+    throw new Error('Firebase Authentication is unavailable.');
+  }
+
+  let firebaseUid = null;
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, password);
+    if (userCredential?.user) {
+      firebaseUid = userCredential.user.uid;
+      await updateProfile(userCredential.user, {
+        displayName: cleanDisplayName
+      }).catch(() => {});
+    }
+  } catch (authErr) {
+    if (authErr.code === 'auth/email-already-in-use') {
+      try {
+        const signinCred = await signInWithEmailAndPassword(auth, cleanEmail, password);
+        if (signinCred?.user) {
+          firebaseUid = signinCred.user.uid;
         }
-      } else if (
-        authErr.code === 'auth/configuration-not-found' ||
-        authErr.code === 'auth/operation-not-allowed' ||
-        authErr.code === 'auth/network-request-failed' ||
-        authErr.code === 'auth/invalid-api-key' ||
-        authErr.code === 'auth/project-not-found'
-      ) {
-        // Fallback to local verified roaster device storage if cloud auth is unconfigured or offline
-        console.warn('Firebase Auth offline/unconfigured; falling back to local roaster account:', authErr.code);
-      } else {
-        throw authErr;
+      } catch {
+        const existingAccErr = new Error('An account already exists for this email address. Please switch to "Sign In" and enter your password.');
+        existingAccErr.code = 'auth/email-already-in-use';
+        throw existingAccErr;
       }
+    } else {
+      throw authErr;
     }
   }
 
@@ -141,20 +121,20 @@ export async function registerRoasterAccount({ email, password, roasterName, dis
     createdAt: new Date().toISOString()
   };
 
-  // Persist to local verified roaster storage
-  saveLocalRoasterAccount(cleanEmail, {
-    uid: firebaseUid,
-    email: cleanEmail,
-    roasterName: cleanRoasterName,
-    roasterSlug: slug,
-    displayName: cleanDisplayName,
-    passwordHash: typeof btoa !== 'undefined' ? btoa(password) : password,
-    updatedAt: new Date().toISOString()
-  });
-
-  // Sync to Cloud Firestore roasters collection
+  // Sync brand profile to Cloud Firestore roasters collection
   if (db) {
     try {
+      await setDoc(doc(db, 'roasters', slug), {
+        id: slug,
+        slug,
+        name: cleanRoasterName,
+        displayName: cleanDisplayName,
+        ownerEmail: cleanEmail,
+        ownerUid: firebaseUid,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      // Save email -> roaster mapping for fast cross-device lookups
       await setDoc(doc(db, 'roaster_accounts', cleanEmail), {
         uid: firebaseUid,
         email: cleanEmail,
@@ -164,7 +144,7 @@ export async function registerRoasterAccount({ email, password, roasterName, dis
         updatedAt: new Date().toISOString()
       }, { merge: true });
     } catch (e) {
-      console.warn('Firestore roaster account sync:', e);
+      console.warn('Firestore roaster profile sync warning:', e);
     }
   }
 
@@ -172,73 +152,60 @@ export async function registerRoasterAccount({ email, password, roasterName, dis
 }
 
 /**
- * Sign in an existing roaster with email and password
+ * Sign in an existing roaster with email and password via Firebase Auth
  */
 export async function signInRoasterAccount({ email, password }) {
   const cleanEmail = String(email || '').trim().toLowerCase();
 
-  let firebaseUid = null;
-  let displayName = null;
-
-  if (auth && password) {
-    try {
-      const cred = await signInWithEmailAndPassword(auth, cleanEmail, password);
-      if (cred?.user) {
-        firebaseUid = cred.user.uid;
-        displayName = cred.user.displayName;
-      }
-    } catch (authErr) {
-      if (
-        authErr.code === 'auth/configuration-not-found' ||
-        authErr.code === 'auth/operation-not-allowed' ||
-        authErr.code === 'auth/network-request-failed' ||
-        authErr.code === 'auth/invalid-api-key' ||
-        authErr.code === 'auth/project-not-found'
-      ) {
-        console.warn('Firebase Auth offline/unconfigured; verifying against local roaster store:', authErr.code);
-      } else {
-        throw authErr;
-      }
-    }
+  if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
+    throw new Error('Please enter a valid email address.');
+  }
+  if (!password) {
+    throw new Error('Please enter your account password.');
   }
 
-  // Verify against local roaster storage if available
-  const localAccounts = getLocalRoasterAccounts();
-  const localAcc = localAccounts[cleanEmail];
-  if (localAcc && localAcc.passwordHash && typeof btoa !== 'undefined') {
-    if (localAcc.passwordHash !== btoa(password)) {
-      const wrongPassErr = new Error('Invalid roaster password.');
-      wrongPassErr.code = 'auth/wrong-password';
-      throw wrongPassErr;
-    }
+  if (!auth) {
+    throw new Error('Firebase Authentication is unavailable.');
   }
 
-  // Fetch roaster details from Firestore if available
+  // Authenticate directly against Firebase Auth
+  const cred = await signInWithEmailAndPassword(auth, cleanEmail, password);
+  const firebaseUid = cred?.user?.uid;
+  const displayName = cred?.user?.displayName;
+
+  // Retrieve roastery profile from Firestore
   let roasterData = null;
   if (db) {
     try {
       const snap = await getDoc(doc(db, 'roaster_accounts', cleanEmail));
       if (snap.exists()) {
         roasterData = snap.data();
+      } else {
+        const querySnap = await getDocs(
+          query(collection(db, 'roasters'), where('ownerEmail', '==', cleanEmail), limit(1))
+        );
+        if (!querySnap.empty) {
+          roasterData = querySnap.docs[0].data();
+        }
       }
     } catch (e) {
-      console.warn('Firestore roaster account fetch:', e);
+      console.warn('Firestore roaster profile fetch warning:', e);
     }
   }
 
-  const roasterName = roasterData?.roasterName || localAcc?.roasterName || displayName || cleanEmail.split('@')[0];
-  const slug = roasterData?.roasterSlug || localAcc?.roasterSlug || roasterName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const roasterName = roasterData?.roasterName || roasterData?.name || displayName || cleanEmail.split('@')[0];
+  const slug = roasterData?.roasterSlug || roasterData?.slug || roasterName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
   return {
-    uid: firebaseUid || roasterData?.uid || localAcc?.uid || `roaster_${Date.now()}`,
+    uid: firebaseUid,
     email: cleanEmail,
     username: `@${cleanEmail.split('@')[0]}`,
-    displayName: displayName || localAcc?.displayName || roasterName,
+    displayName: displayName || roasterName,
     role: 'roaster',
     roasterName,
     roasterSlug: slug,
     isVerifiedRoaster: true,
-    avatar: '/avatar_roast_beans.jpg'
+    avatar: roasterData?.logo || roasterData?.logoImage || '/avatar_roast_beans.jpg'
   };
 }
 
@@ -253,4 +220,12 @@ export async function signOutRoasterAccount() {
       console.warn('Error during signOut:', err);
     }
   }
+}
+
+/**
+ * Observer for Firebase Auth state changes
+ */
+export function onRoasterAuthStateChanged(callback) {
+  if (!auth) return () => {};
+  return onAuthStateChanged(auth, callback);
 }

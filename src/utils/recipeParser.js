@@ -143,6 +143,7 @@ export function normalizeRecipeBean(data) {
     id: data.id || `recipe_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     isBagRecipe: true,
     roaster,
+    roasterSlug: data.roasterSlug || (typeof roaster === 'string' ? roaster.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : 'specialty-roaster'),
     beanName: coffee,
     roastLevel: roast,
     brewMethod,
@@ -262,7 +263,8 @@ export function parseRecipePayload(input) {
 
           const queryData = {
             v: parseInt(params.get('v') || '1', 10),
-            roaster: params.get('roaster') || params.get('r') || pathRoaster || 'Specialty Roaster',
+            roaster: params.get('roasterName') || params.get('roaster') || params.get('r') || pathRoaster || 'Specialty Roaster',
+            roasterSlug: params.get('roaster') || params.get('roasterSlug') || (pathRoaster ? pathRoaster.toLowerCase().replace(/[^a-z0-9]+/g, '-') : null),
             coffee: params.get('coffee') || params.get('bean') || params.get('b'),
             roast: params.get('roast'),
             brewer: params.get('brewer') || params.get('method') || params.get('m'),

@@ -46,10 +46,10 @@ export default function RoasterOfferingsGrid({
               <div>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/30 text-emerald-300 font-mono text-[10px] font-bold uppercase tracking-wider border border-emerald-500/50">
-                    ✨ Smart Bag Scanned
+                    ✨ Scanned Barcode Recipe
                   </span>
                   <span className="text-xs font-mono text-cream-soft">
-                    Matched from your physical packaging
+                    Matched from packaging barcode
                   </span>
                 </div>
                 <h4 className="font-serif text-lg sm:text-xl font-bold text-cream-light mt-0.5">
@@ -72,10 +72,10 @@ export default function RoasterOfferingsGrid({
                     orchestrator.brew(payload);
                   }
                 }}
-                className="px-5 py-3 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition cursor-pointer"
+                className="px-5 py-3 rounded-2xl bg-amber-gold hover:bg-amber-300 text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-gold/20 hover:scale-105 active:scale-95 transition cursor-pointer"
               >
                 <Coffee className="w-4 h-4" />
-                <span>Start Brew Timer</span>
+                <span>Select & Brew Recipe</span>
               </button>
               <button
                 onClick={() => handleSaveToJournal(activeScannedCoffee)}
@@ -176,7 +176,7 @@ export default function RoasterOfferingsGrid({
                     roaster={roaster}
                     qrDataUrl={qr?.qrDataUrl}
                     smartBagUrl={qr?.url}
-                    layout="thermal"
+                    layout="brother_ql"
                     onEnlarge={setActiveLabelModalCoffee}
                     onBrewCoffee={onBrewCoffee}
                   />
@@ -356,7 +356,7 @@ export default function RoasterOfferingsGrid({
                       roaster={roaster}
                       qrDataUrl={qr?.qrDataUrl}
                       smartBagUrl={qr?.url}
-                      layout="thermal"
+                      layout="brother_ql"
                       onEnlarge={setActiveLabelModalCoffee}
                       onBrewCoffee={onBrewCoffee}
                     />
@@ -437,7 +437,7 @@ export default function RoasterOfferingsGrid({
                           roaster={roaster}
                           qrDataUrl={qr?.qrDataUrl}
                           smartBagUrl={qr?.url}
-                          layout="thermal"
+                          layout="brother_ql"
                           onEnlarge={setActiveLabelModalCoffee}
                           onBrewCoffee={onBrewCoffee}
                         />

@@ -668,8 +668,8 @@ export default function UserProfileDashboard({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/85 backdrop-blur-xl animate-fade-in">
-      <div className="min-h-full flex items-start justify-center p-3 sm:p-6 pt-12 sm:pt-16 pb-16">
+    <div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/90 backdrop-blur-xl animate-fade-in">
+      <div className="min-h-full flex items-start justify-center p-3 sm:p-6 pt-16 sm:pt-20 pb-16">
         {content}
       </div>
     </div>
