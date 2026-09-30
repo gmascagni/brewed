@@ -227,6 +227,22 @@ export default function App() {
   const [customGrind, setCustomGrind] = useState(null);
   const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
 
+  // Track offline status for PWA offline resilience
+  const [isOffline, setIsOffline] = useState(() => typeof navigator !== 'undefined' && !navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   // Track whether any full-screen modal overlay is active
   const isAnyModalOpen = Boolean(
     isJournalOpen ||
@@ -1028,6 +1044,14 @@ export default function App() {
             trackMode={trackMode}
           />
         )}
+
+        {/* Offline PWA Banner */}
+        {isOffline && (
+          <div className="bg-amber-500/90 text-espresso-950 px-3 py-1.5 text-center text-xs font-mono font-bold flex items-center justify-center gap-2 shadow-sm animate-fade-in relative z-20">
+            <span className="w-2 h-2 rounded-full bg-amber-900 animate-ping" />
+            <span>⚡ Offline Mode Active • Core Guided Brew Timer &amp; Saved Recipes 100% Available</span>
+          </div>
+        )}
       </header>
 
       {/* Main Workspace Container */}
@@ -1190,7 +1214,7 @@ export default function App() {
               onLogout={handleLogout}
               onBrewAgain={(entry) => handleBrewAgain(entry)}
               onSelectRecipe={(recipe) => handleApplyRecipe(recipe, 3)}
-              onSelectRecipeToBrew={(recipe) => handleApplyRecipe(recipe, 3)}
+              onSelectRecipeToBrew={(recipe) => handleApplyRecipe(recipe, 4)}
               onOpenRecipeBuilder={() => setIsRecipeBuilderOpen(true)}
               onSelectBeanToBrew={(bean) => handleSelectBeanToBrew(bean)}
               onOpenScanner={() => setIsScannerOpen(true)}

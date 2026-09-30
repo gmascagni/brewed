@@ -70,6 +70,8 @@ export default function MyCoffeeHub({
       {/* 2. Primary My Coffee Tabs */}
       <div className="flex items-center gap-1.5 p-1 bg-[#FAF7F2] rounded-2xl border border-[#ECE6DC] w-full overflow-x-auto">
         <button
+          id="my-coffee-tab-journal"
+          data-tab="journal"
           type="button"
           onClick={() => handleTabChange('journal')}
           className={`flex-1 min-w-[140px] py-2.5 px-3.5 rounded-xl text-xs font-sans font-bold transition-all text-center cursor-pointer ${
@@ -85,6 +87,8 @@ export default function MyCoffeeHub({
         </button>
 
         <button
+          id="my-coffee-tab-recipes"
+          data-tab="recipes"
           type="button"
           onClick={() => handleTabChange('recipes')}
           className={`flex-1 min-w-[140px] py-2.5 px-3.5 rounded-xl text-xs font-sans font-bold transition-all text-center cursor-pointer ${
@@ -100,6 +104,8 @@ export default function MyCoffeeHub({
         </button>
 
         <button
+          id="my-coffee-tab-profile"
+          data-tab="profile"
           type="button"
           onClick={() => handleTabChange('profile')}
           className={`flex-1 min-w-[140px] py-2.5 px-3.5 rounded-xl text-xs font-sans font-bold transition-all text-center cursor-pointer ${
@@ -115,6 +121,8 @@ export default function MyCoffeeHub({
         </button>
 
         <button
+          id="my-coffee-tab-tools"
+          data-tab="tools"
           type="button"
           onClick={() => handleTabChange('tools')}
           className={`flex-1 min-w-[140px] py-2.5 px-3.5 rounded-xl text-xs font-sans font-bold transition-all text-center cursor-pointer ${

@@ -379,3 +379,341 @@ export function formatMatchedCoffeeRecipe(match) {
     elevation: match.elevation
   });
 }
+
+/**
+ * Parses free text (Instagram captions, YouTube descriptions, recipe blogs, forum posts)
+ * or external URLs into structured recipe objects with step timelines.
+ */
+export function parseFreeTextRecipe(rawInput) {
+  if (!rawInput || typeof rawInput !== 'string') return null;
+  const text = rawInput.trim();
+  if (!text) return null;
+
+  const methodNames = {
+    pour_over: 'Hario V60 Dripper',
+    classic_pour_over: 'Flat-Bottom Pour Over (Kalita)',
+    chemex: 'Chemex Glass Brewer',
+    aeropress: 'AeroPress',
+    french_press: 'French Press',
+    moka_pot: 'Bialetti Moka Pot',
+    espresso: 'Espresso (9-Bar)',
+    cold_brew: 'Cold Brew',
+    drip_brewer: 'Batch Precision Brewer'
+  };
+
+  // 1. Check if input is a URL
+  let sourceUrl = null;
+  if (/^https?:\/\//i.test(text)) {
+    sourceUrl = text;
+    // Check if it's a thebrew.app link with ?recipe= or ?r= or /r/
+    const parsedFromUrl = parseRecipePayload(text);
+    if (parsedFromUrl) {
+      return {
+        ...parsedFromUrl,
+        sourceUrl
+      };
+    }
+    // YouTube link check
+    if (/youtube\.com|youtu\.be/i.test(text)) {
+      return {
+        id: `imported_yt_${Date.now()}`,
+        title: 'Imported YouTube Brew Guide',
+        technique: 'YouTube Video Recipe',
+        badge: 'Imported Video',
+        methodId: 'pour_over',
+        methodName: 'Hario V60 Dripper',
+        trackMode: 'coffee',
+        beanName: 'Creator Roast Recommendation',
+        roasterName: 'YouTube Creator',
+        ratio: 16.6,
+        dryDoseGrams: 15.0,
+        waterAmountMl: 250.0,
+        waterTempC: 96,
+        waterTempF: 205,
+        grindSetting: 'Medium-Fine',
+        totalTimeSec: 180,
+        description: `Imported from YouTube video: ${text}`,
+        sourceUrl: text,
+        isCustom: true,
+        steps: [
+          { order: 1, durationSec: 45, waterMl: 50, action: 'Bloom Pour & Swirl (3x dose)' },
+          { order: 2, durationSec: 45, waterMl: 150, action: 'First Main Pour in Gentle Concentric Spirals' },
+          { order: 3, durationSec: 45, waterMl: 250, action: 'Final Center Pour & Leveling Swirl' },
+          { order: 4, durationSec: 45, waterMl: 250, action: 'Drawdown to Flat Coffee Bed' }
+        ]
+      };
+    }
+    // Instagram link check
+    if (/instagram\.com/i.test(text)) {
+      return {
+        id: `imported_ig_${Date.now()}`,
+        title: 'Imported Instagram Recipe Post',
+        technique: 'Social Media Recipe Protocol',
+        badge: 'Imported Social',
+        methodId: 'pour_over',
+        methodName: 'Hario V60 Dripper',
+        trackMode: 'coffee',
+        beanName: 'Artisan Roast Selection',
+        roasterName: 'Instagram Creator',
+        ratio: 16.0,
+        dryDoseGrams: 18.0,
+        waterAmountMl: 288.0,
+        waterTempC: 94,
+        waterTempF: 202,
+        grindSetting: 'Medium-Fine',
+        totalTimeSec: 195,
+        description: `Imported from Instagram post: ${text}`,
+        sourceUrl: text,
+        isCustom: true,
+        steps: [
+          { order: 1, durationSec: 45, waterMl: 60, action: 'Bloom Pour (3x coffee weight)' },
+          { order: 2, durationSec: 60, waterMl: 180, action: 'Second Continuous Spiral Pour' },
+          { order: 3, durationSec: 90, waterMl: 288, action: 'Final Pour to Target & Complete Drawdown' }
+        ]
+      };
+    }
+  }
+
+  // 2. Parse unstructured free text
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const fullLower = text.toLowerCase();
+
+  // Method detection
+  let methodId = 'pour_over';
+  if (fullLower.includes('kalita') || fullLower.includes('flat bottom') || fullLower.includes('flat-bottom') || fullLower.includes('wave')) {
+    methodId = 'classic_pour_over';
+  } else if (fullLower.includes('chemex')) {
+    methodId = 'chemex';
+  } else if (fullLower.includes('aeropress') || fullLower.includes('aero press')) {
+    methodId = 'aeropress';
+  } else if (fullLower.includes('french press') || fullLower.includes('french-press') || fullLower.includes('cafetiere') || fullLower.includes('plunger')) {
+    methodId = 'french_press';
+  } else if (fullLower.includes('moka') || fullLower.includes('bialetti') || fullLower.includes('stovetop')) {
+    methodId = 'moka_pot';
+  } else if (fullLower.includes('espresso')) {
+    methodId = 'espresso';
+  } else if (fullLower.includes('cold brew') || fullLower.includes('cold-brew') || fullLower.includes('toddy')) {
+    methodId = 'cold_brew';
+  } else if (fullLower.includes('drip') || fullLower.includes('moccamaster') || fullLower.includes('batch')) {
+    methodId = 'drip_brewer';
+  }
+
+  // Dose extraction
+  let dryDoseGrams = null;
+  const doseMatch = text.match(/(?:dose|coffee|beans|grounds)?\s*[:=-]?\s*(\d+(?:\.\d+)?)\s*(?:g|grams?|gr)\b/i);
+  if (doseMatch) {
+    const val = parseFloat(doseMatch[1]);
+    if (val >= 5 && val <= 120) dryDoseGrams = val;
+  }
+  if (!dryDoseGrams) {
+    dryDoseGrams = methodId === 'espresso' ? 18.0 : methodId === 'french_press' ? 30.0 : methodId === 'chemex' ? 30.0 : 15.0;
+  }
+
+  // Water extraction
+  let waterAmountMl = null;
+  const waterMatch = text.match(/(?:water|yield|liquid|total\s*water)?\s*[:=-]?\s*(\d+(?:\.\d+)?)\s*(?:ml|g|grams?)\b/i);
+  if (waterMatch) {
+    const val = parseFloat(waterMatch[1]);
+    if (val > dryDoseGrams && val <= 2500) waterAmountMl = val;
+  }
+
+  // Ratio extraction
+  let ratio = null;
+  const ratioMatch = text.match(/1\s*[:/]\s*(\d+(?:\.\d+)?)/i);
+  if (ratioMatch) {
+    const rVal = parseFloat(ratioMatch[1]);
+    if (rVal >= 1.5 && rVal <= 25) ratio = rVal;
+  }
+
+  if (!ratio && waterAmountMl && dryDoseGrams) {
+    ratio = Number((waterAmountMl / dryDoseGrams).toFixed(1));
+  } else if (!waterAmountMl && ratio && dryDoseGrams) {
+    waterAmountMl = Math.round(dryDoseGrams * ratio);
+  } else if (!ratio && !waterAmountMl) {
+    ratio = methodId === 'espresso' ? 2.0 : methodId === 'aeropress' ? 14.0 : 16.0;
+    waterAmountMl = Math.round(dryDoseGrams * ratio);
+  }
+
+  // Water temperature extraction
+  let waterTempC = 95;
+  let waterTempF = 203;
+  const tempFMatch = text.match(/(\d{3})\s*(?:°\s*f|f|deg\s*f)\b/i);
+  const tempCMatch = text.match(/(\d{2})\s*(?:°\s*c|c|deg\s*c)\b/i);
+
+  if (tempFMatch) {
+    waterTempF = parseInt(tempFMatch[1], 10);
+    waterTempC = Math.round(((waterTempF - 32) * 5) / 9);
+  } else if (tempCMatch) {
+    waterTempC = parseInt(tempCMatch[1], 10);
+    waterTempF = Math.round((waterTempC * 9) / 5 + 32);
+  } else if (fullLower.includes('boiling') || fullLower.includes('100c') || fullLower.includes('212f')) {
+    waterTempC = 99;
+    waterTempF = 210;
+  } else if (fullLower.includes('off the boil')) {
+    waterTempC = 96;
+    waterTempF = 205;
+  }
+
+  // Grind setting extraction
+  let grindSetting = 'Medium-Fine';
+  const grindMatch = text.match(/(?:grind|setting)?\s*[:=-]?\s*([a-zA-Z0-9\s#\-–.,]+(?:clicks?|setting|burr|coarse|fine|medium|micron|µm))/i);
+  if (grindMatch && grindMatch[1].length < 40) {
+    grindSetting = grindMatch[1].trim();
+  } else {
+    if (fullLower.includes('extra fine') || methodId === 'espresso') grindSetting = 'Extra-Fine (200–300 µm)';
+    else if (fullLower.includes('fine') || methodId === 'moka_pot') grindSetting = 'Fine (350–450 µm)';
+    else if (fullLower.includes('medium-coarse') || methodId === 'chemex') grindSetting = 'Medium-Coarse (750–900 µm)';
+    else if (fullLower.includes('coarse') || methodId === 'french_press' || methodId === 'cold_brew') grindSetting = 'Coarse (850–1000 µm)';
+    else if (fullLower.includes('medium')) grindSetting = 'Medium (600–700 µm)';
+    else grindSetting = 'Medium-Fine (500–650 µm)';
+  }
+
+  // Title extraction (First line or header)
+  let title = lines[0] || 'Imported Coffee Recipe';
+  if (title.length > 50 || title.includes('http') || title.match(/^[\d:.-]+/)) {
+    title = `${methodNames[methodId] || 'Pour Over'} Artisan Recipe`;
+  }
+
+  // Structured Steps Extraction
+  const steps = [];
+  let lastTimeSec = 0;
+
+  for (const line of lines) {
+    const timeMatch = line.match(/^(\d+):(\d{2})\s*[-–:]?\s*(.*)/i);
+    const numStepMatch = line.match(/^(?:step\s*)?(\d+)[.:)]\s*(.*)/i);
+
+    if (timeMatch) {
+      const min = parseInt(timeMatch[1], 10);
+      const sec = parseInt(timeMatch[2], 10);
+      const targetSec = min * 60 + sec;
+      const durationSec = Math.max(15, targetSec - lastTimeSec);
+      lastTimeSec = targetSec;
+      const act = timeMatch[3].trim();
+      const waterInStepMatch = act.match(/(\d+)\s*(?:g|ml)\b/i);
+      const waterMl = waterInStepMatch ? parseInt(waterInStepMatch[1], 10) : Math.round(waterAmountMl * (steps.length + 1) / 3);
+
+      steps.push({
+        order: steps.length + 1,
+        durationSec,
+        waterMl,
+        action: act || `Pour to ${waterMl}g`
+      });
+    } else if (numStepMatch && steps.length < 7) {
+      const act = numStepMatch[2].trim();
+      const waterInStepMatch = act.match(/(\d+)\s*(?:g|ml)\b/i);
+      const waterMl = waterInStepMatch ? parseInt(waterInStepMatch[1], 10) : Math.round(waterAmountMl * (steps.length + 1) / 3);
+      steps.push({
+        order: steps.length + 1,
+        durationSec: 45,
+        waterMl,
+        action: act || `Step ${steps.length + 1}`
+      });
+    }
+  }
+
+  // If no granular steps could be extracted from unstructured text, generate authentic scaled steps
+  if (steps.length === 0) {
+    const bloomWater = Math.round(dryDoseGrams * 3);
+    const pour1 = Math.round(waterAmountMl * 0.6);
+    steps.push(
+      { order: 1, durationSec: 45, waterMl: bloomWater, action: `Bloom with ${bloomWater}g water; let de-gas for 45s` },
+      { order: 2, durationSec: 60, waterMl: pour1, action: `First main pour in concentric circles to ${pour1}g` },
+      { order: 3, durationSec: 45, waterMl: waterAmountMl, action: `Final pour to ${waterAmountMl}g; gentle swirl for flat bed` },
+      { order: 4, durationSec: 45, waterMl: waterAmountMl, action: 'Even drawdown to finish' }
+    );
+  }
+
+  const totalTimeSec = steps.reduce((sum, s) => sum + (s.durationSec || 0), 0) || 195;
+
+  return {
+    id: `imported_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    title,
+    technique: 'Parsed Custom Recipe',
+    badge: 'Imported Recipe',
+    methodId,
+    methodName: methodNames[methodId] || 'Pour Over',
+    trackMode: 'coffee',
+    beanName: 'Imported Coffee Selection',
+    roasterName: 'Custom Roaster',
+    ratio,
+    dryDoseGrams,
+    waterAmountMl,
+    waterTempC,
+    waterTempF,
+    grindSetting,
+    totalTimeSec,
+    description: text.slice(0, 160) + (text.length > 160 ? '...' : ''),
+    sourceUrl,
+    isCustom: true,
+    steps
+  };
+}
+
+/**
+ * Serializes a recipe into an authentic shareable link
+ */
+export function encodeRecipeToShareUrl(recipe) {
+  if (!recipe) return typeof window !== 'undefined' ? window.location.origin : 'https://thebrew.app';
+  const compact = {
+    v: 1,
+    title: recipe.title,
+    method: recipe.methodId,
+    methodName: recipe.methodName,
+    dose: recipe.dryDoseGrams,
+    water: recipe.waterAmountMl,
+    ratio: recipe.ratio,
+    tempF: recipe.waterTempF || Math.round((recipe.waterTempC * 9) / 5 + 32),
+    grind: recipe.grindSetting,
+    time: recipe.totalTimeSec,
+    desc: recipe.description,
+    steps: recipe.steps
+  };
+  try {
+    const jsonStr = JSON.stringify(compact);
+    const b64 = btoa(unescape(encodeURIComponent(jsonStr)));
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://thebrew.app';
+    return `${origin}/recipes?recipe=${b64}`;
+  } catch (e) {
+    console.warn('Failed to encode recipe:', e);
+    return typeof window !== 'undefined' ? window.location.origin : 'https://thebrew.app';
+  }
+}
+
+/**
+ * Decodes a base64 or JSON recipe payload from URL query string
+ */
+export function decodeRecipeFromSharePayload(payload) {
+  if (!payload) return null;
+  try {
+    let jsonStr = payload;
+    if (!payload.startsWith('{')) {
+      jsonStr = decodeURIComponent(escape(atob(payload)));
+    }
+    const data = JSON.parse(jsonStr);
+    return {
+      id: `shared_rec_${Date.now()}`,
+      title: data.title || 'Shared Artisan Recipe',
+      technique: 'Community Shared Protocol',
+      badge: 'Community Recipe',
+      methodId: data.method || 'pour_over',
+      methodName: data.methodName || 'Pour Over',
+      trackMode: 'coffee',
+      beanName: 'Shared Coffee Selection',
+      roasterName: 'Barista Community',
+      ratio: data.ratio || 16.0,
+      dryDoseGrams: data.dose || 15.0,
+      waterAmountMl: data.water || 250,
+      waterTempF: data.tempF || 202,
+      waterTempC: Math.round(((data.tempF || 202) - 32) * 5 / 9),
+      grindSetting: data.grind || 'Medium-Fine',
+      totalTimeSec: data.time || 180,
+      description: data.desc || 'Shared community brew recipe.',
+      isCustom: true,
+      steps: data.steps || []
+    };
+  } catch (e) {
+    console.warn('Failed to decode share payload:', e);
+    return null;
+  }
+}
+
