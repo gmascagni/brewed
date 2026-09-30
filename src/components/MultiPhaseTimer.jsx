@@ -36,6 +36,7 @@ import { requestScreenWakeLock, releaseScreenWakeLock } from '../utils/wakeLock'
 import { hapticStart, hapticPhaseChange, hapticComplete, hapticTap } from '../utils/haptics';
 import { getBloomScalingMetrics, BLOOM_SCALING_TABLE } from '../utils/bloomScaling';
 import V60ProTipModal from './V60ProTipModal';
+import PostBrewAssessmentModal from './PostBrewAssessmentModal';
 import { logBrewSession } from '../utils/journalStorage';
 import { getSavedGrinderId, getGrinderSetting } from '../data/grinderProfiles';
 import { calculateClosedLoopDialIn, formatSecondsToMmSs, METHOD_DRAWDOWN_TARGETS } from '../utils/dialInEngine';
@@ -54,7 +55,8 @@ export default function MultiPhaseTimer({
   totalWaterMl = null,
   customRatio = null,
   onApplyNextBrewTweak = null,
-  customGrind = null
+  customGrind = null,
+  currentUser = null
 }) {
   const isCoffee = trackMode === 'coffee';
 
@@ -100,6 +102,7 @@ export default function MultiPhaseTimer({
   const [tasteFeedback, setTasteFeedback] = useState(null); // 'sour' | 'sweet' | 'bitter'
   const [isSavedToLog, setIsSavedToLog] = useState(false);
   const [isEvaluationSkipped, setIsEvaluationSkipped] = useState(false);
+  const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
 
   // Step 00: Pre-Brew Preparation Checklist State (Option 1)
   const [isPreBrewDismissed, setIsPreBrewDismissed] = useState(false);
@@ -576,6 +579,7 @@ export default function MultiPhaseTimer({
       setIsRunning(false);
       setIsAnnouncing(false);
       setIsCompleted(true);
+      setIsAssessmentModalOpen(true);
       const totalPlanned = phases.reduce((acc, p) => acc + (p.durationSec || 0), 0);
       const elapsedTotal = brewStartedTimeRef.current 
         ? Math.round((Date.now() - brewStartedTimeRef.current) / 1000) 
@@ -759,6 +763,7 @@ export default function MultiPhaseTimer({
     } else {
       setIsRunning(false);
       setIsCompleted(true);
+      setIsAssessmentModalOpen(true);
       const totalPlanned = phases.reduce((acc, p) => acc + (p.durationSec || 0), 0);
       const elapsedTotal = brewStartedTimeRef.current 
         ? Math.round((Date.now() - brewStartedTimeRef.current) / 1000) 
@@ -783,6 +788,7 @@ export default function MultiPhaseTimer({
     setIsAnnouncing(false);
     setIsRunning(false);
     setIsCompleted(false);
+    setIsAssessmentModalOpen(false);
     setTasteFeedback(null);
     setIsSavedToLog(false);
     setIsEvaluationSkipped(false);
@@ -1307,8 +1313,16 @@ export default function MultiPhaseTimer({
                 <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                   <button
                     type="button"
+                    onClick={() => setIsAssessmentModalOpen(true)}
+                    className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-mono font-bold shadow-lg hover:scale-105 active:scale-95 transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-espresso-950" />
+                    <span>Log Tasting & Dial In</span>
+                  </button>
+                  <button
+                    type="button"
                     onClick={handleReset}
-                    className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-mono font-bold shadow-lg hover:scale-105 active:scale-95 transition cursor-pointer"
+                    className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-cream-light text-xs font-mono font-bold border border-white/15 transition cursor-pointer"
                   >
                     Reset Timer
                   </button>
@@ -1898,6 +1912,23 @@ export default function MultiPhaseTimer({
       <V60ProTipModal
         isOpen={isProTipOpen}
         onClose={() => setIsProTipOpen(false)}
+      />
+
+      {/* Lightweight Post-Brew Assessment & Dial-In Assistant Modal */}
+      <PostBrewAssessmentModal
+        isOpen={isAssessmentModalOpen}
+        onClose={() => setIsAssessmentModalOpen(false)}
+        activeMethod={activeMethod}
+        dialedInCoffee={dialedInCoffee}
+        dryDoseGrams={dryDoseGrams}
+        totalWaterMl={totalWaterMl}
+        customRatio={customRatio}
+        customGrind={customGrind}
+        elapsedSec={actualDrawdownSec}
+        unitSystem={unitSystem}
+        onApplyNextBrewTweak={onApplyNextBrewTweak}
+        onOpenJournal={onOpenJournal}
+        currentUser={currentUser}
       />
 
     </div>

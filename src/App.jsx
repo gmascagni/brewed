@@ -1505,6 +1505,7 @@ export default function App() {
                     customRatio={effectiveRatio}
                     customGrind={customGrind}
                     onApplyNextBrewTweak={handleApplyNextBrewTweak}
+                    currentUser={currentUser}
                   />
                 </div>
               )}
@@ -1524,6 +1525,8 @@ export default function App() {
             customWaterMl={calculatedTotalWaterMl}
             unitSystem={unitSystem}
             onOpenScanner={() => setIsScannerOpen(true)}
+            currentUser={currentUser}
+            onBrewAgain={handleBrewAgain}
           />
 
           {/* Multi-Index Global Search Modal */}

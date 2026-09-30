@@ -112,11 +112,29 @@ export function calculateClosedLoopDialIn({
   let summaryHeadline = '';
   let statusBadge = 'optimal';
 
-  if (tasteProfile === 'sweet') {
+  if (tasteProfile === 'sweet' || tasteProfile === 'balanced') {
     statusBadge = 'golden_cup';
     diagnosisTitle = 'Golden Cup Extraction Locked In!';
-    diagnosisDetail = `Drawdown of ${durationFormatted} fell perfectly within the ${idealStr} window. Ratio, flow rate, and dissolved solubles are in optimal balance.`;
+    diagnosisDetail = `Drawdown of ${durationFormatted} fell within the ${idealStr} window. Ratio, flow rate, and dissolved solubles are in optimal balance.`;
     summaryHeadline = `Drawdown was ${durationFormatted} and sweet & balanced. Golden Cup locked in! Saved to your Dial-In journal.`;
+  } else if (tasteProfile === 'weak') {
+    // Weak / Watery / Under-Concentrated (Low TDS)
+    statusBadge = 'under_concentrated';
+    targetRatio = Math.max(14, Number((currentRatio - 1.0).toFixed(1)));
+    grindShiftSteps = -1; // 1 click finer to boost extraction
+    diagnosisTitle = 'Under-Concentrated (Low TDS / Watery)';
+    diagnosisDetail = `The cup lacks body, depth, and flavor intensity. Increasing dry coffee dose relative to water and grinding slightly finer will extract richer solubles.`;
+    grindRecommendation = `Tighten ratio to 1:${targetRatio} and grind 1 click finer on ${grinderName}`;
+    summaryHeadline = `Cup is weak/watery. Tighten ratio from 1:${currentRatio} to 1:${targetRatio} or grind 1 click finer.`;
+  } else if (tasteProfile === 'strong') {
+    // Strong / Overly Intense / Heavy (High TDS / Low Clarity)
+    statusBadge = 'over_concentrated';
+    targetRatio = Math.min(18, Number((currentRatio + 1.0).toFixed(1)));
+    grindShiftSteps = 1; // 1 click coarser to open flavor clarity
+    diagnosisTitle = 'Over-Concentrated (Heavy / Low Clarity)';
+    diagnosisDetail = `The cup is overly intense, syrupy, or muddy with low floral/fruit clarity. Opening the brew ratio provides more water solvent for crisp note separation.`;
+    grindRecommendation = `Widen ratio to 1:${targetRatio} and grind 1 click coarser on ${grinderName}`;
+    summaryHeadline = `Cup is overly intense. Widen ratio from 1:${currentRatio} to 1:${targetRatio} or grind 1 click coarser for flavor clarity.`;
   } else if (flowSpeed === 'slow' && tasteProfile === 'bitter') {
     // 1. Slow + Bitter: Classic Over-Extraction
     statusBadge = 'over_extracted';

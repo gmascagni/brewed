@@ -149,6 +149,7 @@ export default function MyCoffeeHub({
               unitSystem={unitSystem}
               onOpenScanner={onOpenScanner}
               onBrewAgain={onBrewAgain}
+              currentUser={currentUser}
             />
           </div>
         )}

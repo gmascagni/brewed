@@ -51,6 +51,8 @@ export function hapticComplete() {
   }
 }
 
+export const hapticSuccess = hapticComplete;
+
 /**
  * Camera barcode / Smart Bag QR decode confirmation (50ms)
  */
