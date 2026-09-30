@@ -159,7 +159,14 @@ export function logBrewSession({
   notes = '',
   photoUrl = null,
   bagId = null,
-  userId = null
+  userId = null,
+  isPublic = false,
+  sessionId = null,
+  sessionIndex = 1,
+  parentSessionId = null,
+  chainRootId = null,
+  singleVariableTweak = null,
+  evolutionDelta = null
 } = {}) {
   const currentLogs = getJournalLogs();
 
@@ -193,8 +200,18 @@ export function logBrewSession({
     }
   }
 
+  const effectiveSessionId = sessionId || `brew_sess_${Date.now()}`;
+  const effectiveChainRoot = chainRootId || effectiveSessionId;
+  const effectiveTweak = singleVariableTweak || recipePatch?.singleVariableTweak || null;
+
   const newEntry = {
     id: Date.now().toString(),
+    sessionId: effectiveSessionId,
+    sessionIndex: Number(sessionIndex) || 1,
+    parentSessionId: parentSessionId || null,
+    chainRootId: effectiveChainRoot,
+    singleVariableTweak: effectiveTweak,
+    evolutionDelta: evolutionDelta || null,
     date: formattedDate,
     timestamp: Date.now(),
     trackMode,
@@ -212,7 +229,7 @@ export function logBrewSession({
     tempStr: `${tempF}°F`,
     grindStr: grindName || 'Medium-Fine',
     grinderModel,
-    grinderSetting,
+    grinderSetting: grinderSetting || grindName || 'Medium-Fine',
     actualDrawdownSec: Number(actualDrawdownSec) || 180,
     durationFormatted: durationFormatted || '3:00',
     tasteFeedback: tasteFeedback || 'balanced',

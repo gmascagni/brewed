@@ -48,6 +48,7 @@ import { signOutRoasterAccount } from './services/firebase';
 import { parseRecipePayload } from './utils/recipeParser';
 import { getAssetUrl } from './utils/assetUrl';
 import { getRecentBrews, JOURNAL_UPDATED_EVENT } from './utils/journalStorage';
+import { saveActiveBrewSession, createNextIterationSession, startOrGetActiveBrewSession } from './utils/brewSessionManager';
 import { ChevronRight, ChevronLeft, Sparkles, Coffee, Clock, Play, BookOpen, Store } from 'lucide-react';
 import { getCoffeeProvenance } from './utils/roasterVerification';
 
@@ -140,6 +141,11 @@ export default function App() {
 
   // Platform Modal States
   const [isJournalOpen, setIsJournalOpen] = useState(false);
+  useEffect(() => {
+    const handleOpenJournalEvent = () => setIsJournalOpen(true);
+    window.addEventListener('the_brew_app_open_journal', handleOpenJournalEvent);
+    return () => window.removeEventListener('the_brew_app_open_journal', handleOpenJournalEvent);
+  }, []);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isCommunityOpen, setIsCommunityOpen] = useState(false);
@@ -524,27 +530,63 @@ export default function App() {
   };
 
   // Handler for applying closed-loop dial-in engine tweaks to next brew
-  const handleApplyNextBrewTweak = (recipePatch) => {
+  const handleApplyNextBrewTweak = (recipePatch, nextSession = null) => {
     if (!recipePatch) return;
-    if (recipePatch.ratio) {
-      setCustomRatio(Number(recipePatch.ratio));
-    }
-    if (dialedInCoffee) {
-      setDialedInCoffee(prev => ({
-        ...prev,
-        tempF: recipePatch.tempF || prev.tempF,
-        recommendedRatio: recipePatch.ratio || prev.recommendedRatio,
-        recommendedGrind: recipePatch.grindSetting ? `${recipePatch.grindSetting}` : prev.recommendedGrind
-      }));
+    const tweak = recipePatch.singleVariableTweak;
+
+    if (tweak?.variable === 'grind') {
+      const newGrind = tweak.targetGrindSetting || recipePatch.grindSetting;
+      if (newGrind) {
+        setCustomGrind(newGrind);
+        setDialedInCoffee(prev => ({
+          ...(prev || {}),
+          recommendedGrind: newGrind,
+          grindSetting: newGrind
+        }));
+      }
+    } else if (tweak?.variable === 'temp') {
+      const newTempF = tweak.targetTempF || recipePatch.tempF;
+      if (newTempF) {
+        setDialedInCoffee(prev => ({
+          ...(prev || {}),
+          tempF: newTempF
+        }));
+      }
+    } else if (tweak?.variable === 'ratio') {
+      const newRatio = tweak.targetRatio || recipePatch.ratio;
+      if (newRatio) {
+        setCustomRatio(Number(newRatio));
+        setDialedInCoffee(prev => ({
+          ...(prev || {}),
+          recommendedRatio: Number(newRatio)
+        }));
+      }
     } else {
-      setDialedInCoffee({
-        beanName: activeMethod?.preferredCoffeeTypes?.split('.')[0] || 'Single-Origin Lot',
-        roaster: 'Specialty Roastery',
-        tempF: recipePatch.tempF || 202,
-        recommendedRatio: recipePatch.ratio || 16,
-        recommendedGrind: recipePatch.grindSetting || 'Medium-Fine'
-      });
+      if (recipePatch.grindSetting) {
+        setCustomGrind(recipePatch.grindSetting);
+      }
+      if (recipePatch.ratio) {
+        setCustomRatio(Number(recipePatch.ratio));
+      }
+      if (recipePatch.tempF) {
+        setDialedInCoffee(prev => ({
+          ...(prev || {}),
+          tempF: recipePatch.tempF
+        }));
+      }
     }
+
+    if (nextSession) {
+      saveActiveBrewSession(nextSession);
+    }
+
+    // Direct transition to timer so the barista can brew immediately
+    setCurrentStep(4);
+    navigate(`/methods/${activeMethod?.id || 'pour_over'}`);
+    setTimeout(() => {
+      const timerEl = document.getElementById('step-4') || document.querySelector('main');
+      if (timerEl) timerEl.scrollIntoView({ behavior: 'smooth' });
+    }, 150);
   };
 
   // Handler for Quick-Start Direct Brew from Hero Calculator
@@ -644,26 +686,47 @@ export default function App() {
                          allMethods.find(m => m.name?.toLowerCase() === (entry.methodName || '').toLowerCase()) ||
                          allMethods[0];
 
-    const parsedRatio = parseFloat(String(entry.ratioStr || '').replace('1 :', '').trim()) || entry.ratio || 16;
-    const parsedWater = parseFloat(String(entry.waterStr || '').replace(/[^0-9.]/g, '')) || entry.waterMl || 300;
+    // Check if previous entry has a recommended single-variable tweak to apply
+    const tweak = entry.singleVariableTweak;
+    let nextGrind = entry.grinderSetting || entry.grindStr || 'Medium-Fine';
+    let nextTempF = parseInt(entry.tempStr) || entry.tempF || 202;
+    let nextRatio = parseFloat(String(entry.ratioStr || '').replace('1 :', '').trim()) || entry.ratio || 16;
+    let nextWater = parseFloat(String(entry.waterStr || '').replace(/[^0-9.]/g, '')) || entry.waterMl || 300;
+
+    if (tweak) {
+      if (tweak.variable === 'grind' && tweak.targetGrindSetting) {
+        nextGrind = tweak.targetGrindSetting;
+      } else if (tweak.variable === 'temp' && tweak.targetTempF) {
+        nextTempF = tweak.targetTempF;
+      } else if (tweak.variable === 'ratio' && tweak.targetRatio) {
+        nextRatio = tweak.targetRatio;
+        nextWater = Math.round((entry.doseGrams || 18) * nextRatio);
+      }
+    }
 
     setActiveMethod(targetMethod);
     setTrackMode(entry.trackMode || 'coffee');
-    setCustomRatio(parsedRatio);
-    setCustomWaterMl(parsedWater);
+    setCustomRatio(nextRatio);
+    setCustomWaterMl(nextWater);
     setCupCount(1);
     const brewCoffeeContext = {
       beanName: entry.beanName,
       roaster: entry.roaster,
-      recommendedGrind: entry.grindStr,
-      grindSetting: entry.grindStr,
-      tempF: parseInt(entry.tempStr) || 202,
-      recommendedRatio: parsedRatio
+      recommendedGrind: nextGrind,
+      grindSetting: nextGrind,
+      tempF: nextTempF,
+      recommendedRatio: nextRatio
     };
 
     setDialedInCoffee(brewCoffeeContext);
     setSelectedCoffee(brewCoffeeContext);
-    if (entry.grindStr) setCustomGrind(entry.grindStr);
+    setCustomGrind(nextGrind);
+
+    // Create and prime next iteration session
+    const nextSession = createNextIterationSession(entry, tweak);
+    if (nextSession) {
+      saveActiveBrewSession(nextSession);
+    }
 
     setCurrentStep(4);
     navigate(`/methods/${targetMethod.id}`);
@@ -676,7 +739,8 @@ export default function App() {
     trackEvent('brew_again_launched', {
       method: targetMethod.id,
       bean: entry.beanName,
-      roaster: entry.roaster
+      roaster: entry.roaster,
+      sessionIndex: nextSession?.sessionIndex || 2
     });
   };
 
@@ -728,6 +792,14 @@ export default function App() {
           setCustomWaterMl(null);
           return found;
         });
+
+        const stepParam = searchParams.get('step');
+        if (stepParam) {
+          const parsedStep = parseInt(stepParam, 10);
+          if (parsedStep >= 1 && parsedStep <= 4) {
+            setCurrentStep(parsedStep);
+          }
+        }
 
         // Update Dynamic SEO & JSON-LD Structured Data
         updatePageSeo(
@@ -1294,7 +1366,19 @@ export default function App() {
                           >
                             <div className="space-y-1.5">
                               <div className="flex items-center justify-between text-[11px] font-mono text-stone-500">
-                                <span className="font-bold text-[#A8622D]">{brew.methodName}</span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-bold text-[#A8622D]">{brew.methodName}</span>
+                                  {brew.sessionIndex && (
+                                    <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-900 border border-amber-500/30 text-[9px] font-bold">
+                                      Brew #{brew.sessionIndex}
+                                    </span>
+                                  )}
+                                  {brew.evolutionDelta?.isImprovement && (
+                                    <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-900 border border-emerald-500/30 text-[9px] font-bold">
+                                      ▲ Improved
+                                    </span>
+                                  )}
+                                </div>
                                 <span>{brew.date}</span>
                               </div>
                               <h4 className="font-serif font-bold text-base text-[#14110F] line-clamp-1">

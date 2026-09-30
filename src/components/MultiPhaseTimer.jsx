@@ -38,6 +38,12 @@ import { getBloomScalingMetrics, BLOOM_SCALING_TABLE } from '../utils/bloomScali
 import V60ProTipModal from './V60ProTipModal';
 import PostBrewAssessmentModal from './PostBrewAssessmentModal';
 import { logBrewSession } from '../utils/journalStorage';
+import { 
+  getActiveBrewSession, 
+  saveActiveBrewSession, 
+  startOrGetActiveBrewSession, 
+  SESSION_UPDATED_EVENT 
+} from '../utils/brewSessionManager';
 import { getSavedGrinderId, getGrinderSetting } from '../data/grinderProfiles';
 import { calculateClosedLoopDialIn, formatSecondsToMmSs, METHOD_DRAWDOWN_TARGETS } from '../utils/dialInEngine';
 import { resolveGrindId } from './GrindVisualGuide';
@@ -103,6 +109,67 @@ export default function MultiPhaseTimer({
   const [isSavedToLog, setIsSavedToLog] = useState(false);
   const [isEvaluationSkipped, setIsEvaluationSkipped] = useState(false);
   const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
+
+  // Persistent Brew Session State
+  const [activeSession, setActiveSession] = useState(() => getActiveBrewSession());
+
+  useEffect(() => {
+    const handleSessionUpdate = () => {
+      setActiveSession(getActiveBrewSession());
+    };
+    const handleTriggerAssessment = (e) => {
+      setIsCompleted(true);
+      if (e.detail?.drawdownSec) {
+        setActualDrawdownSec(e.detail.drawdownSec);
+      }
+      setIsAssessmentModalOpen(true);
+    };
+    window.addEventListener(SESSION_UPDATED_EVENT, handleSessionUpdate);
+    window.addEventListener('storage', handleSessionUpdate);
+    window.addEventListener('the_brew_app_trigger_assessment', handleTriggerAssessment);
+    return () => {
+      window.removeEventListener(SESSION_UPDATED_EVENT, handleSessionUpdate);
+      window.removeEventListener('storage', handleSessionUpdate);
+      window.removeEventListener('the_brew_app_trigger_assessment', handleTriggerAssessment);
+    };
+  }, []);
+
+  const ensureActiveSession = useCallback(() => {
+    const existing = getActiveBrewSession();
+    if (existing && !existing.isCompleted) {
+      setActiveSession(existing);
+      return existing;
+    }
+
+    const newSess = startOrGetActiveBrewSession({
+      coffee: {
+        beanName: dialedInCoffee?.beanName || activeMethod?.preferredCoffeeTypes?.split('.')[0] || 'Single-Origin Coffee',
+        roaster: dialedInCoffee?.roaster || 'Specialty Roastery',
+        bagId: dialedInCoffee?.bagId || dialedInCoffee?.id
+      },
+      equipment: {
+        methodId: activeMethod?.id || 'pour_over',
+        methodName: activeMethod?.name || 'Pour Over',
+        grinderSetting: customGrind || dialedInCoffee?.recommendedGrind || dialedInCoffee?.grindSetting || 'Medium-Fine'
+      },
+      recipe: {
+        doseGrams: effectiveDose,
+        waterMl: totalWaterMl || Math.round(effectiveDose * (customRatio || activeMethod?.ratio || 16)),
+        ratio: Number(customRatio || activeMethod?.ratio || 16),
+        tempF: Number(dialedInCoffee?.tempF || activeMethod?.tempF || 202),
+        grindSetting: customGrind || dialedInCoffee?.recommendedGrind || 'Medium-Fine'
+      }
+    });
+    setActiveSession(newSess);
+    return newSess;
+  }, [dialedInCoffee, activeMethod, customGrind, effectiveDose, totalWaterMl, customRatio]);
+
+  // Ensure active session is initialized when timer mounts or recipe changes
+  useEffect(() => {
+    if (!isRunning && !isCompleted) {
+      ensureActiveSession();
+    }
+  }, [ensureActiveSession, isRunning, isCompleted]);
 
   // Step 00: Pre-Brew Preparation Checklist State (Option 1)
   const [isPreBrewDismissed, setIsPreBrewDismissed] = useState(false);
@@ -650,6 +717,7 @@ export default function MultiPhaseTimer({
 
       // Automatically collapse pre-brew preparation checklist once extraction begins
       setIsPreBrewDismissed(true);
+      ensureActiveSession();
 
       if (!brewStartedTimeRef.current) {
         brewStartedTimeRef.current = Date.now();
@@ -913,6 +981,47 @@ export default function MultiPhaseTimer({
       <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none ${
         isCoffee ? 'bg-[#A66E38]/10' : 'bg-emerald-500/10'
       }`} />
+
+      {/* Active Persistent Brew Session Banner */}
+      {activeSession && (
+        <div className="mb-6 p-4 rounded-2xl bg-black/60 border border-amber-500/40 text-cream-light flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl relative z-10 animate-fade-in backdrop-blur-md">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-500/50 flex flex-col items-center justify-center text-amber-300 font-bold shrink-0 shadow-inner">
+              <span className="text-[9px] uppercase font-mono text-stone-400 leading-none">Brew</span>
+              <span className="text-base font-mono font-black text-amber-gold leading-none mt-0.5">#{activeSession.sessionIndex || 1}</span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-bold text-amber-gold uppercase tracking-wider">
+                  Brew Session #{activeSession.sessionIndex || 1}
+                </span>
+                {activeSession.sessionIndex > 1 && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+                    Iterating on #{activeSession.sessionIndex - 1}
+                  </span>
+                )}
+              </div>
+              <h4 className="font-serif text-sm sm:text-base font-bold text-cream-light mt-0.5">
+                {activeSession.coffee?.beanName || dialedInCoffee?.beanName || 'Specialty Coffee'}
+              </h4>
+              <p className="text-[11px] font-mono text-stone-400">
+                {activeSession.recipe?.doseGrams || effectiveDose}g → {activeSession.recipe?.waterMl || totalWaterMl || Math.round(effectiveDose * (customRatio || 16))} mL · {activeSession.recipe?.tempF || dialedInCoffee?.tempF || 202}°F ({Math.round(((activeSession.recipe?.tempF || dialedInCoffee?.tempF || 202) - 32) * 5 / 9)}°C) · {activeSession.equipment?.grinderSetting || customGrind || dialedInCoffee?.recommendedGrind || 'Medium-Fine'}
+              </p>
+            </div>
+          </div>
+
+          {activeSession.appliedRecommendation && (
+            <div className="sm:text-right text-xs font-mono bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-xl">
+              <span className="text-[10px] uppercase text-amber-gold font-bold block">
+                Single Variable Change:
+              </span>
+              <span className="text-cream-light font-bold text-[11px] block mt-0.5">
+                {activeSession.appliedRecommendation.summary || activeSession.appliedRecommendation.actionLabel}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Header Info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-white/10 relative z-10">

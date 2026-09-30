@@ -15,10 +15,18 @@ import {
   BookOpen,
   Share2,
   Globe,
-  Lock
+  Lock,
+  Activity
 } from 'lucide-react';
 import { calculateClosedLoopDialIn, formatSecondsToMmSs, METHOD_DRAWDOWN_TARGETS } from '../utils/dialInEngine.js';
 import { logBrewSession, findPreviousBrewsForLot, compressPhotoToThumbnail } from '../utils/journalStorage.js';
+import { 
+  getActiveBrewSession, 
+  startOrGetActiveBrewSession, 
+  createNextIterationSession, 
+  calculateSessionEvolution, 
+  saveActiveBrewSession 
+} from '../utils/brewSessionManager.js';
 import { recordBrewForStreak } from '../utils/streakStorage.js';
 import { deductDoseFromBag } from '../utils/bagInventoryStorage.js';
 import { getSavedGrinderId } from '../data/grinderProfiles.js';
@@ -43,14 +51,15 @@ export default function PostBrewAssessmentModal({
 }) {
   if (!isOpen) return null;
 
-  const methodId = activeMethod?.id || 'pour_over';
-  const methodName = activeMethod?.name || 'Pour Over';
-  const beanName = dialedInCoffee?.beanName || activeMethod?.preferredCoffeeTypes?.split('.')[0] || 'Single-Origin Coffee';
-  const roaster = dialedInCoffee?.roaster || 'Specialty Roastery';
-  const initialTempF = dialedInCoffee?.tempF || activeMethod?.tempF || 202;
-  const initialGrind = dialedInCoffee?.recommendedGrind || dialedInCoffee?.grindSetting || customGrind || activeMethod?.grind || 'Medium-Fine';
-  const effectiveRatio = Number(customRatio || activeMethod?.ratio || 16);
-  const effectiveDose = Number(dryDoseGrams || (totalWaterMl / effectiveRatio)).toFixed(1);
+  const storedSession = useMemo(() => getActiveBrewSession(), []);
+  const methodId = storedSession?.equipment?.methodId || activeMethod?.id || 'pour_over';
+  const methodName = storedSession?.equipment?.methodName || activeMethod?.name || 'Pour Over';
+  const beanName = storedSession?.coffee?.beanName || dialedInCoffee?.beanName || activeMethod?.preferredCoffeeTypes?.split('.')[0] || 'Single-Origin Coffee';
+  const roaster = storedSession?.coffee?.roaster || dialedInCoffee?.roaster || 'Specialty Roastery';
+  const initialTempF = storedSession?.recipe?.tempF || dialedInCoffee?.tempF || activeMethod?.tempF || 202;
+  const initialGrind = storedSession?.equipment?.grinderSetting || storedSession?.recipe?.grindSetting || dialedInCoffee?.recommendedGrind || dialedInCoffee?.grindSetting || customGrind || activeMethod?.grind || 'Medium-Fine';
+  const effectiveRatio = Number(storedSession?.recipe?.ratio || customRatio || activeMethod?.ratio || 16);
+  const effectiveDose = Number(storedSession?.recipe?.doseGrams || dryDoseGrams || (totalWaterMl / effectiveRatio)).toFixed(1);
 
   // 1. Post-Brew Evaluation State
   const [actualDrawdownSec, setActualDrawdownSec] = useState(() => Math.max(30, Number(elapsedSec) || 180));
@@ -75,9 +84,28 @@ export default function PostBrewAssessmentModal({
     });
   }, [beanName, roaster, methodId]);
 
-  const lastBrew = previousBrews.length > 0 ? previousBrews[0] : null;
+  // 3. Active Persistent Brew Session Context
+  const activeSession = useMemo(() => {
+    return storedSession || startOrGetActiveBrewSession({
+      coffee: { beanName, roaster, bagId: dialedInCoffee?.bagId || dialedInCoffee?.id },
+      equipment: { methodId, methodName, grinderSetting: initialGrind },
+      recipe: { doseGrams: effectiveDose, waterMl: totalWaterMl, ratio: effectiveRatio, tempF: initialTempF, grindSetting: initialGrind }
+    });
+  }, [storedSession, beanName, roaster, dialedInCoffee, methodId, methodName, initialGrind, effectiveDose, totalWaterMl, effectiveRatio, initialTempF]);
 
-  // 3. Dynamic Closed-Loop Dial-In Calculation
+  const sessionIndex = activeSession?.sessionIndex || 1;
+  const parentSessionId = activeSession?.parentSessionId || null;
+
+  // Resolve parent brew from chain
+  const parentBrew = useMemo(() => {
+    if (parentSessionId) {
+      const match = previousBrews.find(b => b.sessionId === parentSessionId || b.id === parentSessionId);
+      if (match) return match;
+    }
+    return previousBrews.length > 0 ? previousBrews[0] : null;
+  }, [parentSessionId, previousBrews]);
+
+  // 4. Dynamic Closed-Loop Dial-In Calculation
   const dialInDiagnosis = useMemo(() => {
     return calculateClosedLoopDialIn({
       methodId,
@@ -89,6 +117,20 @@ export default function PostBrewAssessmentModal({
       grinderId: getSavedGrinderId()
     });
   }, [methodId, actualDrawdownSec, tasteFeedback, initialTempF, effectiveRatio, initialGrind]);
+
+  // 5. Calculate evolution comparison if this is an iteration
+  const evolutionDelta = useMemo(() => {
+    if (!parentBrew || sessionIndex <= 1) return null;
+    return calculateSessionEvolution({
+      rating,
+      tasteFeedback,
+      durationFormatted: formatSecondsToMmSs(actualDrawdownSec),
+      grinderSetting: initialGrind,
+      tempF: initialTempF,
+      ratio: effectiveRatio,
+      appliedRecommendation: activeSession?.appliedRecommendation
+    }, parentBrew);
+  }, [parentBrew, sessionIndex, rating, tasteFeedback, actualDrawdownSec, initialGrind, initialTempF, effectiveRatio, activeSession]);
 
   // Handle Photo selection with client-side thumbnail compression
   const handlePhotoUpload = async (e) => {
@@ -108,7 +150,7 @@ export default function PostBrewAssessmentModal({
     }
   };
 
-  // 4. Save to Tasting Journal
+  // 6. Save to Tasting Journal & Prime Next Iteration
   const handleSaveAndApply = (applyToNext = false) => {
     hapticSuccess();
 
@@ -117,6 +159,12 @@ export default function PostBrewAssessmentModal({
 
     const loggedEntry = logBrewSession({
       trackMode: 'coffee',
+      sessionId: activeSession?.sessionId,
+      sessionIndex,
+      parentSessionId: activeSession?.parentSessionId || (sessionIndex > 1 ? (parentBrew?.sessionId || parentBrew?.id) : null),
+      chainRootId: activeSession?.chainRootId,
+      singleVariableTweak: dialInDiagnosis?.singleVariableTweak || null,
+      evolutionDelta,
       methodId,
       methodName,
       beanName,
@@ -140,6 +188,14 @@ export default function PostBrewAssessmentModal({
       userId: currentUser?.uid || null,
       isPublic
     });
+
+    // Mark current session completed
+    if (activeSession) {
+      saveActiveBrewSession({
+        ...activeSession,
+        isCompleted: true
+      });
+    }
 
     // Record brew session for daily streak and barista achievements
     recordBrewForStreak({
@@ -166,11 +222,16 @@ export default function PostBrewAssessmentModal({
       taste: tasteFeedback,
       rating,
       applied_tweaks: applyToNext,
+      sessionIndex,
       isPublic
     });
 
-    if (applyToNext && onApplyNextBrewTweak && dialInDiagnosis?.recipePatch) {
-      onApplyNextBrewTweak(dialInDiagnosis.recipePatch);
+    let nextSession = null;
+    if (applyToNext) {
+      nextSession = createNextIterationSession(loggedEntry, dialInDiagnosis?.singleVariableTweak);
+      if (onApplyNextBrewTweak && dialInDiagnosis?.recipePatch) {
+        onApplyNextBrewTweak(dialInDiagnosis.recipePatch, nextSession);
+      }
     }
 
     setIsSaved(true);
@@ -193,6 +254,7 @@ export default function PostBrewAssessmentModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="post-brew-assessment-title"
+      data-testid="post-brew-assessment-modal"
     >
       <div 
         className="w-full max-w-xl max-h-[92vh] sm:max-h-[88vh] bg-[#14100D] border-t sm:border border-white/20 sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden text-cream-light animate-slide-up"
@@ -210,11 +272,16 @@ export default function PostBrewAssessmentModal({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold">
-                  Dial-In Assistant
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">
+                  Brew #{sessionIndex}
                 </span>
+                {sessionIndex > 1 && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-stone-300 border border-white/15">
+                    Iterating on #{sessionIndex - 1}
+                  </span>
+                )}
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  Brew Completed
+                  Assessment
                 </span>
               </div>
               <h3 id="post-brew-assessment-title" className="font-serif text-lg sm:text-xl font-bold text-cream-light leading-tight mt-0.5">
@@ -400,130 +467,161 @@ export default function PostBrewAssessmentModal({
             </div>
           </div>
 
-          {/* Section 3: Dial-In Assistant Recommendation Card */}
+          {/* Section 3A: Short Analysis of the Result */}
           {dialInDiagnosis && (
-            <div className={`p-4 rounded-2xl border text-xs font-mono space-y-2.5 animate-fade-in shadow-xl ${
-              dialInDiagnosis.tasteProfile === 'balanced' || dialInDiagnosis.tasteProfile === 'sweet'
-                ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-100'
-                : dialInDiagnosis.tasteProfile === 'bitter'
-                ? 'bg-rose-500/10 border-rose-500/40 text-rose-100'
-                : dialInDiagnosis.tasteProfile === 'weak'
-                ? 'bg-sky-500/10 border-sky-500/40 text-sky-100'
-                : 'bg-amber-500/10 border-amber-500/40 text-amber-100'
+            <div className="p-3.5 rounded-2xl bg-black/50 border border-white/10 space-y-1.5 text-xs font-mono">
+              <div className="flex items-center gap-1.5 text-stone-400 font-bold uppercase text-[10px] tracking-wider">
+                <Activity className="w-3.5 h-3.5 text-amber-gold" />
+                <span>Extraction Physics Analysis</span>
+              </div>
+              <p className="text-stone-200 font-sans text-xs leading-relaxed font-medium">
+                {dialInDiagnosis.shortAnalysis || dialInDiagnosis.diagnosisDetail}
+              </p>
+            </div>
+          )}
+
+          {/* Section 3B: Recommend ONE Specific Change for Next Brew */}
+          {dialInDiagnosis && (
+            <div className={`p-4 rounded-2xl border text-xs font-mono space-y-3 animate-fade-in shadow-xl ${
+              dialInDiagnosis.singleVariableTweak?.variable === 'none'
+                ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-100'
+                : 'bg-amber-950/25 border-amber-500/40 text-amber-100'
             }`}>
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5 font-bold text-amber-gold text-[11px] uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Dial-In Assistant Suggestion:</span>
+                  <span>Recommendation for Brew #{sessionIndex + 1}:</span>
                 </div>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border shrink-0 ${
-                  dialInDiagnosis.diagnosisType === 'golden_cup'
+                  dialInDiagnosis.singleVariableTweak?.variable === 'none'
                     ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                     : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                 }`}>
-                  {dialInDiagnosis.headline}
+                  {dialInDiagnosis.singleVariableTweak?.variable === 'none' ? 'Golden Cup' : 'Change 1 Variable'}
                 </span>
               </div>
 
-              <p className="text-[12px] leading-relaxed text-cream-light font-sans font-medium">
-                "{dialInDiagnosis.recommendationText}"
-              </p>
-
-              {/* Quantitative Tweaks Grid */}
-              {dialInDiagnosis.recipePatch && (
-                <div className="grid grid-cols-3 gap-2 pt-1 text-[11px] font-mono">
-                  <div className="p-2 rounded-xl bg-black/40 border border-white/10 text-center">
-                    <span className="text-[9px] text-stone-400 uppercase block">Next Grind</span>
-                    <span className="font-bold text-amber-gold truncate block">
-                      {dialInDiagnosis.recipePatch.grindSetting || 'Lock In'}
-                    </span>
-                    <span className="text-[9px] text-stone-400 block mt-0.5">
-                      {dialInDiagnosis.recipePatch.grindShift > 0 
-                        ? `+${dialInDiagnosis.recipePatch.grindShift} coarser` 
-                        : dialInDiagnosis.recipePatch.grindShift < 0 
-                        ? `${dialInDiagnosis.recipePatch.grindShift} finer` 
-                        : 'Optimal'}
-                    </span>
+              {/* The Single Quantitative Variable Highlight */}
+              <div className="p-3 rounded-xl bg-black/50 border border-white/10 space-y-1">
+                <div className="text-[10px] uppercase font-bold text-amber-300">
+                  {dialInDiagnosis.singleVariableTweak?.actionLabel || 'Dial-In Suggestion'}
+                </div>
+                {dialInDiagnosis.singleVariableTweak?.variable !== 'none' ? (
+                  <div className="text-sm font-bold text-white flex items-center gap-2 font-mono">
+                    <span className="text-stone-300">{dialInDiagnosis.singleVariableTweak?.fromValue}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-gold" />
+                    <span className="text-amber-300 underline underline-offset-2">{dialInDiagnosis.singleVariableTweak?.toValue}</span>
                   </div>
-
-                  <div className="p-2 rounded-xl bg-black/40 border border-white/10 text-center">
-                    <span className="text-[9px] text-stone-400 uppercase block">Water Temp</span>
-                    <span className="font-bold text-cream-light block">
-                      {dialInDiagnosis.recipePatch.tempF}°F
-                    </span>
-                    <span className="text-[9px] text-stone-400 block mt-0.5">
-                      {dialInDiagnosis.recipePatch.tempShiftF > 0 
-                        ? `+${dialInDiagnosis.recipePatch.tempShiftF}° hotter` 
-                        : dialInDiagnosis.recipePatch.tempShiftF < 0 
-                        ? `${dialInDiagnosis.recipePatch.tempShiftF}° cooler` 
-                        : 'Optimal'}
-                    </span>
+                ) : (
+                  <div className="text-xs font-bold text-emerald-300">
+                    Recipe locked in! Perfect balance achieved.
                   </div>
+                )}
+                <p className="text-[11px] text-stone-300 font-sans mt-1">
+                  {dialInDiagnosis.singleVariableTweak?.summary}
+                </p>
+              </div>
 
-                  <div className="p-2 rounded-xl bg-black/40 border border-white/10 text-center">
-                    <span className="text-[9px] text-stone-400 uppercase block">Next Ratio</span>
-                    <span className="font-bold text-amber-gold block">
-                      1 : {dialInDiagnosis.recipePatch.ratio}
-                    </span>
-                    <span className="text-[9px] text-stone-400 block mt-0.5">
-                      {dialInDiagnosis.recipePatch.ratioShift !== 0 
-                        ? `${dialInDiagnosis.recipePatch.ratioShift > 0 ? '+' : ''}${dialInDiagnosis.recipePatch.ratioShift}` 
-                        : 'Optimal'}
-                    </span>
+              {/* Locked Variables Pill Row */}
+              {dialInDiagnosis.singleVariableTweak?.lockedVariables && (
+                <div className="space-y-1 pt-1">
+                  <span className="text-[10px] font-mono text-stone-400 uppercase tracking-wider block">
+                    All Other Variables Locked:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {dialInDiagnosis.singleVariableTweak.lockedVariables.map((item, idx) => (
+                      <span key={idx} className="px-2 py-0.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono text-stone-300 flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5 text-stone-400" />
+                        <span>{item}</span>
+                      </span>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
           )}
 
-          {/* Section 4: Side-by-Side Comparison with Previous Brew of this Bean */}
-          {lastBrew && (
-            <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-2">
-              <div className="flex items-center justify-between text-xs font-mono font-bold text-stone-300">
-                <span className="flex items-center gap-1.5 text-amber-gold">
-                  <History className="w-3.5 h-3.5" />
-                  <span>Side-by-Side Brew Evolution</span>
-                </span>
-                <span className="text-[10px] text-stone-400">
-                  Previous: {lastBrew.date}
-                </span>
-              </div>
+          {/* Section 4: Brew Evolution & Session Comparison */}
+          {(evolutionDelta || parentBrew) && (
+            <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-2.5">
+              {/* Evolution Banner when iterating on parent */}
+              {evolutionDelta && (
+                <div className={`p-3 rounded-xl border text-xs font-mono space-y-1 ${
+                  evolutionDelta.isImprovement
+                    ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'
+                    : 'bg-white/[0.04] border-white/10 text-stone-300'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold flex items-center gap-1.5 text-cream-light">
+                      <CheckCircle2 className={`w-3.5 h-3.5 ${evolutionDelta.isImprovement ? 'text-emerald-400' : 'text-stone-400'}`} />
+                      <span>Brew #{sessionIndex - 1} → Brew #{sessionIndex} Evolution</span>
+                    </span>
+                    {evolutionDelta.ratingDelta !== 0 && (
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                        evolutionDelta.ratingDelta > 0
+                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                          : 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                      }`}>
+                        {evolutionDelta.ratingDelta > 0 ? `+${evolutionDelta.ratingDelta}★ Improved` : `${evolutionDelta.ratingDelta}★`}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] font-sans text-stone-200 leading-relaxed font-medium">
+                    {evolutionDelta.summary}
+                  </p>
+                </div>
+              )}
 
-              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
-                {/* Previous Brew Card */}
-                <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
-                  <div className="text-[10px] text-stone-400 font-bold uppercase">
-                    Previous Extraction:
+              {/* Side-by-Side Cards */}
+              {parentBrew && (
+                <div>
+                  <div className="flex items-center justify-between text-xs font-mono font-bold text-stone-300 mb-1.5">
+                    <span className="flex items-center gap-1.5 text-amber-gold">
+                      <History className="w-3.5 h-3.5" />
+                      <span>Session Comparison</span>
+                    </span>
+                    <span className="text-[10px] text-stone-400">
+                      Parent Date: {parentBrew.date}
+                    </span>
                   </div>
-                  <div className="text-stone-300 font-bold">
-                    {lastBrew.durationFormatted || lastBrew.time || '3:00'} • {lastBrew.grindStr || 'Med-Fine'}
-                  </div>
-                  <div className="text-stone-400 text-[10px]">
-                    Ratio: {lastBrew.ratioStr || `1:${lastBrew.ratio || 16}`} • {lastBrew.tempStr || `${lastBrew.tempF || 202}°F`}
-                  </div>
-                  <div className="flex items-center gap-1 text-[10px] text-amber-300 font-bold pt-0.5">
-                    <span>{lastBrew.tasteFeedback || 'Logged'}</span>
-                    <span>({lastBrew.rating || 3}★)</span>
+
+                  <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                    {/* Parent Brew Card */}
+                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                      <div className="text-[10px] text-stone-400 font-bold uppercase">
+                        Brew #{parentBrew.sessionIndex || Math.max(1, sessionIndex - 1)}:
+                      </div>
+                      <div className="text-stone-300 font-bold">
+                        {parentBrew.durationFormatted || parentBrew.time || '3:00'} • {parentBrew.grinderSetting || parentBrew.grindStr || 'Med-Fine'}
+                      </div>
+                      <div className="text-stone-400 text-[10px]">
+                        Ratio: {parentBrew.ratioStr || `1:${parentBrew.ratio || 16}`} • {parentBrew.tempStr || `${parentBrew.tempF || 202}°F`}
+                      </div>
+                      <div className="flex items-center gap-1 text-[10px] text-amber-300 font-bold pt-0.5">
+                        <span>{parentBrew.tasteFeedback || 'Logged'}</span>
+                        <span>({parentBrew.rating || 3}★)</span>
+                      </div>
+                    </div>
+
+                    {/* Current Brew Card */}
+                    <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-1">
+                      <div className="text-[10px] text-amber-400 font-bold uppercase">
+                        Brew #{sessionIndex} (Current):
+                      </div>
+                      <div className="text-cream-light font-bold">
+                        {formatSecondsToMmSs(actualDrawdownSec)} • {initialGrind}
+                      </div>
+                      <div className="text-stone-300 text-[10px]">
+                        Ratio: 1:{effectiveRatio} • {initialTempF}°F
+                      </div>
+                      <div className="flex items-center gap-1 text-[10px] text-emerald-300 font-bold pt-0.5">
+                        <span>{tasteFeedback}</span>
+                        <span>({rating}★)</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                {/* Current Brew Card */}
-                <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-1">
-                  <div className="text-[10px] text-amber-400 font-bold uppercase">
-                    Current Extraction:
-                  </div>
-                  <div className="text-cream-light font-bold">
-                    {formatSecondsToMmSs(actualDrawdownSec)} • {initialGrind}
-                  </div>
-                  <div className="text-stone-300 text-[10px]">
-                    Ratio: 1:{effectiveRatio} • {initialTempF}°F
-                  </div>
-                  <div className="flex items-center gap-1 text-[10px] text-emerald-300 font-bold pt-0.5">
-                    <span>{tasteFeedback}</span>
-                    <span>({rating}★)</span>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           )}
 
@@ -643,6 +741,7 @@ export default function PostBrewAssessmentModal({
         <div className="p-4 sm:p-5 border-t border-white/10 bg-black/60 space-y-2">
           {/* Primary Action Button */}
           <button
+            data-testid="brew-again-btn"
             type="button"
             onClick={() => handleSaveAndApply(true)}
             disabled={isSaved}
@@ -655,12 +754,16 @@ export default function PostBrewAssessmentModal({
             {isSaved ? (
               <>
                 <Check className="w-4 h-4" />
-                <span>Saved & Next Brew Primed!</span>
+                <span>Saved & Brew #{sessionIndex + 1} Primed!</span>
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4" />
-                <span>Save Log & Apply Tweaks to Next Brew</span>
+                <span>
+                  {dialInDiagnosis?.singleVariableTweak?.variable !== 'none'
+                    ? `Brew Again with Recommendation (Start Brew #${sessionIndex + 1})`
+                    : `Brew Again (Recipe Locked In)`}
+                </span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -668,6 +771,7 @@ export default function PostBrewAssessmentModal({
 
           <div className="flex items-center justify-between text-xs font-mono pt-1 text-stone-400">
             <button
+              data-testid="save-journal-only-btn"
               type="button"
               onClick={() => handleSaveAndApply(false)}
               className="hover:text-cream-light underline transition cursor-pointer"

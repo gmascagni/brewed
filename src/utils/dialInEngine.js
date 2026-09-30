@@ -7,6 +7,7 @@
  */
 
 import { getGrinderProfile, getGrinderSetting, getSavedGrinderId } from '../data/grinderProfiles.js';
+import { shiftGrindSetting } from './brewSessionManager.js';
 
 export const METHOD_DRAWDOWN_TARGETS = {
   pour_over: {
@@ -94,9 +95,9 @@ export function calculateClosedLoopDialIn({
 
   // Flow classification
   let flowSpeed = 'optimal';
-  if (actualDrawdownSec < minSec - 20) {
+  if (actualDrawdownSec < minSec) {
     flowSpeed = 'fast';
-  } else if (actualDrawdownSec > maxSec + 25) {
+  } else if (actualDrawdownSec > maxSec) {
     flowSpeed = 'slow';
   }
 
@@ -105,109 +106,161 @@ export function calculateClosedLoopDialIn({
 
   let diagnosisTitle = '';
   let diagnosisDetail = '';
-  let grindRecommendation = 'Keep current grind';
+  let shortAnalysis = '';
   let grindShiftSteps = 0; // Negative = finer, Positive = coarser
   let targetTempF = currentTempF;
   let targetRatio = currentRatio;
-  let summaryHeadline = '';
+  let singleVariable = 'none'; // 'grind' | 'temp' | 'ratio' | 'none'
+  let singleActionLabel = 'Keep current recipe';
   let statusBadge = 'optimal';
 
   if (tasteProfile === 'sweet' || tasteProfile === 'balanced') {
     statusBadge = 'golden_cup';
+    singleVariable = 'none';
+    singleActionLabel = 'Lock in recipe';
     diagnosisTitle = 'Golden Cup Extraction Locked In!';
+    shortAnalysis = `Drawdown of ${durationFormatted} landed within the ideal ${idealStr} window. Sweetness, acidity, and body are in golden balance.`;
     diagnosisDetail = `Drawdown of ${durationFormatted} fell within the ${idealStr} window. Ratio, flow rate, and dissolved solubles are in optimal balance.`;
-    summaryHeadline = `Drawdown was ${durationFormatted} and sweet & balanced. Golden Cup locked in! Saved to your Dial-In journal.`;
   } else if (tasteProfile === 'weak') {
-    // Weak / Watery / Under-Concentrated (Low TDS)
+    // 1. Weak / Watery -> Ratio is the single variable to adjust
     statusBadge = 'under_concentrated';
+    singleVariable = 'ratio';
+    singleActionLabel = 'Tighten brew ratio';
     targetRatio = Math.max(14, Number((currentRatio - 1.0).toFixed(1)));
-    grindShiftSteps = -1; // 1 click finer to boost extraction
     diagnosisTitle = 'Under-Concentrated (Low TDS / Watery)';
-    diagnosisDetail = `The cup lacks body, depth, and flavor intensity. Increasing dry coffee dose relative to water and grinding slightly finer will extract richer solubles.`;
-    grindRecommendation = `Tighten ratio to 1:${targetRatio} and grind 1 click finer on ${grinderName}`;
-    summaryHeadline = `Cup is weak/watery. Tighten ratio from 1:${currentRatio} to 1:${targetRatio} or grind 1 click finer.`;
+    shortAnalysis = `Drawdown resulted in low dissolved strength (watery/hollow cup). Increasing dry coffee dose relative to water will extract richer body.`;
+    diagnosisDetail = `The cup lacks body, depth, and flavor intensity. Increasing dry coffee dose relative to water will extract richer solubles.`;
   } else if (tasteProfile === 'strong') {
-    // Strong / Overly Intense / Heavy (High TDS / Low Clarity)
+    // 2. Strong / Heavy -> Ratio is the single variable to adjust
     statusBadge = 'over_concentrated';
+    singleVariable = 'ratio';
+    singleActionLabel = 'Widen brew ratio';
     targetRatio = Math.min(18, Number((currentRatio + 1.0).toFixed(1)));
-    grindShiftSteps = 1; // 1 click coarser to open flavor clarity
     diagnosisTitle = 'Over-Concentrated (Heavy / Low Clarity)';
+    shortAnalysis = `Cup is overly concentrated with high TDS muting delicate floral and fruit notes. Widening the brew ratio opens up clarity.`;
     diagnosisDetail = `The cup is overly intense, syrupy, or muddy with low floral/fruit clarity. Opening the brew ratio provides more water solvent for crisp note separation.`;
-    grindRecommendation = `Widen ratio to 1:${targetRatio} and grind 1 click coarser on ${grinderName}`;
-    summaryHeadline = `Cup is overly intense. Widen ratio from 1:${currentRatio} to 1:${targetRatio} or grind 1 click coarser for flavor clarity.`;
   } else if (flowSpeed === 'slow' && tasteProfile === 'bitter') {
-    // 1. Slow + Bitter: Classic Over-Extraction
+    // 3. Slow + Bitter -> Grind is the single variable (coarser)
     statusBadge = 'over_extracted';
+    singleVariable = 'grind';
+    singleActionLabel = 'Grind coarser';
     grindShiftSteps = 2; // 2 clicks coarser
-    targetTempF = Math.max(195, currentTempF - 3);
     diagnosisTitle = 'Over-Extracted (Bed Stalled / High Tannins)';
-    diagnosisDetail = `Water was in contact with grounds for ${durationFormatted} (target: ${idealStr}). Slow water drainage dissolved harsh astringent tannins and bitter compounds.`;
-    grindRecommendation = `Grind 2 clicks coarser on ${grinderName}`;
-    summaryHeadline = `Drawdown was ${durationFormatted} and bitter. Try grinding 2 clicks coarser or dropping water to ${targetTempF}°F.`;
+    shortAnalysis = `Water was in contact with grounds for ${durationFormatted} (target: ${idealStr}). Slow water drainage dissolved harsh astringent tannins and bitter compounds.`;
+    diagnosisDetail = shortAnalysis;
   } else if (flowSpeed === 'slow' && tasteProfile === 'sour') {
-    // 2. Slow + Sour: Channeled Mud Clog! (Classic Barista Trap)
+    // 4. Slow + Sour -> Channeled Mud Clog! Grind is the single variable (coarser)
     statusBadge = 'channeled_clog';
+    singleVariable = 'grind';
+    singleActionLabel = 'Grind coarser (unclog fines)';
     grindShiftSteps = 2; // Coarser to stop fines clogging
-    targetTempF = Math.min(210, currentTempF + 1);
     diagnosisTitle = 'Channeled Mud Clog (Fines Migration)';
-    diagnosisDetail = `Counter-intuitive extraction trap: Grounds were ground too fine, creating a dense mud bed that clogged filter pores. Water was forced into narrow side channels, leaving the center bed dry and under-extracted!`;
-    grindRecommendation = `Grind 2 clicks COARSER on ${grinderName} to open flow channels`;
-    summaryHeadline = `Drawdown was ${durationFormatted} and sour (channeled mud). Don't grind finer—grind 2 clicks coarser to restore flow!`;
+    shortAnalysis = `Counter-intuitive barista trap: grounds were too fine, creating a mud bed that clogged filter pores and forced water down side channels while center remained dry and sour.`;
+    diagnosisDetail = shortAnalysis;
   } else if (flowSpeed === 'fast' && tasteProfile === 'sour') {
-    // 3. Fast + Sour: Classic Under-Extraction
+    // 5. Fast + Sour -> Grind is the single variable (finer)
     statusBadge = 'under_extracted';
+    singleVariable = 'grind';
+    singleActionLabel = 'Grind finer';
     grindShiftSteps = -2; // 2 clicks finer
-    targetTempF = Math.min(210, currentTempF + 3);
     diagnosisTitle = 'Under-Extracted (Fast Drainage / Hollow Acidity)';
-    diagnosisDetail = `Water drained in only ${durationFormatted} (target: ${idealStr}). Water rushed through before sweet core solubles and sugars could dissolve.`;
-    grindRecommendation = `Grind 2 clicks finer on ${grinderName}`;
-    summaryHeadline = `Drawdown was ${durationFormatted} and sour/weak. Try grinding 2 clicks finer and raising water to ${targetTempF}°F.`;
+    shortAnalysis = `Water drained in only ${durationFormatted} (target: ${idealStr}). Water rushed through before sweet core solubles and sugars could dissolve, leaving sharp acidity.`;
+    diagnosisDetail = shortAnalysis;
   } else if (flowSpeed === 'fast' && tasteProfile === 'bitter') {
-    // 4. Fast + Bitter: Rapid Channeling Hole
+    // 6. Fast + Bitter -> Rapid Channeling Hole (grind finer + gentle pour)
     statusBadge = 'channeling';
+    singleVariable = 'grind';
+    singleActionLabel = 'Grind 1 click finer';
     grindShiftSteps = -1;
-    targetTempF = Math.max(198, currentTempF - 2);
     diagnosisTitle = 'High-Speed Channeling';
-    diagnosisDetail = `Water drained quickly (${durationFormatted}) yet tastes bitter. A hard stream of water carved a hole through the coffee bed, burning that narrow path.`;
-    grindRecommendation = `Grind 1 click finer & pour closer to bed with low kettle spout`;
-    summaryHeadline = `Drawdown was ${durationFormatted} and bitter (channeling). Lower kettle spout height and grind 1 click finer.`;
+    shortAnalysis = `Water drained quickly (${durationFormatted}) yet tastes bitter. A hard water stream carved a hole through the coffee bed, scorching that narrow path.`;
+    diagnosisDetail = shortAnalysis;
   } else if (flowSpeed === 'optimal' && tasteProfile === 'bitter') {
-    // 5. Optimal Flow + Bitter: Water Too Hot or Over-Agitated
+    // 7. Optimal Flow + Bitter -> Water Temp is the single variable (drop temp)
     statusBadge = 'too_hot';
+    singleVariable = 'temp';
+    singleActionLabel = 'Lower water temperature';
     targetTempF = Math.max(195, currentTempF - 3);
-    targetRatio = Math.max(15, Number((currentRatio - 0.5).toFixed(1)));
     diagnosisTitle = 'Thermal Over-Extraction';
-    diagnosisDetail = `Flow time of ${durationFormatted} was ideal (${idealStr}), but water temperature was too aggressive for this roast level.`;
-    grindRecommendation = `Maintain current grind, reduce water temperature`;
-    summaryHeadline = `Drawdown was ${durationFormatted} (target flow) but bitter. Keep your grind setting and drop water to ${targetTempF}°F.`;
+    shortAnalysis = `Flow time of ${durationFormatted} was ideal (${idealStr}), but water temperature extracted harsh astringency. Keeping grind and dropping temp will restore sweetness.`;
+    diagnosisDetail = shortAnalysis;
   } else if (flowSpeed === 'optimal' && tasteProfile === 'sour') {
-    // 6. Optimal Flow + Sour: Water Under-Temperature
+    // 8. Optimal Flow + Sour -> Water Temp is the single variable (raise temp)
     statusBadge = 'too_cool';
+    singleVariable = 'temp';
+    singleActionLabel = 'Increase water temperature';
     targetTempF = Math.min(210, currentTempF + 3);
     diagnosisTitle = 'Thermal Under-Extraction';
-    diagnosisDetail = `Flow time of ${durationFormatted} was ideal, but water lacked the thermal energy required to dissolve complex sweet sugars from dense beans.`;
-    grindRecommendation = `Maintain current grind, increase water temperature`;
-    summaryHeadline = `Drawdown was ${durationFormatted} (target flow) but sour. Keep your grind setting and increase water to ${targetTempF}°F.`;
+    shortAnalysis = `Flow time of ${durationFormatted} was ideal (${idealStr}), but water lacked the thermal energy required to dissolve complex sweet sugars from dense beans.`;
+    diagnosisDetail = shortAnalysis;
   } else {
     // Fallback
     diagnosisTitle = 'Standard Extraction Feedback';
-    diagnosisDetail = `Recorded ${durationFormatted} drawdown time for this brew.`;
-    summaryHeadline = `Drawdown recorded at ${durationFormatted}.`;
+    shortAnalysis = `Recorded ${durationFormatted} drawdown time for this brew.`;
+    diagnosisDetail = shortAnalysis;
   }
 
-  // Compute exact shifted grind setting on user's active grinder
-  const grindCategories = ['extra_fine', 'fine', 'medium_fine', 'medium', 'medium_coarse', 'coarse'];
-  let targetCategoryIdx = 2; // default medium_fine
-  if (grindShiftSteps > 0) {
-    targetCategoryIdx = Math.min(grindCategories.length - 1, targetCategoryIdx + 1);
-  } else if (grindShiftSteps < 0) {
-    targetCategoryIdx = Math.max(0, targetCategoryIdx - 1);
+  // Calculate shifted grind setting
+  const targetGrindSetting = shiftGrindSetting(currentGrindSetting, grindShiftSteps, grinderId || getSavedGrinderId());
+
+  // Build the single-variable tweak object
+  let singleSummary = '';
+  let fromValue = '';
+  let toValue = '';
+  let lockedVariables = [];
+
+  const tempC = Math.round(((targetTempF - 32) * 5) / 9);
+  const currentTempC = Math.round(((currentTempF - 32) * 5) / 9);
+
+  if (singleVariable === 'grind') {
+    fromValue = currentGrindSetting || '22 clicks';
+    toValue = targetGrindSetting;
+    singleSummary = `${singleActionLabel}: ${fromValue} → ${toValue}. Keep dose, water, and temp locked.`;
+    lockedVariables = [
+      `Dose & Water: Locked`,
+      `Temp: ${currentTempC}°C (${currentTempF}°F)`,
+      `Ratio: 1:${currentRatio}`
+    ];
+  } else if (singleVariable === 'temp') {
+    fromValue = `${currentTempC}°C (${currentTempF}°F)`;
+    toValue = `${tempC}°C (${targetTempF}°F)`;
+    singleSummary = `${singleActionLabel}: ${fromValue} → ${toValue}. Keep grind (${currentGrindSetting}) and ratio locked.`;
+    lockedVariables = [
+      `Grind: ${currentGrindSetting}`,
+      `Dose & Water: Locked`,
+      `Ratio: 1:${currentRatio}`
+    ];
+  } else if (singleVariable === 'ratio') {
+    fromValue = `1:${currentRatio}`;
+    toValue = `1:${targetRatio}`;
+    singleSummary = `${singleActionLabel}: ${fromValue} → ${toValue}. Keep grind (${currentGrindSetting}) and temp locked.`;
+    lockedVariables = [
+      `Grind: ${currentGrindSetting}`,
+      `Temp: ${currentTempC}°C (${currentTempF}°F)`,
+      `Dose: Locked`
+    ];
+  } else {
+    fromValue = currentGrindSetting;
+    toValue = currentGrindSetting;
+    singleSummary = `Golden Cup locked in! Replicate current settings for your next brew.`;
+    lockedVariables = ['All parameters locked'];
   }
-  const targetCategory = grindCategories[targetCategoryIdx];
-  const targetGrindObj = getGrinderSetting(grinderId || getSavedGrinderId(), targetCategory);
 
   const ratioShift = Number((targetRatio - currentRatio).toFixed(1));
   const tempShiftF = targetTempF - currentTempF;
+
+  const singleVariableTweak = {
+    variable: singleVariable,
+    actionLabel: singleActionLabel,
+    summary: singleSummary,
+    fromValue,
+    toValue,
+    targetGrindSetting: singleVariable === 'grind' ? targetGrindSetting : currentGrindSetting,
+    targetTempF,
+    targetTempC: tempC,
+    targetRatio,
+    lockedVariables
+  };
 
   return {
     methodId,
@@ -222,25 +275,28 @@ export function calculateClosedLoopDialIn({
     headline: diagnosisTitle,
     diagnosisTitle,
     diagnosisDetail,
-    recommendationText: summaryHeadline,
-    summaryHeadline,
-    grindRecommendation,
+    shortAnalysis,
+    recommendationText: singleSummary,
+    summaryHeadline: singleSummary,
+    grindRecommendation: singleActionLabel,
     grindShiftSteps,
     currentTempF,
     targetTempF,
     currentRatio,
     targetRatio,
     grinderName,
+    singleVariableTweak,
     recipePatch: {
       tempF: targetTempF,
-      tempC: Math.round(((targetTempF - 32) * 5) / 9),
+      tempC,
       tempShiftF,
       recommendedRatio: targetRatio,
       ratio: targetRatio,
       ratioShift,
       grindShift: grindShiftSteps,
-      grindSetting: targetGrindObj.setting,
-      grinderName: targetGrindObj.grinderName
+      grindSetting: targetGrindSetting,
+      grinderName,
+      singleVariableTweak
     }
   };
 }

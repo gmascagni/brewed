@@ -349,6 +349,7 @@ export default function BrewJournal({
       role={isInline ? "region" : "dialog"} 
       aria-modal={!isInline} 
       aria-label="Tasting Journal & Extraction Log" 
+      data-testid="tasting-journal-modal" 
       className={`relative max-w-5xl w-full rounded-3xl bg-[#14100D] border border-white/[0.14] p-5 sm:p-7 md:p-9 shadow-2xl text-cream-light ${isInline ? 'my-2' : 'my-8'}`}
     >
       {/* Ambient Top Glow */}
@@ -798,9 +799,21 @@ export default function BrewJournal({
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="text-[10px] font-mono text-amber-gold font-bold uppercase tracking-wider block">
-                        {log.roaster || 'Specialty Roastery'}
-                      </span>
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="text-[10px] font-mono text-amber-gold font-bold uppercase tracking-wider">
+                          {log.roaster || 'Specialty Roastery'}
+                        </span>
+                        {log.sessionIndex && (
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
+                            Brew #{log.sessionIndex}
+                          </span>
+                        )}
+                        {log.evolutionDelta?.isImprovement && (
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">
+                            ▲ Improved
+                          </span>
+                        )}
+                      </div>
                       <h4 className="font-serif text-base font-bold text-cream-light leading-snug">
                         {log.beanName || 'Artisan Single-Origin'}
                       </h4>
@@ -876,8 +889,22 @@ export default function BrewJournal({
                     </div>
                   </div>
 
-                  {/* Notes / Remedy / Photo */}
+                  {/* Notes / Remedy / Evolution / Photo */}
                   <div className="space-y-2 pt-2">
+                    {log.evolutionDelta?.summary && (
+                      <div className="p-2 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-[11px] font-mono text-emerald-200">
+                        <span className="text-[9px] uppercase font-bold text-emerald-400 block mb-0.5">Evolution Result:</span>
+                        <span>{log.evolutionDelta.summary}</span>
+                      </div>
+                    )}
+
+                    {log.singleVariableTweak && log.singleVariableTweak.variable !== 'none' && (
+                      <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] font-mono text-amber-200">
+                        <span className="text-[9px] uppercase font-bold text-amber-400 block mb-0.5">Next Brew Recommendation:</span>
+                        <span>{log.singleVariableTweak.summary || log.singleVariableTweak.actionLabel}</span>
+                      </div>
+                    )}
+
                     {log.notes && (
                       <p className="text-xs text-stone-300 font-sans italic line-clamp-2">
                         "{log.notes}"
@@ -940,7 +967,7 @@ export default function BrewJournal({
                         title="Load this recipe into guided timer"
                       >
                         <Coffee className="w-3.5 h-3.5" />
-                        <span>Brew Again</span>
+                        <span>{log.sessionIndex ? `Brew Again (Start #${log.sessionIndex + 1})` : 'Brew Again'}</span>
                       </button>
                     )}
 
