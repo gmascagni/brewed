@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
   Check,
-  Share2
+  Share2,
+  Search,
+  X,
+  Filter
 } from 'lucide-react';
 import { normalizeRoasterKey, getRoasterShortName } from '../../data/roasterShowcaseData';
+import { isRoasterClaimed } from '../../utils/roasterClaimStorage';
 
 export default function RoasterHeader({
   onBackToApp,
@@ -21,6 +25,27 @@ export default function RoasterHeader({
   copiedLink,
   handleSharePage
 }) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterMode, setFilterMode] = useState('all'); // 'all' | 'verified' | 'curated'
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const filteredRoasters = useMemo(() => {
+    return allRoasters.filter((r) => {
+      const matchesSearch = !searchQuery.trim() || 
+        r.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (r.city && r.city.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (r.state && r.state.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const isClaimed = isRoasterClaimed(r.id || r.slug);
+      if (filterMode === 'verified') {
+        return matchesSearch && (isClaimed || r.isDomainVerified || r.ownerEmail);
+      }
+      if (filterMode === 'curated') {
+        return matchesSearch && !r.isCustomRoaster;
+      }
+      return matchesSearch;
+    });
+  }, [allRoasters, searchQuery, filterMode]);
   const backLabel = activeCoffee?.beanName 
     ? `Back to Recipe: ${activeCoffee.beanName.length > 20 ? `${activeCoffee.beanName.slice(0, 18)}…` : activeCoffee.beanName}`
     : 'Brewing Station';
@@ -55,6 +80,40 @@ export default function RoasterHeader({
             Roasters:
           </span>
 
+          {/* Quick Search Toggle / Input */}
+          {isSearchOpen ? (
+            <div className="flex items-center gap-1.5 bg-[#140D0A] border border-amber-gold/40 rounded-xl px-2 py-1 animate-fade-in">
+              <Search className="w-3.5 h-3.5 text-amber-gold shrink-0" />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search roasters or cities..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-transparent text-xs font-mono text-cream-light placeholder-cream-soft/40 focus:outline-none w-32 sm:w-44"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setIsSearchOpen(false);
+                }}
+                className="text-cream-soft hover:text-white"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
+              className="p-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.14] text-cream-soft hover:text-white border border-white/10 transition cursor-pointer"
+              title="Search roaster marketplace"
+            >
+              <Search className="w-3.5 h-3.5 text-amber-gold" />
+            </button>
+          )}
+
           {/* Direct Select Dropdown Picker */}
           <select
             value={activeRoasterId}
@@ -62,14 +121,20 @@ export default function RoasterHeader({
             className="bg-[#18110D] text-amber-gold border border-white/20 hover:border-amber-gold/50 rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold focus:border-amber-gold focus:outline-none cursor-pointer shadow-sm transition"
             aria-label="Select coffee roaster"
           >
-            {allRoasters.map((r) => {
-              const displayName = r.shortName || getRoasterShortName(r.name);
-              return (
-                <option key={r.id || r.slug || r.name} value={r.id} className="bg-[#18110D] text-cream-light">
-                  {displayName} ({r.city})
-                </option>
-              );
-            })}
+            {filteredRoasters.length === 0 ? (
+              <option value="" disabled className="bg-[#18110D] text-cream-soft">
+                No roasters found
+              </option>
+            ) : (
+              filteredRoasters.map((r) => {
+                const displayName = r.shortName || getRoasterShortName(r.name);
+                return (
+                  <option key={r.id || r.slug || r.name} value={r.id} className="bg-[#18110D] text-cream-light">
+                    {displayName} ({r.city})
+                  </option>
+                );
+              })
+            )}
           </select>
 
           {/* Scroll Left Button */}
@@ -94,7 +159,7 @@ export default function RoasterHeader({
             className="hidden sm:flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 max-w-[180px] md:max-w-[260px] lg:max-w-md overflow-x-auto no-scrollbar scroll-smooth"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {allRoasters.map((r) => {
+            {filteredRoasters.map((r) => {
               const targetKey = normalizeRoasterKey(activeRoasterId);
               const isSelected = 
                 normalizeRoasterKey(r.id) === targetKey ||

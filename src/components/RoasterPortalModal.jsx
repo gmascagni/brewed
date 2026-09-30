@@ -211,6 +211,8 @@ export default function RoasterPortalModal({
   // QR Destination / SKU
   const [upc, setUpc] = useState(prefilledBarcode || '');
   const [customUrl, setCustomUrl] = useState('');
+  const [price, setPrice] = useState('$22.00');
+  const [directUrl, setDirectUrl] = useState('');
   const [selectedCoffeeForSticker, setSelectedCoffeeForSticker] = useState(null);
 
   // Real QR Code State
@@ -394,6 +396,8 @@ export default function RoasterPortalModal({
     const randomSuffix = Math.floor(100000 + Math.random() * 900000).toString();
     setUpc(`LOT-${new Date().getFullYear()}-${randomSuffix}`);
     setCustomUrl('');
+    setPrice('$22.00');
+    setDirectUrl('');
     setFormError(null);
     setActiveTab('onboard');
     if (modalBodyRef.current) {
@@ -427,6 +431,8 @@ export default function RoasterPortalModal({
     setRoasterNotes(coffee.notes || '');
     setUpc(coffee.upc || '');
     setCustomUrl(coffee.customUrl || '');
+    setPrice(coffee.price || '$22.00');
+    setDirectUrl(coffee.directUrl || coffee.customUrl || '');
     setFormError(null);
     setActiveTab('onboard');
     if (modalBodyRef.current) {
@@ -463,6 +469,11 @@ export default function RoasterPortalModal({
       normalizedCustomUrl = `https://${normalizedCustomUrl}`;
     }
 
+    let normalizedDirectUrl = directUrl.trim();
+    if (normalizedDirectUrl && !/^https?:\/\//i.test(normalizedDirectUrl)) {
+      normalizedDirectUrl = `https://${normalizedDirectUrl}`;
+    }
+
     const notesArray = tastingNotesInput
       .split(',')
       .map((s) => s.trim())
@@ -493,6 +504,8 @@ export default function RoasterPortalModal({
       brewTime: brewTime.trim() || '3m 15s',
       upc: upc.trim() || `LOT-${Date.now().toString().slice(-6)}`,
       customUrl: normalizedCustomUrl,
+      price: price.trim() || '$22.00',
+      directUrl: normalizedDirectUrl || normalizedCustomUrl || '',
       notes: roasterNotes.trim() || `Dialed-in recipe from ${trimmedRoaster}. Optimized for ${String(brewMethod || 'pour_over').replace(/_/g, ' ')}.`
     };
 
@@ -1265,6 +1278,10 @@ export default function RoasterPortalModal({
               setRecommendedGrind={setRecommendedGrind}
               roasterNotes={roasterNotes}
               setRoasterNotes={setRoasterNotes}
+              price={price}
+              setPrice={setPrice}
+              directUrl={directUrl}
+              setDirectUrl={setDirectUrl}
               handleSaveCoffee={handleSaveCoffee}
               onClose={onClose}
             />

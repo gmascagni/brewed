@@ -56,6 +56,10 @@ export default function RoasterOnboardTab({
   setRecommendedGrind,
   roasterNotes,
   setRoasterNotes,
+  price = '$22.00',
+  setPrice = null,
+  directUrl = '',
+  setDirectUrl = null,
   handleSaveCoffee,
   onClose
 }) {
@@ -341,6 +345,35 @@ export default function RoasterOnboardTab({
           <p className="text-[10px] text-cream-soft/50 mt-1">
             When customers scan this barcode with the camera scanner, your dialed-in recipe and roastery profile load automatically.
           </p>
+        </div>
+
+        {/* Marketplace Buy Now Link & Retail Bag Price */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+          <div>
+            <label className="block text-cream-soft/70 font-mono mb-1">
+              Retail Bag Price (USD / EUR)
+            </label>
+            <input
+              type="text"
+              value={price}
+              onChange={(e) => setPrice && setPrice(e.target.value)}
+              placeholder="e.g. $22.00"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light font-mono focus:outline-none focus:border-amber-gold"
+            />
+          </div>
+
+          <div>
+            <label className="block text-cream-soft/70 font-mono mb-1">
+              "Buy Beans" Webshop Link (Buy Now URL)
+            </label>
+            <input
+              type="url"
+              value={directUrl}
+              onChange={(e) => setDirectUrl && setDirectUrl(e.target.value)}
+              placeholder="e.g. https://yourroastery.com/products/lot"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light font-mono focus:outline-none focus:border-amber-gold"
+            />
+          </div>
         </div>
       </div>
 

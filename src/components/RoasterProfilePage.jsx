@@ -14,6 +14,12 @@ import {
   isDomainVerifiedRoaster,
   extractDomainFromUrl
 } from '../utils/roasterVerification';
+import {
+  getRoasterClaim,
+  isRoasterClaimed,
+  isRoasterClaimedByUser,
+  ROASTER_CLAIMED_EVENT
+} from '../utils/roasterClaimStorage';
 
 // Subcomponents
 import RoasterHeader from './roaster/RoasterHeader';
@@ -23,6 +29,7 @@ import RoasterOfferingsGrid from './roaster/RoasterOfferingsGrid';
 import RoasterCafesList from './roaster/RoasterCafesList';
 import PackagingLabelProofModal, { useCoffeeLabelQrCodes } from './roaster/PackagingLabelProofModal';
 import RoasterVideoModal from './roaster/RoasterVideoModal';
+import RoasterClaimModal from './roaster/RoasterClaimModal';
 
 export default function RoasterProfilePage({
   initialRoasterId = 'methodical',
@@ -52,6 +59,18 @@ export default function RoasterProfilePage({
   const [cardLabelFlipMap, setCardLabelFlipMap] = useState({});
   const [activeLabelModalCoffee, setActiveLabelModalCoffee] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
+  const [claimVersion, setClaimVersion] = useState(0);
+
+  useEffect(() => {
+    const handleClaimChanged = () => setClaimVersion((v) => v + 1);
+    window.addEventListener(ROASTER_CLAIMED_EVENT, handleClaimChanged);
+    window.addEventListener('storage', handleClaimChanged);
+    return () => {
+      window.removeEventListener(ROASTER_CLAIMED_EVENT, handleClaimChanged);
+      window.removeEventListener('storage', handleClaimChanged);
+    };
+  }, []);
 
   let orchestrator = null;
   try {
@@ -69,11 +88,26 @@ export default function RoasterProfilePage({
     }));
   };
 
-  // Recognize authenticated brand owner via strict multi-tenant authorization
-  const isBrandOwner = Boolean(currentUser && checkRoasterBrandOwnership(roaster, currentUser));
+  const roasterClaim = useMemo(() => {
+    return getRoasterClaim(roaster?.slug || roaster?.id);
+  }, [roaster?.slug, roaster?.id, claimVersion]);
+
+  const isClaimedLocally = Boolean(
+    roasterClaim && (
+      roasterClaim.status === 'verified' ||
+      roasterClaim.status === 'verified_manual' ||
+      (currentUser && isRoasterClaimedByUser(roaster?.slug || roaster?.id, currentUser))
+    )
+  );
+
+  // Recognize authenticated brand owner via strict multi-tenant authorization OR verified claim
+  const isBrandOwner = Boolean(
+    (currentUser && checkRoasterBrandOwnership(roaster, currentUser)) || isClaimedLocally
+  );
   const roasterDomain = extractDomainFromUrl(roaster?.website);
   const isDomainVerified = Boolean(
-    roaster?.ownerEmail && roaster?.website && isDomainVerifiedRoaster(roaster.ownerEmail, roaster.website)
+    (roaster?.ownerEmail && roaster?.website && isDomainVerifiedRoaster(roaster.ownerEmail, roaster.website)) ||
+    (roasterClaim?.isDomainVerified)
   );
 
   useEffect(() => {
@@ -226,6 +260,7 @@ export default function RoasterProfilePage({
           roasterDomain={roasterDomain}
           currentUser={currentUser}
           onOpenRoasterInfo={onOpenRoasterInfo}
+          onOpenClaimModal={() => setIsClaimModalOpen(true)}
           onOpenRoasterPortalWithBean={onOpenRoasterPortalWithBean}
           onWatchVideo={() => setIsVideoModalOpen(true)}
         />
@@ -310,6 +345,7 @@ export default function RoasterProfilePage({
         <RoasterCafesList
           roaster={roaster}
           isBrandOwner={isBrandOwner}
+          currentUser={currentUser}
           onOpenRoasterPortalWithBean={onOpenRoasterPortalWithBean}
           orchestrator={orchestrator}
         />
@@ -335,6 +371,23 @@ export default function RoasterProfilePage({
       <RoasterVideoModal
         isOpen={isVideoModalOpen}
         onClose={() => setIsVideoModalOpen(false)}
+      />
+
+      {/* Roaster Brand Claim & Verification Modal */}
+      <RoasterClaimModal
+        isOpen={isClaimModalOpen}
+        onClose={() => setIsClaimModalOpen(false)}
+        roaster={roaster}
+        currentUser={currentUser}
+        onClaimSuccess={() => {
+          setClaimVersion((v) => v + 1);
+        }}
+        onOpenRoasterPortal={(claimedRoaster) => {
+          setIsClaimModalOpen(false);
+          if (onOpenRoasterPortalWithBean) {
+            onOpenRoasterPortalWithBean(claimedRoaster?.coffees?.[0] || roaster?.coffees?.[0] || null);
+          }
+        }}
       />
 
     </div>

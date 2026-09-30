@@ -11,6 +11,7 @@ import {
   Eye
 } from 'lucide-react';
 import { CoffeePackagingLabel } from './PackagingLabelProofModal';
+import { buildAffiliateUrl, trackOutboundPurchaseClick } from '../../utils/affiliateTracking';
 
 export default function RoasterOfferingsGrid({
   roaster,
@@ -196,9 +197,10 @@ export default function RoasterOfferingsGrid({
 
                     <div className="grid grid-cols-2 gap-2">
                       <a
-                        href={coffee.directUrl || roaster.shopUrl}
+                        href={buildAffiliateUrl(coffee.directUrl || roaster.shopUrl, roaster.name, 'roaster_offerings_compact')}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => trackOutboundPurchaseClick(buildAffiliateUrl(coffee.directUrl || roaster.shopUrl, roaster.name, 'roaster_offerings_compact'), roaster.name, coffee.beanName, coffee.price)}
                         className="py-2 px-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-mono text-cream-light flex items-center justify-center gap-1 transition font-bold"
                       >
                         <ExternalLink className="w-3 h-3 text-amber-gold shrink-0" />
@@ -317,9 +319,10 @@ export default function RoasterOfferingsGrid({
                       </button>
 
                       <a
-                        href={coffee.directUrl || roaster.shopUrl}
+                        href={buildAffiliateUrl(coffee.directUrl || roaster.shopUrl, roaster.name, 'roaster_offerings_detail')}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => trackOutboundPurchaseClick(buildAffiliateUrl(coffee.directUrl || roaster.shopUrl, roaster.name, 'roaster_offerings_detail'), roaster.name, coffee.beanName, coffee.price)}
                         className="py-3 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-mono text-cream-light flex items-center gap-1.5 transition font-bold"
                       >
                         <ExternalLink className="w-3.5 h-3.5 text-amber-gold shrink-0" />
@@ -572,9 +575,10 @@ export default function RoasterOfferingsGrid({
 
                     <div className="grid grid-cols-2 gap-2">
                       <a
-                        href={coffee.directUrl || roaster.shopUrl}
+                        href={buildAffiliateUrl(coffee.directUrl || roaster.shopUrl, roaster.name, 'roaster_offerings_split')}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => trackOutboundPurchaseClick(buildAffiliateUrl(coffee.directUrl || roaster.shopUrl, roaster.name, 'roaster_offerings_split'), roaster.name, coffee.beanName, coffee.price)}
                         className="py-2.5 px-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs font-mono text-cream-light flex items-center justify-center gap-1.5 transition font-bold"
                         title="Purchase directly on roaster's website"
                       >

@@ -2,6 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MapPin, Navigation, Star, Search, Coffee, Compass, ExternalLink, X, Sparkles, Clock, AlertCircle, Map as MapIcon, Loader2, RefreshCw, Store, CheckCircle2, ShieldCheck, ChevronLeft } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 import { recordTelemetryEvent } from '../utils/telemetry';
+import {
+  recordCafeCheckIn,
+  getCafeSocialStats,
+  hasUserCheckedIn
+} from '../utils/cafeCheckInStorage';
 
 // Calculate exact Haversine distance in miles between two lat/lng coordinates
 function getHaversineDistanceMiles(lat1, lon1, lat2, lon2) {
@@ -393,6 +398,7 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
   const [shops, setShops] = useState(CURATED_SPECIALTY_SHOPS);
   const [selectedShopId, setSelectedShopId] = useState(CURATED_SPECIALTY_SHOPS[0].id);
   const [searchStatusText, setSearchStatusText] = useState('');
+  const [checkInTrigger, setCheckInTrigger] = useState(0);
   const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
 
   // Map DOM & Leaflet References
@@ -1312,6 +1318,34 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
                     </div>
 
                     <div className="flex items-center space-x-2 w-full sm:w-auto">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const isAlready = hasUserCheckedIn(activeShop.id);
+                          if (!isAlready) {
+                            recordCafeCheckIn(activeShop.id, activeShop.name, {
+                              city: activeShop.city,
+                              state: activeShop.state
+                            });
+                            trackEvent('cafe_checkin_button_click', { cafeId: activeShop.id, name: activeShop.name });
+                            setCheckInTrigger((v) => v + 1);
+                          }
+                        }}
+                        className={`w-full sm:w-auto py-2.5 px-4 rounded-xl text-xs font-bold font-mono flex items-center justify-center space-x-1.5 shadow-md whitespace-nowrap active:scale-95 transition cursor-pointer ${
+                          hasUserCheckedIn(activeShop.id)
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-default'
+                            : 'bg-white/10 hover:bg-white/15 text-cream-light border border-white/20'
+                        }`}
+                        title="Check in and signal that you brewed or visited here"
+                      >
+                        <Coffee className="w-3.5 h-3.5 text-amber-gold" />
+                        <span>
+                          {hasUserCheckedIn(activeShop.id)
+                            ? `Brewed Here (${getCafeSocialStats(activeShop.id, 18).totalCheckIns} ★)`
+                            : `I Brewed Here (${getCafeSocialStats(activeShop.id, 18).totalCheckIns})`}
+                        </span>
+                      </button>
+
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeShop.name + ' ' + activeShop.address)}`}
                         target="_blank"

@@ -13,12 +13,15 @@ import {
   Check,
   HelpCircle,
   Compass,
-  Camera
+  Camera,
+  CheckCircle2
 } from 'lucide-react';
 import BeanCard from './BeanCard';
 import TastingNoteBadge from './TastingNoteBadge';
 import { CURATED_SINGLE_ORIGINS } from '../data/coffeeSensoryData';
 import { SHOWCASE_ROASTERS } from '../data/roasterShowcaseData';
+import { buildAffiliateUrl, trackOutboundPurchaseClick } from '../utils/affiliateTracking';
+import { isRoasterClaimed } from '../utils/roasterClaimStorage';
 
 // Friendly coffee flavor filter options
 const FRIENDLY_FLAVORS = [
@@ -520,51 +523,65 @@ export default function ConsumerDiscoveryFeed({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {SHOWCASE_ROASTERS.map((roaster) => (
-            <article
-              key={roaster.id}
-              className="editorial-card p-6 flex flex-col justify-between group hover:border-[#D69550] transition-all bg-white border border-[#ECE6DC]"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] flex items-center justify-center font-serif text-lg font-bold text-[#A8622D]">
-                    {roaster.monogram || roaster.name.charAt(0)}
+          {SHOWCASE_ROASTERS.map((roaster) => {
+            const isClaimed = isRoasterClaimed(roaster.id || roaster.slug);
+            const affiliateUrl = buildAffiliateUrl(roaster.website, roaster.name, 'discovery_partners');
+
+            return (
+              <article
+                key={roaster.id}
+                className="editorial-card p-6 flex flex-col justify-between group hover:border-[#D69550] transition-all bg-white border border-[#ECE6DC]"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] flex items-center justify-center font-serif text-lg font-bold text-[#A8622D]">
+                        {roaster.monogram || roaster.name.charAt(0)}
+                      </div>
+                      {isClaimed && (
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-sans font-bold border border-emerald-200 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          <span>Verified Brand</span>
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs font-sans text-[#766A62]">
+                      {roaster.city}, {roaster.state}
+                    </span>
                   </div>
-                  <span className="text-xs font-sans text-[#766A62]">
-                    {roaster.city}, {roaster.state}
-                  </span>
+
+                  <h3 className="font-editorial text-xl font-bold text-[#14110F] group-hover:text-[#A8622D] transition-colors mb-1.5">
+                    {roaster.name}
+                  </h3>
+                  <p className="text-xs text-[#5C524B] font-sans line-clamp-2 mb-4 leading-relaxed">
+                    {roaster.tagline}
+                  </p>
                 </div>
 
-                <h3 className="font-editorial text-xl font-bold text-[#14110F] group-hover:text-[#A8622D] transition-colors mb-1.5">
-                  {roaster.name}
-                </h3>
-                <p className="text-xs text-[#5C524B] font-sans line-clamp-2 mb-4 leading-relaxed">
-                  {roaster.tagline}
-                </p>
-              </div>
+                <div className="pt-4 border-t border-[#ECE6DC] flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => onNavigateToRoaster(roaster.id)}
+                    className="text-xs font-sans font-bold text-[#14110F] hover:text-[#A8622D] flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <span>Explore Roaster Profile</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-[#C88A4B]" />
+                  </button>
 
-              <div className="pt-4 border-t border-[#ECE6DC] flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => onNavigateToRoaster(roaster.id)}
-                  className="text-xs font-sans font-bold text-[#14110F] hover:text-[#A8622D] flex items-center gap-1 transition-colors cursor-pointer"
-                >
-                  <span>Explore Roaster Profile</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-[#C88A4B]" />
-                </button>
-
-                <a
-                  href={roaster.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-1.5 rounded-lg text-[#8C8178] hover:text-[#14110F] transition-colors"
-                  title={`Visit ${roaster.name} Official Website`}
-                >
-                  <ArrowUpRight className="w-4 h-4" />
-                </a>
-              </div>
-            </article>
-          ))}
+                  <a
+                    href={affiliateUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackOutboundPurchaseClick(affiliateUrl, roaster.name, 'Roastery Store')}
+                    className="p-1.5 rounded-lg text-[#8C8178] hover:text-[#14110F] transition-colors"
+                    title={`Visit ${roaster.name} Official Website`}
+                  >
+                    <ArrowUpRight className="w-4 h-4" />
+                  </a>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
     </div>

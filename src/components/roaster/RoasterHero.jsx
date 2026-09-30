@@ -22,6 +22,7 @@ export default function RoasterHero({
   roasterDomain,
   currentUser,
   onOpenRoasterInfo,
+  onOpenClaimModal,
   onOpenRoasterPortalWithBean,
   onWatchVideo
 }) {
@@ -60,9 +61,9 @@ export default function RoasterHero({
             </span>
             <button
               type="button"
-              onClick={onOpenRoasterInfo}
+              onClick={onOpenClaimModal || onOpenRoasterInfo}
               className="px-3 py-1 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-mono text-xs font-bold border border-amber-500/40 flex items-center gap-1.5 shadow-sm transition cursor-pointer"
-              title="Learn about verified roaster partner profiles"
+              title="Learn about verified roaster partner profiles or claim this profile"
             >
               <Store className="w-3.5 h-3.5 text-amber-400" />
               <span>Showcase Roaster Profile</span>
@@ -76,15 +77,15 @@ export default function RoasterHero({
               <Play className="w-3.5 h-3.5 text-red-400 fill-current" />
               <span>Watch Video</span>
             </button>
-            {onOpenRoasterInfo && roasterDomain && (
+            {(onOpenClaimModal || onOpenRoasterInfo) && (
               <button
                 type="button"
-                onClick={onOpenRoasterInfo}
+                onClick={onOpenClaimModal || onOpenRoasterInfo}
                 className="px-3 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs font-bold border border-white/15 flex items-center gap-1.5 shadow-sm transition cursor-pointer"
-                title={`Claim official brand certification with @${roasterDomain}`}
+                title={`Claim official brand certification ${roasterDomain ? `with @${roasterDomain}` : ''}`}
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-amber-gold" />
-                <span>Claim Profile (@{roasterDomain})</span>
+                <span>Claim Profile {roasterDomain ? `(@${roasterDomain})` : ''}</span>
               </button>
             )}
           </>
@@ -189,9 +190,9 @@ export default function RoasterHero({
               )}
             </span>
           </div>
-          {onOpenRoasterInfo && (
+          {(onOpenClaimModal || onOpenRoasterInfo) && (
             <button
-              onClick={onOpenRoasterInfo}
+              onClick={onOpenClaimModal || onOpenRoasterInfo}
               className="text-amber-gold hover:underline font-bold text-xs flex items-center gap-1 whitespace-nowrap shrink-0 self-start sm:self-auto cursor-pointer"
             >
               <span>Claim with @{roasterDomain || 'domain'}</span>
