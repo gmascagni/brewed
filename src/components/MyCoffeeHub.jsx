@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BookOpen, 
   Sparkles, 
@@ -12,12 +12,24 @@ import {
   Layers,
   ChevronRight,
   Flame,
-  Store
+  Store,
+  Package,
+  ScanLine,
+  Trash2,
+  ArrowRight,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import BrewJournal from './BrewJournal';
 import RecipeExplorer from './RecipeExplorer';
 import UserProfileDashboard from './UserProfileDashboard';
-import { hapticTap } from '../utils/haptics';
+import { hapticTap, hapticSuccess } from '../utils/haptics';
+import { 
+  getInventoryBags, 
+  removeBagFromInventory, 
+  calculateBagFreshness, 
+  INVENTORY_UPDATED_EVENT 
+} from '../utils/bagInventoryStorage';
 
 export default function MyCoffeeHub({
   trackMode = 'coffee',
@@ -39,7 +51,51 @@ export default function MyCoffeeHub({
   initialTab = 'journal'
 }) {
   const handleRecipeSelect = onSelectRecipeToBrew || onSelectRecipe;
-  const [activeTab, setActiveTab] = useState(initialTab); // 'journal' | 'recipes' | 'profile' | 'tools'
+  const [activeTab, setActiveTab] = useState(initialTab); // 'journal' | 'stash' | 'recipes' | 'profile' | 'tools'
+  const [inventoryBags, setInventoryBags] = useState(() => getInventoryBags());
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setInventoryBags(getInventoryBags());
+    };
+    window.addEventListener(INVENTORY_UPDATED_EVENT, handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener(INVENTORY_UPDATED_EVENT, handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
+  }, []);
+
+  const handleBrewBag = (bag) => {
+    hapticTap();
+    const recipeToBrew = {
+      ...bag,
+      bagId: bag.id,
+      id: bag.id,
+      beanName: bag.beanName,
+      roaster: bag.roaster,
+      origin: bag.origin,
+      process: bag.process,
+      roastLevel: bag.roastLevel,
+      methodId: bag.brewMethod || 'pour_over',
+      ratio: Number(bag.recommendedRatio) || 16,
+      grindSetting: bag.recommendedGrind || 'Medium-Fine',
+      tempF: Number(bag.tempF) || 202,
+      tempC: Number(bag.tempC) || 94,
+      doseGrams: bag.targetDose || 18.0
+    };
+    if (onBrewAgain) {
+      onBrewAgain(recipeToBrew);
+    } else if (handleRecipeSelect) {
+      handleRecipeSelect(recipeToBrew);
+    }
+  };
+
+  const handleRemoveBag = (bagId) => {
+    hapticTap();
+    removeBagFromInventory(bagId);
+    setInventoryBags(getInventoryBags());
+  };
 
   const handleTabChange = (tabId) => {
     hapticTap();
@@ -83,6 +139,28 @@ export default function MyCoffeeHub({
           <span className="flex items-center justify-center gap-2">
             <Clock className="w-4 h-4 text-[#A8622D]" />
             <span>Tasting Journal</span>
+          </span>
+        </button>
+
+        <button
+          id="my-coffee-tab-stash"
+          data-tab="stash"
+          type="button"
+          onClick={() => handleTabChange('stash')}
+          className={`flex-1 min-w-[140px] py-2.5 px-3.5 rounded-xl text-xs font-sans font-bold transition-all text-center cursor-pointer ${
+            activeTab === 'stash'
+              ? 'bg-white text-[#14110F] shadow-xs border border-[#ECE6DC]'
+              : 'text-[#766A62] hover:text-[#14110F]'
+          }`}
+        >
+          <span className="flex items-center justify-center gap-2">
+            <Package className="w-4 h-4 text-[#A8622D]" />
+            <span>Coffee Stash</span>
+            {inventoryBags.length > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-[#FAF0E6] text-[#A25A24] text-[10px] font-mono font-bold">
+                {inventoryBags.length}
+              </span>
+            )}
           </span>
         </button>
 
@@ -159,6 +237,208 @@ export default function MyCoffeeHub({
               onBrewAgain={onBrewAgain}
               currentUser={currentUser}
             />
+          </div>
+        )}
+
+        {/* Tab: Coffee Stash & Bag Inventory */}
+        {activeTab === 'stash' && (
+          <div className="space-y-6 animate-fade-in text-left">
+            {/* Stash Action Banner */}
+            <div className="p-6 sm:p-7 rounded-3xl bg-white border border-[#ECE6DC] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Package className="w-5 h-5 text-[#A8622D]" />
+                  <h3 className="font-editorial text-2xl font-bold text-[#14110F]">
+                    Coffee Stash &amp; Bags
+                  </h3>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#FAF0E6] text-[#A25A24] text-xs font-mono font-bold">
+                    {inventoryBags.length} active {inventoryBags.length === 1 ? 'bag' : 'bags'}
+                  </span>
+                </div>
+                <p className="text-xs text-[#5C524B] font-sans">
+                  Track degassing freshness, remaining grams, and link authentic bags to your dial-in brew logs.
+                </p>
+              </div>
+
+              {onOpenScanner && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    hapticTap();
+                    onOpenScanner();
+                  }}
+                  className="py-3 px-5 rounded-2xl bg-[#14110F] hover:bg-[#2A2421] text-white font-sans font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+                >
+                  <ScanLine className="w-4 h-4 text-[#E8AF72]" />
+                  <span>Scan New Coffee Bag</span>
+                </button>
+              )}
+            </div>
+
+            {/* Inventory Overview Metrics (if bags present) */}
+            {inventoryBags.length > 0 && (() => {
+              const totalRemainingGrams = inventoryBags.reduce((sum, b) => sum + (Number(b.remainingGrams) || 0), 0);
+              const estCups = Math.floor(totalRemainingGrams / 18);
+              const peakBags = inventoryBags.filter(b => calculateBagFreshness(b.roastDate).status === 'peak').length;
+
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC]">
+                    <span className="text-[10px] font-mono uppercase text-[#766A62] block">Total Stock</span>
+                    <span className="text-xl font-editorial font-bold text-[#14110F] mt-0.5 block">{totalRemainingGrams}g</span>
+                    <span className="text-[10px] text-[#A8622D] font-mono">~{estCups} cups of coffee</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC]">
+                    <span className="text-[10px] font-mono uppercase text-[#766A62] block">Freshness Peak</span>
+                    <span className="text-xl font-editorial font-bold text-[#2F663C] mt-0.5 block">{peakBags} {peakBags === 1 ? 'Bag' : 'Bags'}</span>
+                    <span className="text-[10px] text-[#2F663C] font-mono">In golden extraction window</span>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC]">
+                    <span className="text-[10px] font-mono uppercase text-[#766A62] block">Average Dose</span>
+                    <span className="text-xl font-editorial font-bold text-[#14110F] mt-0.5 block">18.0g</span>
+                    <span className="text-[10px] text-[#766A62] font-mono">Auto-deducted on post-brew</span>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Empty State */}
+            {inventoryBags.length === 0 ? (
+              <div className="p-10 sm:p-12 rounded-3xl bg-white border border-[#ECE6DC] text-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-[#FAF0E6] text-[#A8622D] flex items-center justify-center mx-auto border border-[#ECD4BD]">
+                  <Package className="w-8 h-8" />
+                </div>
+                <div className="max-w-md mx-auto space-y-2">
+                  <h4 className="font-editorial text-2xl font-bold text-[#14110F]">
+                    Your Coffee Stash is Empty
+                  </h4>
+                  <p className="text-xs text-[#5C524B] leading-relaxed">
+                    Scan the barcode, QR code, or text label of any specialty coffee bag. We'll automatically identify the roaster, origin, roast date, calculate its degassing window, and tailor 3 precision brew recipes.
+                  </p>
+                </div>
+                {onOpenScanner && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      hapticTap();
+                      onOpenScanner();
+                    }}
+                    className="py-3 px-6 rounded-2xl bg-[#C88A4B] hover:bg-[#D69550] text-[#14110F] font-sans font-bold text-xs inline-flex items-center gap-2 shadow-sm transition active:scale-95 cursor-pointer"
+                  >
+                    <ScanLine className="w-4 h-4" />
+                    <span>Scan Your First Bag</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              /* Bags Grid */
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {inventoryBags.map((bag) => {
+                  const freshness = calculateBagFreshness(bag.roastDate);
+                  const initialG = Number(bag.initialGrams) || 340;
+                  const remainG = Number(bag.remainingGrams) || 0;
+                  const pct = Math.max(0, Math.min(100, Math.round((remainG / initialG) * 100)));
+                  const cupsLeft = Math.floor(remainG / 18);
+
+                  const badgeClass =
+                    freshness.badgeColor === 'emerald' ? 'bg-[#EBF5EE] text-[#2F663C] border-[#B7E1C3]' :
+                    freshness.badgeColor === 'amber' ? 'bg-[#FFF8EE] text-[#A8622D] border-[#F6D8B0]' :
+                    freshness.badgeColor === 'blue' ? 'bg-[#EEF6FF] text-[#1D4ED8] border-[#BFDBFE]' :
+                    'bg-[#F5EFE8] text-[#5C524B] border-[#ECE6DC]';
+
+                  return (
+                    <div 
+                      key={bag.id}
+                      className="p-5 sm:p-6 rounded-3xl bg-white border border-[#ECE6DC] shadow-xs space-y-4 flex flex-col justify-between hover:shadow-md transition-shadow"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <span className="px-2 py-0.5 rounded-md bg-[#FAF0E6] text-[#A25A24] text-[10px] font-mono font-bold uppercase">
+                              {bag.roaster}
+                            </span>
+                            <h4 className="font-editorial text-xl font-bold text-[#14110F] mt-1">
+                              {bag.beanName}
+                            </h4>
+                            <p className="text-xs text-[#766A62] font-mono mt-0.5">
+                              {bag.origin || 'Specialty Lot'} • {bag.process || 'Washed'} • {bag.roastLevel || 'Medium-Light'}
+                            </p>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveBag(bag.id)}
+                            className="p-2 rounded-xl text-[#766A62] hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                            title="Remove from Stash"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Freshness Badge & Scientific Guidance */}
+                        <div className="p-3 rounded-2xl bg-[#FAF7F2] border border-[#ECE6DC] space-y-1.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold border ${badgeClass}`}>
+                              {freshness.label}
+                            </span>
+                            {bag.roastDate && (
+                              <span className="text-[10px] text-[#766A62] font-mono">
+                                Roasted: {new Date(bag.roastDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-[#5C524B] leading-relaxed">
+                            {freshness.recommendation}
+                          </p>
+                        </div>
+
+                        {/* Remaining Weight Bar */}
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-[11px] font-mono">
+                            <span className="text-[#5C524B] font-bold">{remainG}g / {initialG}g remaining</span>
+                            <span className="text-[#A8622D] font-bold">~{cupsLeft} brews</span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-[#FAF0E6] overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-[#A8622D] to-[#C88A4B] rounded-full transition-all duration-500"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Tasting Notes */}
+                        {bag.tastingNotes && (
+                          <div className="flex flex-wrap gap-1 pt-1">
+                            {(Array.isArray(bag.tastingNotes) ? bag.tastingNotes : [bag.tastingNotes]).map((note, idx) => (
+                              <span key={idx} className="px-2 py-0.5 rounded-md bg-[#FAF7F2] text-[#766A62] text-[10px] font-medium border border-[#ECE6DC]">
+                                {note}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Card Footer Actions */}
+                      <div className="pt-3 border-t border-[#ECE6DC] flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-mono text-[#766A62]">
+                          Ratio: 1:{bag.recommendedRatio || 16} • {bag.tempF || 202}°F
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleBrewBag(bag)}
+                          className="py-2 px-4 rounded-xl bg-[#14110F] hover:bg-[#2A2421] text-white font-sans font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs"
+                        >
+                          <span>Brew This Bag</span>
+                          <ArrowRight className="w-3.5 h-3.5 text-[#E8AF72]" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 

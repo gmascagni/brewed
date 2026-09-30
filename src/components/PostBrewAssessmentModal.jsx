@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { calculateClosedLoopDialIn, formatSecondsToMmSs, METHOD_DRAWDOWN_TARGETS } from '../utils/dialInEngine.js';
 import { logBrewSession, findPreviousBrewsForLot, compressPhotoToThumbnail } from '../utils/journalStorage.js';
+import { deductDoseFromBag } from '../utils/bagInventoryStorage.js';
 import { getSavedGrinderId } from '../data/grinderProfiles.js';
 import { trackEvent } from '../utils/analytics.js';
 import { hapticTap, hapticSuccess } from '../utils/haptics.js';
@@ -103,13 +104,16 @@ export default function PostBrewAssessmentModal({
   const handleSaveAndApply = (applyToNext = false) => {
     hapticSuccess();
 
+    const bagId = dialedInCoffee?.bagId || dialedInCoffee?.id || null;
+    const doseNum = parseFloat(effectiveDose) || 18;
+
     const loggedEntry = logBrewSession({
       trackMode: 'coffee',
       methodId,
       methodName,
       beanName,
       roaster,
-      doseGrams: parseFloat(effectiveDose),
+      doseGrams: doseNum,
       waterMl: totalWaterMl,
       ratio: effectiveRatio,
       tempF: initialTempF,
@@ -124,8 +128,18 @@ export default function PostBrewAssessmentModal({
       tastingNotes: customNotes.trim() ? [customNotes.trim()] : undefined,
       notes: customNotes.trim(),
       photoUrl: photoDataUrl,
+      bagId,
       userId: currentUser?.uid || null
     });
+
+    // Deduct dose from linked coffee bag inventory if present
+    if (bagId) {
+      try {
+        deductDoseFromBag(bagId, doseNum);
+      } catch (err) {
+        console.warn('Could not deduct dose from inventory:', err);
+      }
+    }
 
     trackEvent('brew_logged_post_assessment', {
       method: methodId,

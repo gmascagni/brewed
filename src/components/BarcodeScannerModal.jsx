@@ -22,16 +22,22 @@ import {
   Download,
   Printer,
   FileText,
-  Cpu
+  Cpu,
+  Package,
+  Edit3,
+  Clock,
+  Calendar,
+  Check
 } from 'lucide-react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import jsQR from 'jsqr';
 import { getRegisteredCoffees, fetchRemoteCoffeeByCode, saveRoasterCoffee } from '../data/roasterRegistry';
 import { useAppOrchestrator } from '../context/AppOrchestratorContext';
 import { createCoffeeProfile } from '../models/coffeeProfile';
-import { hapticScan } from '../utils/haptics';
+import { hapticScan, hapticSuccess, hapticTap } from '../utils/haptics';
 import { performBagOcr, parseCoffeeBagLabel, generateTargetBrewRecipe } from '../utils/bagLabelOcr';
-import { getSavedGrinderId } from '../data/grinderProfiles';
+import { getSavedGrinderId, getGrinderSetting } from '../data/grinderProfiles';
+import { saveBagToInventory, calculateBagFreshness } from '../utils/bagInventoryStorage';
 
 import { VERIFIED_BEAN_CATALOG } from '../data/verifiedBeans';
 export { VERIFIED_BEAN_CATALOG };
@@ -67,6 +73,12 @@ export default function BarcodeScannerModal({
   const [isOcrRunning, setIsOcrRunning] = useState(false);
   const [aiBagResult, setAiBagResult] = useState(null);
 
+  // Smart Bag Ecosystem & User Inventory State
+  const [isEditingBag, setIsEditingBag] = useState(false);
+  const [editedBagData, setEditedBagData] = useState(null);
+  const [selectedRecipeMethod, setSelectedRecipeMethod] = useState('pour_over');
+  const [bagSavedToStash, setBagSavedToStash] = useState(false);
+
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const scanIntervalRef = useRef(null);
@@ -75,6 +87,83 @@ export default function BarcodeScannerModal({
   try {
     orchestrator = useAppOrchestrator();
   } catch {}
+
+  // Helper to initialize matched bean with freshness science and suggested recipes
+  const setupMatchedBeanWithEcosystem = (bean) => {
+    if (!bean) return null;
+    const roastDate = bean.roastDate || new Date().toISOString().split('T')[0];
+    const freshness = bean.freshness || calculateBagFreshness(roastDate);
+
+    // Multi-method recipes: Ensure 3 tailored methods are available
+    let suggested = bean.suggestedRecipes;
+    if (!suggested || !Array.isArray(suggested) || suggested.length === 0) {
+      const activeGrinderId = getSavedGrinderId();
+      const rRatio = Number(bean.recommendedRatio) || 16;
+      const rTemp = Number(bean.tempF) || 202;
+      suggested = [
+        {
+          methodId: 'pour_over',
+          methodName: 'Precision Pour-Over (V60 / Kalita)',
+          doseGrams: 18.0,
+          waterGrams: Math.round(18.0 * rRatio),
+          ratio: rRatio,
+          tempF: rTemp,
+          tempC: Math.round(((rTemp - 32) * 5) / 9),
+          grindSetting: bean.recommendedGrind || 'Medium-Fine',
+          technique: 'Multi-pulse bloom and spiral flow',
+          recommendedFor: 'Highest clarity and delicate aromatic florals'
+        },
+        {
+          methodId: 'aeropress',
+          methodName: 'AeroPress Pressure Extraction',
+          doseGrams: 16.0,
+          waterGrams: Math.round(16.0 * 14.5),
+          ratio: 14.5,
+          tempF: Math.max(188, rTemp - 8),
+          tempC: Math.max(86, Math.round(((rTemp - 32) * 5) / 9) - 4),
+          grindSetting: 'Medium-Fine',
+          technique: 'Inverted steep 1:00 min with 30s gentle plunge',
+          recommendedFor: 'Rich body, concentrated stone fruit, and zero bitterness'
+        },
+        {
+          methodId: bean.roastLevel === 'Dark' || bean.roastLevel === 'Medium-Dark' ? 'espresso' : 'french_press',
+          methodName: bean.roastLevel === 'Dark' || bean.roastLevel === 'Medium-Dark' ? 'SCA 1:2 Espresso Shot' : 'Hoffmann French Press',
+          doseGrams: bean.roastLevel === 'Dark' || bean.roastLevel === 'Medium-Dark' ? 18.0 : 30.0,
+          waterGrams: bean.roastLevel === 'Dark' || bean.roastLevel === 'Medium-Dark' ? 36 : 500,
+          ratio: bean.roastLevel === 'Dark' || bean.roastLevel === 'Medium-Dark' ? 2.0 : 16.7,
+          tempF: bean.roastLevel === 'Dark' || bean.roastLevel === 'Medium-Dark' ? 200 : 210,
+          tempC: bean.roastLevel === 'Dark' || bean.roastLevel === 'Medium-Dark' ? 93 : 99,
+          grindSetting: bean.roastLevel === 'Dark' || bean.roastLevel === 'Medium-Dark' ? 'Fine' : 'Coarse',
+          technique: bean.roastLevel === 'Dark' || bean.roastLevel === 'Medium-Dark' ? '9-bar 28s extraction' : '4-min crust break & zero-plunge immersion',
+          recommendedFor: bean.roastLevel === 'Dark' || bean.roastLevel === 'Medium-Dark' ? 'Silky crema and rich dark chocolate sweetness' : 'Heavy, velvety mouthfeel and lingering chocolate sweetness'
+        }
+      ];
+    }
+
+    const enhanced = {
+      ...bean,
+      roastDate,
+      freshness,
+      suggestedRecipes: suggested
+    };
+
+    setMatchedBean(enhanced);
+    setEditedBagData({
+      roaster: enhanced.roaster || '',
+      beanName: enhanced.beanName || '',
+      origin: enhanced.origin || '',
+      region: enhanced.region || '',
+      process: enhanced.process || 'washed',
+      roastLevel: enhanced.roastLevel || 'Medium-Light',
+      elevation: enhanced.elevation || '',
+      roastDate: enhanced.roastDate || new Date().toISOString().split('T')[0],
+      tastingNotesStr: Array.isArray(enhanced.tastingNotes) ? enhanced.tastingNotes.join(', ') : (enhanced.tastingNotes || ''),
+      notes: enhanced.notes || ''
+    });
+    setSelectedRecipeMethod(enhanced.brewMethod || 'pour_over');
+    setBagSavedToStash(false);
+    return enhanced;
+  };
 
   // Initialize camera when modal opens
   useEffect(() => {
@@ -93,6 +182,10 @@ export default function BarcodeScannerModal({
       setAiBagResult(null);
       setIsOcrRunning(false);
       setOcrProgress({ status: '', progress: 0 });
+      setIsEditingBag(false);
+      setEditedBagData(null);
+      setSelectedRecipeMethod('pour_over');
+      setBagSavedToStash(false);
     }
     return () => stopCamera();
   }, [isOpen]);
@@ -394,7 +487,7 @@ export default function BarcodeScannerModal({
         recipe: targetRecipe,
         rawText: extractedText
       });
-      setMatchedBean(targetRecipe);
+      setupMatchedBeanWithEcosystem(targetRecipe);
       setScannedResult(`OCR_${targetRecipe.roaster}_${targetRecipe.origin}`);
       hapticScan();
     } catch (err) {
@@ -426,7 +519,7 @@ export default function BarcodeScannerModal({
       recipe: targetRecipe,
       rawText: demoText
     });
-    setMatchedBean(targetRecipe);
+    setupMatchedBeanWithEcosystem(targetRecipe);
     setScannedResult(`AI_DEMO_${parsed.origin}_${parsed.process}`);
     hapticScan();
   };
@@ -520,7 +613,7 @@ export default function BarcodeScannerModal({
     // 0. Check if raw payload or URL is a Bag Recipe JSON / URL
     const recipeMatch = parseRecipePayload(cleanVal);
     if (recipeMatch) {
-      setMatchedBean(recipeMatch);
+      setupMatchedBeanWithEcosystem(recipeMatch);
       setIsScanning(false);
       setIsLookingUp(false);
       return;
@@ -542,7 +635,7 @@ export default function BarcodeScannerModal({
     });
 
     if (matched) {
-      setMatchedBean(matched);
+      setupMatchedBeanWithEcosystem(matched);
       setIsScanning(false);
       return;
     }
@@ -552,7 +645,7 @@ export default function BarcodeScannerModal({
     try {
       const remoteCoffee = await fetchRemoteCoffeeByCode(cleanVal);
       if (remoteCoffee) {
-        setMatchedBean(remoteCoffee);
+        setupMatchedBeanWithEcosystem(remoteCoffee);
         // Cache to local registry so subsequent offline scans are instantaneous
         saveRoasterCoffee(remoteCoffee);
         setIsScanning(false);
@@ -593,7 +686,7 @@ export default function BarcodeScannerModal({
           brewMethod: urlObj.searchParams.get('method') || 'pour_over',
           notes: `Smart Bag packaging QR scanned. Dialed in by ${roasterTitle}.`
         };
-        setMatchedBean(parsedBean);
+        setupMatchedBeanWithEcosystem(parsedBean);
         setIsScanning(false);
         return;
       } catch (err) {
@@ -618,7 +711,7 @@ export default function BarcodeScannerModal({
           const offData = await res.json();
           if (offData.status === 1 && offData.product) {
             const p = offData.product;
-            setMatchedBean({
+            setupMatchedBeanWithEcosystem({
               id: `off_${cleanVal}`,
               upc: cleanVal,
               roaster: p.brands || p.brand_owner || 'Retail Coffee Roaster',
@@ -711,12 +804,74 @@ export default function BarcodeScannerModal({
 
   const handleApplyToDialIn = () => {
     if (!matchedBean) return;
+
+    // Resolve recipe from suggested extraction protocols or baseline
+    const activeRecipe = matchedBean.suggestedRecipes?.find(r => r.methodId === selectedRecipeMethod) || matchedBean.suggestedRecipes?.[0];
+
+    const beanToBrew = {
+      ...matchedBean,
+      bagId: matchedBean.id || matchedBean.bagId || `bag_${matchedBean.upc || Date.now()}`,
+      brewMethod: activeRecipe ? activeRecipe.methodId : (matchedBean.brewMethod || 'pour_over'),
+      recommendedRatio: activeRecipe ? activeRecipe.ratio : (Number(matchedBean.recommendedRatio) || 16),
+      recommendedGrind: activeRecipe ? activeRecipe.grindSetting : (matchedBean.recommendedGrind || 'Medium-Fine'),
+      tempF: activeRecipe ? activeRecipe.tempF : (Number(matchedBean.tempF) || 202),
+      tempC: activeRecipe ? activeRecipe.tempC : (Number(matchedBean.tempC) || 94),
+      targetDose: activeRecipe ? activeRecipe.doseGrams : 18.0,
+      targetWater: activeRecipe ? activeRecipe.waterGrams : Math.round(18.0 * (Number(matchedBean.recommendedRatio) || 16)),
+      activeRecipeProtocol: activeRecipe || null
+    };
+
     if (orchestrator) {
-      orchestrator.brew(matchedBean);
+      orchestrator.brew(beanToBrew);
     } else if (onApplyRecipe) {
-      onApplyRecipe(matchedBean);
+      onApplyRecipe(beanToBrew);
     }
     onClose();
+  };
+
+  const handleSaveToStash = () => {
+    if (!matchedBean) return;
+    const bagToSave = {
+      ...matchedBean,
+      id: matchedBean.id || matchedBean.bagId || `bag_${matchedBean.upc || Date.now()}`,
+      initialGrams: matchedBean.initialGrams || 340,
+      remainingGrams: matchedBean.remainingGrams || matchedBean.initialGrams || 340,
+      roastDate: matchedBean.roastDate || new Date().toISOString().split('T')[0],
+      dateAdded: new Date().toISOString()
+    };
+    saveBagToInventory(bagToSave, currentUser);
+    hapticSuccess();
+    setBagSavedToStash(true);
+  };
+
+  const handleSaveBagEdits = () => {
+    if (!editedBagData || !matchedBean) return;
+    const newRoastDate = editedBagData.roastDate || matchedBean.roastDate || new Date().toISOString().split('T')[0];
+    const newFreshness = calculateBagFreshness(newRoastDate);
+    const newTastingNotes = editedBagData.tastingNotesStr
+      ? editedBagData.tastingNotesStr.split(',').map(s => s.trim()).filter(Boolean)
+      : matchedBean.tastingNotes;
+
+    const updatedBean = {
+      ...matchedBean,
+      roaster: editedBagData.roaster,
+      beanName: editedBagData.beanName,
+      origin: editedBagData.origin,
+      region: editedBagData.region,
+      process: editedBagData.process,
+      roastLevel: editedBagData.roastLevel,
+      elevation: editedBagData.elevation,
+      roastDate: newRoastDate,
+      freshness: newFreshness,
+      tastingNotes: newTastingNotes,
+      notes: editedBagData.notes,
+      userClaimed: true,
+      lastModified: new Date().toISOString()
+    };
+
+    setMatchedBean(updatedBean);
+    setIsEditingBag(false);
+    hapticSuccess();
   };
 
   const handleSaveToCellar = () => {
@@ -1195,6 +1350,62 @@ export default function BarcodeScannerModal({
                 </div>
               </div>
 
+              {/* Graceful Fallback Options for Consumer */}
+              <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
+                <span className="text-[10px] font-mono uppercase font-bold text-amber-gold block">
+                  Consumer Quick Actions:
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      hapticTap();
+                      setScannerMode('ai_label');
+                      if (capturedSnapshot) {
+                        handleRunBagOcr(capturedSnapshot);
+                      }
+                    }}
+                    className="px-3.5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow transition cursor-pointer"
+                  >
+                    <Sparkles className="w-4 h-4 text-espresso-950" />
+                    <span>Scan Label with AI OCR</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      hapticTap();
+                      const fallbackBean = {
+                        id: `bag_${Date.now()}`,
+                        upc: uncatalogedResult.code,
+                        roaster: 'My Specialty Coffee',
+                        beanName: 'Single-Origin Micro-Lot',
+                        origin: 'Specialty Origin',
+                        region: '',
+                        process: 'washed',
+                        roastLevel: 'Medium',
+                        elevation: '1,800 MASL',
+                        roastDate: new Date().toISOString().split('T')[0],
+                        tastingNotes: ['Artisan Selected'],
+                        recommendedRatio: 16,
+                        recommendedGrind: 'Medium-Fine',
+                        tempF: 202,
+                        tempC: 94,
+                        brewMethod: 'pour_over',
+                        notes: `Manually cataloged bag from barcode ${uncatalogedResult.code}`
+                      };
+                      setupMatchedBeanWithEcosystem(fallbackBean);
+                      setIsEditingBag(true);
+                      setUncatalogedResult(null);
+                    }}
+                    className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-cream-light font-mono text-xs font-bold border border-white/20 flex items-center justify-center gap-2 transition cursor-pointer"
+                  >
+                    <Edit3 className="w-4 h-4 text-amber-gold" />
+                    <span>Enter Coffee Details Manually</span>
+                  </button>
+                </div>
+              </div>
+
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-2">
                 {onOpenRoasterInfo && (
                   <button
@@ -1203,9 +1414,9 @@ export default function BarcodeScannerModal({
                       onOpenRoasterInfo();
                       onClose();
                     }}
-                    className="px-4 py-2.5 rounded-xl bg-amber-gold text-espresso-950 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow hover:scale-105 active:scale-95 transition"
+                    className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-cream-light font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-white/15 transition"
                   >
-                    <Mail className="w-4 h-4" />
+                    <Mail className="w-4 h-4 text-amber-gold" />
                     <span>Contact HQ to Add Label</span>
                   </button>
                 )}
@@ -1220,7 +1431,7 @@ export default function BarcodeScannerModal({
                     className="px-4 py-2.5 rounded-xl bg-amber-gold hover:bg-amber-300 text-espresso-950 font-mono text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
                   >
                     <Store className="w-4 h-4 text-espresso-950" />
-                    <span>Onboard & Register Recipe</span>
+                    <span>Onboard &amp; Register Recipe</span>
                   </button>
                 )}
               </div>
@@ -1230,10 +1441,31 @@ export default function BarcodeScannerModal({
           {/* Scanned Bean Result Card */}
           {matchedBean && (() => {
             const provenance = getCoffeeProvenance(matchedBean, matchedBean.roasterProfile || null, currentUser);
+            const activeProtocol = matchedBean.suggestedRecipes?.find(r => r.methodId === selectedRecipeMethod) || matchedBean.suggestedRecipes?.[0] || {
+              methodId: matchedBean.brewMethod || 'pour_over',
+              methodName: 'Precision Pour-Over',
+              ratio: Number(matchedBean.recommendedRatio) || 16,
+              doseGrams: 18.0,
+              waterGrams: Math.round(18.0 * (Number(matchedBean.recommendedRatio) || 16)),
+              tempF: Number(matchedBean.tempF) || 202,
+              tempC: Number(matchedBean.tempC) || 94,
+              grindSetting: matchedBean.recommendedGrind || 'Medium-Fine',
+              technique: 'Multi-pulse bloom and spiral flow',
+              recommendedFor: 'Highest clarity and delicate aromatic florals'
+            };
+
+            const freshness = matchedBean.freshness || calculateBagFreshness(matchedBean.roastDate);
+            const freshnessBadgeStyle = 
+              freshness.badgeColor === 'emerald' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' :
+              freshness.badgeColor === 'amber' ? 'bg-amber-500/20 text-amber-300 border-amber-500/40' :
+              freshness.badgeColor === 'blue' ? 'bg-blue-500/20 text-blue-300 border-blue-500/40' :
+              'bg-zinc-500/20 text-zinc-300 border-zinc-500/40';
+
             return (
-            <div className="p-5 sm:p-6 rounded-2xl bg-black/60 border-2 border-amber-gold/50 shadow-2xl space-y-4 animate-fade-in">
+            <div className="p-5 sm:p-6 rounded-2xl bg-black/60 border-2 border-amber-gold/50 shadow-2xl space-y-4 animate-fade-in text-left">
+              {/* Header Badges */}
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-gold text-[10px] font-mono font-bold uppercase border border-amber-500/30">
                     {matchedBean.roaster}
                   </span>
@@ -1244,13 +1476,24 @@ export default function BarcodeScannerModal({
                     {provenance.label}
                   </span>
                   <span className="text-[10px] text-cream-soft/50 font-mono">
-                    Code: {scannedResult || matchedBean.upc}
+                    UPC/Code: {scannedResult || matchedBean.upc}
                   </span>
                 </div>
-                <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-mono font-bold">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Profile Ingested</span>
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-mono font-bold">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Smart Bag Active</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingBag(prev => !prev)}
+                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-cream-light font-mono text-[11px] font-bold flex items-center gap-1 border border-white/15 transition cursor-pointer"
+                    title="Correct or claim bag details"
+                  >
+                    <Edit3 className="w-3 h-3 text-amber-gold" />
+                    <span>{isEditingBag ? 'Close Editor' : 'Correct / Claim'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Computer Vision Derivation Notice */}
@@ -1266,6 +1509,143 @@ export default function BarcodeScannerModal({
                 </div>
               )}
 
+              {/* Freshness & Degassing Science Bar */}
+              <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-amber-gold shrink-0" />
+                    <span className={`px-2 py-0.5 rounded-md text-[11px] font-mono font-bold border ${freshnessBadgeStyle}`}>
+                      {freshness.label}
+                    </span>
+                    {matchedBean.roastDate && (
+                      <span className="text-[11px] text-cream-soft/70 font-mono">
+                        Roasted: {new Date(matchedBean.roastDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10px] font-mono text-cream-soft/50 uppercase tracking-wider">
+                    Degassing Science
+                  </span>
+                </div>
+                <p className="text-xs text-cream-light/90 leading-relaxed font-sans">
+                  {freshness.recommendation}
+                </p>
+                {freshness.bloomAdjustmentSec !== 0 && (
+                  <div className="text-[11px] font-mono text-amber-gold/90">
+                    💡 Smart Adjustment: {freshness.bloomAdjustmentSec > 0 ? `+${freshness.bloomAdjustmentSec}s bloom time` : `${freshness.bloomAdjustmentSec}s bloom time`}
+                  </div>
+                )}
+              </div>
+
+              {/* Inline Bag Data Correction & Claim Form */}
+              {isEditingBag && editedBagData && (
+                <div className="p-4 rounded-2xl bg-espresso-900 border border-amber-gold/40 shadow-inner space-y-3 animate-fade-in">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <div className="flex items-center gap-2 text-xs font-mono font-bold text-amber-gold uppercase tracking-wider">
+                      <Edit3 className="w-4 h-4" />
+                      <span>Correct & Claim Coffee Bag Data</span>
+                    </div>
+                    <span className="text-[10px] text-cream-soft/60 font-mono">Saves to local & cloud inventory</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+                    <div>
+                      <label className="text-[10px] text-cream-soft/70 uppercase block mb-1">Roaster Name</label>
+                      <input
+                        type="text"
+                        value={editedBagData.roaster}
+                        onChange={(e) => setEditedBagData({ ...editedBagData, roaster: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-cream-soft/70 uppercase block mb-1">Coffee / Lot Name</label>
+                      <input
+                        type="text"
+                        value={editedBagData.beanName}
+                        onChange={(e) => setEditedBagData({ ...editedBagData, beanName: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-cream-soft/70 uppercase block mb-1">Origin Country / Region</label>
+                      <input
+                        type="text"
+                        value={editedBagData.origin}
+                        onChange={(e) => setEditedBagData({ ...editedBagData, origin: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-cream-soft/70 uppercase block mb-1">Processing Method</label>
+                      <select
+                        value={editedBagData.process}
+                        onChange={(e) => setEditedBagData({ ...editedBagData, process: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold"
+                      >
+                        <option value="washed">Washed / Wet Process</option>
+                        <option value="natural">Natural / Dry Process</option>
+                        <option value="honey">Honey / Pulped Natural</option>
+                        <option value="anaerobic">Anaerobic Fermentation</option>
+                        <option value="experimental">Experimental / Co-Ferment</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-cream-soft/70 uppercase block mb-1">Roast Date</label>
+                      <input
+                        type="date"
+                        value={editedBagData.roastDate}
+                        onChange={(e) => setEditedBagData({ ...editedBagData, roastDate: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-cream-soft/70 uppercase block mb-1">Roast Level</label>
+                      <select
+                        value={editedBagData.roastLevel}
+                        onChange={(e) => setEditedBagData({ ...editedBagData, roastLevel: e.target.value })}
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold"
+                      >
+                        <option value="Light">Light Roast (Cinnamon / City)</option>
+                        <option value="Medium-Light">Medium-Light (City+)</option>
+                        <option value="Medium">Medium (Full City)</option>
+                        <option value="Medium-Dark">Medium-Dark (Vienna)</option>
+                        <option value="Dark">Dark Roast (French / Italian)</option>
+                      </select>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="text-[10px] text-cream-soft/70 uppercase block mb-1">Tasting Notes (comma-separated)</label>
+                      <input
+                        type="text"
+                        value={editedBagData.tastingNotesStr}
+                        onChange={(e) => setEditedBagData({ ...editedBagData, tastingNotesStr: e.target.value })}
+                        placeholder="e.g. Jasmine, White Peach, Meyer Lemon, Bergamot"
+                        className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-cream-light focus:outline-none focus:border-amber-gold"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingBag(false)}
+                      className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-cream-light text-xs font-mono font-bold transition"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveBagEdits}
+                      className="px-4 py-1.5 rounded-xl bg-amber-gold hover:bg-amber-300 text-espresso-950 text-xs font-mono font-bold flex items-center gap-1.5 transition active:scale-95 shadow-md"
+                    >
+                      <Check className="w-3.5 h-3.5 text-espresso-950" />
+                      <span>Save &amp; Update Profile</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Bean Identification */}
               <div>
                 <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream-light">
                   {matchedBean.beanName}
@@ -1275,37 +1655,89 @@ export default function BarcodeScannerModal({
                 </p>
               </div>
 
-              {/* Extraction Specs Grid */}
+              {/* Suggested Extraction Protocols Multi-Method Pills */}
+              {matchedBean.suggestedRecipes && matchedBean.suggestedRecipes.length > 0 && (
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-amber-gold font-bold">
+                      Select Extraction Protocol ({matchedBean.suggestedRecipes.length} available)
+                    </span>
+                    <span className="text-[10px] font-mono text-cream-soft/60">
+                      Auto-tailored to roast &amp; density
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {matchedBean.suggestedRecipes.map((protocol) => {
+                      const isSelected = selectedRecipeMethod === protocol.methodId;
+                      return (
+                        <button
+                          key={protocol.methodId}
+                          type="button"
+                          onClick={() => setSelectedRecipeMethod(protocol.methodId)}
+                          className={`p-2.5 rounded-xl text-left transition border cursor-pointer ${
+                            isSelected
+                              ? 'bg-amber-500/20 border-amber-gold text-cream-light shadow-md'
+                              : 'bg-white/[0.04] border-white/10 text-cream-soft/80 hover:bg-white/[0.08]'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-mono font-bold text-cream-light truncate">
+                              {protocol.methodName.split(' ')[0]}
+                            </span>
+                            {isSelected && <span className="w-2 h-2 rounded-full bg-amber-gold animate-pulse" />}
+                          </div>
+                          <div className="text-[11px] font-mono text-amber-gold">
+                            1:{protocol.ratio} • {protocol.tempF}°F
+                          </div>
+                          <div className="text-[10px] text-cream-soft/70 line-clamp-1 mt-0.5">
+                            {protocol.technique}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Extraction Specs Grid (Reflects Active Protocol) */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
                 <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10">
-                  <span className="text-[10px] text-cream-soft/60 uppercase block">Origin & Altitude</span>
+                  <span className="text-[10px] text-cream-soft/60 uppercase block">Origin &amp; Altitude</span>
                   <span className="font-bold text-cream-light truncate block mt-0.5">{matchedBean.origin}</span>
-                  <span className="text-[10px] text-amber-gold block">{matchedBean.elevation}</span>
+                  <span className="text-[10px] text-amber-gold block">{matchedBean.elevation || '1,800+ MASL'}</span>
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10">
-                  <span className="text-[10px] text-cream-soft/60 uppercase block">Process & Roast</span>
+                  <span className="text-[10px] text-cream-soft/60 uppercase block">Process &amp; Roast</span>
                   <span className="font-bold text-cream-light truncate block mt-0.5">{matchedBean.process}</span>
                   <span className="text-[10px] text-rose-400 block">{matchedBean.roastLevel}</span>
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10">
-                  <span className="text-[10px] text-cream-soft/60 uppercase block">Dial-In Ratio</span>
-                  <span className="font-bold text-amber-gold text-sm block mt-0.5">1 : {matchedBean.recommendedRatio}</span>
-                  <span className="text-[10px] text-cream-soft/70 block">{matchedBean.recommendedGrind}</span>
+                  <span className="text-[10px] text-cream-soft/60 uppercase block">Dial-In Ratio &amp; Dose</span>
+                  <span className="font-bold text-amber-gold text-sm block mt-0.5">1 : {activeProtocol.ratio}</span>
+                  <span className="text-[10px] text-cream-soft/70 block">{activeProtocol.doseGrams}g : {activeProtocol.waterGrams}g</span>
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10">
-                  <span className="text-[10px] text-cream-soft/60 uppercase block">Water Temp</span>
-                  <span className="font-bold text-cream-light text-sm block mt-0.5">{matchedBean.tempF}°F</span>
-                  <span className="text-[10px] text-cream-soft/70 block">{matchedBean.tempC}°C</span>
+                  <span className="text-[10px] text-cream-soft/60 uppercase block">Water Temp &amp; Grind</span>
+                  <span className="font-bold text-cream-light text-sm block mt-0.5">{activeProtocol.tempF}°F</span>
+                  <span className="text-[10px] text-cream-soft/70 block">{activeProtocol.grindSetting}</span>
                 </div>
               </div>
+
+              {/* Active Protocol Technique Rationale */}
+              {activeProtocol.recommendedFor && (
+                <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] font-mono text-amber-200/90 flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span><strong>Technique Target:</strong> {activeProtocol.recommendedFor}</span>
+                </div>
+              )}
 
               {/* Tasting Notes Tags */}
               <div className="flex flex-wrap items-center gap-1.5 pt-1">
                 <span className="text-[10px] font-mono text-cream-soft/60 uppercase">Notes:</span>
-                {matchedBean.tastingNotes.map((note, i) => (
+                {(Array.isArray(matchedBean.tastingNotes) ? matchedBean.tastingNotes : [matchedBean.tastingNotes || 'Artisan Selected']).map((note, i) => (
                   <span key={i} className="px-2 py-0.5 rounded-md bg-white/[0.08] text-[10px] font-medium text-cream-light border border-white/10">
                     {note}
                   </span>
@@ -1318,7 +1750,7 @@ export default function BarcodeScannerModal({
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 text-amber-gold font-bold text-[11px] uppercase tracking-wider">
                       <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Scientific Process & Density Rationale</span>
+                      <span>Scientific Process &amp; Density Rationale</span>
                     </div>
                     {matchedBean.pourAgitation && (
                       <span className="px-2 py-0.5 rounded bg-black/50 text-[10px] text-amber-300 border border-amber-500/30">
@@ -1342,11 +1774,11 @@ export default function BarcodeScannerModal({
                       orchestrator.downloadSticker(matchedBean);
                     }
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light border border-white/15 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95"
+                  className="px-3.5 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light border border-white/15 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95"
                   title="Download 300-DPI packaging sticker (PNG) with 'Scan Me for Recipe' badge directly to your device"
                 >
                   <Download className="w-4 h-4 text-amber-gold" />
-                  <span>Download Sticker (300 DPI)</span>
+                  <span>Download Sticker</span>
                 </button>
 
                 {/* 2. Roaster Studio Handoff */}
@@ -1360,48 +1792,54 @@ export default function BarcodeScannerModal({
                     }
                     onClose();
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-gold border border-amber-500/40 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95"
+                  className="px-3.5 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-gold border border-amber-500/40 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95"
                   title="Open Roaster Studio to export vector SVG or thermal roll specs for your bag printer"
                 >
                   <QrCode className="w-4 h-4 text-amber-gold" />
                   <span>Roaster Studio</span>
                 </button>
 
-                {/* 3. View Roaster Profile */}
-                {matchedBean.roaster && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const slug = String(matchedBean.roaster).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-                      window.history.pushState(null, '', `/roasters/${slug}`);
-                      window.dispatchEvent(new PopStateEvent('popstate'));
-                      onClose();
-                    }}
-                    className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-amber-gold border border-amber-500/30 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95"
-                    title="Open Roaster Showcase Portfolio Page"
-                  >
-                    <Store className="w-4 h-4 text-amber-gold" />
-                    <span>View Roaster Page</span>
-                  </button>
-                )}
-
-                {/* 4. Log to Brew Cellar */}
+                {/* 3. Log to Brew Cellar */}
                 <button
                   type="button"
                   onClick={handleSaveToCellar}
-                  className="px-4 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light text-xs font-mono font-bold flex items-center gap-2 border border-white/15 transition active:scale-95"
+                  className="px-3.5 py-2.5 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-cream-light text-xs font-mono font-bold flex items-center gap-2 border border-white/15 transition active:scale-95"
                 >
                   <BookmarkPlus className="w-4 h-4 text-amber-gold" />
-                  <span>Log to Brew Cellar</span>
+                  <span>Log to Cellar</span>
+                </button>
+
+                {/* 4. Add to Coffee Stash (Inventory) */}
+                <button
+                  type="button"
+                  onClick={handleSaveToStash}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold flex items-center gap-2 border transition active:scale-95 cursor-pointer ${
+                    bagSavedToStash
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                      : 'bg-white/10 hover:bg-white/15 text-cream-light border-white/20'
+                  }`}
+                  title="Save bag to personal Coffee Stash inventory"
+                >
+                  {bagSavedToStash ? (
+                    <>
+                      <Check className="w-4 h-4 text-emerald-400" />
+                      <span>Added to Stash (340g)</span>
+                    </>
+                  ) : (
+                    <>
+                      <Package className="w-4 h-4 text-amber-gold" />
+                      <span>Add to Stash</span>
+                    </>
+                  )}
                 </button>
 
                 {/* 5. Load into Dial-In Station */}
                 <button
                   type="button"
                   onClick={handleApplyToDialIn}
-                  className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-gold/20 transition active:scale-95 hover:scale-105"
+                  className="px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-gold/20 transition active:scale-95 hover:scale-105 cursor-pointer"
                 >
-                  <span>{matchedBean.isAiExtracted ? 'Brew This Bag (Apply Dial-In)' : matchedBean.isBagRecipe ? 'Brew This Bag Recipe' : 'Load into Dial-In Station'}</span>
+                  <span>Brew This Bag (Apply Dial-In)</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

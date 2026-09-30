@@ -7,6 +7,7 @@
  */
 
 import { getSavedGrinderId, getGrinderSetting } from '../data/grinderProfiles.js';
+import { calculateBagFreshness } from './bagInventoryStorage.js';
 
 // Common specialty coffee roasters dictionary for precise matching
 const KNOWN_ROASTERS = [
@@ -358,15 +359,32 @@ export function parseCoffeeBagLabel(rawText = '') {
     ? detectedNotes 
     : [processLabel, matchedCountry || 'Single-Origin'];
 
-  // Bean Name Derivation
-  let beanName = '';
-  if (matchedRegion && matchedCountry) {
-    beanName = `${matchedCountry} ${matchedRegion}`;
-  } else if (matchedCountry) {
-    beanName = `${matchedCountry} ${matchedVarietal || 'Lot'}`;
-  } else {
-    beanName = matchedVarietal ? `${matchedVarietal} Lot` : 'Specialty Micro-Lot';
+  // 8. Roast Date & Freshness Extraction
+  let extractedRoastDate = '';
+  const dateKeywords = /(?:roasted\s*(?:on|date)?|roast\s*date|roast|packed\s*on|baked\s*on|batch)[:\s]*([a-zA-Z]{3,9}\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}|\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}[/-]\d{1,2}[/-]\d{1,2})/i;
+  const dateMatch = cleanText.match(dateKeywords);
+
+  if (dateMatch && dateMatch[1]) {
+    const rawDateStr = dateMatch[1].replace(/(?:st|nd|rd|th)/g, '').trim();
+    const parsedTimestamp = Date.parse(rawDateStr);
+    if (!isNaN(parsedTimestamp)) {
+      extractedRoastDate = new Date(parsedTimestamp).toISOString().split('T')[0];
+    }
   }
+
+  // Fallback: If no explicit keyword, check if there's a standalone recent date pattern (e.g. 2026-09-20 or 09/20/2026)
+  if (!extractedRoastDate) {
+    const standaloneDateRegex = /\b(202[4-9][/-]\d{1,2}[/-]\d{1,2}|\d{1,2}[/-]\d{1,2}[/-]202[4-9])\b/;
+    const standaloneMatch = cleanText.match(standaloneDateRegex);
+    if (standaloneMatch) {
+      const parsedTimestamp = Date.parse(standaloneMatch[1]);
+      if (!isNaN(parsedTimestamp)) {
+        extractedRoastDate = new Date(parsedTimestamp).toISOString().split('T')[0];
+      }
+    }
+  }
+
+  const freshness = calculateBagFreshness(extractedRoastDate);
 
   return {
     roaster: matchedRoaster,
@@ -380,6 +398,8 @@ export function parseCoffeeBagLabel(rawText = '') {
     roastLevel,
     varietal: matchedVarietal,
     tastingNotes: finalNotes,
+    roastDate: extractedRoastDate,
+    freshness,
     rawText: cleanText
   };
 }
@@ -459,6 +479,46 @@ export function generateTargetBrewRecipe(metadata, grinderId = 'generic_stepped'
   const activeGrinderId = grinderId || getSavedGrinderId();
   const grinderSettingObj = getGrinderSetting(activeGrinderId, grindCategory);
 
+  // Multi-method recipe suggestions for smart bag ecosystem
+  const suggestedRecipes = [
+    {
+      methodId: 'pour_over',
+      methodName: 'Precision Pour-Over (V60 / Kalita)',
+      doseGrams: 18.0,
+      waterGrams,
+      ratio,
+      tempF,
+      tempC,
+      grindSetting: `${grinderSettingObj.setting} (${grinderSettingObj.grinderName})`,
+      technique: 'Multi-pulse bloom and spiral flow',
+      recommendedFor: 'Highest clarity and delicate aromatic florals'
+    },
+    {
+      methodId: 'aeropress',
+      methodName: 'AeroPress Pressure Extraction',
+      doseGrams: 16.0,
+      waterGrams: Math.round(16.0 * 14.5),
+      ratio: 14.5,
+      tempF: Math.max(188, tempF - 8),
+      tempC: Math.max(86, tempC - 4),
+      grindSetting: getGrinderSetting(activeGrinderId, 'medium_fine').setting,
+      technique: 'Inverted steep 1:00 min with 30s gentle plunge',
+      recommendedFor: 'Rich body, concentrated stone fruit, and zero bitterness'
+    },
+    {
+      methodId: roastLevel === 'Dark' || roastLevel === 'Medium-Dark' ? 'espresso' : 'french_press',
+      methodName: roastLevel === 'Dark' || roastLevel === 'Medium-Dark' ? 'SCA 1:2 Espresso Shot' : 'Hoffmann French Press',
+      doseGrams: roastLevel === 'Dark' || roastLevel === 'Medium-Dark' ? 18.0 : 30.0,
+      waterGrams: roastLevel === 'Dark' || roastLevel === 'Medium-Dark' ? 36 : 500,
+      ratio: roastLevel === 'Dark' || roastLevel === 'Medium-Dark' ? 2.0 : 16.7,
+      tempF: roastLevel === 'Dark' || roastLevel === 'Medium-Dark' ? 200 : 210,
+      tempC: roastLevel === 'Dark' || roastLevel === 'Medium-Dark' ? 93 : 99,
+      grindSetting: getGrinderSetting(activeGrinderId, roastLevel === 'Dark' || roastLevel === 'Medium-Dark' ? 'fine' : 'coarse').setting,
+      technique: roastLevel === 'Dark' || roastLevel === 'Medium-Dark' ? '9-bar 28s extraction' : '4-min crust break & zero-plunge immersion',
+      recommendedFor: roastLevel === 'Dark' || roastLevel === 'Medium-Dark' ? 'Silky crema and rich dark chocolate sweetness' : 'Heavy, velvety mouthfeel and lingering chocolate sweetness'
+    }
+  ];
+
   return {
     ...metadata,
     id: metadata.id || `ocr_${(metadata.origin || 'origin').toLowerCase().replace(/[^a-z0-9]/g, '_')}_${Date.now()}`,
@@ -476,6 +536,8 @@ export function generateTargetBrewRecipe(metadata, grinderId = 'generic_stepped'
     extractionPhilosophy,
     brewMethod: 'pour_over',
     isAiExtracted: true,
+    suggestedRecipes,
+    freshness: metadata.freshness || calculateBagFreshness(metadata.roastDate),
     extraction: {
       method: 'pour_over',
       ratio,

@@ -158,6 +158,7 @@ export function logBrewSession({
   tastingNotes = [],
   notes = '',
   photoUrl = null,
+  bagId = null,
   userId = null
 } = {}) {
   const currentLogs = getJournalLogs();
@@ -222,6 +223,7 @@ export function logBrewSession({
     tastingNotes: defaultTags,
     notes: notes.trim() || (remedy ? `Diagnosis: ${remedy}` : 'Completed guided multi-phase timed extraction.'),
     photoUrl: photoUrl || null,
+    bagId: bagId || null,
     userId: userId || getActiveUserUid() || null
   };
 
