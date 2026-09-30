@@ -25,7 +25,12 @@ import {
   Cloud,
   CheckCircle2,
   RefreshCw,
-  Sliders
+  Sliders,
+  Flame,
+  Mail,
+  Share2,
+  Globe,
+  Lock
 } from 'lucide-react';
 
 import { 
@@ -35,9 +40,17 @@ import {
   saveJournalLogs,
   syncJournalWithCloud,
   findPreviousBrewsForLot,
-  compressPhotoToThumbnail
+  compressPhotoToThumbnail,
+  toggleEntryPublicStatus
 } from '../utils/journalStorage';
+import { 
+  getStreakData, 
+  STREAK_UPDATED_EVENT, 
+  BADGE_DEFINITIONS 
+} from '../utils/streakStorage';
 import { hapticTap, hapticSuccess } from '../utils/haptics';
+import ShareBrewCardModal from './sharing/ShareBrewCardModal';
+import WeeklyDigestModal from './digest/WeeklyDigestModal';
 
 export default function BrewJournal({
   isOpen,
@@ -86,6 +99,11 @@ export default function BrewJournal({
   const [compareLogPair, setCompareLogPair] = useState(null); // [logA, logB]
   const [activePhotoModal, setActivePhotoModal] = useState(null); // Photo URL for full-screen preview
 
+  // Retention & Social State
+  const [streakData, setStreakData] = useState(() => getStreakData());
+  const [showWeeklyDigestModal, setShowWeeklyDigestModal] = useState(false);
+  const [selectedShareBrew, setSelectedShareBrew] = useState(null);
+
   // New Log Form State
   const [beanName, setBeanName] = useState('');
   const [roaster, setRoaster] = useState('');
@@ -95,6 +113,20 @@ export default function BrewJournal({
   const [tastingNotes, setTastingNotes] = useState('');
   const [notes, setNotes] = useState('');
   const [newPhotoUrl, setNewPhotoUrl] = useState(null);
+  const [isNewEntryPublic, setIsNewEntryPublic] = useState(false);
+
+  // Listen for streak updates
+  useEffect(() => {
+    const handleStreakUpdate = () => {
+      setStreakData(getStreakData());
+    };
+    window.addEventListener(STREAK_UPDATED_EVENT, handleStreakUpdate);
+    window.addEventListener('storage', handleStreakUpdate);
+    return () => {
+      window.removeEventListener(STREAK_UPDATED_EVENT, handleStreakUpdate);
+      window.removeEventListener('storage', handleStreakUpdate);
+    };
+  }, []);
 
   // Load logs on mount and handle live session updates
   useEffect(() => {
@@ -373,6 +405,20 @@ export default function BrewJournal({
           )}
 
           <button
+            type="button"
+            id="journal-weekly-digest-btn"
+            onClick={() => {
+              hapticTap();
+              setShowWeeklyDigestModal(true);
+            }}
+            className="p-2 rounded-xl bg-white/[0.08] hover:bg-white/[0.15] text-amber-gold hover:text-white border border-white/[0.12] flex items-center gap-1.5 text-xs font-mono transition cursor-pointer"
+            title="Weekly Barista Digest & Insights"
+          >
+            <Mail className="w-3.5 h-3.5 text-amber-gold" />
+            <span className="hidden md:inline">Weekly Digest</span>
+          </button>
+
+          <button
             onClick={() => setShowAddForm(!showAddForm)}
             className="px-3 py-2 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 transition"
           >
@@ -443,8 +489,8 @@ export default function BrewJournal({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-2">
               <label className="text-[10px] text-stone-400 block mb-1">Tasting Notes (comma-separated)</label>
               <input
                 type="text"
@@ -471,23 +517,119 @@ export default function BrewJournal({
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
-            <button
-              type="button"
-              onClick={() => setShowAddForm(false)}
-              className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-5 py-2 rounded-xl btn-tactile-amber text-espresso-950 font-bold"
-            >
-              Save to Journal
-            </button>
+          <div className="flex items-center justify-between pt-2 border-t border-white/10">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsNewEntryPublic(!isNewEntryPublic)}
+                className={`py-1.5 px-3 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                  isNewEntryPublic
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    : 'bg-white/5 text-stone-400 border-white/10 hover:bg-white/10'
+                }`}
+              >
+                {isNewEntryPublic ? <Globe className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                <span>{isNewEntryPublic ? 'Public Community' : 'Private Personal'}</span>
+              </button>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setShowAddForm(false)}
+                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 rounded-xl btn-tactile-amber text-espresso-950 font-bold"
+              >
+                Save to Journal
+              </button>
+            </div>
           </div>
         </form>
       )}
+
+      {/* Daily Brew Streak & Barista Achievements Banner */}
+      <div 
+        id="journal-streak-banner"
+        className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#1A120D] via-[#221811] to-[#150E09] border border-amber-500/30 shadow-md space-y-3 mb-6"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-gold flex items-center justify-center shrink-0">
+              <Flame className="w-5 h-5 text-amber-400 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-amber-gold">
+                  Retention &amp; Streaks
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold border border-amber-500/30">
+                  {streakData.currentStreak || 0}-Day Streak
+                </span>
+              </div>
+              <h3 className="font-serif text-lg font-bold text-cream-light leading-tight">
+                {streakData.currentStreak >= 3 ? '🔥 Barista Consistency Master' : 'Specialty Brew Streaks'}
+              </h3>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 font-mono text-xs text-stone-300">
+            <div className="px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-center">
+              <span className="text-[9px] text-stone-400 uppercase block">Current</span>
+              <span className="font-bold text-amber-gold">{streakData.currentStreak || 0}d</span>
+            </div>
+            <div className="px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-center">
+              <span className="text-[9px] text-stone-400 uppercase block">Best</span>
+              <span className="font-bold text-cream-light">{streakData.maxStreak || 0}d</span>
+            </div>
+            <div className="px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-center">
+              <span className="text-[9px] text-stone-400 uppercase block">Total</span>
+              <span className="font-bold text-amber-gold">{streakData.totalBrews || logs.length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Badges Carousel / Pills */}
+        <div className="space-y-1.5">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 block">
+            Barista Achievements ({streakData.unlockedBadges?.length || 0}/{BADGE_DEFINITIONS.length} unlocked):
+          </span>
+          <div className="flex flex-wrap gap-2 pt-0.5">
+            {BADGE_DEFINITIONS.map((badge) => {
+              const isUnlocked = streakData.unlockedBadges?.includes(badge.id);
+              return (
+                <div
+                  key={badge.id}
+                  data-badge-id={badge.id}
+                  data-unlocked={Boolean(isUnlocked)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs font-mono transition ${
+                    isUnlocked
+                      ? badge.tier === 'gold'
+                        ? 'bg-amber-500/20 text-amber-200 border-amber-500/50 shadow-xs'
+                        : badge.tier === 'silver'
+                        ? 'bg-sky-500/20 text-sky-200 border-sky-500/40'
+                        : 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40'
+                      : 'bg-black/30 text-stone-500 border-white/5 opacity-60'
+                  }`}
+                  title={`${badge.title}: ${badge.description} (${isUnlocked ? 'Unlocked' : 'Locked'})`}
+                >
+                  <span className="text-sm">{badge.icon}</span>
+                  <span className="font-bold text-[11px]">{badge.title}</span>
+                  {isUnlocked ? (
+                    <span className="text-[9px] text-amber-400 font-extrabold">✓</span>
+                  ) : (
+                    <span className="text-[9px] text-stone-600">🔒</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       {/* Multi-Faceted Filter & Search Bar */}
       <div className="p-4 rounded-2xl bg-black/40 border border-white/[0.08] space-y-3 mb-6">
@@ -694,15 +836,35 @@ export default function BrewJournal({
                     </div>
                   </div>
 
-                  {/* Taste Tag & Star Rating */}
+                  {/* Taste Tag & Star Rating & Public/Private Indicator */}
                   <div className="flex items-center justify-between pt-2">
-                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase border ${tasteBadgeColor}`}>
-                      {log.tasteFeedback === 'balanced' || log.tasteFeedback === 'sweet' ? '✨ Balanced' :
-                       log.tasteFeedback === 'sour' ? '🍋 Sour' :
-                       log.tasteFeedback === 'bitter' ? '🪵 Bitter' :
-                       log.tasteFeedback === 'weak' ? '💧 Weak' :
-                       log.tasteFeedback === 'strong' ? '⚡ Strong' : 'Logged'}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          hapticTap();
+                          toggleEntryPublicStatus(log.id);
+                          setLogs(getJournalLogs());
+                        }}
+                        className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold flex items-center gap-1 border transition cursor-pointer ${
+                          log.isPublic
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                            : 'bg-white/5 text-stone-400 border-white/10 hover:bg-white/10'
+                        }`}
+                        title={log.isPublic ? "Public Community Brew — Click to make private" : "Private Personal Brew — Click to make public"}
+                      >
+                        {log.isPublic ? <Globe className="w-3 h-3 text-emerald-400" /> : <Lock className="w-3 h-3 text-amber-gold" />}
+                        <span>{log.isPublic ? 'Public' : 'Private'}</span>
+                      </button>
+
+                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase border ${tasteBadgeColor}`}>
+                        {log.tasteFeedback === 'balanced' || log.tasteFeedback === 'sweet' ? '✨ Balanced' :
+                         log.tasteFeedback === 'sour' ? '🍋 Sour' :
+                         log.tasteFeedback === 'bitter' ? '🪵 Bitter' :
+                         log.tasteFeedback === 'weak' ? '💧 Weak' :
+                         log.tasteFeedback === 'strong' ? '⚡ Strong' : 'Logged'}
+                      </span>
+                    </div>
 
                     <div className="flex items-center gap-0.5">
                       {[1, 2, 3, 4, 5].map(s => (
@@ -744,6 +906,20 @@ export default function BrewJournal({
                   <span className="text-[10px] text-stone-500">{log.date}</span>
 
                   <div className="flex items-center gap-2">
+                    {/* Share Card Button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        hapticTap();
+                        setSelectedShareBrew(log);
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-stone-300 hover:text-cream-light border border-white/10 text-[11px] font-mono transition flex items-center gap-1 cursor-pointer active:scale-95"
+                      title="Share luxury brew card image & link"
+                    >
+                      <Share2 className="w-3.5 h-3.5 text-amber-gold" />
+                      <span>Share</span>
+                    </button>
+
                     {/* Compare with Previous Brew Button */}
                     <button
                       type="button"
@@ -907,6 +1083,20 @@ export default function BrewJournal({
           </div>
         </div>
       )}
+
+      {/* Shareable Brew Card Modal */}
+      <ShareBrewCardModal
+        isOpen={Boolean(selectedShareBrew)}
+        onClose={() => setSelectedShareBrew(null)}
+        brew={selectedShareBrew}
+      />
+
+      {/* Weekly Barista Digest Modal */}
+      <WeeklyDigestModal
+        isOpen={showWeeklyDigestModal}
+        onClose={() => setShowWeeklyDigestModal(false)}
+        currentUser={currentUser}
+      />
 
     </div>
   );

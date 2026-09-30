@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Store,
   MapPin,
@@ -12,8 +12,16 @@ import {
   Coffee,
   Sparkles,
   Flame,
-  QrCode
+  QrCode,
+  Bell,
+  Heart
 } from 'lucide-react';
+import { 
+  isFollowingRoaster, 
+  toggleFollowRoaster, 
+  FOLLOWED_ROASTERS_EVENT 
+} from '../../utils/followRoasterStorage.js';
+import { hapticTap, hapticSuccess } from '../../utils/haptics.js';
 
 export default function RoasterHero({
   roaster,
@@ -27,6 +35,38 @@ export default function RoasterHero({
   onWatchVideo
 }) {
   if (!roaster) return null;
+
+  const roasterId = roaster.id || roaster.slug || roaster.name;
+  const [following, setFollowing] = useState(() => isFollowingRoaster(roasterId));
+
+  useEffect(() => {
+    setFollowing(isFollowingRoaster(roasterId));
+
+    const handleFollowChange = (e) => {
+      if (e?.detail?.roasterId && String(e.detail.roasterId).toLowerCase() === String(roasterId).toLowerCase()) {
+        setFollowing(e.detail.nowFollowing);
+      } else {
+        setFollowing(isFollowingRoaster(roasterId));
+      }
+    };
+
+    window.addEventListener(FOLLOWED_ROASTERS_EVENT, handleFollowChange);
+    window.addEventListener('storage', handleFollowChange);
+    return () => {
+      window.removeEventListener(FOLLOWED_ROASTERS_EVENT, handleFollowChange);
+      window.removeEventListener('storage', handleFollowChange);
+    };
+  }, [roasterId]);
+
+  const handleToggleFollow = () => {
+    const nowFollowing = toggleFollowRoaster(roasterId, roaster);
+    setFollowing(nowFollowing);
+    if (nowFollowing) {
+      hapticSuccess();
+    } else {
+      hapticTap();
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -131,10 +171,39 @@ export default function RoasterHero({
           </div>
         )}
 
-        <div className="space-y-2">
-          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-cream-light tracking-tight leading-none">
-            {roaster.name}
-          </h1>
+        <div className="space-y-2 flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-cream-light tracking-tight leading-none">
+              {roaster.name}
+            </h1>
+
+            {/* Follow Roaster Action */}
+            <button
+              type="button"
+              id="follow-roaster-btn"
+              data-roaster={roaster.name}
+              data-following={following}
+              onClick={handleToggleFollow}
+              className={`px-4 py-2 rounded-2xl font-mono text-xs font-bold flex items-center gap-2 transition-all shadow-md cursor-pointer self-start sm:self-auto active:scale-95 ${
+                following
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
+                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
+              }`}
+              title={following ? `Following ${roaster.name}` : `Follow ${roaster.name} for new bag drops & recipes`}
+            >
+              {following ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Following Roaster</span>
+                </>
+              ) : (
+                <>
+                  <Bell className="w-4 h-4 text-amber-400" />
+                  <span>Follow Roaster</span>
+                </>
+              )}
+            </button>
+          </div>
           <p className="font-serif italic text-lg sm:text-2xl text-amber-gold font-medium">
             "{roaster.tagline}"
           </p>

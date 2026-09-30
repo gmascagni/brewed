@@ -12,14 +12,19 @@ import {
   History, 
   CheckCircle2, 
   Trash2,
-  BookOpen
+  BookOpen,
+  Share2,
+  Globe,
+  Lock
 } from 'lucide-react';
 import { calculateClosedLoopDialIn, formatSecondsToMmSs, METHOD_DRAWDOWN_TARGETS } from '../utils/dialInEngine.js';
 import { logBrewSession, findPreviousBrewsForLot, compressPhotoToThumbnail } from '../utils/journalStorage.js';
+import { recordBrewForStreak } from '../utils/streakStorage.js';
 import { deductDoseFromBag } from '../utils/bagInventoryStorage.js';
 import { getSavedGrinderId } from '../data/grinderProfiles.js';
 import { trackEvent } from '../utils/analytics.js';
 import { hapticTap, hapticSuccess } from '../utils/haptics.js';
+import ShareBrewCardModal from './sharing/ShareBrewCardModal.jsx';
 
 export default function PostBrewAssessmentModal({
   isOpen,
@@ -56,6 +61,9 @@ export default function PostBrewAssessmentModal({
   const [photoDataUrl, setPhotoDataUrl] = useState(null);
   const [isPhotoLoading, setIsPhotoLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [lastSavedBrew, setLastSavedBrew] = useState(null);
   const fileInputRef = useRef(null);
 
   // 2. Query historical brews of this same bag/roaster to enable instant side-by-side comparison
@@ -129,8 +137,20 @@ export default function PostBrewAssessmentModal({
       notes: customNotes.trim(),
       photoUrl: photoDataUrl,
       bagId,
-      userId: currentUser?.uid || null
+      userId: currentUser?.uid || null,
+      isPublic
     });
+
+    // Record brew session for daily streak and barista achievements
+    recordBrewForStreak({
+      methodId,
+      methodName,
+      roaster,
+      beanName,
+      isPublic
+    });
+
+    setLastSavedBrew(loggedEntry);
 
     // Deduct dose from linked coffee bag inventory if present
     if (bagId) {
@@ -145,7 +165,8 @@ export default function PostBrewAssessmentModal({
       method: methodId,
       taste: tasteFeedback,
       rating,
-      applied_tweaks: applyToNext
+      applied_tweaks: applyToNext,
+      isPublic
     });
 
     if (applyToNext && onApplyNextBrewTweak && dialInDiagnosis?.recipePatch) {
@@ -566,6 +587,56 @@ export default function PostBrewAssessmentModal({
             )}
           </div>
 
+          {/* Section 6: Privacy Toggle & Social Brew Card Sharing */}
+          <div className="p-3.5 rounded-2xl bg-black/40 border border-white/10 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {isPublic ? (
+                  <Globe className="w-4 h-4 text-emerald-400" />
+                ) : (
+                  <Lock className="w-4 h-4 text-amber-gold" />
+                )}
+                <div>
+                  <span className="text-xs font-mono font-bold text-cream-light block">
+                    {isPublic ? 'Public Community Brew' : 'Private Personal Journal'}
+                  </span>
+                  <span className="text-[10px] font-mono text-stone-400 block">
+                    {isPublic ? 'Visible to community feed & exportable brew card' : 'Saved locally on your device / account'}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => { hapticTap(); setIsPublic(!isPublic); }}
+                className={`px-3 py-1.5 rounded-xl border text-xs font-mono font-bold transition cursor-pointer ${
+                  isPublic
+                    ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                    : 'bg-white/5 border-white/10 text-stone-300 hover:bg-white/10'
+                }`}
+              >
+                {isPublic ? '🌐 Public' : '🔒 Private'}
+              </button>
+            </div>
+
+            <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+              <span className="text-[11px] font-mono text-stone-300">
+                Share luxury brew card with dose, ratio &amp; tasting notes:
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  hapticTap();
+                  setShowShareModal(true);
+                }}
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-cream-light border border-white/15 text-xs font-mono font-bold flex items-center gap-1.5 transition cursor-pointer active:scale-95"
+              >
+                <Share2 className="w-3.5 h-3.5 text-amber-gold" />
+                <span>Share Brew Card</span>
+              </button>
+            </div>
+          </div>
+
         </div>
 
         {/* Modal Footer Actions */}
@@ -618,6 +689,37 @@ export default function PostBrewAssessmentModal({
         </div>
 
       </div>
+
+      {/* Shareable Brew Card Modal */}
+      <ShareBrewCardModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        brew={lastSavedBrew || {
+          id: 'current',
+          beanName,
+          roaster,
+          methodId,
+          methodName,
+          ratio: effectiveRatio,
+          ratioStr: `1 : ${effectiveRatio}`,
+          doseGrams: parseFloat(effectiveDose) || 18,
+          doseStr: `${effectiveDose}g`,
+          waterMl: totalWaterMl,
+          waterStr: `${totalWaterMl} mL`,
+          tempF: initialTempF,
+          tempStr: `${initialTempF}°F`,
+          grindName: initialGrind,
+          grindStr: initialGrind,
+          durationFormatted: formatSecondsToMmSs(actualDrawdownSec),
+          rating,
+          tasteFeedback,
+          remedy: dialInDiagnosis?.summaryHeadline || '',
+          tastingNotes: customNotes.trim() ? [customNotes.trim()] : ['Golden Cup extraction'],
+          notes: customNotes.trim(),
+          photoUrl: photoDataUrl,
+          isPublic
+        }}
+      />
     </div>
   );
 }

@@ -224,12 +224,30 @@ export function logBrewSession({
     notes: notes.trim() || (remedy ? `Diagnosis: ${remedy}` : 'Completed guided multi-phase timed extraction.'),
     photoUrl: photoUrl || null,
     bagId: bagId || null,
-    userId: userId || getActiveUserUid() || null
+    userId: userId || getActiveUserUid() || null,
+    isPublic: Boolean(isPublic)
   };
 
   const updated = [newEntry, ...currentLogs];
   saveJournalLogs(updated, userId);
   return newEntry;
+}
+
+/**
+ * Toggles an entry's public / private visibility.
+ * @param {string} entryId 
+ * @returns {Object|null}
+ */
+export function toggleEntryPublicStatus(entryId) {
+  const currentLogs = getJournalLogs();
+  const updated = currentLogs.map(entry => {
+    if (entry.id === entryId) {
+      return { ...entry, isPublic: !entry.isPublic };
+    }
+    return entry;
+  });
+  saveJournalLogs(updated);
+  return updated.find(e => e.id === entryId) || null;
 }
 
 /**

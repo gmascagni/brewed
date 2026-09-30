@@ -30,6 +30,10 @@ import {
   calculateBagFreshness, 
   INVENTORY_UPDATED_EVENT 
 } from '../utils/bagInventoryStorage';
+import {
+  getFollowedRoasters,
+  FOLLOWED_ROASTERS_EVENT
+} from '../utils/followRoasterStorage';
 
 export default function MyCoffeeHub({
   trackMode = 'coffee',
@@ -53,16 +57,25 @@ export default function MyCoffeeHub({
   const handleRecipeSelect = onSelectRecipeToBrew || onSelectRecipe;
   const [activeTab, setActiveTab] = useState(initialTab); // 'journal' | 'stash' | 'recipes' | 'profile' | 'tools'
   const [inventoryBags, setInventoryBags] = useState(() => getInventoryBags());
+  const [followedRoasters, setFollowedRoasters] = useState(() => getFollowedRoasters());
 
   useEffect(() => {
     const handleUpdate = () => {
       setInventoryBags(getInventoryBags());
     };
+    const handleFollowUpdate = () => {
+      setFollowedRoasters(getFollowedRoasters());
+    };
+
     window.addEventListener(INVENTORY_UPDATED_EVENT, handleUpdate);
+    window.addEventListener(FOLLOWED_ROASTERS_EVENT, handleFollowUpdate);
     window.addEventListener('storage', handleUpdate);
+    window.addEventListener('storage', handleFollowUpdate);
     return () => {
       window.removeEventListener(INVENTORY_UPDATED_EVENT, handleUpdate);
+      window.removeEventListener(FOLLOWED_ROASTERS_EVENT, handleFollowUpdate);
       window.removeEventListener('storage', handleUpdate);
+      window.removeEventListener('storage', handleFollowUpdate);
     };
   }, []);
 
@@ -120,6 +133,23 @@ export default function MyCoffeeHub({
           <p className="text-sm text-[#5C524B] leading-relaxed font-sans">
             Your personal hub for logged tasting extractions, custom recipes, barista achievement badges, and quick 1-click brew replay.
           </p>
+
+          {followedRoasters.length > 0 && (
+            <div id="followed-roasters-banner" className="pt-2 flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-mono font-bold text-[#766A62] uppercase tracking-wider">
+                Followed Roasters ({followedRoasters.length}):
+              </span>
+              {followedRoasters.map((r) => (
+                <span
+                  key={r.id || r.slug}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-[#ECE6DC] text-xs font-mono text-[#14110F] shadow-2xs"
+                >
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  <strong>{r.name}</strong>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
