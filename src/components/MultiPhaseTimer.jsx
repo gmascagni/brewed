@@ -114,13 +114,20 @@ export default function MultiPhaseTimer({
   // Persistent Brew Session State
   const [activeSession, setActiveSession] = useState(() => getActiveBrewSession());
   const activeSessionRef = useRef(activeSession);
+  const handleResetRef = useRef(null);
 
   useEffect(() => {
     const handleSessionUpdate = () => {
       const newSession = getActiveBrewSession();
       // If a brand-new session arrived (different sessionId), reset the timer for Brew #N
       if (newSession && newSession.sessionId !== activeSessionRef.current?.sessionId) {
-        setIsCompleted(false);
+        if (handleResetRef.current) {
+          handleResetRef.current();
+        } else {
+          setIsCompleted(false);
+          setIsRunning(false);
+          setCurrentPhaseIndex(0);
+        }
       }
       activeSessionRef.current = newSession;
       setActiveSession(newSession);
@@ -885,6 +892,7 @@ export default function MultiPhaseTimer({
     setIsCupWarming(false);
     setCupWarmSecondsLeft(30);
   };
+  handleResetRef.current = handleReset;
 
   const handleSaveToLog = () => {
     const savedGrinderId = getSavedGrinderId();
@@ -995,7 +1003,7 @@ export default function MultiPhaseTimer({
 
       {/* Active Persistent Brew Session Banner */}
       {activeSession && (
-        <div className="mb-6 p-4 rounded-2xl bg-black/60 border border-amber-500/40 text-cream-light flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl relative z-10 animate-fade-in backdrop-blur-md">
+        <div data-testid="active-session-banner" className="mb-6 p-4 rounded-2xl bg-black/60 border border-amber-500/40 text-cream-light flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl relative z-10 animate-fade-in backdrop-blur-md">
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-500/50 flex flex-col items-center justify-center text-amber-300 font-bold shrink-0 shadow-inner">
               <span className="text-[9px] uppercase font-mono text-stone-400 leading-none">Brew</span>
@@ -2035,21 +2043,24 @@ export default function MultiPhaseTimer({
       />
 
       {/* Lightweight Post-Brew Assessment & Dial-In Assistant Modal */}
-      <PostBrewAssessmentModal
-        isOpen={isAssessmentModalOpen}
-        onClose={() => setIsAssessmentModalOpen(false)}
-        activeMethod={activeMethod}
-        dialedInCoffee={dialedInCoffee}
-        dryDoseGrams={dryDoseGrams}
-        totalWaterMl={totalWaterMl}
-        customRatio={customRatio}
-        customGrind={customGrind}
-        elapsedSec={actualDrawdownSec}
-        unitSystem={unitSystem}
-        onApplyNextBrewTweak={onApplyNextBrewTweak}
-        onOpenJournal={onOpenJournal}
-        currentUser={currentUser}
-      />
+      {isAssessmentModalOpen && (
+        <PostBrewAssessmentModal
+          key={`assessment_${activeSession?.sessionId || 'active'}`}
+          isOpen={isAssessmentModalOpen}
+          onClose={() => setIsAssessmentModalOpen(false)}
+          activeMethod={activeMethod}
+          dialedInCoffee={dialedInCoffee}
+          dryDoseGrams={dryDoseGrams}
+          totalWaterMl={totalWaterMl}
+          customRatio={customRatio}
+          customGrind={customGrind}
+          elapsedSec={actualDrawdownSec}
+          unitSystem={unitSystem}
+          onApplyNextBrewTweak={onApplyNextBrewTweak}
+          onOpenJournal={onOpenJournal}
+          currentUser={currentUser}
+        />
+      )}
 
     </div>
   );

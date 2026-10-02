@@ -278,25 +278,16 @@ async def main():
         assert state_check["activeSessionIndex"] == 2, "Active session was not updated to sessionIndex 2"
         assert "20 clicks" in str(state_check["activeGrindSetting"]) or "20" in str(state_check["activeGrindSetting"]), "Grind was not shifted to 20 clicks"
 
-        # Verify Guided Timer now shows Brew #2 Active Session Iteration Banner
-        # Navigate to the timer page explicitly so the banner is in the DOM
-        await browser.navigate(f"{base_url}/methods/pour_over?step=4", wait_seconds=2.0)
-        await asyncio.sleep(0.5)
+        # Verify Guided Timer now shows Brew #2 Active Session Iteration Banner (Seamless SPA transition)
+        await asyncio.sleep(1.0)
         banner2_text = await browser.evaluate("""
             (() => {
-                // Look for the specific session banner (data-testid or known banner selector)
                 const sessionBanner = document.querySelector('[data-testid="active-session-banner"]');
-                if (sessionBanner) return sessionBanner.innerText;
-
-                // Fallback: look for divs that contain both 'brew' and 'session' in close proximity
-                const candidates = Array.from(document.querySelectorAll('[class*="border"][class*="rounded"]')).filter(d => {
-                    const t = d.innerText.toLowerCase();
-                    return (t.includes('brew session #2') || t.includes('iterating on #1')) && t.length < 500;
-                });
-                return candidates.length > 0 ? candidates[0].innerText : '';
+                return sessionBanner ? sessionBanner.innerText : '';
             })()
         """)
-        print("Brew #2 Timer Banner Text:", banner2_text[:140].replace('\n', ' '))
+        print("Brew #2 Timer Banner Text (from data-testid='active-session-banner'):", banner2_text[:140].replace('\n', ' '))
+        assert "brew #2" in banner2_text.lower() or "brew session #2" in banner2_text.lower() or "iterating on #1" in banner2_text.lower(), "Brew #2 active-session-banner not rendered"
         # Check localStorage as ground truth since banner may render after async state update
         banner2_state = await browser.evaluate("""
             (() => {

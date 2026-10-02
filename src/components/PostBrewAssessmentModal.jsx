@@ -50,16 +50,6 @@ export default function PostBrewAssessmentModal({
   onOpenJournal = null,
   currentUser = null
 }) {
-  // Persistent Brew Session — read from localStorage. Initialized synchronously so the first
-  // render has session data. Re-read in useEffect whenever isOpen changes to get fresh data
-  // for Brew #2 (Rules of Hooks: ref + effect must come before any early return).
-  const storedSessionRef = useRef(getActiveBrewSession());
-  useEffect(() => {
-    if (isOpen) {
-      storedSessionRef.current = getActiveBrewSession();
-    }
-  }, [isOpen]);
-
   // 1. Post-Brew Evaluation State (hooks must be before any early return)
   const [actualDrawdownSec, setActualDrawdownSec] = useState(() => Math.max(30, Number(elapsedSec) || 180));
   const [tasteFeedback, setTasteFeedback] = useState('balanced');
@@ -74,19 +64,38 @@ export default function PostBrewAssessmentModal({
   const [lastSavedBrew, setLastSavedBrew] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Sync elapsedSec from the timer when the modal opens (e.g. via trigger event with drawdownSec detail).
-  // This covers cases where the timer has already updated its actualDrawdownSec before setting isOpen=true.
+  // Reset evaluation state & sync elapsedSec whenever the modal is opened
   useEffect(() => {
-    if (isOpen && elapsedSec > 30) {
-      setActualDrawdownSec(Math.max(30, Number(elapsedSec) || 180));
+    if (isOpen) {
+      setIsSaved(false);
+      setTasteFeedback('balanced');
+      setRating(5);
+      setCustomNotes('');
+      setPhotoDataUrl(null);
+      if (elapsedSec > 30) {
+        setActualDrawdownSec(Math.max(30, Number(elapsedSec) || 180));
+      }
     }
   }, [isOpen, elapsedSec]);
+
+  // Handle Escape key to dismiss modal cleanly
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        clearActiveBrewSession();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Guard: render nothing when modal is closed. Must be after ALL hook calls.
   if (!isOpen) return null;
 
-  // Derive session parameters after guard (these are plain variable assignments, not hooks)
-  const storedSession = storedSessionRef.current;
+  // Derive session parameters freshly from localStorage upon render
+  const storedSession = getActiveBrewSession();
   const methodId = storedSession?.equipment?.methodId || activeMethod?.id || 'pour_over';
   const methodName = storedSession?.equipment?.methodName || activeMethod?.name || 'Pour Over';
   const beanName = storedSession?.coffee?.beanName || dialedInCoffee?.beanName || activeMethod?.preferredCoffeeTypes?.split('.')[0] || 'Single-Origin Coffee';
@@ -109,13 +118,13 @@ export default function PostBrewAssessmentModal({
   // 2. Query historical brews of this same bag/roaster for side-by-side comparison
   const previousBrews = findPreviousBrewsForLot({ beanName, roaster, methodId });
 
-  // Resolve parent brew from chain
+  // Resolve parent brew from chain (only valid for iterations sessionIndex > 1)
   const parentBrew = (() => {
-    if (parentSessionId) {
+    if (sessionIndex > 1 && parentSessionId) {
       const match = previousBrews.find(b => b.sessionId === parentSessionId || b.id === parentSessionId);
       if (match) return match;
     }
-    return previousBrews.length > 0 ? previousBrews[0] : null;
+    return null;
   })();
 
 

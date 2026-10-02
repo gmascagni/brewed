@@ -695,6 +695,7 @@ export default function App() {
     let nextRatio = parseFloat(String(entry.ratioStr || '').replace('1 :', '').trim()) || entry.ratio || 16;
     let nextWater = parseFloat(String(entry.waterStr || '').replace(/[^0-9.]/g, '')) || entry.waterMl || 300;
 
+    const currentDose = Number(entry.doseGrams) || parseFloat(entry.doseStr) || 18;
     if (tweak) {
       if (tweak.variable === 'grind' && tweak.targetGrindSetting) {
         nextGrind = tweak.targetGrindSetting;
@@ -702,7 +703,7 @@ export default function App() {
         nextTempF = tweak.targetTempF;
       } else if (tweak.variable === 'ratio' && tweak.targetRatio) {
         nextRatio = tweak.targetRatio;
-        nextWater = Math.round((entry.doseGrams || 18) * nextRatio);
+        nextWater = Math.round(currentDose * nextRatio);
       }
     }
 
@@ -724,11 +725,11 @@ export default function App() {
     setSelectedCoffee(brewCoffeeContext);
     setCustomGrind(nextGrind);
 
-    // Create and prime next iteration session
+    // Create and prime next iteration session (createNextIterationSession automatically saves and dispatches event)
     const nextSession = createNextIterationSession(entry, tweak);
-    if (nextSession) {
-      saveActiveBrewSession(nextSession);
-    }
+
+    // Close Tasting Journal modal if open so the user immediately sees the guided timer
+    setIsJournalOpen(false);
 
     setCurrentStep(4);
     navigate(`/methods/${targetMethod.id}`);

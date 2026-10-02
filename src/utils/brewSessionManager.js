@@ -68,8 +68,8 @@ export function shiftGrindSetting(currentGrind = 'Medium-Fine', stepDelta = -2, 
   if (!stepDelta) return currentGrind;
   const str = String(currentGrind || '').trim();
 
-  // Pattern 1: Click based (e.g. "22 clicks", "22 Clicks", "22")
-  const clickMatch = str.match(/^(\d+)(?:\s*(?:clicks?|clix))?$/i);
+  // Pattern 1: Click based (e.g. "22 clicks", "22 Clicks", "22 clix")
+  const clickMatch = str.match(/^(\d+)\s*(?:clicks?|clix)$/i);
   if (clickMatch) {
     const currentClicks = parseInt(clickMatch[1], 10);
     const newClicks = Math.max(1, currentClicks + stepDelta);
@@ -84,13 +84,20 @@ export function shiftGrindSetting(currentGrind = 'Medium-Fine', stepDelta = -2, 
     return `#${newStep}`;
   }
 
-  // Pattern 3: Decimal dial (e.g. "4.5", "4.0", "5.2")
-  const decimalMatch = str.match(/^(\d+(?:\.\d+)?)$/);
-  if (decimalMatch) {
-    const currentVal = parseFloat(decimalMatch[1]);
-    const shiftAmt = stepDelta * 0.5;
-    const newVal = Math.max(1.0, Math.min(10.0, Number((currentVal + shiftAmt).toFixed(1))));
-    return `${newVal}`;
+  // Pattern 3: Numeric / Decimal dial (e.g. "14", "18", or decimal "4.5", "4.0")
+  const numericMatch = str.match(/^(\d+(?:\.\d+)?)$/);
+  if (numericMatch) {
+    const isDecimal = str.includes('.');
+    if (isDecimal) {
+      const currentVal = parseFloat(numericMatch[1]);
+      const shiftAmt = stepDelta * 0.5;
+      const newVal = Math.max(1.0, Math.min(10.0, Number((currentVal + shiftAmt).toFixed(1))));
+      return `${newVal}`;
+    } else {
+      const currentVal = parseInt(numericMatch[1], 10);
+      const newVal = Math.max(1, currentVal + stepDelta);
+      return `${newVal}`;
+    }
   }
 
   // Pattern 4: Descriptive Category mapping
@@ -288,7 +295,9 @@ export function calculateSessionEvolution(currentEntry, parentEntry) {
   const ratingDelta = Number((currentRating - parentRating).toFixed(1));
 
   const isImprovement = ratingDelta > 0 || 
-    (ratingDelta === 0 && (currentEntry.tasteFeedback === 'balanced' || currentEntry.tasteFeedback === 'sweet') && parentEntry.tasteFeedback !== 'balanced');
+    (ratingDelta === 0 && 
+     (currentEntry.tasteFeedback === 'balanced' || currentEntry.tasteFeedback === 'sweet') && 
+     !['balanced', 'sweet'].includes(parentEntry.tasteFeedback));
 
   const variableChanged = currentEntry.appliedRecommendation?.variable || 'parameter';
   let variableLabel = 'Recipe';
