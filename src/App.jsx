@@ -47,8 +47,8 @@ import { syncCloudCatalog } from './data/roasterRegistry';
 import { signOutRoasterAccount } from './services/firebase';
 import { parseRecipePayload } from './utils/recipeParser';
 import { getAssetUrl } from './utils/assetUrl';
-import { getRecentBrews, JOURNAL_UPDATED_EVENT } from './utils/journalStorage';
-import { saveActiveBrewSession, createNextIterationSession, startOrGetActiveBrewSession } from './utils/brewSessionManager';
+import { getRecentBrews, JOURNAL_UPDATED_EVENT, JOURNAL_STORAGE_KEY, logBrewSession } from './utils/journalStorage';
+import { saveActiveBrewSession, createNextIterationSession, startOrGetActiveBrewSession, OPEN_JOURNAL_EVENT } from './utils/brewSessionManager';
 import { ChevronRight, ChevronLeft, Sparkles, Coffee, Clock, Play, BookOpen, Store } from 'lucide-react';
 import { getCoffeeProvenance } from './utils/roasterVerification';
 
@@ -143,8 +143,8 @@ export default function App() {
   const [isJournalOpen, setIsJournalOpen] = useState(false);
   useEffect(() => {
     const handleOpenJournalEvent = () => setIsJournalOpen(true);
-    window.addEventListener('the_brew_app_open_journal', handleOpenJournalEvent);
-    return () => window.removeEventListener('the_brew_app_open_journal', handleOpenJournalEvent);
+    window.addEventListener(OPEN_JOURNAL_EVENT, handleOpenJournalEvent);
+    return () => window.removeEventListener(OPEN_JOURNAL_EVENT, handleOpenJournalEvent);
   }, []);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -576,10 +576,7 @@ export default function App() {
       }
     }
 
-    if (nextSession) {
-      saveActiveBrewSession(nextSession);
-    }
-
+    // nextSession was already saved by createNextIterationSession() — no need to save again here.
     // Direct transition to timer so the barista can brew immediately
     setCurrentStep(4);
     navigate(`/methods/${activeMethod?.id || 'pour_over'}`);
@@ -622,33 +619,38 @@ export default function App() {
   const handleSaveScannedToJournal = (scannedBean) => {
     if (!scannedBean) return;
     try {
-      const existing = JSON.parse(localStorage.getItem('the_brew_app_journal_v1') || '[]');
       const provenance = getCoffeeProvenance(scannedBean, scannedBean.roasterProfile || null, currentUser);
-      const newEntry = {
-        id: Date.now().toString(),
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      const dose = 18;
+      const ratio = scannedBean.recommendedRatio || 16;
+      const water = dose * ratio;
+      const methodId = String(scannedBean.brewMethod || 'pour_over').replace(/\s+/g, '_');
+
+      logBrewSession({
         trackMode: 'coffee',
-        methodName: String(scannedBean.brewMethod || 'pour_over').replace(/_/g, ' '),
+        methodId,
+        methodName: methodId.replace(/_/g, ' '),
         beanName: scannedBean.beanName,
         roaster: scannedBean.roaster,
-        doseStr: '18.0 g',
-        waterStr: `${18 * (scannedBean.recommendedRatio || 16)} mL`,
-        ratioStr: `1 : ${scannedBean.recommendedRatio || 16}`,
-        grindStr: scannedBean.recommendedGrind || 'Medium-Fine',
-        tempStr: `${scannedBean.tempF || 200}°F`,
+        doseGrams: dose,
+        waterMl: water,
+        ratio,
+        tempF: scannedBean.tempF || 200,
+        grindName: scannedBean.recommendedGrind || 'Medium-Fine',
+        grinderSetting: scannedBean.recommendedGrind || 'Medium-Fine',
         rating: 5,
-        isFavorite: true,
         tastingNotes: scannedBean.tastingNotes || [],
         notes: `${scannedBean.notes || ''} (Origin: ${scannedBean.origin || 'Specialty'}, Altitude: ${scannedBean.elevation || '1800+ MASL'})`,
-        provenanceTier: provenance.tier,
-        provenanceLabel: provenance.label
-      };
-      localStorage.setItem('the_brew_app_journal_v1', JSON.stringify([newEntry, ...existing]));
+        userId: currentUser?.uid || null,
+        isPublic: false,
+        // Attach provenance metadata via notes (logBrewSession doesn't have a provenance field)
+        tasteFeedback: 'balanced'
+      });
       setIsJournalOpen(true);
     } catch (err) {
       console.error('Error saving scanned bean to journal', err);
     }
   };
+
 
   // Active Method & Scaling State
   const methods = BREW_METHODS[trackMode] || BREW_METHODS.coffee;
@@ -689,7 +691,7 @@ export default function App() {
     // Check if previous entry has a recommended single-variable tweak to apply
     const tweak = entry.singleVariableTweak;
     let nextGrind = entry.grinderSetting || entry.grindStr || 'Medium-Fine';
-    let nextTempF = parseInt(entry.tempStr) || entry.tempF || 202;
+    let nextTempF = Number(entry.tempF) || parseInt(String(entry.tempStr || '')) || 202;
     let nextRatio = parseFloat(String(entry.ratioStr || '').replace('1 :', '').trim()) || entry.ratio || 16;
     let nextWater = parseFloat(String(entry.waterStr || '').replace(/[^0-9.]/g, '')) || entry.waterMl || 300;
 

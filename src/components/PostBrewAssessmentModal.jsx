@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Sparkles, 
   Star, 
@@ -25,7 +25,8 @@ import {
   startOrGetActiveBrewSession, 
   createNextIterationSession, 
   calculateSessionEvolution, 
-  saveActiveBrewSession 
+  saveActiveBrewSession,
+  clearActiveBrewSession
 } from '../utils/brewSessionManager.js';
 import { recordBrewForStreak } from '../utils/streakStorage.js';
 import { deductDoseFromBag } from '../utils/bagInventoryStorage.js';
@@ -49,21 +50,19 @@ export default function PostBrewAssessmentModal({
   onOpenJournal = null,
   currentUser = null
 }) {
-  if (!isOpen) return null;
+  // Persistent Brew Session — read from localStorage. Initialized synchronously so the first
+  // render has session data. Re-read in useEffect whenever isOpen changes to get fresh data
+  // for Brew #2 (Rules of Hooks: ref + effect must come before any early return).
+  const storedSessionRef = useRef(getActiveBrewSession());
+  useEffect(() => {
+    if (isOpen) {
+      storedSessionRef.current = getActiveBrewSession();
+    }
+  }, [isOpen]);
 
-  const storedSession = useMemo(() => getActiveBrewSession(), []);
-  const methodId = storedSession?.equipment?.methodId || activeMethod?.id || 'pour_over';
-  const methodName = storedSession?.equipment?.methodName || activeMethod?.name || 'Pour Over';
-  const beanName = storedSession?.coffee?.beanName || dialedInCoffee?.beanName || activeMethod?.preferredCoffeeTypes?.split('.')[0] || 'Single-Origin Coffee';
-  const roaster = storedSession?.coffee?.roaster || dialedInCoffee?.roaster || 'Specialty Roastery';
-  const initialTempF = storedSession?.recipe?.tempF || dialedInCoffee?.tempF || activeMethod?.tempF || 202;
-  const initialGrind = storedSession?.equipment?.grinderSetting || storedSession?.recipe?.grindSetting || dialedInCoffee?.recommendedGrind || dialedInCoffee?.grindSetting || customGrind || activeMethod?.grind || 'Medium-Fine';
-  const effectiveRatio = Number(storedSession?.recipe?.ratio || customRatio || activeMethod?.ratio || 16);
-  const effectiveDose = Number(storedSession?.recipe?.doseGrams || dryDoseGrams || (totalWaterMl / effectiveRatio)).toFixed(1);
-
-  // 1. Post-Brew Evaluation State
+  // 1. Post-Brew Evaluation State (hooks must be before any early return)
   const [actualDrawdownSec, setActualDrawdownSec] = useState(() => Math.max(30, Number(elapsedSec) || 180));
-  const [tasteFeedback, setTasteFeedback] = useState('balanced'); // 'balanced' | 'sour' | 'bitter' | 'weak' | 'strong'
+  const [tasteFeedback, setTasteFeedback] = useState('balanced');
   const [rating, setRating] = useState(5);
   const [hoveredStar, setHoveredStar] = useState(0);
   const [customNotes, setCustomNotes] = useState('');
@@ -75,62 +74,75 @@ export default function PostBrewAssessmentModal({
   const [lastSavedBrew, setLastSavedBrew] = useState(null);
   const fileInputRef = useRef(null);
 
-  // 2. Query historical brews of this same bag/roaster to enable instant side-by-side comparison
-  const previousBrews = useMemo(() => {
-    return findPreviousBrewsForLot({
-      beanName,
-      roaster,
-      methodId
-    });
-  }, [beanName, roaster, methodId]);
+  // Sync elapsedSec from the timer when the modal opens (e.g. via trigger event with drawdownSec detail).
+  // This covers cases where the timer has already updated its actualDrawdownSec before setting isOpen=true.
+  useEffect(() => {
+    if (isOpen && elapsedSec > 30) {
+      setActualDrawdownSec(Math.max(30, Number(elapsedSec) || 180));
+    }
+  }, [isOpen, elapsedSec]);
 
-  // 3. Active Persistent Brew Session Context
-  const activeSession = useMemo(() => {
-    return storedSession || startOrGetActiveBrewSession({
-      coffee: { beanName, roaster, bagId: dialedInCoffee?.bagId || dialedInCoffee?.id },
-      equipment: { methodId, methodName, grinderSetting: initialGrind },
-      recipe: { doseGrams: effectiveDose, waterMl: totalWaterMl, ratio: effectiveRatio, tempF: initialTempF, grindSetting: initialGrind }
-    });
-  }, [storedSession, beanName, roaster, dialedInCoffee, methodId, methodName, initialGrind, effectiveDose, totalWaterMl, effectiveRatio, initialTempF]);
+  // Guard: render nothing when modal is closed. Must be after ALL hook calls.
+  if (!isOpen) return null;
+
+  // Derive session parameters after guard (these are plain variable assignments, not hooks)
+  const storedSession = storedSessionRef.current;
+  const methodId = storedSession?.equipment?.methodId || activeMethod?.id || 'pour_over';
+  const methodName = storedSession?.equipment?.methodName || activeMethod?.name || 'Pour Over';
+  const beanName = storedSession?.coffee?.beanName || dialedInCoffee?.beanName || activeMethod?.preferredCoffeeTypes?.split('.')[0] || 'Single-Origin Coffee';
+  const roaster = storedSession?.coffee?.roaster || dialedInCoffee?.roaster || 'Specialty Roastery';
+  const initialTempF = storedSession?.recipe?.tempF || dialedInCoffee?.tempF || activeMethod?.tempF || 202;
+  const initialGrind = storedSession?.equipment?.grinderSetting || storedSession?.recipe?.grindSetting || dialedInCoffee?.recommendedGrind || dialedInCoffee?.grindSetting || customGrind || activeMethod?.grind || 'Medium-Fine';
+  const effectiveRatio = Number(storedSession?.recipe?.ratio || customRatio || activeMethod?.ratio || 16);
+  const effectiveDose = Number(storedSession?.recipe?.doseGrams || dryDoseGrams || (totalWaterMl / effectiveRatio)).toFixed(1);
+
+  // Active session: storedSession is the primary source of truth; fallback creates a new session if none exists
+  const activeSession = storedSession || startOrGetActiveBrewSession({
+    coffee: { beanName, roaster, bagId: dialedInCoffee?.bagId || dialedInCoffee?.id },
+    equipment: { methodId, methodName, grinderSetting: initialGrind },
+    recipe: { doseGrams: effectiveDose, waterMl: totalWaterMl, ratio: effectiveRatio, tempF: initialTempF, grindSetting: initialGrind }
+  });
 
   const sessionIndex = activeSession?.sessionIndex || 1;
   const parentSessionId = activeSession?.parentSessionId || null;
 
+  // 2. Query historical brews of this same bag/roaster for side-by-side comparison
+  const previousBrews = findPreviousBrewsForLot({ beanName, roaster, methodId });
+
   // Resolve parent brew from chain
-  const parentBrew = useMemo(() => {
+  const parentBrew = (() => {
     if (parentSessionId) {
       const match = previousBrews.find(b => b.sessionId === parentSessionId || b.id === parentSessionId);
       if (match) return match;
     }
     return previousBrews.length > 0 ? previousBrews[0] : null;
-  }, [parentSessionId, previousBrews]);
+  })();
 
-  // 4. Dynamic Closed-Loop Dial-In Calculation
-  const dialInDiagnosis = useMemo(() => {
-    return calculateClosedLoopDialIn({
-      methodId,
-      actualDrawdownSec,
-      tasteProfile: tasteFeedback,
-      currentTempF: initialTempF,
-      currentRatio: effectiveRatio,
-      currentGrindSetting: initialGrind,
-      grinderId: getSavedGrinderId()
-    });
-  }, [methodId, actualDrawdownSec, tasteFeedback, initialTempF, effectiveRatio, initialGrind]);
+
+
+  // 4. Dynamic Closed-Loop Dial-In Calculation (plain call, not useMemo — component only renders when isOpen=true)
+  const dialInDiagnosis = calculateClosedLoopDialIn({
+    methodId,
+    actualDrawdownSec,
+    tasteProfile: tasteFeedback,
+    currentTempF: initialTempF,
+    currentRatio: effectiveRatio,
+    currentGrindSetting: initialGrind,
+    grinderId: getSavedGrinderId()
+  });
 
   // 5. Calculate evolution comparison if this is an iteration
-  const evolutionDelta = useMemo(() => {
-    if (!parentBrew || sessionIndex <= 1) return null;
-    return calculateSessionEvolution({
-      rating,
-      tasteFeedback,
-      durationFormatted: formatSecondsToMmSs(actualDrawdownSec),
-      grinderSetting: initialGrind,
-      tempF: initialTempF,
-      ratio: effectiveRatio,
-      appliedRecommendation: activeSession?.appliedRecommendation
-    }, parentBrew);
-  }, [parentBrew, sessionIndex, rating, tasteFeedback, actualDrawdownSec, initialGrind, initialTempF, effectiveRatio, activeSession]);
+  const evolutionDelta = (!parentBrew || sessionIndex <= 1) ? null : calculateSessionEvolution({
+    rating,
+    tasteFeedback,
+    durationFormatted: formatSecondsToMmSs(actualDrawdownSec),
+    grinderSetting: initialGrind,
+    tempF: initialTempF,
+    ratio: effectiveRatio,
+    appliedRecommendation: activeSession?.appliedRecommendation
+  }, parentBrew);
+
+
 
   // Handle Photo selection with client-side thumbnail compression
   const handlePhotoUpload = async (e) => {
@@ -295,7 +307,7 @@ export default function PostBrewAssessmentModal({
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => { clearActiveBrewSession(); onClose(); }}
             className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-stone-400 hover:text-white border border-white/10 transition cursor-pointer"
             title="Close / Skip"
             aria-label="Close"
@@ -574,7 +586,7 @@ export default function PostBrewAssessmentModal({
 
               {/* Side-by-Side Cards */}
               {parentBrew && (
-                <div>
+                <div data-testid="session-comparison">
                   <div className="flex items-center justify-between text-xs font-mono font-bold text-stone-300 mb-1.5">
                     <span className="flex items-center gap-1.5 text-amber-gold">
                       <History className="w-3.5 h-3.5" />

@@ -42,7 +42,8 @@ import {
   getActiveBrewSession, 
   saveActiveBrewSession, 
   startOrGetActiveBrewSession, 
-  SESSION_UPDATED_EVENT 
+  SESSION_UPDATED_EVENT,
+  TRIGGER_ASSESSMENT_EVENT
 } from '../utils/brewSessionManager';
 import { getSavedGrinderId, getGrinderSetting } from '../data/grinderProfiles';
 import { calculateClosedLoopDialIn, formatSecondsToMmSs, METHOD_DRAWDOWN_TARGETS } from '../utils/dialInEngine';
@@ -112,12 +113,22 @@ export default function MultiPhaseTimer({
 
   // Persistent Brew Session State
   const [activeSession, setActiveSession] = useState(() => getActiveBrewSession());
+  const activeSessionRef = useRef(activeSession);
 
   useEffect(() => {
     const handleSessionUpdate = () => {
-      setActiveSession(getActiveBrewSession());
+      const newSession = getActiveBrewSession();
+      // If a brand-new session arrived (different sessionId), reset the timer for Brew #N
+      if (newSession && newSession.sessionId !== activeSessionRef.current?.sessionId) {
+        setIsCompleted(false);
+      }
+      activeSessionRef.current = newSession;
+      setActiveSession(newSession);
     };
     const handleTriggerAssessment = (e) => {
+      // Stop the timer immediately before opening the assessment modal
+      setIsRunning(false);
+      endTimeRef.current = null;
       setIsCompleted(true);
       if (e.detail?.drawdownSec) {
         setActualDrawdownSec(e.detail.drawdownSec);
@@ -126,11 +137,11 @@ export default function MultiPhaseTimer({
     };
     window.addEventListener(SESSION_UPDATED_EVENT, handleSessionUpdate);
     window.addEventListener('storage', handleSessionUpdate);
-    window.addEventListener('the_brew_app_trigger_assessment', handleTriggerAssessment);
+    window.addEventListener(TRIGGER_ASSESSMENT_EVENT, handleTriggerAssessment);
     return () => {
       window.removeEventListener(SESSION_UPDATED_EVENT, handleSessionUpdate);
       window.removeEventListener('storage', handleSessionUpdate);
-      window.removeEventListener('the_brew_app_trigger_assessment', handleTriggerAssessment);
+      window.removeEventListener(TRIGGER_ASSESSMENT_EVENT, handleTriggerAssessment);
     };
   }, []);
 

@@ -93,11 +93,13 @@ export function calculateClosedLoopDialIn({
 
   const durationFormatted = formatSecondsToMmSs(actualDrawdownSec);
 
-  // Flow classification
+  // Flow classification with ±toleranceSec buffer to prevent false-positive recommendations
+  // for brews that are only marginally outside the ideal window (±10s default).
+  const toleranceSec = target.toleranceSec ?? 10;
   let flowSpeed = 'optimal';
-  if (actualDrawdownSec < minSec) {
+  if (actualDrawdownSec < minSec - toleranceSec) {
     flowSpeed = 'fast';
-  } else if (actualDrawdownSec > maxSec) {
+  } else if (actualDrawdownSec > maxSec + toleranceSec) {
     flowSpeed = 'slow';
   }
 

@@ -12,6 +12,8 @@ import { getSavedGrinderId, getGrinderProfile, getGrinderSetting } from '../data
 
 export const ACTIVE_SESSION_STORAGE_KEY = 'the_brew_app_active_session_v1';
 export const SESSION_UPDATED_EVENT = 'the_brew_app_session_updated';
+export const TRIGGER_ASSESSMENT_EVENT = 'the_brew_app_trigger_assessment';
+export const OPEN_JOURNAL_EVENT = 'the_brew_app_open_journal';
 
 /**
  * Retrieves the currently active brew session from localStorage, if any.
@@ -153,11 +155,12 @@ export function startOrGetActiveBrewSession({
   const parentSessionId = parentEntry ? (parentEntry.sessionId || parentEntry.id) : null;
   const chainRootId = parentEntry ? (parentEntry.chainRootId || parentEntry.sessionId || parentEntry.id) : null;
 
+  const sessionId = `brew_sess_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const newSession = {
-    sessionId: `brew_sess_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    sessionId,
     sessionIndex,
     parentSessionId,
-    chainRootId: chainRootId || `brew_sess_${Date.now()}`,
+    chainRootId: chainRootId || sessionId,
     createdAt: Date.now(),
     coffee: {
       beanName,
@@ -190,10 +193,13 @@ export function startOrGetActiveBrewSession({
 /**
  * Creates the next iteration session (Brew #2, Brew #3, etc.) with the single-variable recommendation applied.
  * All other variables are strictly locked in place.
- * 
- * @param {Object} completedEntry The brew session that just finished
- * @param {Object} singleVariableTweak The single variable recommendation
- * @returns {Object} Newly primed active session for the next brew
+ *
+ * @param {Object} completedEntry - A **journal log entry** (as returned by `logBrewSession`).
+ *   Numeric fields may be stored as formatted strings (e.g. doseStr='18.0g', ratioStr='1 : 16',
+ *   tempStr='202°F', waterStr='288 mL', grindStr='22 clicks'). This function handles both
+ *   numeric (.doseGrams, .ratio, .tempF, .waterMl) and their string fallbacks.
+ * @param {Object|null} singleVariableTweak - The single variable recommendation from dialInEngine.
+ * @returns {Object} Newly primed active session for the next brew.
  */
 export function createNextIterationSession(completedEntry, singleVariableTweak) {
   if (!completedEntry) return null;
@@ -202,13 +208,23 @@ export function createNextIterationSession(completedEntry, singleVariableTweak) 
   const chainRootId = completedEntry.chainRootId || completedEntry.sessionId || completedEntry.id;
   const parentSessionId = completedEntry.sessionId || completedEntry.id;
 
-  const currentDose = Number(completedEntry.doseGrams) || 18;
-  let nextRatio = Number(completedEntry.ratio) || 16;
+  // Read numeric fields, falling back to their formatted string counterparts
+  const currentDose = Number(completedEntry.doseGrams)
+    || parseFloat(completedEntry.doseStr)
+    || 18;
+  let nextRatio = Number(completedEntry.ratio)
+    || parseFloat(String(completedEntry.ratioStr || '').replace('1 :', '').trim())
+    || 16;
+  // Always use .tempF directly — parseInt('94°C') returns 94 which is wrong for metric users
   let nextTempF = Number(completedEntry.tempF) || 202;
-  let nextGrind = completedEntry.grinderSetting || completedEntry.grindStr || 'Medium-Fine';
-  let nextWater = Math.round(completedEntry.waterMl) || Math.round(currentDose * nextRatio);
+  let nextGrind = completedEntry.grinderSetting
+    || completedEntry.grindStr
+    || 'Medium-Fine';
+  let nextWater = Math.round(completedEntry.waterMl)
+    || parseFloat(String(completedEntry.waterStr || '').replace(/[^0-9.]/g, ''))
+    || Math.round(currentDose * nextRatio);
 
-  // Apply ONLY the single recommended variable
+  // Apply ONLY the single recommended variable; lock all others
   if (singleVariableTweak) {
     if (singleVariableTweak.variable === 'grind' && singleVariableTweak.targetGrindSetting) {
       nextGrind = singleVariableTweak.targetGrindSetting;
@@ -218,13 +234,15 @@ export function createNextIterationSession(completedEntry, singleVariableTweak) 
       nextRatio = singleVariableTweak.targetRatio;
       nextWater = Math.round(currentDose * nextRatio);
     }
+    // variable === 'none' → Golden Cup: all variables remain locked as-is
   }
 
+  const nextSessionId = `brew_sess_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const nextSession = {
-    sessionId: `brew_sess_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    sessionId: nextSessionId,
     sessionIndex: nextIndex,
     parentSessionId,
-    chainRootId,
+    chainRootId: chainRootId || nextSessionId,
     createdAt: Date.now(),
     coffee: {
       beanName: completedEntry.beanName,
@@ -234,8 +252,9 @@ export function createNextIterationSession(completedEntry, singleVariableTweak) 
     equipment: {
       methodId: completedEntry.methodId,
       methodName: completedEntry.methodName,
+      // Persist grinderId so next iteration uses the correct grinder profile calculations
       grinderId: completedEntry.grinderId || getSavedGrinderId(),
-      grinderName: completedEntry.grinderModel || 'Grinder',
+      grinderName: completedEntry.grinderModel || completedEntry.grinderName || 'Grinder',
       grinderSetting: nextGrind
     },
     recipe: {
