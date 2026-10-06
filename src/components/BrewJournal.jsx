@@ -342,6 +342,16 @@ export default function BrewJournal({
     reader.readAsText(file);
   };
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen || isInline || !onClose) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isInline, onClose]);
+
   if (!isOpen && !isInline) return null;
 
   const content = (
@@ -352,11 +362,24 @@ export default function BrewJournal({
       data-testid="tasting-journal-modal" 
       className={`relative max-w-5xl w-full rounded-3xl bg-[#14100D] border border-white/[0.14] p-5 sm:p-7 md:p-9 shadow-2xl text-cream-light ${isInline ? 'my-2' : 'my-8'}`}
     >
+      {/* Prominent Dedicated Close Button (Modal mode only) */}
+      {!isInline && onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white border border-white/15 transition cursor-pointer z-30 flex items-center justify-center active:scale-95 shadow-lg"
+          aria-label="Close Tasting Journal"
+          title="Close Journal (Esc)"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
+
       {/* Ambient Top Glow */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-white/[0.10] gap-4 mb-6">
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-white/[0.10] gap-4 mb-6 ${!isInline ? 'pr-12 sm:pr-14' : ''}`}>
         <div className="flex items-center space-x-3.5">
           <div className="p-3.5 rounded-2xl bg-amber-500/20 text-amber-gold border border-amber-400/30">
             <BookOpen className="w-6 h-6 text-amber-400" />
@@ -426,16 +449,6 @@ export default function BrewJournal({
             <Plus className="w-3.5 h-3.5" />
             <span>{showAddForm ? 'Cancel' : 'Log Manual Brew'}</span>
           </button>
-
-          {!isInline && onClose && (
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-stone-400 hover:text-white border border-white/10 transition"
-              aria-label="Close"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
         </div>
       </div>
 
@@ -1125,6 +1138,23 @@ export default function BrewJournal({
         currentUser={currentUser}
       />
 
+      {/* Bottom Close Action Bar (Modal mode only) */}
+      {!isInline && onClose && (
+        <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
+          <span className="text-[11px] font-mono text-stone-400">
+            {logs.length} logged {logs.length === 1 ? 'extraction' : 'extractions'}
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white border border-white/15 text-xs font-mono font-bold transition flex items-center gap-2 cursor-pointer active:scale-95 shadow-md"
+          >
+            <X className="w-4 h-4" />
+            <span>Close Journal</span>
+          </button>
+        </div>
+      )}
+
     </div>
   );
 
@@ -1133,7 +1163,14 @@ export default function BrewJournal({
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fade-in">
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && onClose) {
+          onClose();
+        }
+      }}
+    >
       {content}
     </div>
   );
