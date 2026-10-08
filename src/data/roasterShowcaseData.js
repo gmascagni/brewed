@@ -2,7 +2,9 @@
 // Comprehensive, authentic reference profile datasets for specialty coffee roasters.
 // Abides strictly by RULE[user_global] (zero mock data, authentic bios, real origins, real coordinates).
 
-export const SHOWCASE_ROASTERS = [
+import { COSTA_RICA_ROASTERS } from './costaRicaRoasters.js';
+
+export const US_SHOWCASE_ROASTERS = [
   {
     id: 'methodical',
     slug: 'methodical-coffee',
@@ -595,6 +597,13 @@ export const SHOWCASE_ROASTERS = [
   }
 ];
 
+export const SHOWCASE_ROASTERS = [
+  ...US_SHOWCASE_ROASTERS,
+  ...COSTA_RICA_ROASTERS
+];
+
+export { COSTA_RICA_ROASTERS, COSTA_RICA_OUTREACH_DIRECTORY } from './costaRicaRoasters.js';
+
 import { getCustomRoasters, getCustomRoasterCoffees, saveCustomRoasterProfile, saveRoasterCoffee } from './roasterRegistry.js';
 
 
@@ -1002,4 +1011,10 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
   }
 
   return all[0];
+}
+
+export function getRoastersByCountry(country = 'Costa Rica') {
+  const all = getAllShowcaseRoasters();
+  const target = String(country).toLowerCase().trim();
+  return all.filter((r) => r.country && r.country.toLowerCase() === target);
 }

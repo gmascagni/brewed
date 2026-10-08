@@ -719,7 +719,17 @@ const baseSubPaths = [
   'roasters/stumptown',
   'roasters/stumptown-coffee-roasters',
   'roasters/heart',
-  'roasters/proud-mary'
+  'roasters/proud-mary',
+  'roasters/cafe-milagro',
+  'roasters/cafe-la-mancha',
+  'roasters/franco',
+  'roasters/cafe-del-barista',
+  'roasters/don-mayo',
+  'roasters/doka-estate',
+  'roasters/cafeto-altamira',
+  'roasters/cafe-britt',
+  'roasters/kaffa-cafe',
+  'roasters/cafe-del-valle'
 ];
 
 // Dynamically generate prerender paths for all catalog coffees under /r/{slug}
