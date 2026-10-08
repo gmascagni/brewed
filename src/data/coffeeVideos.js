@@ -6,6 +6,7 @@
 
 export const VIDEO_CATEGORIES = [
   { id: 'all', label: 'All Masterclasses', icon: 'Sparkles' },
+  { id: 'pip_barista', label: "Pip's Welcome & Academy", icon: 'Sparkles' },
   { id: 'pour_over', label: 'Pour-Over & Drippers', icon: 'Coffee' },
   { id: 'espresso', label: 'Espresso & Latte Art', icon: 'Flame' },
   { id: 'immersion', label: 'AeroPress & Immersion', icon: 'Droplets' },
@@ -15,6 +16,88 @@ export const VIDEO_CATEGORIES = [
 ];
 
 export const COFFEE_VIDEOS = [
+  {
+    id: 'pip-welcome-to-thebrewapp',
+    youtubeId: '',
+    localVideo: '/videos/pip_welcome_thebrewapp.mp4',
+    thumbnail: '/videos/pip_welcome_thebrewapp_cover.jpg',
+    title: 'Meet Pip! Welcome to TheBrew.App',
+    creator: 'Pip the Barista',
+    creatorBadge: 'Official Mascot & Coach',
+    creatorAvatar: '/videos/pip_welcome_thebrewapp_cover.jpg',
+    category: 'pip_barista',
+    duration: '0:51',
+    views: 'Featured',
+    featured: true,
+    description: 'Welcome to TheBrew.App! Meet Pip, your friendly barista companion. Learn how our smart multi-phase timers, auto-calculated ratios, tasting journal, and 700+ artisan roasters help you brew the sweetest cup every morning.',
+    recipeSync: {
+      methodName: 'Guided Brew Timer',
+      methodId: 'classic_pour_over',
+      ratio: 16.0,
+      doseGrams: 20.0,
+      totalWaterMl: 320,
+      waterTempF: 204,
+      waterTempC: 95.5,
+      grindSetting: 'Medium-Fine',
+      notes: 'Explore all brew methods with Pip: Pour Over, French Press, AeroPress, Moka Pot, Cold Brew, and Espresso.',
+      phases: [
+        { name: 'Welcome & Beans Prep', durationSec: 30, instruction: 'Select your brew method, weigh whole beans, and heat water to target temperature.' },
+        { name: 'Live Multi-Phase Coaching', durationSec: 180, instruction: 'Follow real-time audio chimes and water weight targets for perfectly balanced extraction.' }
+      ]
+    }
+  },
+  {
+    id: 'pip-origins-coffee-history',
+    youtubeId: '',
+    localVideo: '/videos/pip_origins_british_barista.mp4',
+    thumbnail: '/videos/pip_welcome_thebrewapp_cover.jpg',
+    title: 'How Dancing Goats Invented Coffee (with Pip)',
+    creator: 'Pip the Barista',
+    creatorBadge: 'Coffee History & Lore',
+    creatorAvatar: '/videos/pip_welcome_thebrewapp_cover.jpg',
+    category: 'pip_barista',
+    duration: '0:52',
+    views: '12.4K',
+    featured: false,
+    description: "Before Pip was your morning pour-over, he was a wild fruit discovered by dancing goats in 9th-century Ethiopia. Follow the hearth fire accident and Mokha smugglers that gave birth to 2 billion cups a day.",
+    recipeSync: {
+      methodName: 'Ethiopian Light Roast V60',
+      methodId: 'classic_pour_over',
+      ratio: 16.0,
+      doseGrams: 15.0,
+      totalWaterMl: 240,
+      waterTempF: 208,
+      waterTempC: 98,
+      grindSetting: 'Medium-Fine (Burr 14-16)',
+      notes: 'Celebrate Ethiopian coffee heritage with high-temp slurry extraction and crisp floral acidity.'
+    }
+  },
+  {
+    id: 'pip-pourover-masterclass',
+    youtubeId: '',
+    localVideo: '/videos/pip_pourover_masterclass.mp4',
+    thumbnail: '/videos/pip_welcome_thebrewapp_cover.jpg',
+    title: "Pip's Pour Over Masterclass: Stop Making Bitter Coffee",
+    creator: 'Pip the Barista',
+    creatorBadge: 'Extraction Specialist',
+    creatorAvatar: '/videos/pip_welcome_thebrewapp_cover.jpg',
+    category: 'pip_barista',
+    duration: '0:57',
+    views: '8.9K',
+    featured: false,
+    description: 'Pip demonstrates the essential 4-step pour-over dial-in: 1:16 ratio, 45-second CO2 bloom, spiral pulse pacing, and flat bed drawdown.',
+    recipeSync: {
+      methodName: 'Classic Pour Over (V60)',
+      methodId: 'classic_pour_over',
+      ratio: 16.0,
+      doseGrams: 15.0,
+      totalWaterMl: 240,
+      waterTempF: 204,
+      waterTempC: 95.5,
+      grindSetting: 'Medium-Fine',
+      notes: '45-second bloom followed by concentric spiral pours for maximum cup clarity.'
+    }
+  },
   {
     id: 'hoffmann-ultimate-v60',
     youtubeId: '1oB1oDrDkHM',
@@ -26,7 +109,7 @@ export const COFFEE_VIDEOS = [
     methodId: 'pour_over',
     duration: '13:42',
     views: '5.2M',
-    featured: true,
+    featured: false,
     description: 'The definitive single-cup V60 masterclass focusing on high-temperature slurry retention, gentle agitation, and a flat drawdown bed.',
     recipeSync: {
       methodName: 'Pour-Over (V60)',

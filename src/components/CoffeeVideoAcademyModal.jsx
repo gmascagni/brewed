@@ -301,7 +301,7 @@ export default function CoffeeVideoAcademyModal({
                         {/* Thumbnail Frame */}
                         <div className="relative aspect-video w-full overflow-hidden bg-black">
                           <img
-                            src={`https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`}
+                            src={video.thumbnail || (video.youtubeId ? `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg` : '/favicon.ico')}
                             alt={video.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-95"
                             loading="lazy"
@@ -387,12 +387,12 @@ export default function CoffeeVideoAcademyModal({
                               </button>
 
                               <a
-                                href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                                href={video.youtubeId ? `https://www.youtube.com/watch?v=${video.youtubeId}` : 'https://www.youtube.com/@TheBrewApp'}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
                                 className="p-1.5 rounded-lg bg-red-600/15 hover:bg-red-600/30 text-red-300 hover:text-white border border-red-500/30 transition flex items-center"
-                                title="Open video directly on YouTube"
+                                title={video.youtubeId ? "Open video directly on YouTube" : "Visit TheBrewApp YouTube Channel"}
                               >
                                 <ExternalLink className="w-3 h-3" />
                               </a>
@@ -448,15 +448,26 @@ export default function CoffeeVideoAcademyModal({
                 id="academy-theater-player"
                 className="rounded-3xl bg-[#1A120B] border border-amber-gold/30 p-4 sm:p-6 shadow-2xl space-y-5"
               >
-                {/* 16:9 Responsive YouTube Embed */}
-                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl group">
-                  <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${selectedVideo.youtubeId}?autoplay=1&modestbranding=1&rel=0&color=white`}
-                    title={selectedVideo.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                    className="w-full h-full border-0"
-                  />
+                {/* 16:9 Responsive Video Embed or Local Video Player */}
+                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl group flex items-center justify-center">
+                  {selectedVideo.localVideo ? (
+                    <video
+                      src={selectedVideo.localVideo}
+                      poster={selectedVideo.thumbnail}
+                      controls
+                      autoPlay
+                      playsInline
+                      className="w-full h-full object-contain bg-black"
+                    />
+                  ) : (
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${selectedVideo.youtubeId}?autoplay=1&modestbranding=1&rel=0&color=white`}
+                      title={selectedVideo.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="w-full h-full border-0"
+                    />
+                  )}
                 </div>
 
                 {/* Theater Video Meta & Brew-Along Sync Section */}
@@ -475,14 +486,14 @@ export default function CoffeeVideoAcademyModal({
                         {selectedVideo.views} views
                       </span>
                       <a
-                        href={`https://www.youtube.com/watch?v=${selectedVideo.youtubeId}`}
+                        href={selectedVideo.youtubeId ? `https://www.youtube.com/watch?v=${selectedVideo.youtubeId}` : 'https://www.youtube.com/@TheBrewApp'}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-600/20 hover:bg-red-600/30 text-red-300 hover:text-white text-[11px] font-mono font-bold border border-red-500/30 transition shadow-xs"
-                        title="Open this masterclass directly on YouTube"
+                        title={selectedVideo.youtubeId ? "Open this masterclass directly on YouTube" : "Visit TheBrewApp YouTube Channel"}
                       >
                         <ExternalLink className="w-3 h-3" />
-                        <span>Watch on YouTube</span>
+                        <span>{selectedVideo.youtubeId ? 'Watch on YouTube' : 'YouTube Channel'}</span>
                       </a>
                     </div>
 
