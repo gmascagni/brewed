@@ -168,13 +168,13 @@ export default function CoffeeLandingPage({
   return (
     <div className="space-y-10 animate-fade-in max-w-5xl mx-auto pb-16">
       {/* Top Breadcrumb & Quick Actions */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono pb-2 border-b border-white/10">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono pb-2 border-b border-[#ECE6DC]">
         <button
           type="button"
           onClick={onBackToHome}
-          className="inline-flex items-center gap-1.5 text-cream-soft hover:text-amber-gold transition cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 hover:bg-white text-stone-800 hover:text-amber-800 font-bold border border-[#ECE6DC] shadow-xs transition cursor-pointer"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-4 h-4 text-[#A8622D]" />
           <span>The Brew Station</span>
         </button>
 
@@ -183,9 +183,9 @@ export default function CoffeeLandingPage({
             <button
               type="button"
               onClick={() => onNavigateToRoaster(roasterSlug)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-cream-light border border-white/10 transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 hover:bg-white text-stone-900 font-bold border border-[#ECE6DC] shadow-xs transition cursor-pointer"
             >
-              <Store className="w-3.5 h-3.5 text-amber-gold" />
+              <Store className="w-3.5 h-3.5 text-[#A8622D]" />
               <span>{roasterName} Profile</span>
             </button>
           )}
@@ -193,17 +193,17 @@ export default function CoffeeLandingPage({
           <button
             type="button"
             onClick={handleCopyLink}
-            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-cream-light border border-white/10 transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 hover:bg-white text-stone-900 font-bold border border-[#ECE6DC] shadow-xs transition cursor-pointer"
             title="Copy unique bag URL"
           >
             {copiedLink ? (
               <>
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-300">Link Copied!</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="text-emerald-700 font-bold">Link Copied!</span>
               </>
             ) : (
               <>
-                <Share2 className="w-3.5 h-3.5 text-amber-gold" />
+                <Share2 className="w-3.5 h-3.5 text-[#A8622D]" />
                 <span>Share Guide</span>
               </>
             )}
@@ -232,14 +232,14 @@ export default function CoffeeLandingPage({
               )}
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono uppercase tracking-widest font-extrabold text-amber-gold">
+                  <span className="text-xs font-mono uppercase tracking-widest font-black text-amber-400">
                     Official Roaster Dial-In Guide
                   </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold border border-emerald-500/30">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 font-mono text-[10px] font-black border border-emerald-400/50">
                     ✓ Verified
                   </span>
                 </div>
-                <h3 className="text-sm font-sans font-bold text-cream-light/90">
+                <h3 className="text-sm font-sans font-extrabold text-white">
                   {roasterName}
                 </h3>
               </div>
@@ -247,24 +247,24 @@ export default function CoffeeLandingPage({
 
             {/* Coffee Lot Title */}
             <div>
-              <h1 className="font-editorial text-3xl sm:text-5xl font-bold text-cream-light tracking-tight leading-tight">
+              <h1 className="font-editorial text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
                 {beanName}
               </h1>
-              <p className="text-sm sm:text-base font-sans text-cream-soft/90 mt-2 leading-relaxed">
+              <p className="text-sm sm:text-base font-sans text-stone-200 mt-2 leading-relaxed font-medium">
                 {origin} • {region} • {process} • {elevation}
               </p>
             </div>
 
             {/* Tasting Notes Chips */}
             <div className="space-y-1.5 pt-1">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-cream-soft/60 block">
+              <span className="text-xs font-mono uppercase tracking-wider text-stone-300 font-bold block">
                 Cupping Tasting Notes:
               </span>
               <div className="flex flex-wrap gap-2">
                 {tastingNotes.map((note, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs font-mono font-medium shadow-sm"
+                    className="px-3 py-1 rounded-xl bg-amber-500/25 border-2 border-amber-400/60 text-amber-100 text-xs font-mono font-bold shadow-xs"
                   >
                     ✦ {note}
                   </span>
@@ -278,27 +278,27 @@ export default function CoffeeLandingPage({
             {qrDataUrl && (
               <div
                 onClick={() => setShowQrModal(true)}
-                className="p-3 rounded-2xl bg-white shadow-xl cursor-pointer hover:scale-105 transition border-2 border-amber-gold/40 group relative"
+                className="p-3.5 rounded-2xl bg-white shadow-2xl cursor-pointer hover:scale-105 transition border-2 border-amber-400 group relative"
                 title="Click to view packaging QR code"
               >
                 <img src={qrDataUrl} alt="Smart Bag QR" className="w-28 h-28 object-contain" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition rounded-xl flex items-center justify-center text-white text-[11px] font-mono font-bold">
-                  View QR
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition rounded-xl flex items-center justify-center text-white text-xs font-mono font-black">
+                  View Full QR
                 </div>
               </div>
             )}
-            <span className="text-[10px] font-mono text-cream-soft/60 text-center sm:text-right">
+            <span className="text-xs font-mono text-stone-200 text-center sm:text-right font-medium">
               Bag QR Destination<br />
-              <strong className="text-amber-gold">{roasterSlug}/{coffeeSlug}</strong>
+              <strong className="text-amber-300 font-black">{roasterSlug}/{coffeeSlug}</strong>
             </span>
           </div>
         </div>
 
         {/* Primary Action Row: Start Guided Brew & Buy Beans */}
-        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <div className="mt-8 pt-6 border-t border-stone-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-xs font-mono text-cream-soft/80">
+            <span className="text-xs font-mono text-stone-200 font-medium">
               No app download required • Guided timer launches directly in browser
             </span>
           </div>
@@ -307,9 +307,9 @@ export default function CoffeeLandingPage({
             <button
               type="button"
               onClick={handleSaveToCellar}
-              className="px-4 py-3 rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] text-cream-light font-mono text-xs font-bold flex items-center gap-1.5 border border-white/15 transition cursor-pointer"
+              className="px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-mono text-xs font-bold flex items-center gap-1.5 border border-white/20 transition cursor-pointer"
             >
-              <Bookmark className={`w-4 h-4 ${savedToJournal ? 'text-amber-gold fill-amber-gold' : 'text-cream-soft'}`} />
+              <Bookmark className={`w-4 h-4 ${savedToJournal ? 'text-amber-300 fill-amber-300' : 'text-stone-300'}`} />
               <span>{savedToJournal ? 'Saved to Cellar!' : 'Save Lot'}</span>
             </button>
 
@@ -318,19 +318,19 @@ export default function CoffeeLandingPage({
                 href={shopLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-cream-light font-mono text-xs font-bold flex items-center gap-1.5 border border-white/20 transition"
+                className="px-5 py-3 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-mono text-xs font-black flex items-center gap-1.5 border border-white/30 transition shadow-xs"
               >
                 <span>Buy This Coffee</span>
-                <ExternalLink className="w-3.5 h-3.5 text-amber-gold" />
+                <ExternalLink className="w-3.5 h-3.5 text-amber-300" />
               </a>
             )}
 
             <button
               type="button"
               onClick={handleLaunchBrew}
-              className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-gold via-amber-400 to-amber-gold text-espresso-950 font-mono text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-amber-gold/30 hover:scale-105 active:scale-95 transition cursor-pointer"
+              className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:brightness-110 text-stone-950 font-mono text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-amber-500/30 hover:scale-105 active:scale-95 transition cursor-pointer"
             >
-              <Play className="w-4 h-4 fill-espresso-950" />
+              <Play className="w-4 h-4 fill-stone-950" />
               <span>Start Guided Brew</span>
             </button>
           </div>
@@ -341,81 +341,83 @@ export default function CoffeeLandingPage({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Recommended Brewing Recipe (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="p-6 sm:p-7 rounded-3xl bg-black/40 border border-white/10 space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-amber-gold font-mono text-xs uppercase font-bold tracking-wider">
-                <Sparkles className="w-4 h-4" />
+          <div className="p-6 sm:p-8 rounded-3xl bg-[#18130F] border-2 border-amber-500/30 space-y-6 shadow-2xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-stone-800">
+              <div className="flex items-center gap-2 text-amber-400 font-mono text-xs uppercase font-black tracking-wider">
+                <Sparkles className="w-4 h-4 text-amber-300" />
                 <span>Roaster's Recommended Brew Recipe</span>
               </div>
-              <span className="text-xs font-mono text-cream-soft/60">
+              <span className="text-xs font-mono text-amber-200/90 font-bold bg-amber-500/20 px-3 py-1 rounded-full border border-amber-400/40 self-start sm:self-auto shadow-xs">
                 Calibrated by Head Roaster
               </span>
             </div>
 
             {/* Method Banner */}
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+            <div className="p-5 rounded-2xl bg-gradient-to-r from-[#281C14] via-[#1E140E] to-[#281C14] border-2 border-amber-400/60 shadow-lg flex items-center justify-between gap-4">
               <div>
-                <span className="text-[10px] font-mono text-amber-gold uppercase font-bold block">
+                <span className="text-xs font-mono text-amber-300 uppercase font-black tracking-wider block">
                   Recommended Method
                 </span>
-                <h4 className="font-serif text-lg font-bold text-cream-light mt-0.5">
+                <h4 className="font-serif text-xl sm:text-2xl font-bold text-white mt-0.5 tracking-tight">
                   {formattedMethodName}
                 </h4>
               </div>
-              <div className="px-3 py-1 rounded-xl bg-amber-500/20 text-amber-gold font-mono text-xs font-bold border border-amber-500/40">
+              <div className="px-4 py-2 rounded-xl bg-amber-400 text-stone-950 font-mono text-sm font-black shadow-md border border-amber-300 tracking-wide shrink-0">
                 Ratio 1 : {ratio}
               </div>
             </div>
 
             {/* Extraction Specs Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3.5 rounded-xl bg-black/50 border border-white/10 text-center space-y-1">
-                <Scale className="w-4 h-4 text-amber-gold mx-auto" />
-                <span className="text-[10px] font-mono text-cream-soft/60 uppercase block">Coffee Dose</span>
-                <span className="text-base font-mono font-bold text-cream-light">{dose}g</span>
+              <div className="p-4 rounded-2xl bg-[#241A13] border-2 border-amber-500/30 hover:border-amber-400/70 text-center space-y-1.5 shadow-md transition">
+                <Scale className="w-5 h-5 text-amber-300 mx-auto" />
+                <span className="text-xs font-mono text-stone-200 uppercase font-bold tracking-wider block">Coffee Dose</span>
+                <span className="text-2xl font-mono font-black text-white block">{dose}g</span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-black/50 border border-white/10 text-center space-y-1">
-                <Droplet className="w-4 h-4 text-blue-400 mx-auto" />
-                <span className="text-[10px] font-mono text-cream-soft/60 uppercase block">Total Water</span>
-                <span className="text-base font-mono font-bold text-cream-light">{water}g</span>
+              <div className="p-4 rounded-2xl bg-[#241A13] border-2 border-amber-500/30 hover:border-amber-400/70 text-center space-y-1.5 shadow-md transition">
+                <Droplet className="w-5 h-5 text-sky-300 mx-auto" />
+                <span className="text-xs font-mono text-stone-200 uppercase font-bold tracking-wider block">Total Water</span>
+                <span className="text-2xl font-mono font-black text-white block">{water}g</span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-black/50 border border-white/10 text-center space-y-1">
-                <Thermometer className="w-4 h-4 text-rose-400 mx-auto" />
-                <span className="text-[10px] font-mono text-cream-soft/60 uppercase block">Water Temp</span>
-                <span className="text-base font-mono font-bold text-cream-light">{tempF}°F <span className="text-[11px] font-normal text-cream-soft/70">({tempC}°C)</span></span>
+              <div className="p-4 rounded-2xl bg-[#241A13] border-2 border-amber-500/30 hover:border-amber-400/70 text-center space-y-1.5 shadow-md transition">
+                <Thermometer className="w-5 h-5 text-rose-300 mx-auto" />
+                <span className="text-xs font-mono text-stone-200 uppercase font-bold tracking-wider block">Water Temp</span>
+                <span className="text-2xl font-mono font-black text-white block">
+                  {tempF}°F <span className="text-xs font-medium text-stone-300 block sm:inline">({tempC}°C)</span>
+                </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-black/50 border border-white/10 text-center space-y-1">
-                <Clock className="w-4 h-4 text-emerald-400 mx-auto" />
-                <span className="text-[10px] font-mono text-cream-soft/60 uppercase block">Total Time</span>
-                <span className="text-base font-mono font-bold text-cream-light">{brewTime}</span>
+              <div className="p-4 rounded-2xl bg-[#241A13] border-2 border-amber-500/30 hover:border-amber-400/70 text-center space-y-1.5 shadow-md transition">
+                <Clock className="w-5 h-5 text-emerald-300 mx-auto" />
+                <span className="text-xs font-mono text-stone-200 uppercase font-bold tracking-wider block">Total Time</span>
+                <span className="text-2xl font-mono font-black text-white block">{brewTime}</span>
               </div>
             </div>
 
             {/* Grind & Bloom Cards */}
             <div className="space-y-3">
-              <div className="p-4 rounded-xl bg-black/50 border border-white/10 flex items-start gap-3">
-                <Sliders className="w-4 h-4 text-amber-gold shrink-0 mt-0.5" />
+              <div className="p-4.5 rounded-2xl bg-[#221912] border border-amber-500/30 flex items-start gap-3.5 shadow-xs">
+                <Sliders className="w-5 h-5 text-amber-300 shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-xs font-mono font-bold text-cream-light block">
-                    Grind Size Setting: <span className="text-amber-gold">{grind}</span>
+                  <span className="text-sm font-mono font-bold text-white block">
+                    Grind Size Setting: <span className="text-amber-300 font-black bg-amber-500/25 px-2.5 py-0.5 rounded-md border border-amber-400/40 ml-1.5">{grind}</span>
                   </span>
-                  <p className="text-xs font-sans text-cream-soft/80 mt-1 leading-relaxed">
+                  <p className="text-xs font-sans text-stone-200 mt-1.5 leading-relaxed">
                     A calibrated burr grind balances extraction surface area with percolation drainage speed.
                   </p>
                 </div>
               </div>
 
               {bloom && (
-                <div className="p-4 rounded-xl bg-black/50 border border-white/10 flex items-start gap-3">
-                  <Flame className="w-4 h-4 text-amber-gold shrink-0 mt-0.5" />
+                <div className="p-4.5 rounded-2xl bg-[#221912] border border-amber-500/30 flex items-start gap-3.5 shadow-xs">
+                  <Flame className="w-5 h-5 text-amber-300 shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-xs font-mono font-bold text-cream-light block">
-                      Bloom Phase & Degassing: <span className="text-amber-gold">{bloom}</span>
+                    <span className="text-sm font-mono font-bold text-white block">
+                      Bloom Phase & Degassing: <span className="text-amber-300 font-black bg-amber-500/25 px-2.5 py-0.5 rounded-md border border-amber-400/40 ml-1.5">{bloom}</span>
                     </span>
-                    <p className="text-xs font-sans text-cream-soft/80 mt-1 leading-relaxed">
+                    <p className="text-xs font-sans text-stone-200 mt-1.5 leading-relaxed">
                       Saturate all dry grounds completely during the bloom to release roasted CO2 and ensure uniform water channels during subsequent pours.
                     </p>
                   </div>
@@ -423,11 +425,11 @@ export default function CoffeeLandingPage({
               )}
 
               {roasterNotes && (
-                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-1">
-                  <span className="text-[11px] font-mono text-amber-gold uppercase font-bold block">
+                <div className="p-4.5 rounded-2xl bg-gradient-to-r from-[#281C14] to-[#1E140E] border-2 border-amber-400/50 space-y-1.5 shadow-sm">
+                  <span className="text-xs font-mono text-amber-300 uppercase font-black tracking-wider block">
                     Roaster's Pour Cadence & Advice:
                   </span>
-                  <p className="text-xs font-sans text-cream-soft/90 leading-relaxed italic">
+                  <p className="text-sm font-sans text-stone-100 leading-relaxed italic">
                     "{roasterNotes}"
                   </p>
                 </div>
@@ -438,35 +440,35 @@ export default function CoffeeLandingPage({
             <button
               type="button"
               onClick={handleLaunchBrew}
-              className="w-full py-4 rounded-2xl bg-amber-gold hover:bg-amber-400 text-espresso-950 font-mono text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg hover:scale-[1.01] active:scale-95 transition cursor-pointer"
+              className="w-full py-4.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:brightness-110 text-stone-950 font-mono text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/30 hover:scale-[1.01] active:scale-95 transition cursor-pointer"
             >
-              <Play className="w-4 h-4 fill-espresso-950" />
+              <Play className="w-4 h-4 fill-stone-950" />
               <span>Launch Guided Brew Timer ({formattedMethodName})</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
           {/* Grinder Calibration Helper Table */}
-          <div className="p-5 rounded-3xl bg-black/30 border border-white/10 space-y-3">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-amber-gold font-bold block">
+          <div className="p-6 rounded-3xl bg-[#18130F] border-2 border-amber-500/30 space-y-4 shadow-xl">
+            <span className="text-xs font-mono uppercase tracking-wider text-amber-300 font-black block">
               Quick Grinder Calibration Reference
             </span>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-              <div className="p-2.5 rounded-lg bg-black/40 border border-white/10">
-                <span className="text-cream-soft/60 text-[10px] block">Comandante C40</span>
-                <span className="text-cream-light font-bold">22–24 Clicks</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
+              <div className="p-3 rounded-xl bg-[#241A13] border border-amber-500/25 text-center">
+                <span className="text-stone-300 text-[11px] font-bold block mb-1">Comandante C40</span>
+                <span className="text-amber-200 font-black text-sm">22–24 Clicks</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-black/40 border border-white/10">
-                <span className="text-cream-soft/60 text-[10px] block">Baratza Encore</span>
-                <span className="text-cream-light font-bold">Setting 14–16</span>
+              <div className="p-3 rounded-xl bg-[#241A13] border border-amber-500/25 text-center">
+                <span className="text-stone-300 text-[11px] font-bold block mb-1">Baratza Encore</span>
+                <span className="text-amber-200 font-black text-sm">Setting 14–16</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-black/40 border border-white/10">
-                <span className="text-cream-soft/60 text-[10px] block">Fellow Ode (Gen 2)</span>
-                <span className="text-cream-light font-bold">Setting 4.1–5.0</span>
+              <div className="p-3 rounded-xl bg-[#241A13] border border-amber-500/25 text-center">
+                <span className="text-stone-300 text-[11px] font-bold block mb-1">Fellow Ode (Gen 2)</span>
+                <span className="text-amber-200 font-black text-sm">Setting 4.1–5.0</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-black/40 border border-white/10">
-                <span className="text-cream-soft/60 text-[10px] block">Timemore C2/C3</span>
-                <span className="text-cream-light font-bold">18–20 Clicks</span>
+              <div className="p-3 rounded-xl bg-[#241A13] border border-amber-500/25 text-center">
+                <span className="text-stone-300 text-[11px] font-bold block mb-1">Timemore C2/C3</span>
+                <span className="text-amber-200 font-black text-sm">18–20 Clicks</span>
               </div>
             </div>
           </div>
@@ -475,89 +477,89 @@ export default function CoffeeLandingPage({
         {/* Right Column: Terroir, Origin & Roastery Knowledge (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
           {/* Origin & Terroir Card */}
-          <div className="p-6 rounded-3xl bg-black/40 border border-white/10 space-y-5">
-            <div className="flex items-center gap-2 text-amber-gold font-mono text-xs uppercase font-bold tracking-wider">
-              <Globe className="w-4 h-4" />
+          <div className="p-6 sm:p-7 rounded-3xl bg-[#18130F] border-2 border-amber-500/30 space-y-5 shadow-xl">
+            <div className="flex items-center gap-2 text-amber-300 font-mono text-xs uppercase font-black tracking-wider pb-2 border-b border-stone-800">
+              <Globe className="w-4 h-4 text-amber-300" />
               <span>Origin Terroir & Processing</span>
             </div>
 
             <div className="space-y-3 text-xs font-mono">
-              <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
-                <span className="text-cream-soft/60">Country Origin</span>
-                <span className="text-cream-light font-bold">{origin}</span>
+              <div className="flex items-center justify-between pb-2.5 border-b border-stone-800">
+                <span className="text-stone-300 font-bold">Country Origin</span>
+                <span className="text-white font-extrabold">{origin}</span>
               </div>
 
-              <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
-                <span className="text-cream-soft/60">Region / Zone</span>
-                <span className="text-cream-light font-bold">{region}</span>
+              <div className="flex items-center justify-between pb-2.5 border-b border-stone-800">
+                <span className="text-stone-300 font-bold">Region / Zone</span>
+                <span className="text-white font-extrabold">{region}</span>
               </div>
 
-              <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
-                <span className="text-cream-soft/60">Producer / Farm</span>
-                <span className="text-cream-light font-bold">{farm}</span>
+              <div className="flex items-center justify-between pb-2.5 border-b border-stone-800">
+                <span className="text-stone-300 font-bold">Producer / Farm</span>
+                <span className="text-white font-extrabold">{farm}</span>
               </div>
 
-              <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
-                <span className="text-cream-soft/60">Botanical Variety</span>
-                <span className="text-cream-light font-bold">{variety}</span>
+              <div className="flex items-center justify-between pb-2.5 border-b border-stone-800">
+                <span className="text-stone-300 font-bold">Botanical Variety</span>
+                <span className="text-white font-extrabold">{variety}</span>
               </div>
 
-              <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
-                <span className="text-cream-soft/60">Processing Method</span>
-                <span className="text-cream-light font-bold">{process}</span>
+              <div className="flex items-center justify-between pb-2.5 border-b border-stone-800">
+                <span className="text-stone-300 font-bold">Processing Method</span>
+                <span className="text-white font-extrabold">{process}</span>
               </div>
 
-              <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
-                <span className="text-cream-soft/60">Elevation</span>
-                <span className="text-cream-light font-bold">{elevation}</span>
+              <div className="flex items-center justify-between pb-2.5 border-b border-stone-800">
+                <span className="text-stone-300 font-bold">Elevation</span>
+                <span className="text-white font-extrabold">{elevation}</span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-cream-soft/60">Roast Profile</span>
-                <span className="text-cream-light font-bold">{roastLevel}</span>
+                <span className="text-stone-300 font-bold">Roast Profile</span>
+                <span className="text-white font-extrabold">{roastLevel}</span>
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-black/60 border border-white/10 text-xs font-sans text-cream-soft/80 leading-relaxed">
-              <strong className="text-amber-gold font-mono font-bold block mb-1">Terroir Impact:</strong>
+            <div className="p-4 rounded-xl bg-[#241A13] border border-amber-500/30 text-xs font-sans text-stone-200 leading-relaxed shadow-xs">
+              <strong className="text-amber-300 font-mono font-black block mb-1">Terroir Impact:</strong>
               High elevation ({elevation}) slows cherry maturation, concentrating complex organic fruit sugars and crisp citric acidity that shine under precise extraction.
             </div>
           </div>
 
           {/* About the Roastery Card */}
-          <div className="p-6 rounded-3xl bg-black/40 border border-white/10 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-amber-gold font-mono text-xs uppercase font-bold tracking-wider">
-                <Store className="w-4 h-4" />
+          <div className="p-6 sm:p-7 rounded-3xl bg-[#18130F] border-2 border-amber-500/30 space-y-4 shadow-xl">
+            <div className="flex items-center justify-between pb-2 border-b border-stone-800">
+              <div className="flex items-center gap-2 text-amber-300 font-mono text-xs uppercase font-black tracking-wider">
+                <Store className="w-4 h-4 text-amber-300" />
                 <span>About {roasterName}</span>
               </div>
               {roasterSlug && onNavigateToRoaster && (
                 <button
                   type="button"
                   onClick={() => onNavigateToRoaster(roasterSlug)}
-                  className="text-[11px] font-mono text-amber-gold hover:underline cursor-pointer"
+                  className="text-xs font-mono text-amber-300 hover:text-amber-200 font-bold hover:underline cursor-pointer"
                 >
                   View Showcase →
                 </button>
               )}
             </div>
 
-            <p className="text-xs font-sans text-cream-soft/90 leading-relaxed">
+            <p className="text-xs font-sans text-stone-200 leading-relaxed">
               {coffee?.roasterInfo?.originStory?.[0] ||
                 coffee?.about ||
                 `${roasterName} roasts exceptional specialty coffees with precision heat transfer and deep producer relationships, bringing direct-trade lots to passionate home baristas.`}
             </p>
 
-            <div className="pt-2 flex flex-wrap items-center gap-2">
+            <div className="pt-2 flex flex-wrap items-center gap-2.5">
               {shopLink && (
                 <a
                   href={shopLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-2 rounded-xl bg-amber-gold/20 hover:bg-amber-gold text-amber-gold hover:text-espresso-950 font-mono text-xs font-bold flex items-center gap-1.5 border border-amber-500/30 transition"
+                  className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-mono text-xs font-black flex items-center gap-1.5 shadow-md transition"
                 >
                   <span>Visit Roaster Store</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <ExternalLink className="w-3.5 h-3.5 text-stone-950" />
                 </a>
               )}
 
@@ -566,9 +568,9 @@ export default function CoffeeLandingPage({
                   href={website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs flex items-center gap-1.5 border border-white/10 transition"
+                  className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono text-xs font-bold flex items-center gap-1.5 border border-white/20 transition"
                 >
-                  <Globe className="w-3.5 h-3.5 text-cream-soft" />
+                  <Globe className="w-3.5 h-3.5 text-amber-300" />
                   <span>Website</span>
                 </a>
               )}
@@ -578,7 +580,7 @@ export default function CoffeeLandingPage({
                   href={instagram.startsWith('http') ? instagram : `https://instagram.com/${instagram.replace('@', '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3.5 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-light font-mono text-xs flex items-center gap-1.5 border border-white/10 transition"
+                  className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono text-xs font-bold flex items-center gap-1.5 border border-white/20 transition"
                 >
                   <Instagram className="w-3.5 h-3.5 text-pink-400" />
                   <span>{instagram.startsWith('@') ? instagram : '@roaster'}</span>
@@ -588,16 +590,16 @@ export default function CoffeeLandingPage({
           </div>
 
           {/* Roaster Partner Callout / Ecosystem Principle */}
-          <div className="p-5 rounded-3xl bg-gradient-to-r from-amber-950/30 to-black/60 border border-amber-500/20 text-xs font-mono space-y-2">
-            <span className="font-bold text-amber-gold uppercase block text-[10px]">
+          <div className="p-5.5 rounded-3xl bg-gradient-to-r from-[#281C14] to-[#1E140E] border-2 border-amber-400/40 text-xs font-mono space-y-2 shadow-lg">
+            <span className="font-black text-amber-300 uppercase block text-xs">
               Are you a specialty coffee roaster?
             </span>
-            <p className="text-cream-soft/80 text-[11px] font-sans leading-relaxed">
+            <p className="text-stone-200 text-xs font-sans leading-relaxed">
               Create a free Roaster Hub profile to generate custom Smart Bag QR codes, connect your coffees to daily home baristas, and direct customers straight back to your shop.
             </p>
             <a
               href="/roasters"
-              className="inline-flex items-center gap-1 text-[11px] text-amber-gold hover:underline font-bold"
+              className="inline-flex items-center gap-1 text-xs text-amber-300 hover:text-amber-200 hover:underline font-black"
             >
               <span>Explore Roaster Hub Founding Program →</span>
             </a>
