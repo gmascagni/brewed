@@ -179,10 +179,10 @@ export const US_SHOWCASE_ROASTERS = [
   {
     id: 'onyx',
     slug: 'onyx-coffee-lab',
-    name: 'Onyx Coffee Lab',
-    shortName: 'Onyx',
+    name: 'Onyx Coffee Lab (Showcase Example)',
+    shortName: 'Onyx (Demo)',
     isDemoExample: true,
-    demoNotice: 'Demonstration & Showcase Partner Example',
+    demoNotice: 'Demonstration & Showcase Example • Not an official onboarded partner',
     tagline: 'Never Settle for Good Enough',
     founded: '2012',
     city: 'Rogers',

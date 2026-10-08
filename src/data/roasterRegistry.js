@@ -20,7 +20,10 @@ function getBuiltinShowcaseCoffees() {
         showcaseCoffees.push({
           ...coffee,
           roaster: coffee.roaster || roaster.name,
-          roasterSlug: roaster.slug || roaster.id
+          roasterSlug: roaster.slug || roaster.id,
+          isDemoExample: Boolean(roaster.isDemoExample),
+          demoNotice: roaster.demoNotice || '',
+          roasterInfo: roaster
         });
       });
     });

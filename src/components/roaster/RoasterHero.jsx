@@ -68,8 +68,27 @@ export default function RoasterHero({
     }
   };
 
+  const isDemo = Boolean(roaster.isDemoExample || ['onyx', 'onyx-coffee-lab'].includes(String(roaster.slug || roaster.id || '').toLowerCase()));
+
   return (
     <div className="space-y-6">
+      {/* Prominent Demo Notice Banner */}
+      {isDemo && (
+        <div className="p-4 rounded-2xl bg-amber-500/15 border-2 border-amber-400/50 flex items-start gap-3 text-amber-200 text-xs sm:text-sm animate-fade-in shadow-md">
+          <Sparkles className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <div className="font-mono font-bold tracking-wider uppercase text-amber-300 text-xs flex items-center gap-2">
+              <span>Demonstration Showcase Profile</span>
+              <span className="text-[10px] bg-amber-500/30 text-amber-200 px-2 py-0.5 rounded border border-amber-400/40 font-semibold">
+                Not Onboarded Partner
+              </span>
+            </div>
+            <p className="text-stone-300 text-xs sm:text-sm leading-relaxed">
+              {roaster.demoNotice || 'This is an illustrative demonstration example showcasing how a roastery profile, bag QR codes, and recipe dial-in guides appear on The Brew. Onyx Coffee Lab is not an official onboarded partner.'}
+            </p>
+          </div>
+        </div>
+      )}
       
       {/* Brand Metadata Badges */}
       <div className="flex flex-wrap items-center gap-2.5">
@@ -93,6 +112,31 @@ export default function RoasterHero({
             <Building className="w-3.5 h-3.5 text-sky-400" />
             <span>Artisan Roaster (Self-Registered)</span>
           </span>
+        ) : isDemo ? (
+          <>
+            <span className="px-3 py-1 rounded-full bg-amber-500/25 text-amber-300 font-mono text-xs font-black border border-amber-400/50 flex items-center gap-1.5 shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>✦ Demo Showcase Preview</span>
+            </span>
+            <button
+              type="button"
+              onClick={onOpenClaimModal || onOpenRoasterInfo}
+              className="px-3 py-1 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-mono text-xs font-bold border border-amber-500/40 flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+              title="Learn about verified roaster partner profiles or claim this profile"
+            >
+              <Store className="w-3.5 h-3.5 text-amber-400" />
+              <span>Demonstration Example</span>
+            </button>
+            <button
+              type="button"
+              onClick={onWatchVideo}
+              className="px-3 py-1 rounded-full bg-red-600/20 hover:bg-red-600/30 text-red-300 font-mono text-xs font-bold border border-red-500/40 flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+              title="Watch 60-Second Video Demo Walkthrough"
+            >
+              <Play className="w-3.5 h-3.5 text-red-400 fill-current" />
+              <span>Watch Video</span>
+            </button>
+          </>
         ) : (
           <>
             <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-xs font-extrabold border border-amber-500/40 flex items-center gap-1.5 shadow-sm">

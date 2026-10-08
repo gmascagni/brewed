@@ -83,6 +83,14 @@ export default function CoffeeLandingPage({
   const website = coffee?.website || coffee?.roasterInfo?.website || '';
   const logoImage = coffee?.logoImage || coffee?.roasterInfo?.logoImage || '';
 
+  // Demonstration / Showcase Status
+  const isDemo = Boolean(
+    coffee?.isDemoExample ||
+    coffee?.roasterInfo?.isDemoExample ||
+    ['onyx', 'onyx-coffee-lab', 'methodical', 'methodical-coffee', 'black_and_white', 'black-and-white'].includes(String(roasterSlug || '').toLowerCase())
+  );
+  const demoNotice = coffee?.demoNotice || coffee?.roasterInfo?.demoNotice || `${roasterName} is an illustrative demonstration showcase on The Brew and is not currently an official onboarded partner.`;
+
   const customerUrl = useMemo(() => {
     return getCoffeeCustomerUrl(coffee);
   }, [coffee]);
@@ -233,17 +241,34 @@ export default function CoffeeLandingPage({
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-mono uppercase tracking-widest font-black text-amber-400">
-                    Official Roaster Dial-In Guide
+                    {isDemo ? 'Demonstration Showcase Guide' : 'Official Roaster Dial-In Guide'}
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 font-mono text-[10px] font-black border border-emerald-400/50">
-                    ✓ Verified
-                  </span>
+                  {isDemo ? (
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/25 text-amber-300 font-mono text-[10px] font-black border border-amber-400/50">
+                      ✦ Demo Preview
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 font-mono text-[10px] font-black border border-emerald-400/50">
+                      ✓ Verified Partner
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-sm font-sans font-extrabold text-white">
                   {roasterName}
                 </h3>
               </div>
             </div>
+
+            {/* Prominent Demo Notice Banner if not an official onboarded partner */}
+            {isDemo && (
+              <div className="p-3.5 rounded-2xl bg-amber-500/20 border-2 border-amber-400/60 flex items-start gap-2.5 text-xs font-mono text-amber-200 shadow-sm animate-fade-in">
+                <Sparkles className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
+                <div className="leading-relaxed">
+                  <strong className="text-white block font-sans text-xs mb-0.5">Demonstration Showcase Profile</strong>
+                  <span>{demoNotice}</span>
+                </div>
+              </div>
+            )}
 
             {/* Coffee Lot Title */}
             <div>
@@ -345,10 +370,10 @@ export default function CoffeeLandingPage({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-stone-800">
               <div className="flex items-center gap-2 text-amber-400 font-mono text-xs uppercase font-black tracking-wider">
                 <Sparkles className="w-4 h-4 text-amber-300" />
-                <span>Roaster's Recommended Brew Recipe</span>
+                <span>{isDemo ? "Showcase Recommended Brew Recipe" : "Roaster's Recommended Brew Recipe"}</span>
               </div>
               <span className="text-xs font-mono text-amber-200/90 font-bold bg-amber-500/20 px-3 py-1 rounded-full border border-amber-400/40 self-start sm:self-auto shadow-xs">
-                Calibrated by Head Roaster
+                {isDemo ? 'Demonstration Recipe Calibration' : 'Calibrated by Head Roaster'}
               </span>
             </div>
 
