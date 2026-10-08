@@ -166,6 +166,24 @@ export default function App() {
     setIsAuthModalOpen(true);
   };
 
+  useEffect(() => {
+    const handleAuthEvent = (e) => {
+      handleOpenAuth(e?.detail || { role: 'roaster', mode: 'signup' });
+    };
+    const handleRoasterAuth = (e) => {
+      if (e?.detail) {
+        setCurrentUser(e.detail);
+        setUsersList((prev) => [e.detail, ...prev.filter((u) => u.username !== e.detail.username)]);
+      }
+    };
+    window.addEventListener('the_brew_app_open_auth', handleAuthEvent);
+    window.addEventListener('the_brew_app_roaster_authenticated', handleRoasterAuth);
+    return () => {
+      window.removeEventListener('the_brew_app_open_auth', handleAuthEvent);
+      window.removeEventListener('the_brew_app_roaster_authenticated', handleRoasterAuth);
+    };
+  }, []);
+
   const handleLogout = () => {
     signOutRoasterAccount().catch(() => {});
     setCurrentUser(null);

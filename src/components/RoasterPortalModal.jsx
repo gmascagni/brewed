@@ -1234,6 +1234,13 @@ export default function RoasterPortalModal({
             <RoasterAuthGate
               onOpenAuth={onOpenAuth}
               onReturnToVideo={() => setActiveTab('video')}
+              onAuthenticated={(roasterUser) => {
+                if (roasterUser) {
+                  if (roasterUser.roasterName) setRoasterName(roasterUser.roasterName);
+                  if (roasterUser.displayName) setHeadRoaster(roasterUser.displayName);
+                  setActiveTab('profile');
+                }
+              }}
             />
           )}
 
