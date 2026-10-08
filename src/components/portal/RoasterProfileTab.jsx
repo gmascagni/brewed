@@ -27,6 +27,10 @@ export default function RoasterProfileTab({
   website,
   handleWebsiteChange,
   handleWebsiteBlur,
+  shopLink = '',
+  setShopLink = null,
+  instagram = '',
+  setInstagram = null,
   logoImage,
   logoFileName,
   handleLogoUpload,
@@ -164,7 +168,7 @@ export default function RoasterProfileTab({
           </div>
 
           <div>
-            <label className="block text-cream-soft/70 font-mono mb-1">Website / Store URL</label>
+            <label className="block text-cream-soft/70 font-mono mb-1">Website URL</label>
             <input
               type="text"
               inputMode="url"
@@ -175,6 +179,31 @@ export default function RoasterProfileTab({
               onChange={handleWebsiteChange}
               onBlur={handleWebsiteBlur}
               placeholder="https://methodicalcoffee.com"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold font-mono"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div>
+            <label className="block text-cream-soft/70 font-mono mb-1">Shop Link (Webshop Store URL)</label>
+            <input
+              type="text"
+              inputMode="url"
+              value={shopLink}
+              onChange={(e) => setShopLink && setShopLink(e.target.value)}
+              placeholder="https://methodicalcoffee.com/collections/coffee"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold font-mono"
+            />
+          </div>
+
+          <div>
+            <label className="block text-cream-soft/70 font-mono mb-1">Instagram (@handle or profile)</label>
+            <input
+              type="text"
+              value={instagram}
+              onChange={(e) => setInstagram && setInstagram(e.target.value)}
+              placeholder="@methodicalcoffee"
               className="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-cream-light placeholder-cream-soft/40 focus:outline-none focus:border-amber-gold font-mono"
             />
           </div>

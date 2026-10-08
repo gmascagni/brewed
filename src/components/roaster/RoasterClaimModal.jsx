@@ -150,7 +150,7 @@ export default function RoasterClaimModal({
                     className="w-full sm:w-auto px-5 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-mono font-bold flex items-center justify-center gap-2 shadow-lg cursor-pointer"
                   >
                     <Store className="w-4 h-4" />
-                    <span>Open Roaster Portal &amp; Add Recipes</span>
+                    <span>Open Roaster Hub &amp; Add Recipes</span>
                   </button>
                 )}
                 <button

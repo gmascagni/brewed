@@ -240,7 +240,7 @@ export function getCoffeeProvenance(coffee, roaster = null, currentUser = null) 
       badgeColor: 'bg-sky-500/20 text-sky-300 border-sky-500/40',
       pillColor: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
       accentColor: '#38BDF8',
-      description: 'Independent artisan coffee lot registered directly through the Roaster Portal.',
+      description: 'Independent artisan coffee lot registered directly through the Roaster Hub.',
       isAiDerived: false,
       isDomainVerified: false
     };

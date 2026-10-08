@@ -743,7 +743,7 @@ export default function AuthModal({
                   </>
                 ) : (
                   accountType === 'roaster'
-                    ? (mode === 'signup' ? 'Create Roaster / Café Account' : mode === 'login' ? 'Sign In to Roaster / Café Portal' : 'Save Roaster / Café Profile')
+                    ? (mode === 'signup' ? 'Create Roaster / Café Account' : mode === 'login' ? 'Sign In to Roaster Hub / Café Portal' : 'Save Roaster / Café Profile')
                     : (mode === 'edit' ? 'Save Profile Changes' : mode === 'signup' ? 'Save Profile to Device' : 'Use Profile')
                 )}
               </button>

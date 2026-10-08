@@ -543,7 +543,7 @@ export default function MyCoffeeHub({
                 className="py-3.5 px-7 rounded-2xl bg-[#14110F] hover:bg-[#2A2421] text-white font-sans font-bold text-xs flex items-center gap-2 shadow-md cursor-pointer transition-all active:scale-95"
               >
                 <Store className="w-4 h-4 text-[#E8AF72]" />
-                <span>Launch Roaster Packaging Studio</span>
+                <span>Launch Roaster Hub</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>

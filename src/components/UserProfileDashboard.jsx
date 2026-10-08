@@ -285,7 +285,7 @@ export default function UserProfileDashboard({
                     }}
                     className="px-3 py-1 rounded-lg bg-amber-gold hover:bg-amber-400 text-espresso-950 text-[11px] font-mono font-bold flex items-center gap-1 shadow transition cursor-pointer"
                   >
-                    <span>Roaster Portal →</span>
+                    <span>Roaster Hub →</span>
                   </button>
                 )}
               </div>

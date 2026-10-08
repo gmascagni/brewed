@@ -19,6 +19,7 @@ import ShopDrawer from './components/ShopDrawer';
 import WorldNewsSection from './components/WorldNewsSection';
 import RoasterInfoPage from './components/RoasterInfoPage';
 import RoasterProfilePage from './components/RoasterProfilePage';
+import CoffeeLandingPage from './components/CoffeeLandingPage';
 import ConsumerDiscoveryFeed from './components/ConsumerDiscoveryFeed';
 import CafePartnerPortal from './components/CafePartnerPortal';
 import { getShowcaseRoaster, normalizeRoasterKey } from './data/roasterShowcaseData';
@@ -43,7 +44,7 @@ import { BREW_METHODS } from './data/brewData';
 import { initGA, trackEvent } from './utils/analytics';
 import { recordTelemetryEvent } from './utils/telemetry';
 import { getMethodJsonLd, updatePageSeo } from './utils/seo';
-import { syncCloudCatalog } from './data/roasterRegistry';
+import { syncCloudCatalog, findCoffeeBySlugs, slugify } from './data/roasterRegistry';
 import { signOutRoasterAccount } from './services/firebase';
 import { parseRecipePayload } from './utils/recipeParser';
 import { getAssetUrl } from './utils/assetUrl';
@@ -177,9 +178,50 @@ export default function App() {
   const [roasterPrefillBarcode, setRoasterPrefillBarcode] = useState('');
   const [roasterPrefillBean, setRoasterPrefillBean] = useState(null);
   const [roasterPortalInitialTab, setRoasterPortalInitialTab] = useState(null);
+  const [activeCustomerCoffee, setActiveCustomerCoffee] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname.replace(/^\/brewed/, '');
+      const parts = p.split('/').filter(Boolean);
+      const RESERVED_PATHS = [
+        'methods', 'guides', 'discover', 'academy', 'videos', 'learn',
+        'recipes', 'recipe', 'my-coffee', 'journal', 'profile', 'shops',
+        'cafes', 'local', 'demo', 'smart-bag-scanner', 'scanner', 'scan',
+        'brewed', 'api', 'images', 'static', 'emails', 'r'
+      ];
+      let rSlug = null;
+      let cSlug = null;
+      if (parts.length === 2 && !RESERVED_PATHS.includes(parts[0].toLowerCase())) {
+        rSlug = parts[0];
+        cSlug = parts[1];
+      } else if (parts.length === 3 && (parts[0] === 'roasters' || parts[0] === 'roaster')) {
+        rSlug = parts[1];
+        cSlug = parts[2];
+      }
+      if (rSlug && cSlug) {
+        return findCoffeeBySlugs(rSlug, cSlug);
+      }
+    }
+    return null;
+  });
+
   const [currentArea, setCurrentArea] = useState(() => {
     if (typeof window !== 'undefined') {
       const p = window.location.pathname.replace(/^\/brewed/, '');
+      const parts = p.split('/').filter(Boolean);
+      const RESERVED_PATHS = [
+        'methods', 'guides', 'discover', 'academy', 'videos', 'learn',
+        'recipes', 'recipe', 'my-coffee', 'journal', 'profile', 'shops',
+        'cafes', 'local', 'demo', 'smart-bag-scanner', 'scanner', 'scan',
+        'brewed', 'api', 'images', 'static', 'emails', 'r'
+      ];
+      if ((parts.length === 2 && !RESERVED_PATHS.includes(parts[0].toLowerCase())) || (parts.length === 3 && (parts[0] === 'roasters' || parts[0] === 'roaster'))) {
+        const rSlug = parts.length === 2 ? parts[0] : parts[1];
+        const cSlug = parts.length === 2 ? parts[1] : parts[2];
+        if (findCoffeeBySlugs(rSlug, cSlug)) {
+          return 'coffee';
+        }
+      }
+
       const search = window.location.search || '';
       const params = new URLSearchParams(search);
       const hasRecipeParams = params.has('recipe') || params.has('bean') || params.has('coffee') || params.has('method');
@@ -780,6 +822,39 @@ export default function App() {
       return;
     }
 
+    // Customer Coffee Deep-Link Detection (e.g. /onyx-coffee-lab/ethiopia-guji-natural or /roasters/onyx-coffee-lab/ethiopia-guji-natural)
+    const pathParts = path.split('/').filter(Boolean);
+    const RESERVED_PATHS = [
+      'methods', 'guides', 'discover', 'academy', 'videos', 'learn',
+      'recipes', 'recipe', 'my-coffee', 'journal', 'profile', 'shops',
+      'cafes', 'local', 'demo', 'smart-bag-scanner', 'scanner', 'scan',
+      'brewed', 'api', 'images', 'static', 'emails', 'r'
+    ];
+    let candidateRoasterSlug = null;
+    let candidateCoffeeSlug = null;
+
+    if (pathParts.length === 2 && !RESERVED_PATHS.includes(pathParts[0].toLowerCase())) {
+      candidateRoasterSlug = pathParts[0];
+      candidateCoffeeSlug = pathParts[1];
+    } else if (pathParts.length === 3 && (pathParts[0] === 'roasters' || pathParts[0] === 'roaster')) {
+      candidateRoasterSlug = pathParts[1];
+      candidateCoffeeSlug = pathParts[2];
+    }
+
+    if (candidateRoasterSlug && candidateCoffeeSlug) {
+      const matchedCoffee = findCoffeeBySlugs(candidateRoasterSlug, candidateCoffeeSlug);
+      if (matchedCoffee) {
+        setActiveCustomerCoffee(matchedCoffee);
+        setCurrentArea('coffee');
+        updatePageSeo(
+          `${matchedCoffee.beanName} | ${matchedCoffee.roaster} | The Brew`,
+          `Explore origin details, tasting notes, and roaster-certified dial-in parameters for ${matchedCoffee.beanName}. Scan bag to launch guided brew.`,
+          `https://thebrew.app/${slugify(matchedCoffee.roasterSlug || matchedCoffee.roaster)}/${slugify(matchedCoffee.slug || matchedCoffee.beanSlug || matchedCoffee.beanName || matchedCoffee.id)}`
+        );
+        return;
+      }
+    }
+
     if (path.startsWith('/methods/')) {
       setCurrentArea('brew');
       const methodId = path.replace('/methods/', '').replace(/\/$/, '');
@@ -1133,6 +1208,29 @@ export default function App() {
       <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 pb-24 md:pb-8 relative">
 
         <main className="mt-4 space-y-10">
+
+          {/* AREA 0: COFFEE CUSTOMER LANDING PAGE (SCAN BAG QR DESTINATION) */}
+          {currentArea === 'coffee' && activeCustomerCoffee && (
+            <CoffeeLandingPage
+              roasterSlug={activeCustomerCoffee.roasterSlug}
+              coffeeSlug={activeCustomerCoffee.slug || activeCustomerCoffee.beanSlug || activeCustomerCoffee.id}
+              coffee={activeCustomerCoffee}
+              onStartGuidedBrew={(coffeeToBrew) => {
+                handleSelectBeanToBrew(coffeeToBrew || activeCustomerCoffee);
+              }}
+              onNavigateToRoaster={(slug) => {
+                setSelectedRoasterSlug(slug);
+                setCurrentArea('discover');
+                navigate(`/roasters/${slug}`);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onBackToHome={() => {
+                setCurrentArea('brew');
+                navigate('/');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+          )}
 
           {/* AREA 1: DISCOVER (ROASTERS & SINGLE ORIGINS) */}
           {currentArea === 'discover' && (

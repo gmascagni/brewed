@@ -170,10 +170,10 @@ export default function RoasterCafesList({
                 ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-bold'
                 : 'bg-white/[0.04] hover:bg-white/[0.08] text-cream-soft hover:text-cream-light border border-white/10'
             }`}
-            title={isBrandOwner ? "Open Roaster Portal & Manage Packaging" : "Open Smart Bag Packaging & Label Studio"}
+            title={isBrandOwner ? "Open Roaster Hub & Manage Packaging" : "Open Smart Bag Packaging & Label Studio"}
           >
             <QrCode className="w-3.5 h-3.5 text-amber-gold" />
-            <span>{isBrandOwner ? 'Roaster Portal & Label Studio' : 'Roaster Packaging & Label Studio'}</span>
+            <span>{isBrandOwner ? 'Roaster Hub & Label Studio' : 'Roaster Packaging & Label Studio'}</span>
           </button>
         </div>
       )}

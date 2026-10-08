@@ -38,3 +38,4 @@ scratch/
 *.zip
 !public/coffee_brew_timer.zip
 Email SMTP RESEND API KEY.png
+scripts/send_*.py

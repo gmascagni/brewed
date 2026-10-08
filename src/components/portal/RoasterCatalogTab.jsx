@@ -1,6 +1,6 @@
 import React from 'react';
-import { Download, Coffee, QrCode, ArrowRight, Trash2, Plus, Edit3 } from 'lucide-react';
-import { exportRoasterCatalogJson } from '../../data/roasterRegistry';
+import { Download, Coffee, QrCode, ArrowRight, Trash2, Plus, Edit3, ExternalLink } from 'lucide-react';
+import { exportRoasterCatalogJson, getCoffeeCustomerUrl } from '../../data/roasterRegistry';
 
 export default function RoasterCatalogTab({
   registeredCoffees = [],
@@ -18,9 +18,14 @@ export default function RoasterCatalogTab({
     <div className="space-y-4 animate-fade-in">
       <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-black/30 border border-white/10 text-xs">
         <div>
-          <span className="font-mono text-amber-gold font-bold uppercase text-[10px]">
-            Roastery Coffee Registry
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-amber-gold font-bold uppercase text-[10px]">
+              Roastery Coffee Registry
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-white/10 text-cream-light font-mono text-[9px] font-bold border border-white/10">
+              Free Tier: {registeredCoffees.length} / 3 Lots
+            </span>
+          </div>
           <p className="text-cream-soft/80 text-xs mt-0.5">
             {registeredCoffees.length} coffee lots registered under {currentUser?.email || 'your account'}.
           </p>
@@ -121,6 +126,17 @@ export default function RoasterCatalogTab({
                       <span>Edit Lot</span>
                     </button>
                   )}
+
+                  <a
+                    href={getCoffeeCustomerUrl(c)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-[11px] font-mono text-cream-light flex items-center gap-1 border border-white/10 transition"
+                    title="Open unique customer-facing page"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-cream-soft" />
+                    <span>Customer Page</span>
+                  </a>
                 </div>
 
                 <div className="flex items-center gap-1.5">

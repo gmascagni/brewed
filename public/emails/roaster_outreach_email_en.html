@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark light">
+  <meta name="supported-color-schemes" content="dark light">
+  <title>A free QR brewing experience for [Roastery Name]</title>
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td, a { font-family: Arial, Helvetica, sans-serif !important; }
+  </style>
+  <![endif]-->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100% !important;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      background-color: #0e0c0b;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #f5f5f4;
+    }
+    table {
+      border-spacing: 0;
+      border-collapse: collapse;
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+    td {
+      padding: 0;
+    }
+    img {
+      border: 0;
+      outline: none;
+      text-decoration: none;
+      -ms-interpolation-mode: bicubic;
+    }
+    a {
+      color: #fbbf24;
+      text-decoration: none;
+    }
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #0e0c0b;
+      padding: 32px 12px 48px 12px;
+    }
+    .main {
+      background-color: #1a1715;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 580px;
+      border: 1px solid #2d2621;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    }
+    .header {
+      background: linear-gradient(180deg, #26201b 0%, #1a1715 100%);
+      padding: 32px 28px 24px 28px;
+      text-align: center;
+      border-bottom: 1px solid #332a24;
+    }
+    .badge {
+      display: inline-block;
+      background-color: rgba(217, 119, 6, 0.16);
+      border: 1px solid #d97706;
+      color: #fbbf24;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-top: 14px;
+    }
+    .content {
+      padding: 32px 32px 28px 32px;
+    }
+    .greeting {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #f5f5f4;
+      margin: 0 0 16px 0;
+    }
+    .paragraph {
+      font-size: 15px;
+      line-height: 1.65;
+      color: #d6d3d1;
+      margin: 0 0 16px 0;
+    }
+    .feature-card {
+      background-color: #241f1b;
+      border: 1px solid #3a322b;
+      border-left: 3px solid #d97706;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 20px 0;
+    }
+    .feature-card p {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #e7e5e4;
+    }
+    .feature-card p:last-child {
+      margin-bottom: 0;
+    }
+    .cta-container {
+      text-align: center;
+      padding: 8px 0 20px 0;
+    }
+    .btn-primary {
+      display: inline-block;
+      background-color: #d97706;
+      color: #ffffff !important;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 13px 28px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);
+    }
+    .btn-secondary {
+      display: inline-block;
+      background-color: #26201b;
+      border: 1px solid #4a3f36;
+      color: #fbbf24 !important;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 11px 24px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .video-box {
+      background-color: #151312;
+      border: 1px solid #2d2621;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin: 24px 0 20px 0;
+    }
+    .video-title {
+      font-size: 13px;
+      color: #a8a29e;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+    .signoff {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #e7e5e4;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #2d2621;
+    }
+    .footer {
+      background-color: #12100f;
+      padding: 22px 28px;
+      text-align: center;
+      border-top: 1px solid #251f1a;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #78716c;
+    }
+    @media only screen and (max-width: 600px) {
+      .wrapper {
+        padding: 16px 8px 32px 8px !important;
+      }
+      .content {
+        padding: 24px 20px !important;
+      }
+      .header {
+        padding: 24px 20px 18px 20px !important;
+      }
+      .btn-primary, .btn-secondary {
+        display: block !important;
+        width: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <table role="presentation" width="100%">
+      <tr>
+        <td align="center">
+          <table role="presentation" class="main">
+            <!-- Header with Official Medallion Brand Logo -->
+            <tr>
+              <td class="header">
+                <a href="https://thebrew.app/" target="_blank" style="text-decoration: none;">
+                  <img src="https://thebrew.app/images/branding/thebrew_app_logo_master.png" alt="The Brew" width="124" style="width: 124px; max-width: 124px; height: auto; display: block; margin: 0 auto; border-radius: 14px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);">
+                </a>
+                <div class="badge">Founding Partner Invitation</div>
+              </td>
+            </tr>
+
+            <!-- Body Content -->
+            <tr>
+              <td class="content">
+                <p class="greeting">Hi [Name],</p>
+
+                <p class="paragraph">
+                  I’m building <strong>The Brew</strong>, a specialty coffee platform designed to help people get better results from the coffee they buy.
+                </p>
+
+                <p class="paragraph">
+                  I’m inviting a small group of specialty roasters to become founding partners.
+                </p>
+
+                <p class="paragraph">
+                  <strong>The idea is simple:</strong>
+                </p>
+
+                <div class="feature-card">
+                  <p>
+                    <strong>Put a QR code on your coffee bag</strong>, and your customer can scan it to instantly open a brewing guide created specifically for that coffee.
+                  </p>
+                  <p style="padding-top: 6px;">
+                    <strong>They get:</strong> The right recipe and a guided brew timer.<br>
+                    <strong>You get:</strong> A dedicated roaster and coffee page with a direct link back to your shop.
+                  </p>
+                </div>
+
+                <p class="paragraph">
+                  There is no cost to join the founding program.
+                </p>
+
+                <p class="paragraph">
+                  If you'd like, I'll create your roastery profile and add one of your current coffees for you.
+                </p>
+
+                <p class="paragraph">
+                  You can see an example here:
+                </p>
+
+                <!-- Primary CTA: View Example -->
+                <div class="cta-container">
+                  <a href="https://thebrew.app/onyx-coffee-lab/ethiopia-guji-natural" class="btn-primary" target="_blank">
+                    [View Example]
+                  </a>
+                </div>
+
+                <p class="paragraph">
+                  If it looks useful, just reply with the coffee you'd like to start with.
+                </p>
+
+                <!-- Short Video Section -->
+                <div class="video-box">
+                  <div class="video-title">Short Video Walkthrough</div>
+                  <p style="font-size: 13px; color: #d6d3d1; margin: 0 0 14px 0; line-height: 1.5;">
+                    Here is a short video explaining the process:
+                  </p>
+                  <a href="https://thebrew.app/videos/roasters_and_cafes_partner_walkthrough.mp4" class="btn-secondary" target="_blank">
+                    ▶ [Watch the Video]
+                  </a>
+                </div>
+
+                <!-- Signoff -->
+                <div class="signoff">
+                  Thanks,<br><br>
+                  <strong>Clay</strong><br>
+                  The Brew<br>
+                  <a href="https://thebrew.app/" target="_blank" style="color: #fbbf24;">https://thebrew.app/</a>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td class="footer">
+                <p style="margin: 0 0 4px 0;">
+                  <strong style="color: #d6d3d1;">The Brew</strong> • Coffee Education, Brewing Knowledge &amp; Precision Tools
+                </p>
+                <p style="margin: 0; color: #57534e;">
+                  Direct replies go directly to Clay (<a href="mailto:clay@thebrew.app" style="color: #a8a29e; text-decoration: underline;">clay@thebrew.app</a>)
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>

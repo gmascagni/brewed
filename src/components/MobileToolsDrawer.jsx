@@ -280,8 +280,8 @@ export default function MobileToolsDrawer({
                   <QrCode className="w-5 h-5" />
                 </div>
                 <div className="text-left">
-                  <h4 className="font-sans font-bold text-xs text-[#14110F]">Roaster Packaging Studio</h4>
-                  <p className="text-[11px] text-[#766A62]">300 DPI thermal labels & bag QR generator</p>
+                  <h4 className="font-sans font-bold text-xs text-[#14110F]">Roaster Hub &amp; QR Studio</h4>
+                  <p className="text-[11px] text-[#766A62]">Free lot registry, 300 DPI labels &amp; bag QR generator</p>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-[#A89F91]" />

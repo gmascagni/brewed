@@ -320,10 +320,10 @@ export default function Header({
                   type="button"
                   onClick={onOpenRoasterPortal}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-[#FAF0E6] hover:bg-amber-100 text-[#A25A24] font-mono font-bold text-xs shadow-xs transition-all cursor-pointer active:scale-95"
-                  title="Open Roaster Portal to manage lots, recipes & packaging QR stickers"
+                  title="Open Roaster Hub to manage lots, recipes & packaging QR stickers"
                 >
                   <Store className="w-3.5 h-3.5 text-[#A25A24]" />
-                  <span className="hidden xl:inline">Roaster Portal</span>
+                  <span className="hidden xl:inline">Roaster Hub</span>
                 </button>
               )}
 
@@ -556,14 +556,14 @@ export default function Header({
                   if (onOpenRoasterPortal) onOpenRoasterPortal();
                 }}
                 className="w-full text-left flex items-start gap-2.5 p-2 rounded-xl hover:bg-[#FAF7F2] transition-colors group"
-                title="Open Roaster Portal"
+                title="Open Roaster Hub"
               >
                 <div className="w-7 h-7 rounded-lg bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center text-[#A25A24] shrink-0 mt-0.5">
                   <Store className="w-3.5 h-3.5" />
                 </div>
                 <div>
                   <h4 className="font-sans font-bold text-xs text-[#14110F] group-hover:text-[#A8622D] transition-colors">
-                    Roaster Portal
+                    Roaster Hub
                   </h4>
                   <p className="text-[11px] text-[#766A62]">
                     Free lot management, roast curves, thermal QR labels & telemetry.

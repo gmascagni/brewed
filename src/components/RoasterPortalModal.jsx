@@ -37,6 +37,7 @@ import RoasterOnboardTab from './portal/RoasterOnboardTab';
 import RoasterStickerStudioTab from './portal/RoasterStickerStudioTab';
 import RoasterCatalogTab from './portal/RoasterCatalogTab';
 import RoasterTelemetryTab from './portal/RoasterTelemetryTab';
+import RoasterPlansTab from './portal/RoasterPlansTab';
 import RoasterAuthGate from './portal/RoasterAuthGate';
 
 export default function RoasterPortalModal({
@@ -96,6 +97,9 @@ export default function RoasterPortalModal({
   const [foundedYear, setFoundedYear] = useState('');
   const [location, setLocation] = useState('');
   const [website, setWebsite] = useState('');
+  const [about, setAbout] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [shopLink, setShopLink] = useState('');
   const [logoImage, setLogoImage] = useState('');
   const [logoFileName, setLogoFileName] = useState('');
   const [originStory, setOriginStory] = useState('');
@@ -106,9 +110,14 @@ export default function RoasterPortalModal({
   // Bean & Recipe Details
   const [beanName, setBeanName] = useState('');
   const [origin, setOrigin] = useState('');
+  const [farm, setFarm] = useState('');
+  const [region, setRegion] = useState('');
   const [varietal, setVarietal] = useState('');
   const [process, setProcess] = useState('Washed');
   const [elevation, setElevation] = useState('1,850 MASL');
+  const [doseGrams, setDoseGrams] = useState(18);
+  const [waterGrams, setWaterGrams] = useState(297);
+  const [bloom, setBloom] = useState('45s bloom (50g water)');
 
   const [formError, setFormError] = useState(null);
   const [saveToast, setSaveToast] = useState(null);
@@ -489,8 +498,13 @@ export default function RoasterPortalModal({
       location: location.trim(),
       website: normalizedWebsite,
       logoImage: logoImage || '',
+      about: about.trim(),
+      instagram: instagram.trim(),
+      shopLink: (shopLink || normalizedDirectUrl || '').trim(),
       beanName: trimmedBean,
       origin: origin.trim() || 'Single Origin',
+      farm: farm.trim(),
+      region: region.trim(),
       varietal: varietal.trim(),
       process,
       elevation,
@@ -498,6 +512,9 @@ export default function RoasterPortalModal({
       tastingNotes: notesArray.length > 0 ? notesArray : ['Floral', 'Fruit', 'Balanced'],
       brewMethod,
       recommendedRatio: Number(recommendedRatio) || 16.5,
+      doseGrams: Number(doseGrams) || 18,
+      waterGrams: Number(waterGrams) || 297,
+      bloom: bloom.trim() || '45s bloom (50g water)',
       tempF: Number(tempF) || 202,
       tempC: Math.round(((Number(tempF || 202) - 32) * 5) / 9),
       recommendedGrind: recommendedGrind.trim() || 'Medium-Fine',
@@ -981,14 +998,14 @@ export default function RoasterPortalModal({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-amber-gold">
-                  B2B Specialty Roaster Portal
+                  B2B Specialty Roaster Hub
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[9px] font-bold border border-emerald-500/30">
                   Real QR Code Generator
                 </span>
               </div>
               <h2 id="roaster-portal-title" className="font-serif text-xl sm:text-2xl font-bold text-cream-light">
-                Roaster Onboarding & Smart Bag QR Studio
+                Roaster Hub & Smart Bag QR Studio
               </h2>
             </div>
           </div>
@@ -996,7 +1013,7 @@ export default function RoasterPortalModal({
           <button
             onClick={onClose}
             className="p-2.5 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] text-cream-soft hover:text-white border border-white/10 transition cursor-pointer"
-            title="Close Roaster Portal"
+            title="Close Roaster Hub"
           >
             <X className="w-5 h-5" />
           </button>
@@ -1058,6 +1075,18 @@ export default function RoasterPortalModal({
               </button>
 
               <button
+                onClick={() => setActiveTab('plans')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'plans'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 shrink-0 text-amber-gold" />
+                <span>5. Partner Plans (Free vs Pro)</span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('telemetry')}
                 className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
                   activeTab === 'telemetry'
@@ -1066,7 +1095,7 @@ export default function RoasterPortalModal({
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                <span>5. Telemetry & Analytics</span>
+                <span>6. Telemetry & Analytics</span>
               </button>
 
               <button
@@ -1078,7 +1107,7 @@ export default function RoasterPortalModal({
                 }`}
               >
                 <Play className="w-3.5 h-3.5 shrink-0" />
-                <span>6. Walkthrough Video</span>
+                <span>7. Walkthrough Video</span>
               </button>
             </>
           ) : (
@@ -1148,6 +1177,18 @@ export default function RoasterPortalModal({
               </button>
 
               <button
+                onClick={() => setActiveTab('plans')}
+                className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
+                  activeTab === 'plans'
+                    ? 'bg-amber-gold text-espresso-950 shadow'
+                    : 'text-cream-soft hover:text-cream-light bg-white/[0.04]'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 shrink-0 text-amber-gold" />
+                <span>6. Partner Plans (Free vs Pro)</span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('telemetry')}
                 className={`px-3.5 sm:px-4 py-2 rounded-xl transition flex items-center gap-1.5 font-bold whitespace-nowrap shrink-0 cursor-pointer ${
                   activeTab === 'telemetry'
@@ -1156,7 +1197,7 @@ export default function RoasterPortalModal({
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                <span>6. Telemetry & Analytics</span>
+                <span>7. Telemetry & Analytics</span>
                 <Lock className="w-3 h-3 text-stone-400 opacity-60 ml-0.5" />
               </button>
             </>
@@ -1224,6 +1265,10 @@ export default function RoasterPortalModal({
               setSourcingPhilosophy={setSourcingPhilosophy}
               roastingPhilosophy={roastingPhilosophy}
               setRoastingPhilosophy={setRoastingPhilosophy}
+              shopLink={shopLink}
+              setShopLink={setShopLink}
+              instagram={instagram}
+              setInstagram={setInstagram}
               handleSaveProfile={handleSaveRoasterProfile}
               onViewShowcase={handleNavigateToPortfolio}
               formError={profileFormError}
@@ -1247,6 +1292,12 @@ export default function RoasterPortalModal({
               website={website}
               handleWebsiteChange={handleWebsiteChange}
               handleWebsiteBlur={handleWebsiteBlur}
+              about={about}
+              setAbout={setAbout}
+              instagram={instagram}
+              setInstagram={setInstagram}
+              shopLink={shopLink}
+              setShopLink={setShopLink}
               logoImage={logoImage}
               logoFileName={logoFileName}
               handleLogoUpload={handleLogoUpload}
@@ -1255,6 +1306,10 @@ export default function RoasterPortalModal({
               setBeanName={setBeanName}
               origin={origin}
               setOrigin={setOrigin}
+              farm={farm}
+              setFarm={setFarm}
+              region={region}
+              setRegion={setRegion}
               varietal={varietal}
               setVarietal={setVarietal}
               process={process}
@@ -1270,12 +1325,20 @@ export default function RoasterPortalModal({
               handleGenerateRandomSku={handleGenerateRandomSku}
               brewMethod={brewMethod}
               setBrewMethod={setBrewMethod}
+              doseGrams={doseGrams}
+              setDoseGrams={setDoseGrams}
+              waterGrams={waterGrams}
+              setWaterGrams={setWaterGrams}
               recommendedRatio={recommendedRatio}
               setRecommendedRatio={setRecommendedRatio}
               tempF={tempF}
               setTempF={setTempF}
               recommendedGrind={recommendedGrind}
               setRecommendedGrind={setRecommendedGrind}
+              bloom={bloom}
+              setBloom={setBloom}
+              brewTime={brewTime}
+              setBrewTime={setBrewTime}
               roasterNotes={roasterNotes}
               setRoasterNotes={setRoasterNotes}
               price={price}
@@ -1283,6 +1346,16 @@ export default function RoasterPortalModal({
               directUrl={directUrl}
               setDirectUrl={setDirectUrl}
               handleSaveCoffee={handleSaveCoffee}
+              onClose={onClose}
+            />
+          )}
+
+          {/* TAB: PARTNER PLANS (Available to all) */}
+          {activeTab === 'plans' && (
+            <RoasterPlansTab
+              currentUser={currentUser}
+              registeredCoffees={registeredCoffees}
+              onOpenOnboardTab={() => setActiveTab('onboard')}
               onClose={onClose}
             />
           )}

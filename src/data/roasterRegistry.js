@@ -231,12 +231,26 @@ export function saveRoasterCoffee(coffee, currentUser = null) {
     }
   }
 
+  const rSlug = coffee.roasterSlug || slugify(coffee.roaster || 'specialty-roaster');
+  const cSlug = coffee.coffeeSlug || coffee.beanSlug || slugify(coffee.beanName || 'single-origin');
+
   const record = {
     ...coffee,
     id,
     ownerEmail: ownerEmail || existingCoffee?.ownerEmail || null,
     ownerUid: ownerUid || existingCoffee?.ownerUid || null,
-    roasterSlug: normalizeRoasterKey(coffee.roaster),
+    roasterSlug: rSlug,
+    coffeeSlug: cSlug,
+    slug: cSlug,
+    farm: coffee.farm || '',
+    region: coffee.region || '',
+    doseGrams: coffee.doseGrams !== undefined ? coffee.doseGrams : (coffee.dryDoseGrams || 18),
+    waterGrams: coffee.waterGrams !== undefined ? coffee.waterGrams : 297,
+    bloom: coffee.bloom || '',
+    brewTime: coffee.brewTime || '3m 15s',
+    about: coffee.about || coffee.originStory || '',
+    instagram: coffee.instagram || '',
+    shopLink: coffee.shopLink || coffee.directUrl || '',
     updatedAt: new Date().toISOString(),
     isCustom: true
   };
@@ -323,6 +337,7 @@ const ROASTER_PROFILES_KEY = 'thebrewapp_custom_roasters_v1';
  * Get custom roasters registered via the Roaster Portal
  */
 export function getCustomRoasters() {
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') return [];
   try {
     const raw = localStorage.getItem(ROASTER_PROFILES_KEY);
     return raw ? JSON.parse(raw) : [];
@@ -516,13 +531,48 @@ export function getSmartBagBaseUrl() {
 }
 
 /**
- * Generate a deep-link URL for a coffee profile that opens the app directly into the dialed-in recipe
+ * URL-safe slugify helper (e.g. "Onyx Coffee Lab" -> "onyx-coffee-lab", "Ethiopia Guji Natural" -> "ethiopia-guji-natural")
+ */
+export function slugify(text) {
+  return String(text || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * Generate a unique customer-facing webpage URL for a coffee:
+ * Structure: https://thebrew.app/[roaster-name]/[coffee-name]
+ */
+export function getCoffeeCustomerUrl(coffee, baseUrl) {
+  const base = (baseUrl || getSmartBagBaseUrl()).replace(/\/+$/, '');
+  if (!coffee) return `${base}/`;
+
+  let rSlug = coffee.roasterSlug || slugify(coffee.roaster || 'specialty-roaster');
+  if (rSlug.includes('brookmill')) rSlug = 'brookmill-roaster';
+
+  const cSlug = coffee.coffeeSlug || coffee.slug || coffee.beanSlug || slugify(coffee.beanName || 'single-origin');
+  return `${base}/${rSlug}/${cSlug}`;
+}
+
+/**
+ * Generate a destination URL for a coffee's Smart Bag QR code.
+ * Directs customers to https://thebrew.app/[roaster-name]/[coffee-name]
  */
 export function generateSmartBagUrl(coffee, baseUrl, options = {}) {
   const base = (baseUrl || getSmartBagBaseUrl()).replace(/\/+$/, '');
   if (!coffee) return `${base}/`;
 
-  // Normalize roaster slug with full alias resolution
+  const customerUrl = getCoffeeCustomerUrl(coffee, base);
+
+  // Return clean customer URL unless explicit query params format is requested
+  if (!options.asQueryParams) {
+    return customerUrl;
+  }
+
+  // Fallback / legacy query param payload
   let roasterSlug = String(coffee.roasterSlug || coffee.roaster || 'methodical')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -532,7 +582,6 @@ export function generateSmartBagUrl(coffee, baseUrl, options = {}) {
   }
 
   const params = new URLSearchParams();
-  // Essential flag: launches the brew app straight into the Recipe & Dial-In step (Step 3)
   params.set('recipe', '1');
   params.set('roaster', roasterSlug);
 
@@ -543,7 +592,6 @@ export function generateSmartBagUrl(coffee, baseUrl, options = {}) {
   if (coffee.beanName) params.set('bean', coffee.beanName);
   if (coffee.id) params.set('coffeeId', coffee.id);
 
-  // Extract extraction dial-in specs reliably
   const method = coffee.brewMethod || coffee.extraction?.method || 'pour_over';
   const ratio = coffee.recommendedRatio || coffee.extraction?.ratio || 16.5;
   const tempF = coffee.tempF || coffee.extraction?.tempF || 202;
@@ -555,23 +603,121 @@ export function generateSmartBagUrl(coffee, baseUrl, options = {}) {
   params.set('grind', grind);
   if (coffee.upc) params.set('upc', coffee.upc);
 
-  if (!options.compact) {
-    if (coffee.origin) params.set('origin', coffee.origin);
-    if (coffee.process) params.set('process', coffee.process);
-    if (coffee.elevation) params.set('elevation', coffee.elevation);
-    if (coffee.roastLevel) params.set('roast', coffee.roastLevel);
-  }
-
-  const rawNotes = coffee.tastingNotes && Array.isArray(coffee.tastingNotes) && coffee.tastingNotes.length > 0
-    ? coffee.tastingNotes.join(', ')
-    : (coffee.notes || '');
-  if (rawNotes) {
-    params.set('notes', rawNotes);
-  }
-
-  // Direct root path with query parameters launches the brew app straight into the recipe!
   return `${base}/?${params.toString()}`;
 }
+
+/**
+ * Find a coffee profile by roasterSlug and coffeeSlug
+ */
+export function findCoffeeBySlugs(roasterSlugInput, coffeeSlugInput) {
+  if (!roasterSlugInput) return null;
+  const targetRoasterSlug = slugify(roasterSlugInput);
+  const targetCoffeeSlug = coffeeSlugInput ? slugify(coffeeSlugInput) : '';
+
+  // 1. Search Showcase Roasters
+  const showcaseRoasters = typeof getAllShowcaseRoasters === 'function' ? getAllShowcaseRoasters() : SHOWCASE_ROASTERS;
+  const matchedRoaster = (showcaseRoasters || []).find((r) => {
+    const s = slugify(r.slug || r.id || r.name || r.shortName || '');
+    return s === targetRoasterSlug || targetRoasterSlug.includes(s) || s.includes(targetRoasterSlug);
+  });
+
+  if (matchedRoaster && targetCoffeeSlug) {
+    const matchedCoffee = (matchedRoaster.coffees || []).find((c) => {
+      const cSlug = slugify(c.slug || c.beanSlug || c.beanName || c.id || '');
+      if (cSlug === targetCoffeeSlug) return true;
+      if (c.id === targetCoffeeSlug) return true;
+      if (Array.isArray(c.aliases) && c.aliases.some((a) => slugify(a) === targetCoffeeSlug)) return true;
+      if (targetCoffeeSlug.length >= 6 && (cSlug.includes(targetCoffeeSlug) || targetCoffeeSlug.includes(cSlug))) return true;
+      return false;
+    });
+
+    if (matchedCoffee) {
+      return {
+        ...matchedCoffee,
+        roaster: matchedRoaster.name,
+        roasterSlug: matchedRoaster.slug,
+        roasterInfo: matchedRoaster
+      };
+    }
+  }
+
+  // 2. Search Custom / Registered Coffees in local storage and registry
+  const customCoffees = getCustomRoasterCoffees();
+  const customMatch = (customCoffees || []).find((c) => {
+    const rSlug = slugify(c.roasterSlug || c.roaster || '');
+    const cSlug = slugify(c.coffeeSlug || c.slug || c.beanSlug || c.beanName || c.id || '');
+    const roasterMatches = rSlug === targetRoasterSlug || targetRoasterSlug.includes(rSlug) || rSlug.includes(targetRoasterSlug);
+    if (!roasterMatches) return false;
+    if (!targetCoffeeSlug) return true;
+    return cSlug === targetCoffeeSlug || c.id === targetCoffeeSlug || cSlug.includes(targetCoffeeSlug) || targetCoffeeSlug.includes(cSlug);
+  });
+
+  if (customMatch) {
+    const allCustomRoasters = getCustomRoasters();
+    const roasterObj = allCustomRoasters.find((r) => slugify(r.slug || r.name || '') === targetRoasterSlug) || matchedRoaster;
+    return {
+      ...customMatch,
+      roaster: customMatch.roaster || roasterObj?.name || targetRoasterSlug,
+      roasterSlug: targetRoasterSlug,
+      roasterInfo: roasterObj || null
+    };
+  }
+
+  // 3. Fallback: if roaster found but specific coffee was not found, return first roaster coffee
+  if (matchedRoaster && !targetCoffeeSlug && matchedRoaster.coffees?.length > 0) {
+    return {
+      ...matchedRoaster.coffees[0],
+      roaster: matchedRoaster.name,
+      roasterSlug: matchedRoaster.slug,
+      roasterInfo: matchedRoaster
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Simplified Roaster Monetization Plans (Free vs Pro)
+ */
+export const ROASTER_PLANS = {
+  free: {
+    id: 'free',
+    name: 'Free Partner',
+    price: '$0',
+    period: 'Forever',
+    lotLimit: 3,
+    badge: 'Founding Partner Tier',
+    description: 'Designed to make it extremely easy for a specialty roaster to participate and provide customers with coffee-specific brewing guidance.',
+    features: [
+      'Roaster profile & story',
+      '1–3 coffee lots',
+      'Basic brewing recipe & dial-in parameters',
+      'Instant QR code generation',
+      'Link back to roaster',
+      'Listed in the Roaster Hub'
+    ]
+  },
+  pro: {
+    id: 'pro',
+    name: 'Pro Partner',
+    price: '$24',
+    period: '/ month',
+    annualPrice: '$199 / year',
+    lotLimit: 20,
+    badge: 'Extended Lot Capacity',
+    description: 'Target up to 20 coffee lots with custom QR codes, multiple brew recipes, analytics, and featured placement.',
+    features: [
+      'Up to 20 coffee lots',
+      'Custom QR codes & label formats',
+      'Multiple brewing recipes per coffee',
+      'Custom branded landing pages',
+      'Analytics & click-through tracking',
+      'Featured placement in Roaster Hub',
+      'Customer feedback & community ratings',
+      '"Buy This Coffee" direct shop links'
+    ]
+  }
+};
 
 
 /**
