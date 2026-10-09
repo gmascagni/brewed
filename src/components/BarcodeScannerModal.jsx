@@ -27,7 +27,8 @@ import {
   Edit3,
   Clock,
   Calendar,
-  Check
+  Check,
+  RotateCcw
 } from 'lucide-react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import jsQR from 'jsqr';
@@ -600,6 +601,24 @@ export default function BarcodeScannerModal({
     a.remove();
   };
 
+  const handleResetSelection = () => {
+    hapticTap();
+    setMatchedBean(null);
+    setScannedResult(null);
+    setUncatalogedResult(null);
+    setManualCode('');
+    setCapturedSnapshot(null);
+    setAiBagResult(null);
+    setIsEditingBag(false);
+    setEditedBagData(null);
+    setBagSavedToStash(false);
+    setScanNotice(null);
+    setIsScanning(false);
+    setIsLookingUp(false);
+    setIsOcrRunning(false);
+    setIsSnapshotScanning(false);
+  };
+
   const handleCodeDetected = async (rawValue, format = 'code') => {
     if (!rawValue || rawValue === scannedResult) return;
     hapticScan(); // Mobile tactile vibration on successful scan/detection
@@ -887,6 +906,53 @@ export default function BarcodeScannerModal({
     }
     onClose();
   };
+
+  const STUMPTOWN_PRESET_PAYLOAD = JSON.stringify({
+    v: 1,
+    roaster: "Stumptown",
+    coffee: "Hair Bender",
+    roast: "medium",
+    brewer: "pour-over",
+    ratio: 16,
+    dose: 18.8,
+    water: 300,
+    temp_f: 205,
+    grind: "Medium-Fine",
+    total_time_sec: 210,
+    bloom_water: 60,
+    bloom_time_sec: 45,
+    notes: "Milk chocolate, sweet orange. 45-second bloom recommended."
+  });
+
+  const isStumptownActive = Boolean(
+    (matchedBean?.roaster?.toLowerCase().includes('stumptown') && matchedBean?.beanName?.toLowerCase().includes('hair bender')) ||
+    scannedResult === STUMPTOWN_PRESET_PAYLOAD
+  );
+  const isOnyxActive = Boolean(
+    (scannedResult === '850012345012' || matchedBean?.upc === '850012345012') &&
+    matchedBean?.beanName?.toLowerCase().includes('southern')
+  );
+  const isSeyActive = Boolean(
+    scannedResult === '850098765011' || matchedBean?.upc === '850098765011'
+  );
+  const isProudMaryActive = Boolean(
+    scannedResult === '935412300101' || matchedBean?.upc === '935412300101'
+  );
+
+  const isAiWashedActive = Boolean(
+    (scannedResult?.includes('AI_DEMO') || aiBagResult) &&
+    (matchedBean?.origin?.toLowerCase().includes('ethiopia') || aiBagResult?.metadata?.origin?.toLowerCase().includes('ethiopia'))
+  );
+  const isAiAnaerobicActive = Boolean(
+    (scannedResult?.includes('AI_DEMO') || aiBagResult) &&
+    (matchedBean?.origin?.toLowerCase().includes('colombia') || aiBagResult?.metadata?.origin?.toLowerCase().includes('colombia'))
+  );
+  const isAiMediumActive = Boolean(
+    (scannedResult?.includes('AI_DEMO') || aiBagResult) &&
+    (matchedBean?.beanName?.toLowerCase().includes('southern') || aiBagResult?.metadata?.roaster?.toLowerCase().includes('onyx'))
+  );
+
+  const hasActiveSelection = Boolean(matchedBean || uncatalogedResult || scannedResult || aiBagResult || capturedSnapshot);
 
   if (!isOpen) return null;
 
@@ -1196,73 +1262,115 @@ export default function BarcodeScannerModal({
                 {scannerMode === 'ai_label' ? 'AI Label Demos:' : 'Quick Presets:'}
               </span>
 
+              {hasActiveSelection && (
+                <button
+                  type="button"
+                  onClick={handleResetSelection}
+                  className="px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-[11px] font-mono text-rose-300 hover:text-rose-200 border border-rose-500/40 shrink-0 font-bold flex items-center gap-1.5 transition shadow-sm active:scale-95 cursor-pointer"
+                  title="Clear selected coffee and reset scanner"
+                >
+                  <RotateCcw className="w-3 h-3 text-rose-400" />
+                  <span>Reset / Clear</span>
+                </button>
+              )}
+
               {scannerMode === 'ai_label' ? (
                 <>
                   <button
                     type="button"
-                    onClick={() => handleRunDemoBagOcr('washed')}
-                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-[11px] font-mono text-amber-gold border border-amber-500/40 shrink-0 font-bold flex items-center gap-1.5 shadow-sm"
+                    onClick={() => isAiWashedActive ? handleResetSelection() : handleRunDemoBagOcr('washed')}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono shrink-0 font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer ${
+                      isAiWashedActive
+                        ? 'bg-amber-500/35 text-amber-200 border-2 border-amber-400 ring-2 ring-amber-400/30'
+                        : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-gold border border-amber-500/40'
+                    }`}
+                    title={isAiWashedActive ? "Active preset (click to deselect / reset)" : "Load Washed Ethiopia demo"}
                   >
                     <Sparkles className="w-3 h-3 text-amber-400" />
                     <span>Dense Washed Ethiopia (208°F • 1:16.5)</span>
+                    {isAiWashedActive && <span className="ml-0.5 text-[9px] bg-amber-950/80 px-1 py-0.2 rounded border border-amber-400/60 font-mono">✕</span>}
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleRunDemoBagOcr('anaerobic')}
-                    className="px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 text-[11px] font-mono text-purple-300 border border-purple-500/40 shrink-0 font-bold flex items-center gap-1.5 shadow-sm"
+                    onClick={() => isAiAnaerobicActive ? handleResetSelection() : handleRunDemoBagOcr('anaerobic')}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono shrink-0 font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer ${
+                      isAiAnaerobicActive
+                        ? 'bg-purple-500/35 text-purple-200 border-2 border-purple-400 ring-2 ring-purple-400/30'
+                        : 'bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40'
+                    }`}
+                    title={isAiAnaerobicActive ? "Active preset (click to deselect / reset)" : "Load Anaerobic demo"}
                   >
                     <Sparkles className="w-3 h-3 text-purple-400" />
                     <span>Anaerobic Thermal Shock (198°F • 1:15.5)</span>
+                    {isAiAnaerobicActive && <span className="ml-0.5 text-[9px] bg-purple-950/80 px-1 py-0.2 rounded border border-purple-400/60 font-mono">✕</span>}
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleRunDemoBagOcr('medium')}
-                    className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
+                    onClick={() => isAiMediumActive ? handleResetSelection() : handleRunDemoBagOcr('medium')}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono shrink-0 font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                      isAiMediumActive
+                        ? 'bg-[#A66E38]/40 text-cream-light border-2 border-amber-400 ring-2 ring-amber-400/30'
+                        : 'bg-white/[0.05] hover:bg-[#A66E38]/30 text-cream-soft hover:text-cream-light border border-white/10'
+                    }`}
+                    title={isAiMediumActive ? "Active preset (click to deselect / reset)" : "Load Medium Roast Blend demo"}
                   >
-                    Medium Roast Blend
+                    <span>Medium Roast Blend</span>
+                    {isAiMediumActive && <span className="ml-0.5 text-[9px] bg-black/60 px-1 py-0.2 rounded border border-amber-400/60 font-mono">✕</span>}
                   </button>
                 </>
               ) : (
                 <>
                   <button
                     type="button"
-                    onClick={() => handleCodeDetected(JSON.stringify({
-                      v: 1,
-                      roaster: "Stumptown",
-                      coffee: "Hair Bender",
-                      roast: "medium",
-                      brewer: "pour-over",
-                      ratio: 16,
-                      dose: 18.8,
-                      water: 300,
-                      temp_f: 205,
-                      grind: "Medium-Fine",
-                      total_time_sec: 210,
-                      bloom_water: 60,
-                      bloom_time_sec: 45,
-                      notes: "Milk chocolate, sweet orange. 45-second bloom recommended."
-                    }), "qr_code")}
-                    className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-[11px] font-mono text-amber-gold border border-amber-500/40 shrink-0 font-bold"
+                    onClick={() => isStumptownActive ? handleResetSelection() : handleCodeDetected(STUMPTOWN_PRESET_PAYLOAD, "qr_code")}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono shrink-0 font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                      isStumptownActive
+                        ? 'bg-amber-500/35 text-amber-200 border-2 border-amber-400 ring-2 ring-amber-400/30 shadow-md'
+                        : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-gold border border-amber-500/40'
+                    }`}
+                    title={isStumptownActive ? "Active preset (click to deselect / reset)" : "Load Stumptown Recipe QR"}
                   >
-                    ⚡ Stumptown Recipe QR
+                    <span>⚡ Stumptown Recipe QR</span>
+                    {isStumptownActive && <span className="ml-0.5 text-[9px] bg-amber-950/80 px-1 py-0.2 rounded border border-amber-400/60 font-mono">✕</span>}
                   </button>
                   <button
-                    onClick={() => handleCodeDetected("850012345012", "upc_a")}
-                    className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
+                    type="button"
+                    onClick={() => isOnyxActive ? handleResetSelection() : handleCodeDetected("850012345012", "upc_a")}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono shrink-0 font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                      isOnyxActive
+                        ? 'bg-[#A66E38]/40 text-cream-light border-2 border-amber-400 ring-2 ring-amber-400/30'
+                        : 'bg-white/[0.05] hover:bg-[#A66E38]/30 text-cream-soft hover:text-cream-light border border-white/10'
+                    }`}
+                    title={isOnyxActive ? "Active preset (click to deselect / reset)" : "Load Onyx Southern"}
                   >
-                    Onyx Southern
+                    <span>Onyx Southern</span>
+                    {isOnyxActive && <span className="ml-0.5 text-[9px] bg-black/60 px-1 py-0.2 rounded border border-amber-400/60 font-mono">✕</span>}
                   </button>
                   <button
-                    onClick={() => handleCodeDetected("850098765011", "upc_a")}
-                    className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
+                    type="button"
+                    onClick={() => isSeyActive ? handleResetSelection() : handleCodeDetected("850098765011", "upc_a")}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono shrink-0 font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                      isSeyActive
+                        ? 'bg-[#A66E38]/40 text-cream-light border-2 border-amber-400 ring-2 ring-amber-400/30'
+                        : 'bg-white/[0.05] hover:bg-[#A66E38]/30 text-cream-soft hover:text-cream-light border border-white/10'
+                    }`}
+                    title={isSeyActive ? "Active preset (click to deselect / reset)" : "Load Sey Pink Bourbon"}
                   >
-                    Sey Pink Bourbon
+                    <span>Sey Pink Bourbon</span>
+                    {isSeyActive && <span className="ml-0.5 text-[9px] bg-black/60 px-1 py-0.2 rounded border border-amber-400/60 font-mono">✕</span>}
                   </button>
                   <button
-                    onClick={() => handleCodeDetected("935412300101", "upc_a")}
-                    className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-[#A66E38]/30 text-[11px] font-mono text-cream-soft hover:text-cream-light border border-white/10 shrink-0"
+                    type="button"
+                    onClick={() => isProudMaryActive ? handleResetSelection() : handleCodeDetected("935412300101", "upc_a")}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-mono shrink-0 font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                      isProudMaryActive
+                        ? 'bg-[#A66E38]/40 text-cream-light border-2 border-amber-400 ring-2 ring-amber-400/30'
+                        : 'bg-white/[0.05] hover:bg-[#A66E38]/30 text-cream-soft hover:text-cream-light border border-white/10'
+                    }`}
+                    title={isProudMaryActive ? "Active preset (click to deselect / reset)" : "Load Proud Mary Ghost"}
                   >
-                    Proud Mary Ghost
+                    <span>Proud Mary Ghost</span>
+                    {isProudMaryActive && <span className="ml-0.5 text-[9px] bg-black/60 px-1 py-0.2 rounded border border-amber-400/60 font-mono">✕</span>}
                   </button>
                 </>
               )}
@@ -1407,6 +1515,16 @@ export default function BarcodeScannerModal({
               </div>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={handleResetSelection}
+                  className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-cream-soft hover:text-cream-light font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-white/15 transition cursor-pointer"
+                  title="Clear uncataloged barcode"
+                >
+                  <RotateCcw className="w-4 h-4 text-rose-400" />
+                  <span>Clear / Scan Again</span>
+                </button>
+
                 {onOpenRoasterInfo && (
                   <button
                     type="button"
@@ -1492,6 +1610,15 @@ export default function BarcodeScannerModal({
                   >
                     <Edit3 className="w-3 h-3 text-amber-gold" />
                     <span>{isEditingBag ? 'Close Editor' : 'Correct / Claim'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResetSelection}
+                    className="px-2.5 py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 hover:text-rose-200 font-mono text-[11px] font-bold flex items-center gap-1 border border-rose-500/30 transition cursor-pointer"
+                    title="Clear selected coffee and reset scanner"
+                  >
+                    <RotateCcw className="w-3 h-3 text-rose-400" />
+                    <span>Reset / Clear</span>
                   </button>
                 </div>
               </div>
@@ -1766,6 +1893,17 @@ export default function BarcodeScannerModal({
 
               {/* Action Buttons */}
               <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-end gap-3">
+                {/* 0. Reset / Clear Selection */}
+                <button
+                  type="button"
+                  onClick={handleResetSelection}
+                  className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-cream-soft hover:text-cream-light border border-white/15 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95 cursor-pointer mr-auto"
+                  title="Deselect this coffee and scan another bag"
+                >
+                  <RotateCcw className="w-4 h-4 text-rose-400" />
+                  <span>Reset / Scan Another</span>
+                </button>
+
                 {/* 1. Direct 300-DPI Packaging Sticker Download */}
                 <button
                   type="button"
