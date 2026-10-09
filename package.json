@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/record_build.js && vite build && node scripts/prerender.js",
+    "build": "node scripts/record_build.js && node scripts/fetch_coffee_news.js && vite build && node scripts/prerender.js",
     "preview": "vite preview",
     "check:affiliates": "node scripts/check_affiliate_links.mjs",
     "test:affiliates": "node scripts/check_affiliate_links.mjs",

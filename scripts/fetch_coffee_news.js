@@ -163,8 +163,10 @@ async function run() {
   console.log('=== World Coffee News Live RSS Crawler ===');
   console.log(`Timestamp: ${new Date().toISOString()}`);
 
-  const [dcnItems, googleCoffeeItems] = await Promise.all([
+  const [dcnItems, pdgItems, sprudgeItems, googleCoffeeItems] = await Promise.all([
     fetchFeed('https://dailycoffeenews.com/feed/', 'Daily Coffee News', 'coffee'),
+    fetchFeed('https://perfectdailygrind.com/feed/', 'Perfect Daily Grind', 'coffee'),
+    fetchFeed('https://sprudge.com/feed', 'Sprudge', 'coffee'),
     fetchFeed('https://news.google.com/rss/search?q=specialty+coffee+industry&hl=en-US&gl=US&ceid=US:en', 'Specialty Coffee Press', 'coffee')
   ]);
 
@@ -173,8 +175,8 @@ async function run() {
   const seenUrls = new Set();
   const seenTitles = new Set();
 
-  // Prioritize primary publisher (Daily Coffee News) first
-  for (const item of [...dcnItems, ...googleCoffeeItems]) {
+  // Prioritize primary publishers first
+  for (const item of [...dcnItems, ...pdgItems, ...sprudgeItems, ...googleCoffeeItems]) {
     const normTitle = item.title.toLowerCase().replace(/[^a-z0-9]/g, '');
     if (seenUrls.has(item.url) || seenTitles.has(normTitle)) {
       continue;
@@ -189,8 +191,9 @@ async function run() {
     return;
   }
 
-  // Pick top 8 fresh coffee articles
-  const finalArticles = combined.filter(a => a.category === 'coffee').slice(0, 8);
+  // Pick top 12 fresh coffee articles sorted by publication date
+  combined.sort((a, b) => new Date(b.dateIso).getTime() - new Date(a.dateIso).getTime());
+  const finalArticles = combined.filter(a => a.category === 'coffee').slice(0, 12);
 
   const nowFormatted = new Date().toLocaleDateString('en-US', { 
     month: 'short', 
@@ -201,7 +204,7 @@ async function run() {
   });
 
   const fileContent = `// World Coffee News Dispatch
-// Automatically synced from live RSS feeds: Daily Coffee News, Specialty Coffee Press.
+// Automatically synced from live RSS feeds: Daily Coffee News, Perfect Daily Grind, Sprudge, Specialty Coffee Press.
 // Last Synced: ${nowFormatted}
 
 export const LAST_UPDATED = ${JSON.stringify(nowFormatted)};
@@ -222,6 +225,7 @@ export const NEWS_CATEGORIES = [
 }
 
 run().catch((err) => {
-  console.error('[RSS Fetcher] Fatal error running crawler:', err);
-  process.exit(1);
+  console.warn('[RSS Fetcher] Warning running crawler (retaining existing news cache):', err.message);
+  // Do not break build if external network is unavailable
+  process.exit(0);
 });

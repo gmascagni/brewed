@@ -40,11 +40,82 @@ function sanitizeNewsText(str) {
     .trim();
 }
 
+function parseRssJsonItem(item, defaultSource) {
+  const title = (item.title || '').replace(/<[^>]+>/g, '').trim();
+  const url = item.link || item.guid || '';
+  if (!title || !url) return null;
+
+  let desc = (item.description || item.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  if (desc.length > 280) {
+    desc = desc.substring(0, 277) + '...';
+  }
+  if (!desc || desc.length < 20) {
+    desc = `${title}. Read complete reporting on ${defaultSource}.`;
+  }
+
+  const parsedDate = item.pubDate ? new Date(item.pubDate.replace(' ', 'T')) : new Date();
+  const dateFormatted = !isNaN(parsedDate.getTime())
+    ? parsedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : 'Recent';
+
+  let tag = 'Industry & News';
+  const combined = (title + ' ' + desc).toLowerCase();
+  if (combined.includes('farm') || combined.includes('origin') || combined.includes('harvest') || combined.includes('producer') || combined.includes('grower')) {
+    tag = 'Farm & Origin';
+  } else if (combined.includes('competition') || combined.includes('championship') || combined.includes('barista') || combined.includes('cup of excellence')) {
+    tag = 'Competitions';
+  } else if (combined.includes('market') || combined.includes('price') || combined.includes('trade') || combined.includes('report') || combined.includes('export')) {
+    tag = 'Market & Trade';
+  }
+
+  const domain = url.replace(/^https?:\/\//i, '').split('/')[0];
+
+  return {
+    id: `live_${Math.abs(url.split('').reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0))}`,
+    title,
+    source: defaultSource,
+    sourceDomain: domain,
+    url,
+    publishedDate: dateFormatted,
+    dateIso: !isNaN(parsedDate.getTime()) ? parsedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+    category: 'coffee',
+    tag,
+    readTime: `${Math.max(2, Math.min(6, Math.round(desc.split(' ').length / 30) + 1))} min read`,
+    featured: false,
+    summary: desc,
+    keyPoints: [
+      `Published by ${defaultSource} on ${dateFormatted}`,
+      `Direct coverage covering ${tag.toLowerCase()}`
+    ]
+  };
+}
+
 export default function WorldNewsSection({ trackMode }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [syncStatusNotice, setSyncStatusNotice] = useState(null);
+
+  // Client-side persisted news state (falling back to build-time bundled articles)
+  const [articles, setArticles] = useState(() => {
+    try {
+      const cached = localStorage.getItem('the_brew_app_fresh_news');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return WORLD_BREW_NEWS;
+  });
+
+  const [lastSynced, setLastSynced] = useState(() => {
+    try {
+      const saved = localStorage.getItem('the_brew_app_news_last_synced');
+      if (saved) return saved;
+    } catch {}
+    return LAST_UPDATED || 'Recently';
+  });
 
   // Listen for navigation event from Header
   useEffect(() => {
@@ -57,7 +128,7 @@ export default function WorldNewsSection({ trackMode }) {
 
   // Filter and search logic
   const filteredNews = useMemo(() => {
-    return WORLD_BREW_NEWS.filter((item) => {
+    return articles.filter((item) => {
       // Category filter
       const matchesCategory = 
         selectedCategory === 'all' ||
@@ -78,13 +149,90 @@ export default function WorldNewsSection({ trackMode }) {
         item.keyPoints.some((pt) => pt.toLowerCase().includes(q))
       );
     });
-  }, [selectedCategory, searchQuery]);
+  }, [articles, selectedCategory, searchQuery]);
 
-  const handleManualRefresh = () => {
+  // Real live RSS fetcher connecting directly to primary publishers
+  const handleManualRefresh = async () => {
     setIsRefreshing(true);
-    setTimeout(() => {
+    setSyncStatusNotice({ 
+      type: 'loading', 
+      message: 'Connecting to live RSS feeds (Daily Coffee News & Perfect Daily Grind)...' 
+    });
+    setIsExpanded(true);
+
+    try {
+      const feedEndpoints = [
+        { url: 'https://dailycoffeenews.com/feed/', source: 'Daily Coffee News' },
+        { url: 'https://perfectdailygrind.com/feed/', source: 'Perfect Daily Grind' }
+      ];
+
+      const results = await Promise.allSettled(
+        feedEndpoints.map(async ({ url, source }) => {
+          const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`, {
+            signal: AbortSignal.timeout(9000)
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          if (data.status !== 'ok' || !Array.isArray(data.items)) throw new Error('Invalid RSS payload');
+          return data.items.map(item => parseRssJsonItem(item, source)).filter(Boolean);
+        })
+      );
+
+      const fetchedItems = [];
+      const seenUrls = new Set();
+      const seenTitles = new Set();
+
+      for (const res of results) {
+        if (res.status === 'fulfilled' && Array.isArray(res.value)) {
+          for (const item of res.value) {
+            const normTitle = item.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (!seenUrls.has(item.url) && !seenTitles.has(normTitle)) {
+              seenUrls.add(item.url);
+              seenTitles.add(normTitle);
+              fetchedItems.push(item);
+            }
+          }
+        }
+      }
+
+      if (fetchedItems.length > 0) {
+        fetchedItems.sort((a, b) => new Date(b.dateIso).getTime() - new Date(a.dateIso).getTime());
+        const topStories = fetchedItems.slice(0, 12);
+        setArticles(topStories);
+
+        const nowFormatted = new Date().toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit'
+        });
+        setLastSynced(nowFormatted);
+
+        try {
+          localStorage.setItem('the_brew_app_fresh_news', JSON.stringify(topStories));
+          localStorage.setItem('the_brew_app_news_last_synced', nowFormatted);
+        } catch {}
+
+        setSyncStatusNotice({
+          type: 'success',
+          message: `Successfully captured ${topStories.length} live stories from primary RSS feeds.`
+        });
+      } else {
+        throw new Error('No stories returned from live RSS feeds');
+      }
+    } catch (err) {
+      console.warn('Live RSS refresh error:', err);
+      setSyncStatusNotice({
+        type: 'error',
+        message: 'Could not connect to live RSS proxy. Displaying authentic curated cache.'
+      });
+    } finally {
       setIsRefreshing(false);
-    }, 700);
+      setTimeout(() => {
+        setSyncStatusNotice(null);
+      }, 6000);
+    }
   };
 
   return (
@@ -105,7 +253,7 @@ export default function WorldNewsSection({ trackMode }) {
           <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-extrabold text-cream-light drop-shadow-md flex items-center gap-3">
             <span>Brew News</span>
             <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-cream-soft/80 border border-white/15">
-              {WORLD_BREW_NEWS.length} Stories
+              {articles.length} Stories
             </span>
           </h3>
           
@@ -126,10 +274,22 @@ export default function WorldNewsSection({ trackMode }) {
                 <span>Curated via RSS</span>
               </div>
               <div className="text-[10px] text-cream-soft/70 font-mono">
-                {LAST_UPDATED ? `Synced: ${LAST_UPDATED}` : 'Updated periodically'}
+                {lastSynced ? `Synced: ${lastSynced}` : 'Updated periodically'}
               </div>
             </div>
           </div>
+
+          {/* Real Live RSS Refresh Button */}
+          <button
+            type="button"
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="px-4 py-3.5 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-gold border border-amber-500/35 text-xs font-mono font-bold flex items-center gap-2 transition active:scale-95 cursor-pointer disabled:opacity-50 shadow-md whitespace-nowrap"
+            title="Fetch the newest live articles from Daily Coffee News & Perfect Daily Grind"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-amber-gold ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>{isRefreshing ? 'Fetching News...' : 'Refresh Feed'}</span>
+          </button>
 
           {/* Expand / Collapse Button */}
           <button
@@ -151,6 +311,25 @@ export default function WorldNewsSection({ trackMode }) {
       {/* Collapsible Body Content */}
       {isExpanded && (
         <div className="mt-8 space-y-8 animate-fade-in">
+          {/* Live Sync Status Notice Banner */}
+          {syncStatusNotice && (
+            <div className={`p-4 rounded-2xl flex items-center gap-3 text-xs font-mono border transition-all animate-fade-in ${
+              syncStatusNotice.type === 'success'
+                ? 'bg-emerald-500/15 text-emerald-200 border-emerald-500/35 shadow-lg'
+                : syncStatusNotice.type === 'error'
+                ? 'bg-amber-500/15 text-amber-200 border-amber-500/35 shadow-lg'
+                : 'bg-white/[0.08] text-cream-light border-white/20 shadow-lg'
+            }`}>
+              {syncStatusNotice.type === 'loading' ? (
+                <RefreshCw className="w-4 h-4 text-amber-gold animate-spin shrink-0" />
+              ) : syncStatusNotice.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              ) : (
+                <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+              )}
+              <span>{syncStatusNotice.message}</span>
+            </div>
+          )}
 
       {/* Control Bar: Category Filters & Search Input */}
       <div className="mt-8 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
