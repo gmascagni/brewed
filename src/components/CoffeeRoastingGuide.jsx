@@ -408,6 +408,7 @@ export default function CoffeeRoastingGuide({ onOpenWaterLab, onSelectMethodToBr
   const [totalRoastSec, setTotalRoastSec] = useState(570); // 9m 30s
   const [firstCrackSec, setFirstCrackSec] = useState(465); // 7m 45s
   const [checkedSteps, setCheckedSteps] = useState({});
+  const [isBannerExpanded, setIsBannerExpanded] = useState(false);
 
   const selectedLayer = CHERRY_LAYERS.find((l) => l.id === selectedLayerId) || CHERRY_LAYERS[4];
   const selectedPhase = ROAST_PHASES.find((p) => p.id === selectedPhaseId) || ROAST_PHASES[3];
@@ -529,28 +530,37 @@ export default function CoffeeRoastingGuide({ onOpenWaterLab, onSelectMethodToBr
 
   return (
     <section
-      id="coffee-roasting-science-section"
+      id="coffee-roasting-section"
       className="rounded-3xl border border-[#ECE6DC] bg-white shadow-card overflow-hidden scroll-mt-28 transition-all"
     >
       {/* Top Banner Header */}
-      <div className="p-5 sm:p-8 bg-gradient-to-br from-[#1C140E] via-[#261A11] to-[#140E0A] text-[#FAF7F2] border-b border-[#A66E38]/30 relative overflow-hidden">
+      <div className="p-4 sm:p-8 bg-gradient-to-br from-[#1C140E] via-[#261A11] to-[#140E0A] text-[#FAF7F2] border-b border-[#A66E38]/30 relative overflow-hidden">
         <div className="max-w-4xl relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#A66E38]/25 border border-[#D2A06E]/40 text-[#E8AF72] font-mono text-[11px] font-bold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#A66E38]/25 border border-[#D2A06E]/40 text-[#E8AF72] font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-2.5 sm:mb-3">
             <Flame className="w-3.5 h-3.5 text-[#E8AF72]" />
             <span>Roasting Thermodynamics & Green Bean Masterclass</span>
           </div>
 
-          <h3 className="font-editorial text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight mb-2.5">
+          <h3 className="font-editorial text-xl sm:text-3xl md:text-4xl font-bold text-white leading-tight mb-2">
             From Green Seed to Roasted Cup: Rate of Rise (RoR), Maillard & DIY Home Roasting
           </h3>
 
-          <p className="text-xs sm:text-sm md:text-base text-stone-300 leading-relaxed max-w-3xl font-sans">
+          <p className={`text-xs sm:text-sm md:text-base text-stone-300 leading-relaxed max-w-3xl font-sans ${
+            isBannerExpanded ? '' : 'line-clamp-2 sm:line-clamp-none'
+          }`}>
             Understand what actually happens inside a coffee bean at 400°F. Explore the 5 cellular layers of a coffee cherry, the 5 thermal stages of a roast, how master roasters control <strong className="text-[#E8AF72]">Rate of Rise (RoR)</strong> to prevent baked or scorched flavors, and how to roast your own green beans at home.
           </p>
+          <button
+            type="button"
+            onClick={() => setIsBannerExpanded(prev => !prev)}
+            className="sm:hidden mt-1 text-[11px] font-mono font-bold text-[#E8AF72] hover:underline cursor-pointer"
+          >
+            {isBannerExpanded ? 'Show less ↑' : 'Read more ↓'}
+          </button>
         </div>
 
         {/* Interactive Pillar Tab Selector (Mobile-Friendly Horizontal Scroll) */}
-        <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="mt-4 sm:mt-6 flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {PILLARS.map((tab) => {
             const isActive = activePillar === tab.id;
             return (

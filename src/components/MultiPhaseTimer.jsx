@@ -46,7 +46,7 @@ import {
   TRIGGER_ASSESSMENT_EVENT
 } from '../utils/brewSessionManager';
 import { getSavedGrinderId, getGrinderSetting } from '../data/grinderProfiles';
-import { calculateClosedLoopDialIn, formatSecondsToMmSs, METHOD_DRAWDOWN_TARGETS } from '../utils/dialInEngine';
+import { calculateClosedLoopDialIn, formatSecondsToMmSs, METHOD_DRAWDOWN_TARGETS, analyzeUserBrewDescription, AI_SYMPTOM_PRESETS } from '../utils/dialInEngine';
 import { resolveGrindId } from './GrindVisualGuide';
 
 export default function MultiPhaseTimer({ 
@@ -991,6 +991,51 @@ export default function MultiPhaseTimer({
 
   const [isProTipOpen, setIsProTipOpen] = useState(false);
 
+  // AI Barista Co-Pilot Natural Language Diagnostic State
+  const [aiDescriptionInput, setAiDescriptionInput] = useState('');
+  const [aiDiagnosisResult, setAiDiagnosisResult] = useState(null);
+  const [isAiCopilotExpanded, setIsAiCopilotExpanded] = useState(false);
+
+  const handleRunAiDiagnosis = (textOverride) => {
+    const queryText = typeof textOverride === 'string' ? textOverride : aiDescriptionInput;
+    if (!queryText || !queryText.trim()) return;
+    if (typeof textOverride === 'string') {
+      setAiDescriptionInput(textOverride);
+    }
+    hapticTap();
+    const savedGrinderId = getSavedGrinderId();
+    const ratio = customRatio || activeMethod?.ratio || 16;
+    const tempF = dialedInCoffee?.tempF || activeMethod?.tempF || 202;
+    const currentGrind = dialedInCoffee?.recommendedGrind || dialedInCoffee?.grindSetting || customGrind || activeMethod?.grind || 'Medium-Fine';
+
+    const result = analyzeUserBrewDescription({
+      description: queryText,
+      methodId: activeMethod?.id || 'pour_over',
+      actualDrawdownSec: actualDrawdownSec || scheduledTotalDurationSec,
+      currentTempF: tempF,
+      currentRatio: ratio,
+      currentGrindSetting: currentGrind,
+      grinderId: savedGrinderId,
+      beanInfo: dialedInCoffee
+    });
+    setAiDiagnosisResult(result);
+    if (result?.tasteProfile && ['sour', 'sweet', 'bitter'].includes(result.tasteProfile)) {
+      setTasteFeedback(result.tasteProfile);
+    }
+  };
+
+  const handleApplyAiPrescription = () => {
+    if (!aiDiagnosisResult?.recipePatch) return;
+    hapticTap();
+    if (onApplyNextBrewTweak) {
+      onApplyNextBrewTweak(aiDiagnosisResult.recipePatch);
+    }
+    if (!isSavedToLog) {
+      handleSaveToLog();
+    }
+    handleReset();
+  };
+
   return (
     <div className={`p-5 sm:p-8 md:p-10 lg:p-12 rounded-3xl ${
       isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
@@ -1930,6 +1975,188 @@ export default function MultiPhaseTimer({
           {localMuted ? <VolumeX className="w-5 h-5 text-rose-400" /> : <Volume2 className="w-5 h-5 text-amber-400" />}
         </button>
 
+      </div>
+
+      {/* AI Barista Co-Pilot: Natural-Language Brew & Cup Diagnostic Assistant */}
+      <div className="mt-8 relative z-10" data-testid="ai-barista-copilot">
+        <div className="rounded-3xl bg-gradient-to-br from-[#1C140E]/95 via-black/85 to-[#120D09]/95 border border-amber-500/40 shadow-2xl overflow-hidden backdrop-blur-md">
+          {/* Header / Toggle Bar */}
+          <button
+            type="button"
+            onClick={() => {
+              hapticTap();
+              setIsAiCopilotExpanded(prev => !prev);
+            }}
+            className="w-full p-4 sm:p-5 flex items-center justify-between gap-3 text-left hover:bg-white/[0.03] transition-colors cursor-pointer"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-300 shrink-0 shadow-inner">
+                <Sparkles className="w-5 h-5 animate-pulse" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-400">
+                    AI Barista Co-Pilot • Interactive Brew Diagnostics
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[9px] font-mono font-bold">
+                    Describe Your Pour or Cup
+                  </span>
+                </div>
+                <h4 className="font-serif text-base sm:text-lg font-bold text-cream-light truncate mt-0.5">
+                  Tell the AI Barista what your coffee bed looks like or how the cup tastes
+                </h4>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs font-mono font-bold text-amber-300 hidden sm:inline">
+                {isAiCopilotExpanded ? 'Hide Co-Pilot' : 'Ask AI Barista'}
+              </span>
+              {isAiCopilotExpanded ? (
+                <ChevronUp className="w-4 h-4 text-amber-300" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-amber-300" />
+              )}
+            </div>
+          </button>
+
+          {isAiCopilotExpanded && (
+            <div className="px-4 pb-5 sm:px-6 sm:pb-6 pt-2 border-t border-white/10 space-y-4 animate-fade-in">
+              <p className="text-xs text-stone-300 font-sans leading-relaxed">
+                Describe what happened during your pour (e.g., <em>"water stalled and left a muddy bed"</em>, <em>"deep crater in the middle with grounds high on the filter walls"</em>) or how the cup tastes as it cools. The AI Co-Pilot cross-references your active <strong>{activeMethod?.name || 'Brewer'}</strong> recipe ({effectiveDose}g, 1:{customRatio || activeMethod?.ratio || 16}, {formatSecondsToMmSs(actualDrawdownSec)}) to prescribe technique and 1-click dial-in fixes.
+              </p>
+
+              {/* Quick-Tap Symptom Presets */}
+              <div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-stone-400 block mb-2">
+                  Quick-Tap Common Brew & Cup Observations:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {AI_SYMPTOM_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => handleRunAiDiagnosis(preset.text)}
+                      className="px-3 py-1.5 rounded-xl bg-white/[0.06] hover:bg-amber-500/20 border border-white/10 hover:border-amber-400/50 text-stone-200 hover:text-amber-200 text-[11px] font-sans font-medium transition-all active:scale-95 cursor-pointer text-left"
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Free-Text Input & Diagnose Button */}
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <textarea
+                  rows={2}
+                  value={aiDescriptionInput}
+                  onChange={(e) => setAiDescriptionInput(e.target.value)}
+                  placeholder="Describe your coffee bed, drawdown speed, bloom bubbles, or flavor notes (e.g. 'Water pooled on top, tastes dry and astringent')..."
+                  className="flex-1 rounded-2xl bg-black/60 border border-white/15 focus:border-amber-400 px-3.5 py-2.5 text-xs sm:text-sm text-cream-light placeholder:text-stone-500 font-sans focus:outline-none resize-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRunAiDiagnosis()}
+                  disabled={!aiDescriptionInput.trim()}
+                  className="px-5 py-3 rounded-2xl btn-tactile-amber text-espresso-950 font-mono text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg hover:scale-[1.02] active:scale-95 transition disabled:opacity-40 cursor-pointer shrink-0"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Diagnose My Brew</span>
+                </button>
+              </div>
+
+              {/* AI Diagnosis Output Card */}
+              {aiDiagnosisResult && (
+                <div className="p-4 sm:p-5 rounded-2xl bg-black/60 border border-amber-400/40 space-y-4 animate-fade-in">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                    <div>
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold block">
+                        AI Extraction Forensics Diagnosis
+                      </span>
+                      <h5 className="font-serif text-base sm:text-lg font-bold text-cream-light mt-0.5">
+                        {aiDiagnosisResult.headline}
+                      </h5>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        unlockAudio();
+                        speakActiveInstruction(
+                          `${aiDiagnosisResult.headline}. ${aiDiagnosisResult.physicsExplanation} Recommended adjustment: ${aiDiagnosisResult.singleSummary}`,
+                          false
+                        );
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-amber-200 text-[11px] font-mono font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition"
+                    >
+                      <Volume2 className="w-3.5 h-3.5" />
+                      <span>🔊 Speak Diagnosis</span>
+                    </button>
+                  </div>
+
+                  {/* Detected Signals */}
+                  {aiDiagnosisResult.detectedSignals?.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-[10px] font-mono text-stone-400 uppercase mr-1">Detected Signals:</span>
+                      {aiDiagnosisResult.detectedSignals.map((sig, i) => (
+                        <span key={i} className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-200 text-[10px] font-mono font-bold">
+                          {sig}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* 1. Physics Root Cause */}
+                  <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/10 space-y-1">
+                    <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-amber-300 block">
+                      1. Why This Happened (Extraction Physics)
+                    </span>
+                    <p className="text-xs sm:text-sm text-stone-200 font-sans leading-relaxed">
+                      {aiDiagnosisResult.physicsExplanation}
+                    </p>
+                  </div>
+
+                  {/* 2. Pouring & Technique Prescription */}
+                  {aiDiagnosisResult.techniquePrescription?.length > 0 && (
+                    <div className="p-3.5 rounded-xl bg-emerald-950/25 border border-emerald-500/30 space-y-2">
+                      <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-emerald-300 block">
+                        2. What To Do Next Brew (Technique & Pouring Adjustments)
+                      </span>
+                      <ul className="space-y-1.5 text-xs text-stone-200 font-sans">
+                        {aiDiagnosisResult.techniquePrescription.map((step, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-emerald-400 font-mono font-bold shrink-0">{idx + 1}.</span>
+                            <span>{step}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* 3. Quantitative Recipe Patch & 1-Click Apply */}
+                  <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="text-[10px] font-mono font-extrabold uppercase tracking-wider text-amber-300 block">
+                        3. Quantitative Recipe Adjustment
+                      </span>
+                      <p className="text-xs font-mono font-bold text-cream-light mt-0.5">
+                        {aiDiagnosisResult.singleSummary}
+                      </p>
+                    </div>
+                    {onApplyNextBrewTweak && aiDiagnosisResult.recipePatch && (
+                      <button
+                        type="button"
+                        onClick={handleApplyAiPrescription}
+                        className="px-4 py-2.5 rounded-xl btn-tactile-amber text-espresso-950 font-mono text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg hover:scale-[1.02] active:scale-95 transition cursor-pointer shrink-0"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                        <span>Apply AI Fix to Next Brew</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Phase Roadmap Progress Timeline */}

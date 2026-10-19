@@ -322,3 +322,21 @@ input[type=range]::-webkit-slider-thumb:hover {
   }
 }
 
+/* Scroll-Driven Header Shadow & Compact Elevation (Progressive Enhancement) */
+@keyframes headerScrollElevate {
+  to {
+    box-shadow: 0 8px 24px -6px rgba(20, 17, 15, 0.1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {
+    header.sticky {
+      animation: headerScrollElevate auto linear both;
+      animation-timeline: scroll(block root);
+      animation-range: 0px 120px;
+    }
+  }
+}
+
+

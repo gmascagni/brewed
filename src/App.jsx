@@ -1092,6 +1092,72 @@ export default function App() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [currentStep]);
+
+  // Auto-hide mobile top brand bar when scrolling down; reveal immediately on upward scroll
+  const [isMobileHeaderHidden, setIsMobileHeaderHidden] = useState(false);
+  const lastScrollYRef = useRef(0);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleScroll = () => {
+      const currentY = window.scrollY || 0;
+      const delta = currentY - lastScrollYRef.current;
+      if (currentY < 60) {
+        setIsMobileHeaderHidden(false);
+      } else if (delta > 12 && currentY > 90) {
+        setIsMobileHeaderHidden(true);
+      } else if (delta < -8) {
+        setIsMobileHeaderHidden(false);
+      }
+      lastScrollYRef.current = currentY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Horizontal touch swipe gestures between Step 1 <-> Step 2 <-> Step 3 <-> Step 4 in Brew Station
+  const brewTouchStartRef = useRef(null);
+
+  const handleBrewTouchStart = (e) => {
+    if (!e.touches || e.touches.length !== 1) return;
+    const target = e.target;
+    if (
+      target &&
+      target.closest &&
+      target.closest('input, textarea, select, [role="slider"], .overflow-x-auto, [data-no-swipe]')
+    ) {
+      brewTouchStartRef.current = null;
+      return;
+    }
+    brewTouchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+      time: Date.now()
+    };
+  };
+
+  const handleBrewTouchEnd = (e) => {
+    if (!brewTouchStartRef.current || !e.changedTouches || e.changedTouches.length !== 1) return;
+    const start = brewTouchStartRef.current;
+    brewTouchStartRef.current = null;
+    const dx = e.changedTouches[0].clientX - start.x;
+    const dy = e.changedTouches[0].clientY - start.y;
+    const elapsed = Date.now() - start.time;
+
+    // Require intentional horizontal swipe (>75px, predominantly horizontal, within 700ms)
+    if (elapsed < 700 && Math.abs(dx) > 75 && Math.abs(dx) > Math.abs(dy) * 2.2) {
+      if (dx < 0 && currentStep < 4) {
+        const next = currentStep + 1;
+        setCurrentStep(next);
+        if (currentActiveMethod) navigate(`/methods/${currentActiveMethod.id}`);
+      } else if (dx > 0 && currentStep > 1) {
+        const prev = currentStep - 1;
+        setCurrentStep(prev);
+        if (prev === 1) navigate('/');
+        else if (currentActiveMethod) navigate(`/methods/${currentActiveMethod.id}`);
+      }
+    }
+  };
   
   // Guarantee active method belongs to current track
   const currentActiveMethod = (activeMethod && methods.some(m => m.id === activeMethod.id))
@@ -1137,7 +1203,12 @@ export default function App() {
       </div>
       
       {/* 100% Bulletproof Sticky Top Header Container */}
-      <header className={`sticky top-0 ${isAnyModalOpen ? 'z-20 pointer-events-none' : 'z-40'} backdrop-blur-xl transition-all duration-300 border-b border-[#ECE6DC] bg-[#FAF7F2]/95 shadow-xs pt-1 sm:pt-2 pb-0.5`}>
+      <header className={`sticky top-0 ${isAnyModalOpen ? 'z-20 pointer-events-none' : 'z-40'} backdrop-blur-xl transition-all duration-300 border-b border-[#ECE6DC] bg-[#FAF7F2]/95 shadow-xs pt-0.5 sm:pt-2 pb-0.5`}>
+        <div className={`transition-all duration-300 ease-out ${
+          isMobileHeaderHidden
+            ? 'max-md:max-h-0 max-md:opacity-0 max-md:-translate-y-2 max-md:overflow-hidden max-md:pointer-events-none'
+            : 'max-md:max-h-24 max-md:opacity-100 max-md:translate-y-0'
+        }`}>
         <Header
           onOpenJournal={() => setIsJournalOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
@@ -1197,6 +1268,7 @@ export default function App() {
           onToggleMute={() => setIsMuted(!isMuted)}
           currentUser={currentUser}
         />
+        </div>
         
         {/* Step Progress Bar Pinned Inside Sticky Top Bar (active only in BREW area) */}
         {currentArea === 'brew' && (
@@ -1422,7 +1494,11 @@ export default function App() {
 
           {/* AREA 5: BREW (4-STEP GUIDED BREW WORKFLOW) */}
           {currentArea === 'brew' && (
-            <>
+            <div
+              onTouchStart={handleBrewTouchStart}
+              onTouchEnd={handleBrewTouchEnd}
+              className="space-y-8"
+            >
               {/* STEP 01: CHOOSE BREWER */}
               {currentStep === 1 && (
                 <div className="space-y-10 animate-fade-in">
@@ -1737,7 +1813,7 @@ export default function App() {
                   />
                 </div>
               )}
-            </>
+            </div>
           )}
 
           {/* Tasting Journal Modal */}

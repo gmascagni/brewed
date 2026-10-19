@@ -59,6 +59,9 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
           );
         })}
       </div>
+      <div className="md:hidden text-center pt-1 text-[9px] font-mono text-[#766A62] tracking-wide select-none">
+        ← Swipe left or right between steps (0{currentStep}/04) →
+      </div>
     </nav>
   );
 }

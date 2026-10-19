@@ -18,6 +18,7 @@ export default function LearnSection({
 }) {
   const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
   const [isKnowledgeOpen, setIsKnowledgeOpen] = useState(false);
+  const [isHeroExpanded, setIsHeroExpanded] = useState(false);
 
   const handleScrollToSection = (id) => {
     const el = document.getElementById(id);
@@ -52,9 +53,9 @@ export default function LearnSection({
   };
 
   return (
-    <div className="space-y-8 sm:space-y-12 animate-fade-in">
+    <div className="space-y-6 sm:space-y-12 animate-fade-in">
       {/* Sticky Mobile & Desktop Quick-Jump Sub-Navigation Bar */}
-      <div className="sticky top-[62px] md:top-[74px] z-30 -mx-3 px-3 py-2.5 sm:mx-0 sm:px-4 sm:rounded-2xl bg-[#FAF7F2]/95 backdrop-blur-md border-y sm:border border-[#ECE6DC] shadow-xs flex items-center gap-2 overflow-x-auto no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="sticky top-[54px] md:top-[74px] z-30 -mx-3 px-3 py-2 sm:mx-0 sm:px-4 sm:rounded-2xl bg-[#FAF7F2]/95 backdrop-blur-md border-y sm:border border-[#ECE6DC] shadow-xs flex items-center gap-2 overflow-x-auto no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#766A62] shrink-0 hidden sm:inline pr-1">
           Jump To:
         </span>
@@ -118,21 +119,32 @@ export default function LearnSection({
         </button>
       </div>
 
-      {/* Learn Hub Header */}
-      <div className="p-6 sm:p-8 md:p-10 rounded-3xl relative overflow-hidden shadow-card border border-[#ECE6DC] bg-gradient-to-br from-[#FAF7F2] via-white to-[#F7F4EE]">
+      {/* Learn Hub Header (Compact & Collapsible on Mobile) */}
+      <div className="p-4 sm:p-8 md:p-10 rounded-3xl relative overflow-hidden shadow-card border border-[#ECE6DC] bg-gradient-to-br from-[#FAF7F2] via-white to-[#F7F4EE]">
         <div className="max-w-3xl relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] font-sans text-xs sm:text-sm font-bold uppercase tracking-wider mb-4">
-            <GraduationCap className="w-4 h-4" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] font-sans text-[11px] sm:text-sm font-bold uppercase tracking-wider mb-2.5 sm:mb-4">
+            <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Specialty Coffee Knowledge & Learning Center</span>
           </div>
 
-          <h2 className="font-editorial text-2xl sm:text-4xl lg:text-5xl font-bold text-[#14110F] leading-tight mb-4">
+          <h2 className="font-editorial text-xl sm:text-4xl lg:text-5xl font-bold text-[#14110F] leading-tight mb-2 sm:mb-4">
             Bean Anatomy, Roasting Science (RoR), Masterclasses & Extraction
           </h2>
 
-          <p className="text-sm sm:text-base md:text-lg text-[#5C524B] leading-relaxed mb-6 font-sans">
-            Everything you need to master specialty coffee from seed to cup. Explore interactive Rate of Rise (RoR) roasting thermodynamics, green bean anatomy, DIY home roasting, champion video masterclasses, and extraction diagnostics.
-          </p>
+          <div className="mb-4 sm:mb-6">
+            <p className={`text-xs sm:text-base md:text-lg text-[#5C524B] leading-relaxed font-sans ${
+              isHeroExpanded ? '' : 'line-clamp-2 sm:line-clamp-none'
+            }`}>
+              Everything you need to master specialty coffee from seed to cup. Explore interactive Rate of Rise (RoR) roasting thermodynamics, green bean anatomy, DIY home roasting, champion video masterclasses, and extraction diagnostics.
+            </p>
+            <button
+              type="button"
+              onClick={() => setIsHeroExpanded(prev => !prev)}
+              className="sm:hidden mt-1 text-[11px] font-mono font-bold text-[#A8622D] hover:underline cursor-pointer"
+            >
+              {isHeroExpanded ? 'Show less ↑' : 'Read more ↓'}
+            </button>
+          </div>
 
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs sm:text-sm font-sans font-bold">
             <button
