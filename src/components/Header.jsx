@@ -64,49 +64,62 @@ export default function Header({
   }, []);
 
   return (
-    <div className="relative z-40 px-3 sm:px-6 lg:px-8 py-3.5 sm:py-4 transition-colors duration-400 bg-white/95 backdrop-blur-md border-b border-[#ECE6DC] text-[#14110F]">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 min-h-[52px]">
+    <div className="relative z-40 px-3 sm:px-6 lg:px-8 py-2.5 sm:py-4 transition-colors duration-400 bg-white/95 backdrop-blur-md border-b border-[#ECE6DC] text-[#14110F]">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2.5 md:gap-4 min-h-[48px] md:min-h-[52px]">
         
         {/* 1. Left: Editorial Logo & Brand Title */}
-        <div className="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start">
-          <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5 sm:space-x-3 w-full md:w-auto justify-between md:justify-start">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
             <div 
               onClick={() => onSelectView && onSelectView('discovery')}
               className="cursor-pointer p-1.5 rounded-2xl transition-all duration-300 flex items-center justify-center bg-[#FAF7F2] border border-[#ECE6DC] shadow-xs hover:border-[#D69550] shrink-0"
             >
-              <BrandLogo size={32} />
+              <BrandLogo size={30} />
             </div>
-            <div>
+            <div className="min-w-0">
               <h1 
                 onClick={() => onSelectView && onSelectView('discovery')}
-                className="font-editorial text-xl sm:text-2xl font-bold tracking-tight text-[#14110F] flex items-center gap-2 cursor-pointer leading-normal py-0.5"
+                className="font-editorial text-lg sm:text-2xl font-bold tracking-tight text-[#14110F] flex items-center gap-1.5 sm:gap-2 cursor-pointer leading-normal py-0.5 truncate"
               >
                 <span>TheBrew.App</span>
-                <span className="whitespace-nowrap text-[9px] uppercase font-mono px-2 py-0.5 rounded-full border bg-[#FAF0E6] text-[#A25A24] border-[#ECD4BD] font-bold shrink-0">
+                <span className="whitespace-nowrap text-[9px] uppercase font-mono px-1.5 sm:px-2 py-0.5 rounded-full border bg-[#FAF0E6] text-[#A25A24] border-[#ECD4BD] font-bold shrink-0">
                   Master
                 </span>
               </h1>
-              <p className="text-[10.5px] text-[#766A62] font-sans leading-tight">Precision Specialty Coffee Guide</p>
+              <p className="text-[10px] sm:text-[10.5px] text-[#766A62] font-sans leading-tight truncate">Precision Specialty Coffee Guide</p>
             </div>
           </div>
 
-          {/* Mobile Tools Menu Toggle & Quick Brew */}
-          <div className="flex items-center gap-1.5 md:hidden">
-            <button
-              type="button"
-              onClick={() => onSelectView && onSelectView('brew')}
-              className="px-2.5 py-1.5 rounded-xl bg-[#14110F] text-white flex items-center gap-1 text-xs font-bold font-sans mobile-touch-target shadow-xs"
-              title="Start a Brew"
-            >
-              <Coffee className="w-3.5 h-3.5 text-[#E8AF72]" />
-              <span className="text-[11px]">Brew</span>
-            </button>
+          {/* Mobile Compact Action Bar (Scan, Search, Profile, Tools) */}
+          <div className="flex items-center gap-1.5 md:hidden shrink-0">
+            {onOpenScanner && (
+              <button
+                type="button"
+                onClick={onOpenScanner}
+                className="p-2 rounded-xl bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] mobile-touch-target flex items-center justify-center active:scale-95 transition-transform"
+                title="Scan Coffee Bag Barcode or QR"
+                aria-label="Scan Coffee Bag"
+              >
+                <ScanLine className="w-4 h-4" />
+              </button>
+            )}
+            {onOpenSearch && (
+              <button
+                type="button"
+                onClick={onOpenSearch}
+                className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B] mobile-touch-target flex items-center justify-center active:scale-95 transition-transform"
+                title="Open Global Search (Ctrl + K)"
+                aria-label="Open Global Search"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+            )}
             {/* Mobile Direct Profile Button */}
             {currentUser ? (
               <button
                 type="button"
                 onClick={onOpenProfile}
-                className="w-8 h-8 rounded-xl bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center text-[#A25A24] text-xs font-bold font-mono overflow-hidden mobile-touch-target cursor-pointer"
+                className="w-8 h-8 rounded-xl bg-[#FAF0E6] border border-[#ECD4BD] flex items-center justify-center text-[#A25A24] text-xs font-bold font-mono overflow-hidden mobile-touch-target cursor-pointer active:scale-95 transition-transform"
                 title={`Signed in as ${currentUser.displayName || currentUser.username} • Click to open Profile`}
                 aria-label="Open My Profile"
               >
@@ -120,22 +133,11 @@ export default function Header({
               <button
                 type="button"
                 onClick={onOpenAuth}
-                className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B] mobile-touch-target flex items-center justify-center cursor-pointer"
+                className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B] mobile-touch-target flex items-center justify-center cursor-pointer active:scale-95 transition-transform"
                 title="Profile Login / Sign Up"
                 aria-label="Profile Login / Sign Up"
               >
                 <User className="w-4 h-4" />
-              </button>
-            )}
-            {onOpenSearch && (
-              <button
-                type="button"
-                onClick={onOpenSearch}
-                className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#5C524B] mobile-touch-target flex items-center justify-center"
-                title="Open Global Search (Ctrl + K)"
-                aria-label="Open Global Search"
-              >
-                <Search className="w-4 h-4" />
               </button>
             )}
             <button
@@ -147,16 +149,16 @@ export default function Header({
                   setIsToolsMenuOpen(!isToolsMenuOpen);
                 }
               }}
-              className="p-2 rounded-xl bg-[#FAF7F2] border border-[#ECE6DC] text-[#14110F] flex items-center justify-center gap-1 text-xs font-bold font-sans mobile-touch-target"
+              className="p-2 rounded-xl bg-[#14110F] text-white flex items-center justify-center gap-1 text-xs font-bold font-sans mobile-touch-target active:scale-95 transition-transform shadow-xs"
               title="Open Barista Tools & Settings"
               aria-label="Open Barista Tools Menu"
             >
-              <SlidersHorizontal className="w-4 h-4 text-[#C88A4B]" />
+              <SlidersHorizontal className="w-4 h-4 text-[#E8AF72]" />
             </button>
           </div>
         </div>
 
-        {/* 2. Center: 5 PRIMARY NAVIGATION AREAS (BREW | DISCOVER | CAFÉS | LEARN | MY COFFEE) */}
+        {/* 2. Center: 5 PRIMARY NAVIGATION AREAS (Desktop Only - Mobile uses MobileBottomNav) */}
         {(() => {
           const isBrewActive = currentView === 'brew' || currentView === 'brew_station' || (!['discover', 'roasters', 'cafes', 'shops', 'learn', 'my_coffee', 'recipes'].includes(currentView) && !isRoasterShowcaseView && !isShopsView);
           const isDiscoverActive = currentView === 'discover' || currentView === 'roasters' || isRoasterShowcaseView;
@@ -165,7 +167,7 @@ export default function Header({
           const isMyCoffeeActive = currentView === 'my_coffee' || currentView === 'recipes';
 
           return (
-            <nav className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-2xl border border-[#ECE6DC] w-full md:w-auto justify-center overflow-x-auto scrollbar-none no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <nav className="hidden md:flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-2xl border border-[#ECE6DC] w-auto justify-center overflow-x-auto scrollbar-none no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               
               {/* Primary 1: BREW */}
               <button
@@ -259,8 +261,8 @@ export default function Header({
           );
         })()}
 
-        {/* 3. Right: Quick Actions & Primary Start a Brew Button */}
-        <div className="flex items-center space-x-2">
+        {/* 3. Right: Quick Actions & Primary Start a Brew Button (Desktop Only) */}
+        <div className="hidden md:flex items-center space-x-2">
 
           {/* Audio Engine Mute / Sound Toggle */}
           {onToggleMute && (

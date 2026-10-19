@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { BookOpen, GraduationCap, Wrench, Newspaper, Sparkles, ShoppingBag, FlaskConical } from 'lucide-react';
+import { BookOpen, GraduationCap, Wrench, Newspaper, Sparkles, ShoppingBag, FlaskConical, Flame, Tv } from 'lucide-react';
 import CoffeeNoobGuide from './CoffeeNoobGuide';
+import CoffeeRoastingGuide from './CoffeeRoastingGuide';
 import MasterclassHub from './MasterclassHub';
 import DiagnosticsDrawer from './DiagnosticsDrawer';
 import KnowledgeBaseDrawer from './KnowledgeBaseDrawer';
@@ -18,12 +19,17 @@ export default function LearnSection({
   const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
   const [isKnowledgeOpen, setIsKnowledgeOpen] = useState(false);
 
-  const handleScrollToNoob = () => {
-    const el = document.getElementById('coffee-noob-section');
+  const handleScrollToSection = (id) => {
+    const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+
+  const handleScrollToNoob = () => handleScrollToSection('coffee-noob-section');
+  const handleScrollToRoasting = () => handleScrollToSection('coffee-roasting-section');
+  const handleScrollToMasterclass = () => handleScrollToSection('video-academy');
+  const handleScrollToNews = () => handleScrollToSection('world-news');
 
   const handleOpenDiagnostics = () => {
     setIsDiagnosticsOpen(true);
@@ -46,28 +52,102 @@ export default function LearnSection({
   };
 
   return (
-    <div className="space-y-12 animate-fade-in">
+    <div className="space-y-8 sm:space-y-12 animate-fade-in">
+      {/* Sticky Mobile & Desktop Quick-Jump Sub-Navigation Bar */}
+      <div className="sticky top-[62px] md:top-[74px] z-30 -mx-3 px-3 py-2.5 sm:mx-0 sm:px-4 sm:rounded-2xl bg-[#FAF7F2]/95 backdrop-blur-md border-y sm:border border-[#ECE6DC] shadow-xs flex items-center gap-2 overflow-x-auto no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#766A62] shrink-0 hidden sm:inline pr-1">
+          Jump To:
+        </span>
+        <button
+          type="button"
+          onClick={handleScrollToRoasting}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#14110F] text-white text-xs font-sans font-bold shrink-0 shadow-xs active:scale-95 transition-all cursor-pointer"
+        >
+          <Flame className="w-3.5 h-3.5 text-[#E8AF72]" />
+          <span>Roasting & RoR Lab</span>
+        </button>
+        <button
+          type="button"
+          onClick={handleScrollToNoob}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAF0E6] border border-[#ECE6DC] text-[#2A2421] text-xs font-sans font-semibold shrink-0 active:scale-95 transition-all cursor-pointer"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-[#C88A4B]" />
+          <span>Beginner Guide</span>
+        </button>
+        <button
+          type="button"
+          onClick={handleScrollToMasterclass}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAF0E6] border border-[#ECE6DC] text-[#2A2421] text-xs font-sans font-semibold shrink-0 active:scale-95 transition-all cursor-pointer"
+        >
+          <Tv className="w-3.5 h-3.5 text-rose-600" />
+          <span>Video Academy</span>
+        </button>
+        <button
+          type="button"
+          onClick={handleOpenKnowledge}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAF0E6] border border-[#ECE6DC] text-[#2A2421] text-xs font-sans font-semibold shrink-0 active:scale-95 transition-all cursor-pointer"
+        >
+          <BookOpen className="w-3.5 h-3.5 text-[#C88A4B]" />
+          <span>Origins & Terroir</span>
+        </button>
+        <button
+          type="button"
+          onClick={handleOpenDiagnostics}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAF0E6] border border-[#ECE6DC] text-[#2A2421] text-xs font-sans font-semibold shrink-0 active:scale-95 transition-all cursor-pointer"
+        >
+          <Wrench className="w-3.5 h-3.5 text-[#2F663C]" />
+          <span>Diagnostics</span>
+        </button>
+        {onOpenWaterLab && (
+          <button
+            type="button"
+            onClick={onOpenWaterLab}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF0E6] hover:bg-[#F5E2CF] border border-[#ECD4BD] text-[#A25A24] text-xs font-sans font-bold shrink-0 active:scale-95 transition-all cursor-pointer"
+          >
+            <FlaskConical className="w-3.5 h-3.5" />
+            <span>Water Lab ↗</span>
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={handleScrollToNews}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FAF0E6] border border-[#ECE6DC] text-[#2A2421] text-xs font-sans font-semibold shrink-0 active:scale-95 transition-all cursor-pointer"
+        >
+          <Newspaper className="w-3.5 h-3.5 text-[#C88A4B]" />
+          <span>News</span>
+        </button>
+      </div>
+
       {/* Learn Hub Header */}
-      <div className="p-8 md:p-10 rounded-3xl relative overflow-hidden shadow-card border border-[#ECE6DC] bg-gradient-to-br from-[#FAF7F2] via-white to-[#F7F4EE]">
+      <div className="p-6 sm:p-8 md:p-10 rounded-3xl relative overflow-hidden shadow-card border border-[#ECE6DC] bg-gradient-to-br from-[#FAF7F2] via-white to-[#F7F4EE]">
         <div className="max-w-3xl relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF0E6] border border-[#ECD4BD] text-[#A25A24] font-sans text-xs sm:text-sm font-bold uppercase tracking-wider mb-4">
             <GraduationCap className="w-4 h-4" />
             <span>Specialty Coffee Knowledge & Learning Center</span>
           </div>
 
-          <h2 className="font-editorial text-3xl sm:text-4xl lg:text-5xl font-bold text-[#14110F] leading-tight mb-4">
-            Extraction Science, Masterclasses & Brew Knowledge
+          <h2 className="font-editorial text-2xl sm:text-4xl lg:text-5xl font-bold text-[#14110F] leading-tight mb-4">
+            Bean Anatomy, Roasting Science (RoR), Masterclasses & Extraction
           </h2>
 
-          <p className="text-base md:text-lg text-[#5C524B] leading-relaxed mb-6 font-sans">
-            Everything you need to master specialty coffee extraction. Explore verified video masterclasses from world barista champions, troubleshoot extraction channeling, discover water mineral chemistry, and browse precision coffee gear.
+          <p className="text-sm sm:text-base md:text-lg text-[#5C524B] leading-relaxed mb-6 font-sans">
+            Everything you need to master specialty coffee from seed to cup. Explore interactive Rate of Rise (RoR) roasting thermodynamics, green bean anatomy, DIY home roasting, champion video masterclasses, and extraction diagnostics.
           </p>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm font-sans font-bold">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs sm:text-sm font-sans font-bold">
+            <button
+              type="button"
+              onClick={handleScrollToRoasting}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#14110F] hover:bg-[#A8622D] text-white transition-all shadow-xs cursor-pointer active:scale-95"
+            >
+              <Flame className="w-4 h-4 text-[#E8AF72]" />
+              <span>🔥 Beans, Roasting & RoR Guide</span>
+            </button>
+
             <button
               type="button"
               onClick={handleScrollToNoob}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FAF0E6] hover:bg-[#F5E2CF] border border-[#ECD4BD] text-[#A25A24] transition-all shadow-xs cursor-pointer active:scale-95"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FAF0E6] hover:bg-[#F5E2CF] border border-[#ECD4BD] text-[#A25A24] transition-all shadow-xs cursor-pointer active:scale-95"
             >
               <Sparkles className="w-4 h-4 text-[#C88A4B]" />
               <span>🌱 Coffee Noob (Start Here)</span>
@@ -76,7 +156,7 @@ export default function LearnSection({
             <button
               type="button"
               onClick={handleOpenKnowledge}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#ECE6DC] hover:border-[#D69550] text-[#2A2421] transition-all shadow-xs cursor-pointer active:scale-95"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#ECE6DC] hover:border-[#D69550] text-[#2A2421] transition-all shadow-xs cursor-pointer active:scale-95"
             >
               <BookOpen className="w-4 h-4 text-[#C88A4B]" />
               <span>Terroir & Processing Atlas</span>
@@ -85,7 +165,7 @@ export default function LearnSection({
             <button
               type="button"
               onClick={handleOpenDiagnostics}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#ECE6DC] hover:border-[#D69550] text-[#2A2421] transition-all shadow-xs cursor-pointer active:scale-95"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-[#FAF7F2] border border-[#ECE6DC] hover:border-[#D69550] text-[#2A2421] transition-all shadow-xs cursor-pointer active:scale-95"
             >
               <Wrench className="w-4 h-4 text-[#2F663C]" />
               <span>Extraction Diagnostics</span>
@@ -95,7 +175,7 @@ export default function LearnSection({
               <button
                 type="button"
                 onClick={onOpenWaterLab}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FAF0E6] hover:bg-[#F5E2CF] border border-[#ECD4BD] text-[#A25A24] transition-all shadow-xs cursor-pointer active:scale-95"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FAF0E6] hover:bg-[#F5E2CF] border border-[#ECD4BD] text-[#A25A24] transition-all shadow-xs cursor-pointer active:scale-95"
               >
                 <FlaskConical className="w-4 h-4" />
                 <span>Launch Water Chemistry Lab ↗</span>
@@ -105,7 +185,13 @@ export default function LearnSection({
         </div>
       </div>
 
-      {/* 0. Coffee Noob Section: Beginner's Field Guide */}
+      {/* 0A. Coffee Beans & Roasting Science (RoR, Anatomy, Thermal Phases, Spectrum & DIY Home Roasting) */}
+      <CoffeeRoastingGuide
+        onOpenWaterLab={onOpenWaterLab}
+        onSelectMethodToBrew={onSelectMethodToBrew}
+      />
+
+      {/* 0B. Coffee Noob Section: Beginner's Field Guide */}
       <CoffeeNoobGuide 
         onOpenWaterLab={onOpenWaterLab} 
         onSelectMethodToBrew={onSelectMethodToBrew} 

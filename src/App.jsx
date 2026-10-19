@@ -1189,6 +1189,7 @@ export default function App() {
               setCurrentArea('my_coffee');
               navigate('/recipes');
             }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
           onOpenNews={handleOpenBrewNews}
@@ -1973,6 +1974,7 @@ export default function App() {
               setCurrentArea('my_coffee');
               navigate('/recipes');
             }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           onStartBrew={() => handleStartBrew()}
           onOpenLocalCoffee={() => {
@@ -1999,7 +2001,7 @@ export default function App() {
           onOpenJournal={() => setIsJournalOpen(true)}
           onOpenNews={handleOpenBrewNews}
           onOpenRoasterPortal={() => { setRoasterPrefillBarcode(''); setRoasterPrefillBean(null); setIsRoasterPortalOpen(true); }}
-          onOpenCafePortal={() => { setIsRoasterShowcaseView(false); setIsCafePortalView(true); }}
+          onOpenCafePortal={() => { setCurrentArea('cafes'); setIsCafePartnerPortalOpen(true); }}
           onOpenProfile={() => setIsProfileOpen(true)}
           onOpenAuth={handleOpenAuth}
           isMuted={isMuted}
