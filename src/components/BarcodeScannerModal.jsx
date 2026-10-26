@@ -570,10 +570,13 @@ export default function BarcodeScannerModal({
       if (decoded && decoded.text) {
         handleCodeDetected(decoded.text, decoded.format);
       } else {
+        // Fallback: If no barcode or QR code is detected on the photo, seamlessly analyze as a bag label with OCR
+        setScannerMode('ai_label');
         setScanNotice({
-          type: 'no_code_found',
-          message: 'Photo captured, but no clear barcode or QR code was detected in this angle. Hold the bag 6–10 inches from the camera with good lighting, or upload a photo directly.'
+          type: 'info',
+          message: 'No barcode detected. Automatically analyzing coffee bag label with Optical Character Recognition (OCR)...'
         });
+        await handleRunBagOcr(canvas);
       }
     } catch (err) {
       console.warn('Error during snapshot capture & scan:', err);
@@ -772,6 +775,7 @@ export default function BarcodeScannerModal({
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (e.target) e.target.value = '';
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -803,10 +807,13 @@ export default function BarcodeScannerModal({
         if (decoded && decoded.text) {
           handleCodeDetected(decoded.text, decoded.format);
         } else {
+          // Fallback: If no barcode or QR code is detected on the photo, seamlessly analyze as a bag label with OCR
+          setScannerMode('ai_label');
           setScanNotice({
-            type: 'no_code_found',
-            message: 'Uploaded photo analyzed, but no readable barcode or QR code was detected. Please ensure the code is clearly visible and well lit.'
+            type: 'info',
+            message: 'No barcode detected. Automatically analyzing coffee bag label with Optical Character Recognition (OCR)...'
           });
+          await handleRunBagOcr(canvas);
         }
       };
       img.src = dataUrl;

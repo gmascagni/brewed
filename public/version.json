@@ -1,9 +1,9 @@
 {
   "version": "1.5.0",
-  "buildId": "1.5.0-09361ff-mver4cog",
-  "commit": "09361ff",
+  "buildId": "1.5.0-5f6496c-mvpeaum1",
+  "commit": "5f6496c",
   "branch": "main",
-  "buildDate": "2026-10-19T04:25:41.680Z",
+  "buildDate": "2026-10-26T15:12:17.785Z",
   "environment": "production",
   "appName": "the-brew-app"
 }

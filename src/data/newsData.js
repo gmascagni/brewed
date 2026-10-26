@@ -1,223 +1,223 @@
 // World Coffee News Dispatch
 // Automatically synced from live RSS feeds: Daily Coffee News, Perfect Daily Grind, Sprudge, Specialty Coffee Press.
-// Last Synced: Oct 19, 2026, 12:25 AM
+// Last Synced: Oct 26, 2026, 11:12 AM
 
-export const LAST_UPDATED = "Oct 19, 2026, 12:25 AM";
+export const LAST_UPDATED = "Oct 26, 2026, 11:12 AM";
 
 export const WORLD_BREW_NEWS = [
   {
-    "id": "news_1087236162",
-    "title": "University of Hawaii to Lead New Federal Coffee and Cacao Research Lab",
+    "id": "news_3751482602",
+    "title": "U.S. Coffee Drink Calories Climbed 40% in 15-Year Span",
     "source": "Daily Coffee News",
     "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/16/university-of-hawaii-to-lead-new-federal-coffee-and-cacao-research-lab/",
-    "publishedDate": "Oct 16, 2026",
-    "dateIso": "2026-10-16",
+    "url": "https://dailycoffeenews.com/2026/10/26/u-s-coffee-drink-calories-climbed-40-in-15-year-span/",
+    "publishedDate": "Oct 26, 2026",
+    "dateIso": "2026-10-26",
     "category": "coffee",
     "tag": "Industry & News",
     "readTime": "2 min read",
     "featured": true,
-    "summary": "The University of Hawaiʻi at Mānoa will lead a new federally funded research program focused on coffee and cacao, with an initial $8 million obligation for its first year under...",
+    "summary": "U.S. adults consumed nearly 40% more calories from coffee drinks in 2018 than they did in 2003, despite drinking roughly the same amount of coffee, according to a new study...",
     "keyPoints": [
-      "Published by Daily Coffee News on Oct 16, 2026",
+      "Published by Daily Coffee News on Oct 26, 2026",
       "Direct coverage covering industry & news"
     ]
   },
   {
-    "id": "news_10230990079",
-    "title": "Weekly Coffee News: New Look for IWCA + Nestlé in Mexico",
+    "id": "news_4043826763",
+    "title": "DiFluid RS Extract Expands the Temperature Range for Coffee TDS",
     "source": "Daily Coffee News",
     "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/16/weekly-coffee-news-new-look-for-iwca-nestle-in-mexico/",
-    "publishedDate": "Oct 16, 2026",
-    "dateIso": "2026-10-16",
+    "url": "https://dailycoffeenews.com/2026/10/26/difluid-rs-extract-expands-the-temperature-range-for-coffee-tds/",
+    "publishedDate": "Oct 26, 2026",
+    "dateIso": "2026-10-26",
     "category": "coffee",
     "tag": "Industry & News",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "Welcome to DCN’s Weekly Coffee News! Subscribe here for all the latest coffee industry news. Also, check out the latest career opportunities at CoffeeIndustryJobs.com. IWCA Introduces New Global Visual Identity...",
+    "summary": "Chinese coffee analysis equipment maker DiFluid has rolled out a new professional refractometer called the RS Extract for measuring total dissolved solids (TDS) in brewed coffee. The device can also connect...",
     "keyPoints": [
-      "Published by Daily Coffee News on Oct 16, 2026",
+      "Published by Daily Coffee News on Oct 26, 2026",
       "Direct coverage covering industry & news"
     ]
   },
   {
-    "id": "news_7202873487",
-    "title": "Three Questions with Esther Singer of Segara Coffee",
+    "id": "news_12180106357",
+    "title": "De’Longhi Boosts Ownership of La Marzocco and Eversys Business to 88%",
     "source": "Daily Coffee News",
     "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/15/three-questions-with-esther-singer-of-segara-coffee/",
-    "publishedDate": "Oct 15, 2026",
-    "dateIso": "2026-10-15",
+    "url": "https://dailycoffeenews.com/2026/10/23/delonghi-boosts-ownership-of-la-marzocco-and-eversys-business-to-88/",
+    "publishedDate": "Oct 23, 2026",
+    "dateIso": "2026-10-23",
     "category": "coffee",
     "tag": "Industry & News",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "For Esther Singer, a career in coffee grew out of a classic scientific impulse: Start digging and see what turns up. The German-Indonesian-Californian scientist spent more than a decade researching...",
+    "summary": "Italy-based De’Longhi Group has paid €662.5 million (US$744 million) to increase its ownership of the professional coffee business containing La Marzocco and Eversys from approximately 61% to 88%. The deal...",
     "keyPoints": [
-      "Published by Daily Coffee News on Oct 15, 2026",
+      "Published by Daily Coffee News on Oct 23, 2026",
       "Direct coverage covering industry & news"
     ]
   },
   {
-    "id": "news_22195568033",
-    "title": "Pastime Coffee Goes All In at New Portland Production Roastery",
+    "id": "news_20367042303",
+    "title": "Weekly Coffee News: New 20-Kilo Roasters + War Impacting Coffee Trade",
     "source": "Daily Coffee News",
     "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/15/pastime-coffee-goes-all-in-at-new-portland-production-roastery/",
-    "publishedDate": "Oct 15, 2026",
-    "dateIso": "2026-10-15",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Portland, Oregon-based Pastime Coffee is heading full bore into professional production with the opening of a new 1,000-square-foot roastery in a former Northeast Portland flower shop. At the center of...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 15, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_2687482077",
-    "title": "Niyyah Coffee Brings a Deaf-Owned Cafe to Indianapolis",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/14/niyyah-coffee-brings-a-deaf-owned-cafe-to-indianapolis/",
-    "publishedDate": "Oct 14, 2026",
-    "dateIso": "2026-10-14",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Niyyah Coffee has opened Indianapolis’ first Deaf-owned coffee shop, designed around greater access, employment and interaction for the Deaf community. Opened June 27 near the intersection of North College Avenue...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 14, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_10204709298",
-    "title": "Canada's Purebread Plans to Acquire Caffè Artigiano's Cafe Business",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/14/canadas-purebread-plans-to-acquire-caffe-artigianos-cafe-business/",
-    "publishedDate": "Oct 14, 2026",
-    "dateIso": "2026-10-14",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Canadian bakery and cafe company Purebread Brands has signed a letter of intent to acquire the cafe business of Vancouver, British Columbia-based Caffè Artigiano in a stock transaction valued at...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 14, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_14706888968",
-    "title": "Presenting the 2027 Roaster of the Year Finalists",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/13/presenting-the-2027-roaster-of-the-year-finalists/",
-    "publishedDate": "Oct 13, 2026",
-    "dateIso": "2026-10-13",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Roast magazine is thrilled to announce the finalists for the 23rd Annual Roaster of the Year awards! The Micro Roaster category includes companies roasting less than 100,000 pounds of coffee each...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 13, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_4564082519",
-    "title": "NCA Convention Returns to Austin in March 2027",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/13/nca-convention-returns-to-austin-in-march-2027/",
-    "publishedDate": "Oct 13, 2026",
-    "dateIso": "2026-10-13",
+    "url": "https://dailycoffeenews.com/2026/10/23/weekly-coffee-news-new-20-kilo-roasters-war-impacting-coffee-trade/",
+    "publishedDate": "Oct 23, 2026",
+    "dateIso": "2026-10-23",
     "category": "coffee",
     "tag": "Market & Trade",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "Registration is open for the 2027 National Coffee Association (NCA) Convention, taking place March 4-6 at the JW Marriott Austin in Austin, Texas. The U.S. coffee trade group expects approximately...",
+    "summary": "Welcome to DCN’s Weekly Coffee News! Subscribe here for all the latest coffee industry news. Also, check out the latest career opportunities at CoffeeIndustryJobs.com. Mill City Ships First 20-Kilogram M-Series...",
     "keyPoints": [
-      "Published by Daily Coffee News on Oct 13, 2026",
+      "Published by Daily Coffee News on Oct 23, 2026",
       "Direct coverage covering market & trade"
     ]
   },
   {
-    "id": "news_972292035",
-    "title": "The Mocha Monopoly: How Yemen’s Dominance of the Global Coffee Trade Birthed the Houthi Rebels",
+    "id": "news_13362010093",
+    "title": "Massive Coffee Variety Trial Reveals Yield and Leaf Rust Winners",
     "source": "Daily Coffee News",
     "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/13/the-mocha-monopoly-how-yemens-dominance-of-the-global-coffee-trade-birthed-the-houthi-rebels/",
-    "publishedDate": "Oct 13, 2026",
-    "dateIso": "2026-10-13",
-    "category": "coffee",
-    "tag": "Market & Trade",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "The Red Sea often makes headlines as the launch site for attacks on oil tankers and infrastructure by the Houthi rebels, a political and religious group that controls much of the northern and...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 13, 2026",
-      "Direct coverage covering market & trade"
-    ]
-  },
-  {
-    "id": "news_6549290339",
-    "title": "Hypnos Coffee Reawakens with Second Multiroaster Cafe in Portland",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/13/hypnos-coffee-reawakens-with-second-multiroaster-cafe-in-portland/",
-    "publishedDate": "Oct 13, 2026",
-    "dateIso": "2026-10-13",
+    "url": "https://dailycoffeenews.com/2026/10/22/massive-coffee-variety-trial-reveals-yield-and-leaf-rust-winners/",
+    "publishedDate": "Oct 22, 2026",
+    "dateIso": "2026-10-22",
     "category": "coffee",
     "tag": "Industry & News",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "A multiroaster program is now a multi-location phenomenon on both sides of the Willamette River in Portland, Oregon, where Hypnos Coffee opened its second design-forward shop last month. The new...",
+    "summary": "The coffee industry's largest coordinated field trial has found that recently bred arabica varieties generally provided higher yields and greater resistance to coffee leaf rust than traditional pure-arabica varieties, while...",
     "keyPoints": [
-      "Published by Daily Coffee News on Oct 13, 2026",
+      "Published by Daily Coffee News on Oct 22, 2026",
       "Direct coverage covering industry & news"
     ]
   },
   {
-    "id": "news_30286284448",
-    "title": "His coffee revolution started decades ago. George Howell isn’t calling it quits. - The Boston Globe",
-    "source": "The Boston Globe",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTE8tU3k5b1NocXZRemZfRTlubktfdnFOZTFDN2xHbkFTT3RtbE83WkVJY3RpSlR3MU1GUnMwMDRCYjVIT1JDcUhyT2RMNURmbll4Qm9Ba3N6RXNpRHhWaVNJbE0xM0gwZy1hbWRNdzFaUjZYTVRKcENCdw?oc=5",
-    "publishedDate": "Oct 8, 2026",
-    "dateIso": "2026-10-08",
+    "id": "news_2203242260",
+    "title": "Weber Workshops Launches Thoroughly Redesigned EG-1 Grinder",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/10/22/weber-workshops-launches-thoroughly-redesigned-eg-1-grinder/",
+    "publishedDate": "Oct 22, 2026",
+    "dateIso": "2026-10-22",
     "category": "coffee",
     "tag": "Industry & News",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "His coffee revolution started decades ago. George Howell isn’t calling it quits.&nbsp;&nbsp;",
+    "summary": "High-end specialty coffee equipment maker Weber Workshops has unveiled a top-to-bottom internal redesign of its flagship single-dose electric grinder, the EG-1. While maintaining the overall aesthetic, footprint and core platform...",
     "keyPoints": [
-      "Published by The Boston Globe on Oct 8, 2026",
+      "Published by Daily Coffee News on Oct 22, 2026",
       "Direct coverage covering industry & news"
     ]
   },
   {
-    "id": "news_33637487889",
-    "title": "Kunshan brews 100 billion yuan coffee industry to become major global hub - China Daily",
-    "source": "China Daily",
+    "id": "news_7173575834",
+    "title": "The History of Specialty Coffee in Mexico - Mexico Business News",
+    "source": "Mexico Business News",
     "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9rYmI5V2pHS21zWmZlY1NyX1MycHFpbk1Wa1BxSFRjakQ0VmM4dXJTWHo2aXl6ZHFhN1ktc3NzUE9KNlFQd0c5Nk8za0Q2U3NiNWNJSk1BTjVSNkZBWDU5QzRoWTl1dVZPbjBtS3VTbTd2NVNVcVIxdTV3RXZfdw?oc=5",
-    "publishedDate": "Sep 29, 2026",
-    "dateIso": "2026-09-30",
+    "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNLTF4Rm53RUw5Rk9OY0pfQXMtb3gtLVd2SFdCVnM1cGg3aVhqMHoxaUdlVTFWTWdYbF83RnlpOTRnbktwZUZ0aDh2N2tZaFJtQkE0R211Zy1qUUdRcy1OM29ic1VwVjExTHJiQmdha0dCeDNva1ZNcmplRWItLUx4d2VOdw?oc=5",
+    "publishedDate": "Oct 22, 2026",
+    "dateIso": "2026-10-22",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": true,
+    "summary": "The History of Specialty Coffee in Mexico&nbsp;&nbsp;",
+    "keyPoints": [
+      "Published by Mexico Business News on Oct 22, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_8853761587",
+    "title": "Three Questions with Kris Carlson of Coffeekris",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/10/21/three-questions-with-kris-carlson-of-coffeekris/",
+    "publishedDate": "Oct 21, 2026",
+    "dateIso": "2026-10-21",
     "category": "coffee",
     "tag": "Industry & News",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "Kunshan brews 100 billion yuan coffee industry to become major global hub&nbsp;&nbsp;",
+    "summary": "After more than a decade working in cafes, roasting, wholesale, green coffee sales and sourcing, Kris Carlson decided to give herself a distinct new job title: sourcing curator. Carlson launched...",
     "keyPoints": [
-      "Published by China Daily on Sep 29, 2026",
+      "Published by Daily Coffee News on Oct 21, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_3754527224",
+    "title": "Design Details: 'Elevated Maru' at Blue Bottle Coffee Busan",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/10/21/design-details-elevated-maru-at-blue-bottle-coffee-busan/",
+    "publishedDate": "Oct 21, 2026",
+    "dateIso": "2026-10-21",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Welcome to Design Details, an ongoing editorial feature in Daily Coffee News focused on individual examples of coffee shop architecture, interior design, packaging design or branding. If you are a...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Oct 21, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_8567382402",
+    "title": "Little Nest Coffee Roasters Hatches Outside Detroit",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/10/21/little-nest-coffee-roasters-hatches-outside-detroit/",
+    "publishedDate": "Oct 21, 2026",
+    "dateIso": "2026-10-21",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "A family-friendly new roost for fresh roasts recently hatched in the Detroit suburb of Grosse Pointe Woods with the opening of Little Nest Coffee Roasters. The 3,400-square-foot location is effectively...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Oct 21, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_1440418473",
+    "title": "Dr. Joseph John, Champion of Indian Coffee and Espresso, Dies at 88",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/10/20/dr-joseph-john-champion-of-indian-coffee-and-espresso-dies-at-88/",
+    "publishedDate": "Oct 20, 2026",
+    "dateIso": "2026-10-20",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Dr. Joseph John, a former nuclear physicist who helped introduce and redefine Indian-grown coffee in the United States, died Sept. 15. He was 88. Known throughout the industry simply as...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Oct 20, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_11728859479",
+    "title": "Dr. Joseph John, Champion of Indian Coffee and Espresso, Dies at 88 - Daily Coffee News by Roast Magazine",
+    "source": "Daily Coffee News by Roast Magazine",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOYlR1akViVy1DcFljUzB3clNZSVZiWlNZZzlmN1haZ2VwbHkzVnFPOXNQbmFWUlN0UWVIbzl2c0JRczdKRW93eW84bWVvSXZSMVl5X1NuVzdyb1ZxQ3V6N1ZLTTRmVFZfTmE3UHpmcXBNUmh1YUZWdXd1QkJvVjVnSHFOaVRweUFXSk9DZUlmaUhMSkpNQ09BbnJLSHdiN3FXSTIzWmM2MA?oc=5",
+    "publishedDate": "Oct 20, 2026",
+    "dateIso": "2026-10-20",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Dr. Joseph John, Champion of Indian Coffee and Espresso, Dies at 88&nbsp;&nbsp;",
+    "keyPoints": [
+      "Published by Daily Coffee News by Roast Magazine on Oct 20, 2026",
       "Direct coverage covering industry & news"
     ]
   }
