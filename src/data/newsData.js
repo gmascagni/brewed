@@ -1,10 +1,64 @@
 // World Coffee News Dispatch
 // Automatically synced from live RSS feeds: Daily Coffee News, Perfect Daily Grind, Sprudge, Specialty Coffee Press.
-// Last Synced: Oct 26, 2026, 11:12 AM
+// Last Synced: Oct 27, 2026, 11:19 AM
 
-export const LAST_UPDATED = "Oct 26, 2026, 11:12 AM";
+export const LAST_UPDATED = "Oct 27, 2026, 11:19 AM";
 
 export const WORLD_BREW_NEWS = [
+  {
+    "id": "news_5366235168",
+    "title": "AI Coffee Defect Detector Gets Much Smarter When It Flips the Beans",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/10/27/ai-coffee-defect-detector-gets-much-smarter-when-it-flips-the-beans/",
+    "publishedDate": "Oct 27, 2026",
+    "dateIso": "2026-10-27",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": true,
+    "summary": "A new prototype coffee inspection system combines AI and a simple mechanical idea — flipping coffee beans over — to capture more data to improve defect detection. The prototype was...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Oct 27, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_12588754015",
+    "title": "Lovr Boys Cafe & Roastery is Pouring Hearts in Bonita Springs, Florida",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/10/27/lovr-boys-cafe-roastery-is-pouring-hearts-in-bonita-springs-florida/",
+    "publishedDate": "Oct 27, 2026",
+    "dateIso": "2026-10-27",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Home is where the hearts are for Lovr Boys Cafe &#38; Roastery in Bonita Springs, Florida. Between Adirondack-green walls, the 2,000-square-foot coffee shop that opened in late August includes a...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Oct 27, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_18250224714",
+    "title": "Blue Bottle Coffee: How Chinese Financial Backers Accelerate the \"Slow Brand\" - 36Kr",
+    "source": "36Kr",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE1Iak1UeUQyaXFNSnVUdnloTmoxSnIwTGFCWW8zNHVnS2NiRkVNb0VvM2FqNU1nb3N5YllxRXpmZ1FOTTBwaUZMODZmbFpCYVJORGF3?oc=5",
+    "publishedDate": "Oct 26, 2026",
+    "dateIso": "2026-10-27",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": true,
+    "summary": "Blue Bottle Coffee: How Chinese Financial Backers Accelerate the \"Slow Brand\"&nbsp;&nbsp;",
+    "keyPoints": [
+      "Published by 36Kr on Oct 26, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
   {
     "id": "news_3751482602",
     "title": "U.S. Coffee Drink Calories Climbed 40% in 15-Year Span",
@@ -16,7 +70,7 @@ export const WORLD_BREW_NEWS = [
     "category": "coffee",
     "tag": "Industry & News",
     "readTime": "2 min read",
-    "featured": true,
+    "featured": false,
     "summary": "U.S. adults consumed nearly 40% more calories from coffee drinks in 2018 than they did in 2003, despite drinking roughly the same amount of coffee, according to a new study...",
     "keyPoints": [
       "Published by Daily Coffee News on Oct 26, 2026",
@@ -38,6 +92,42 @@ export const WORLD_BREW_NEWS = [
     "summary": "Chinese coffee analysis equipment maker DiFluid has rolled out a new professional refractometer called the RS Extract for measuring total dissolved solids (TDS) in brewed coffee. The device can also connect...",
     "keyPoints": [
       "Published by Daily Coffee News on Oct 26, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_3513421133",
+    "title": "Acidity vs sweetness: How basket design affects espresso extraction",
+    "source": "Perfect Daily Grind",
+    "sourceDomain": "perfectdailygrind.com",
+    "url": "https://perfectdailygrind.com/2026/10/espresso-basket-design-extraction/",
+    "publishedDate": "Oct 26, 2026",
+    "dateIso": "2026-10-26",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": true,
+    "summary": "Filter basket design changes where and how fast water leaves the puck, shaping the balance of acidity and sweetness in espresso extraction. The post Acidity vs sweetness: How basket design affects espresso extraction appeared first on Perfect Daily Grind.",
+    "keyPoints": [
+      "Published by Perfect Daily Grind on Oct 26, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_10019953207",
+    "title": "Workshop on the development of specialty coffee and agroforestry coffee industries. - Vietnam.vn",
+    "source": "Vietnam.vn",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOZno4UFFwM3NvSElqT1hTX01odi1XT3JXQkdpWHZGeFRCTFFnbnhNUVMzcjBHSE5mN1pmTm5EelYwZUhlSDFIdF9tYldGTy1TNkpkcExOZHFtQzdDcVl2Y2k5M2VXUWFFN0lsQzNwcy1GR2tpa1E0NnR1eElMUEpxRzNWQWpsckZxblJtazhzTjhVczM0V3VLczlKYw?oc=5",
+    "publishedDate": "Oct 24, 2026",
+    "dateIso": "2026-10-24",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Workshop on the development of specialty coffee and agroforestry coffee industries.&nbsp;&nbsp;",
+    "keyPoints": [
+      "Published by Vietnam.vn on Oct 24, 2026",
       "Direct coverage covering industry & news"
     ]
   },
@@ -78,6 +168,24 @@ export const WORLD_BREW_NEWS = [
     ]
   },
   {
+    "id": "news_4965476801",
+    "title": "Coffee News Recap, 23 Oct: 2026 World Barista Championship takes place in Panama, Clearpath Coffee & M-Cultivo to host Colombia Legends auction & other stories",
+    "source": "Perfect Daily Grind",
+    "sourceDomain": "perfectdailygrind.com",
+    "url": "https://perfectdailygrind.com/2026/10/coffee-news-recap-23-october-2026/",
+    "publishedDate": "Oct 23, 2026",
+    "dateIso": "2026-10-23",
+    "category": "coffee",
+    "tag": "Competitions",
+    "readTime": "3 min read",
+    "featured": false,
+    "summary": "2026 World Barista Championship begins in Panama, De’Longhi increases stake in La Marzocco and Eversys SA, arabica futures hit their highest level since late August, Clearpath Coffee & M Cultivo to host Colombia Legends auction on 16 November & more The post Coffee News Recap,...",
+    "keyPoints": [
+      "Published by Perfect Daily Grind on Oct 23, 2026",
+      "Direct coverage covering competitions"
+    ]
+  },
+  {
     "id": "news_13362010093",
     "title": "Massive Coffee Variety Trial Reveals Yield and Leaf Rust Winners",
     "source": "Daily Coffee News",
@@ -110,114 +218,6 @@ export const WORLD_BREW_NEWS = [
     "summary": "High-end specialty coffee equipment maker Weber Workshops has unveiled a top-to-bottom internal redesign of its flagship single-dose electric grinder, the EG-1. While maintaining the overall aesthetic, footprint and core platform...",
     "keyPoints": [
       "Published by Daily Coffee News on Oct 22, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_7173575834",
-    "title": "The History of Specialty Coffee in Mexico - Mexico Business News",
-    "source": "Mexico Business News",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxNLTF4Rm53RUw5Rk9OY0pfQXMtb3gtLVd2SFdCVnM1cGg3aVhqMHoxaUdlVTFWTWdYbF83RnlpOTRnbktwZUZ0aDh2N2tZaFJtQkE0R211Zy1qUUdRcy1OM29ic1VwVjExTHJiQmdha0dCeDNva1ZNcmplRWItLUx4d2VOdw?oc=5",
-    "publishedDate": "Oct 22, 2026",
-    "dateIso": "2026-10-22",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": true,
-    "summary": "The History of Specialty Coffee in Mexico&nbsp;&nbsp;",
-    "keyPoints": [
-      "Published by Mexico Business News on Oct 22, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_8853761587",
-    "title": "Three Questions with Kris Carlson of Coffeekris",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/21/three-questions-with-kris-carlson-of-coffeekris/",
-    "publishedDate": "Oct 21, 2026",
-    "dateIso": "2026-10-21",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "After more than a decade working in cafes, roasting, wholesale, green coffee sales and sourcing, Kris Carlson decided to give herself a distinct new job title: sourcing curator. Carlson launched...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 21, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_3754527224",
-    "title": "Design Details: 'Elevated Maru' at Blue Bottle Coffee Busan",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/21/design-details-elevated-maru-at-blue-bottle-coffee-busan/",
-    "publishedDate": "Oct 21, 2026",
-    "dateIso": "2026-10-21",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Welcome to Design Details, an ongoing editorial feature in Daily Coffee News focused on individual examples of coffee shop architecture, interior design, packaging design or branding. If you are a...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 21, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_8567382402",
-    "title": "Little Nest Coffee Roasters Hatches Outside Detroit",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/21/little-nest-coffee-roasters-hatches-outside-detroit/",
-    "publishedDate": "Oct 21, 2026",
-    "dateIso": "2026-10-21",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "A family-friendly new roost for fresh roasts recently hatched in the Detroit suburb of Grosse Pointe Woods with the opening of Little Nest Coffee Roasters. The 3,400-square-foot location is effectively...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 21, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_1440418473",
-    "title": "Dr. Joseph John, Champion of Indian Coffee and Espresso, Dies at 88",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/20/dr-joseph-john-champion-of-indian-coffee-and-espresso-dies-at-88/",
-    "publishedDate": "Oct 20, 2026",
-    "dateIso": "2026-10-20",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Dr. Joseph John, a former nuclear physicist who helped introduce and redefine Indian-grown coffee in the United States, died Sept. 15. He was 88. Known throughout the industry simply as...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 20, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_11728859479",
-    "title": "Dr. Joseph John, Champion of Indian Coffee and Espresso, Dies at 88 - Daily Coffee News by Roast Magazine",
-    "source": "Daily Coffee News by Roast Magazine",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOYlR1akViVy1DcFljUzB3clNZSVZiWlNZZzlmN1haZ2VwbHkzVnFPOXNQbmFWUlN0UWVIbzl2c0JRczdKRW93eW84bWVvSXZSMVl5X1NuVzdyb1ZxQ3V6N1ZLTTRmVFZfTmE3UHpmcXBNUmh1YUZWdXd1QkJvVjVnSHFOaVRweUFXSk9DZUlmaUhMSkpNQ09BbnJLSHdiN3FXSTIzWmM2MA?oc=5",
-    "publishedDate": "Oct 20, 2026",
-    "dateIso": "2026-10-20",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Dr. Joseph John, Champion of Indian Coffee and Espresso, Dies at 88&nbsp;&nbsp;",
-    "keyPoints": [
-      "Published by Daily Coffee News by Roast Magazine on Oct 20, 2026",
       "Direct coverage covering industry & news"
     ]
   }

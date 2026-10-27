@@ -65,6 +65,13 @@ async def main():
                 print(f"    [PASS] OCR Result Card rendered at {i+1}s!")
                 break
 
+        print(">>> Scrolling modal to bottom to verify translation card & dial-in...")
+        await session.evaluate("""
+            const modal = document.querySelector('[role="dialog"]');
+            if (modal) modal.scrollTop = modal.scrollHeight;
+        """)
+        await asyncio.sleep(0.5)
+
         modal_shot = os.path.join(ARTIFACT_DIR, "cofi_traders_ocr_verified.png")
         await session.screenshot(modal_shot)
         print(f"\n[PASS] Modal screenshot captured: {modal_shot}")

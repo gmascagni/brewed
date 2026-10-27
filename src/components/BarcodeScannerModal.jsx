@@ -28,7 +28,8 @@ import {
   Clock,
   Calendar,
   Check,
-  RotateCcw
+  RotateCcw,
+  Languages
 } from 'lucide-react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import jsQR from 'jsqr';
@@ -1671,6 +1672,42 @@ export default function BarcodeScannerModal({
                 )}
               </div>
 
+              {/* Spanish-to-English Auto-Translation Card */}
+              {matchedBean.translations?.isSpanish && matchedBean.translations.fields?.length > 0 && (
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/[0.08] border border-amber-500/35 text-xs font-mono space-y-2.5 animate-fade-in">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <Languages className="w-4 h-4 text-amber-gold" />
+                      <span className="font-bold text-amber-gold uppercase tracking-wider text-[11px]">
+                        Spanish Label Translated &amp; Calibrated
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingBag(prev => !prev)}
+                      className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[10px] font-bold border border-amber-500/40 flex items-center gap-1 transition cursor-pointer"
+                      title="Adjust any translated numbers or details"
+                    >
+                      <Edit3 className="w-3 h-3 text-amber-gold" />
+                      <span>{isEditingBag ? 'Close Editor' : 'Adjust Numbers / Altitude'}</span>
+                    </button>
+                  </div>
+
+                  <p className="text-[11px] text-cream-soft/80 leading-relaxed font-sans">
+                    Artisan packaging terms detected in Spanish — automatically translated and mapped into SCA extraction chemistry:
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                    {matchedBean.translations.fields.map((f, idx) => (
+                      <div key={idx} className="flex items-start justify-between p-2 rounded-xl bg-black/40 border border-white/5 gap-2">
+                        <span className="text-cream-soft/60 shrink-0 font-medium">{f.spanish}:</span>
+                        <span className="text-cream-light font-bold text-right truncate" title={f.value}>{f.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Inline Bag Data Correction & Claim Form */}
               {isEditingBag && editedBagData && (
                 <div className="p-4 rounded-2xl bg-espresso-900 border border-amber-gold/40 shadow-inner space-y-3 animate-fade-in">
@@ -1838,7 +1875,7 @@ export default function BarcodeScannerModal({
                 <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10">
                   <span className="text-[10px] text-cream-soft/60 uppercase block">Origin &amp; Altitude</span>
                   <span className="font-bold text-cream-light truncate block mt-0.5">{matchedBean.origin}</span>
-                  <span className="text-[10px] text-amber-gold block">{matchedBean.elevation || '1,800+ MASL'}</span>
+                  <span className="text-[10px] text-amber-gold block">{matchedBean.elevation || 'Unspecified MASL'}</span>
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10">
