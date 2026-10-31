@@ -1093,28 +1093,6 @@ export default function App() {
     }
   }, [currentStep]);
 
-  // Auto-hide mobile top brand bar when scrolling down; reveal immediately on upward scroll
-  const [isMobileHeaderHidden, setIsMobileHeaderHidden] = useState(false);
-  const lastScrollYRef = useRef(0);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const handleScroll = () => {
-      const currentY = window.scrollY || 0;
-      const delta = currentY - lastScrollYRef.current;
-      if (currentY < 60) {
-        setIsMobileHeaderHidden(false);
-      } else if (delta > 12 && currentY > 90) {
-        setIsMobileHeaderHidden(true);
-      } else if (delta < -8) {
-        setIsMobileHeaderHidden(false);
-      }
-      lastScrollYRef.current = currentY;
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   // Horizontal touch swipe gestures between Step 1 <-> Step 2 <-> Step 3 <-> Step 4 in Brew Station
   const brewTouchStartRef = useRef(null);
 
@@ -1184,7 +1162,7 @@ export default function App() {
       onOpenJournal={() => setIsJournalOpen(true)}
       navigate={navigate}
     >
-      <div className="min-h-screen font-sans flex flex-col transition-colors duration-700 relative bg-[#FAF7F2] text-[#14110F] selection:bg-[#C48B56] selection:text-white">
+      <div className="min-h-screen font-sans flex flex-col transition-colors duration-700 relative bg-[#FAF7F2] text-[#14110F] selection:bg-[#C48B56] selection:text-white overflow-x-hidden max-w-full">
 
       {/* High-Definition Extraction Method Background Image Overlay */}
       <div 
@@ -1204,11 +1182,6 @@ export default function App() {
       
       {/* 100% Bulletproof Sticky Top Header Container */}
       <header className={`sticky top-0 ${isAnyModalOpen ? 'z-20 pointer-events-none' : 'z-40'} backdrop-blur-xl transition-all duration-300 border-b border-[#ECE6DC] bg-[#FAF7F2]/95 shadow-xs pt-0.5 sm:pt-2 pb-0.5`}>
-        <div className={`transition-all duration-300 ease-out ${
-          isMobileHeaderHidden
-            ? 'max-md:max-h-0 max-md:opacity-0 max-md:-translate-y-2 max-md:overflow-hidden max-md:pointer-events-none'
-            : 'max-md:max-h-24 max-md:opacity-100 max-md:translate-y-0'
-        }`}>
         <Header
           onOpenJournal={() => setIsJournalOpen(true)}
           onOpenSearch={() => setIsSearchOpen(true)}
@@ -1268,7 +1241,6 @@ export default function App() {
           onToggleMute={() => setIsMuted(!isMuted)}
           currentUser={currentUser}
         />
-        </div>
         
         {/* Step Progress Bar Pinned Inside Sticky Top Bar (active only in BREW area) */}
         {currentArea === 'brew' && (

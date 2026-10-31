@@ -12,7 +12,7 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
   ];
 
   return (
-    <nav className="w-full py-2 px-2 sm:px-4 lg:px-8 transition-colors duration-400 border-t border-b bg-[#FAF7F2] border-[#ECE6DC] relative z-10">
+    <nav className="w-full py-2 px-1.5 sm:px-4 lg:px-8 transition-colors duration-400 border-t border-b bg-[#FAF7F2] border-[#ECE6DC] relative z-10 overflow-x-hidden">
       <div className="max-w-7xl mx-auto flex items-center justify-between relative gap-1 sm:gap-3">
         
         {/* Background Connecting Timeline Line */}
@@ -27,7 +27,7 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
             <div key={step.id} className="relative z-1 flex-1 flex justify-center min-w-0">
               <button
                 onClick={() => setCurrentStep(step.id)}
-                className={`w-full group flex items-center justify-center sm:justify-start space-x-1 sm:space-x-2 px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border transition-all duration-200 active:scale-95 ${
+                className={`w-full group flex items-center justify-center sm:justify-start space-x-1 sm:space-x-2 px-1 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border transition-all duration-200 active:scale-95 ${
                   isActive
                     ? 'bg-[#14110F] text-[#FAF7F2] font-extrabold shadow-sm scale-[1.02] border-[#14110F]'
                     : isCompleted
@@ -51,7 +51,8 @@ export default function StepIndicator({ currentStep, setCurrentStep, trackMode }
                 {/* Step Metadata & Title */}
                 <div className="text-left min-w-0">
                   <div className="text-[9px] sm:text-[10px] uppercase font-mono tracking-wider font-extrabold truncate opacity-90">
-                    0{step.id} • <span className="hidden sm:inline">{step.title}</span><span className="sm:hidden">{step.title.split(' ')[0]}</span>
+                    <span className="sm:hidden">0{step.id}</span>
+                    <span className="hidden sm:inline">0{step.id} • {step.title}</span>
                   </div>
                 </div>
               </button>

@@ -1037,9 +1037,12 @@ export default function MultiPhaseTimer({
   };
 
   return (
-    <div className={`p-5 sm:p-8 md:p-10 lg:p-12 rounded-3xl ${
-      isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
-    } shadow-2xl transition-all duration-500 relative overflow-hidden`}>
+    <div 
+      data-no-swipe="true"
+      className={`p-5 sm:p-8 md:p-10 lg:p-12 rounded-3xl ${
+        isCoffee ? 'glass-panel-coffee border-[#A66E38]/40' : 'glass-panel-tea border-sage-500/40'
+      } shadow-2xl transition-colors duration-500 relative overflow-hidden`}
+    >
       
       {/* Background Radial Glow */}
       <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none ${
@@ -1431,7 +1434,7 @@ export default function MultiPhaseTimer({
               cx="100"
               cy="100"
               r={radius}
-              className={`transition-all duration-300 ${
+              className={`transition-[stroke-dashoffset] duration-300 ${
                 isCoffee ? 'text-[#D2A06E]' : 'text-sage-400'
               } drop-shadow-[0_0_12px_rgba(210,160,110,0.3)]`}
               strokeWidth="12"
