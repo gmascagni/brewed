@@ -11,7 +11,7 @@ export const US_SHOWCASE_ROASTERS = [
     name: 'Methodical Coffee',
     shortName: 'Methodical',
     isDemoExample: true,
-    demoNotice: 'Demonstration & Showcase Partner Example',
+    demoNotice: 'Demonstration Showcase Example • Illustrates how an onboarded specialty roaster profile, dial-in water recipe, tasting notes, and smart bag QR dials look on The Brew App.',
     tagline: 'Coffee, Hospitality, Design',
     founded: '2015',
     city: 'Greenville',
@@ -174,433 +174,13 @@ export const US_SHOWCASE_ROASTERS = [
         badge: 'Year-Round Benchmark'
       }
     ]
-  },
-
-  {
-    id: 'onyx',
-    slug: 'onyx-coffee-lab',
-    name: 'Onyx Coffee Lab (Showcase Example)',
-    shortName: 'Onyx (Demo)',
-    isDemoExample: true,
-    demoNotice: 'Demonstration & Showcase Example • Not an official onboarded partner',
-    tagline: 'Never Settle for Good Enough',
-    founded: '2012',
-    city: 'Rogers',
-    state: 'Arkansas',
-    country: 'USA',
-    founders: ['Jon Allen', 'Andrea Allen'],
-    website: 'https://onyxcoffeelab.com',
-    shopUrl: 'https://onyxcoffeelab.com/collections/coffee',
-    brandColor: '#E2B874',
-    accentColor: '#C08A3E',
-    roasterMachines: 'Diedrich & Loring Convection Roasters',
-    sourcingPhilosophy: '100% Transparent Sourcing, Farm-Gate Pricing, and Fair Trade Plus',
-    carbonFootprint: 'Solar Powered Roastery HQ & Compostable Packaging',
-
-    monogram: 'O',
-    emblemSubtitle: 'ROGERS, AR • EST. 2012',
-
-    stats: [
-      { label: 'Barista Titles', value: 'US Champion / World #2' },
-      { label: 'Pricing Data', value: '100% Published' },
-      { label: 'Active Roasts', value: '22 Lots' },
-      { label: 'Cupping Standards', value: '89.0+ Benchmark' }
-    ],
-
-    originStory: [
-      "Onyx Coffee Lab was founded in 2012 in Arkansas by Jon and Andrea Allen with a single, uncompromising mandate: 'Never Settle for Good Enough.' Starting from humble beginnings roasting small batches after-hours, Onyx transformed into one of the most decorated specialty coffee institutions in the world.",
-      "Beyond their championship barista pedigrees, Onyx is renowned for radical pricing transparency. Every box published by Onyx discloses the exact farm gate price paid to the producer, the FOB price at export, the harvest dates, and cupping scores—setting a new ethical benchmark for the global specialty coffee trade."
-    ],
-
-    roastingPhilosophy:
-      "We roast on high-precision convection roasters with meticulous computer data logging. We optimize every roast curve for peak sweetness and cellular development, never hiding the coffee behind smoke or charcoal.",
-
-    cafes: [
-      {
-        name: 'Onyx HQ at The 1907',
-        address: '101 E Walnut St, Rogers, AR 72756',
-        description: 'World-renowned architectural masterpiece roastery, cupping auditorium, and coffee bar.',
-        hours: 'Mon–Sun: 6:30am – 7pm'
-      },
-      {
-        name: 'Bentonville Square',
-        address: '105 W Central Ave, Bentonville, AR 72712',
-        description: 'Art-deco jewel on the historic downtown square with bespoke pourover stations.',
-        hours: 'Mon–Sun: 7am – 6pm'
-      }
-    ],
-
-    recommendedWater: {
-      targetTds: 145,
-      gh: 75,
-      kh: 35,
-      ph: 7.0,
-      philosophy: 'Onyx Competition Spec: Balanced calcium and magnesium to amplify silky mouthfeel and structured malic acidity.',
-      lotusFormula: { calcium: 3, magnesium: 3, buffer: 2 },
-      diyFormula: { epsomMl: 12.5, bakingSodaMl: 8.5 },
-      bottledWaterPairing: 'Third Wave Water (Light Roast Profile in Distilled) or Crystal Geyser'
-    },
-
-    coffees: [
-      {
-        id: 'onyx_southern_weather',
-        beanName: 'Southern Weather',
-        origin: 'Colombia & Ethiopia',
-        process: 'Washed',
-        varietal: 'Castillo, Caturra, Ethiopian Heirloom',
-        elevation: '1,850 – 2,000 MASL',
-        roastLevel: 'Medium-Light',
-        cuppingScore: 88.0,
-        harvestYear: 'Current Fresh Crop',
-        tastingNotes: ['Milk Chocolate', 'Plum', 'Candied Walnuts', 'Citrus Sparkle'],
-        description: 'The defining coffee of Onyx Coffee Lab. Effortlessly sweet with juicy stone-fruit and chocolate finish.',
-        brewMethod: 'pour_over',
-        recommendedRatio: 16.0,
-        dryDoseGrams: 18.0,
-        waterGrams: 288,
-        tempF: 200,
-        tempC: 93.3,
-        recommendedGrind: 'Medium-Fine',
-        brewTime: '3m 00s',
-        pourSchedule: [
-          { phase: 'Bloom Phase', time: '0:00 - 0:45', water: '50g', note: 'Gentle swirl bloom' },
-          { phase: 'Pulse 1', time: '0:45 - 1:30', water: '130g', note: 'Center-outward spiral' },
-          { phase: 'Pulse 2', time: '1:30 - 2:30', water: '108g', note: 'Even top-up drawdown' }
-        ],
-        upc: '850012345012',
-        price: '$21.00',
-        bagSize: '10 oz (284g)',
-        directUrl: 'https://onyxcoffeelab.com/products/southern-weather',
-        badge: 'Onyx Benchmark'
-      },
-      {
-        id: 'onyx_tropical_weather',
-        beanName: 'Tropical Weather',
-        origin: 'Ethiopia (Washed & Natural)',
-        process: 'Washed & Natural Blend',
-        varietal: 'Ethiopian Heirloom Varieties',
-        elevation: '1,900 – 2,200 MASL',
-        roastLevel: 'Light',
-        cuppingScore: 89.5,
-        harvestYear: '2025/2026 Harvest',
-        tastingNotes: ['Mango Nectar', 'Peach Sweet Tea', 'Floral Jasmine', 'Candied Berry'],
-        description: 'A vibrant tribute to the birthplace of coffee. Combines floral washed and fruity natural Ethiopian lots.',
-        brewMethod: 'pour_over',
-        recommendedRatio: 16.5,
-        dryDoseGrams: 18.0,
-        waterGrams: 297,
-        tempF: 203,
-        tempC: 95.0,
-        recommendedGrind: 'Medium-Fine',
-        brewTime: '3m 15s',
-        pourSchedule: [
-          { phase: 'Bloom Phase', time: '0:00 - 0:45', water: '50g', note: 'Full grounds saturation' },
-          { phase: 'Main Pour', time: '0:45 - 2:00', water: '150g', note: 'Gentle low-turbulence spirals' },
-          { phase: 'Final Pulse', time: '2:00 - 3:15', water: '97g', note: 'Center drawdown' }
-        ],
-        upc: '850012345029',
-        price: '$23.00',
-        bagSize: '10 oz (284g)',
-        directUrl: 'https://onyxcoffeelab.com/products/tropical-weather',
-        badge: 'Fruity & Vibrant'
-      },
-      {
-        id: 'onyx_ethiopia_guji_natural',
-        beanName: 'Ethiopia Guji Natural',
-        slug: 'ethiopia-guji-natural',
-        aliases: ['ethiopia-guji'],
-        origin: 'Ethiopia',
-        farm: 'Dambi Uddo Station',
-        region: 'Shakisso, Guji Zone',
-        varietal: 'Gibirinna 74110 & Serto 74112',
-        process: 'Natural / Sun Dried on African Beds',
-        elevation: '2,000 – 2,150 MASL',
-        roastLevel: 'Light',
-        cuppingScore: 89.5,
-        harvestYear: '2025/2026 Harvest',
-        tastingNotes: ['Wild Strawberry', 'Jasmine Blossom', 'Meyer Lemon', 'Bergamot Honey'],
-        description: 'Grown in the legendary highland forests of Guji. Hand-sorted cherries dried slowly on African raised beds to preserve pristine florals, intense strawberry sweetness, and crystalline citric brightness.',
-        brewMethod: 'pour_over',
-        recommendedRatio: 16.5,
-        dryDoseGrams: 18.0,
-        doseGrams: 18.0,
-        waterGrams: 297,
-        tempF: 202,
-        tempC: 94.4,
-        recommendedGrind: 'Medium-Fine (620µm)',
-        bloom: '45s bloom with 50g water',
-        brewTime: '3m 15s',
-        pourSchedule: [
-          { phase: 'Bloom Phase', time: '0:00 - 0:45', water: '50g', note: 'Gentle grounds saturation & degas' },
-          { phase: 'Main Spiral', time: '0:45 - 2:00', water: '150g', note: 'Steady concentric rings' },
-          { phase: 'Final Drawdown', time: '2:00 - 3:15', water: '97g', note: 'Center pour to maintain bed warmth' }
-        ],
-        upc: '850012345099',
-        price: '$24.00',
-        bagSize: '10 oz (284g)',
-        directUrl: 'https://onyxcoffeelab.com/products/ethiopia-guji',
-        shopLink: 'https://onyxcoffeelab.com/collections/coffee',
-        badge: 'Founding Micro-Lot'
-      }
-    ]
-  },
-
-  {
-    id: 'black_and_white',
-    slug: 'black-and-white-coffee',
-    name: 'Black & White Coffee Roasters',
-    shortName: 'Black & White',
-    isDemoExample: true,
-    demoNotice: 'Demonstration & Showcase Partner Example',
-    tagline: 'Creating Opportunities Through Coffee',
-    founded: '2017',
-    city: 'Raleigh / Rolesville',
-    state: 'North Carolina',
-    country: 'USA',
-    founders: ['Kyle Ramage', 'Lem Butler'],
-    website: 'https://blackwhiteroasters.com',
-    shopUrl: 'https://blackwhiteroasters.com/collections/coffee',
-    brandColor: '#FDFBF7',
-    accentColor: '#A66E38',
-    roasterMachines: 'Loring S15, S35, S70 Fleet with SOVDA Optical Sorting',
-    sourcingPhilosophy: 'Pioneering Yeast Fermentation, Anaerobic Inoculation, and Experimental Terroir',
-    carbonFootprint: 'Single-Burner Recirculating Loring Convection Roasting',
-
-    monogram: 'BW',
-    emblemSubtitle: 'RALEIGH, NC • EST. 2017',
-
-    stats: [
-      { label: 'Founder Accolades', value: '2x US Barista Champions' },
-      { label: 'Roaster Facility', value: '3x Loring Fleet' },
-      { label: 'Sorting Tech', value: 'SOVDA Pearl Mini' },
-      { label: 'Fermentations', value: 'Anaerobic / Koji / Honey' }
-    ],
-
-    originStory: [
-      "Founded in 2017 by United States Barista Champions Kyle Ramage (2017) and Lem Butler (2016) in North Carolina, Black & White set out to make exceptional specialty coffee approachable while fearlessly exploring experimental processing.",
-      "Operating a world-class roasting campus in Rolesville/Raleigh equipped with a fleet of single-burner Loring roasters and SOVDA optical sorters, Black & White is globally celebrated for their anaerobic naturals, thermal shock processing, and yeast-inoculated lots that redefine what coffee can taste like."
-    ],
-
-    roastingPhilosophy:
-      "We believe coffee should be exciting. We roast on single-burner Loring roasters that recycle superheated air, producing impeccably uniform convective heat transfer that highlights fruit esters without roasty interference.",
-
-    cafes: [
-      {
-        name: 'B&W Downtown Raleigh Cafe',
-        address: '314 S Blount St, Raleigh, NC 27601',
-        description: 'Vibrant city cafe located in the historic downtown district.',
-        hours: 'Mon–Sun: 7am – 5pm'
-      },
-      {
-        name: 'Rolesville Flagship & Roastery',
-        address: '314 Southtown Cir, Rolesville, NC 27571',
-        description: 'Production roastery, lab, and cafe featuring experimental flights.',
-        hours: 'Mon–Sat: 7am – 4pm'
-      }
-    ],
-
-    recommendedWater: {
-      targetTds: 125,
-      gh: 65,
-      kh: 25,
-      ph: 6.8,
-      philosophy: 'Low bicarbonate buffer allows the wild fruit esters and vibrant lactic acids of experimental fermentations to be fully expressed.',
-      lotusFormula: { calcium: 2, magnesium: 4, buffer: 1 },
-      diyFormula: { epsomMl: 14.0, bakingSodaMl: 5.0 },
-      bottledWaterPairing: 'Crystal Geyser or Aquafina remineralized with Third Wave Water'
-    },
-
-    coffees: [
-      {
-        id: 'bw_the_future',
-        beanName: 'The Future (Experimental Anaerobic Series)',
-        origin: 'Rotating Micro-Lot Partners (Huila / Cauca)',
-        process: 'Anaerobic Natural / Co-Fermentation',
-        varietal: 'Caturra & Castillo',
-        elevation: '1,800 – 2,100 MASL',
-        roastLevel: 'Light',
-        cuppingScore: 90.0,
-        harvestYear: '2025/2026 Micro-Batch',
-        tastingNotes: ['Grape Soda', 'Wild Strawberry', 'Candied Pineapple', 'Dark Chocolate Truffle'],
-        description: 'Black & White legendary experimental series. Pushes fermentation boundaries with mind-bending fruit aromatics and confectionery sweetness.',
-        brewMethod: 'pour_over',
-        recommendedRatio: 16.0,
-        dryDoseGrams: 18.0,
-        waterGrams: 288,
-        tempF: 198,
-        tempC: 92.2,
-        recommendedGrind: 'Medium (Slightly Coarser to prevent overextraction)',
-        brewTime: '3m 15s',
-        pourSchedule: [
-          { phase: 'Bloom', time: '0:00 - 0:45', water: '50g', note: 'Low agitation pour' },
-          { phase: 'Body Pulse', time: '0:45 - 1:45', water: '130g', note: 'Steady center pour' },
-          { phase: 'Finish', time: '1:45 - 3:00', water: '108g', note: 'Gentle edge wash' }
-        ],
-        upc: '850034567019',
-        price: '$24.00',
-        bagSize: '12 oz (340g)',
-        directUrl: 'https://blackwhiteroasters.com/collections/coffee/products/the-future',
-        badge: 'Wild & Experimental'
-      },
-      {
-        id: 'bw_the_classic',
-        beanName: 'The Classic',
-        origin: 'Latin America Blend',
-        process: 'Washed',
-        varietal: 'Bourbon, Caturra, Typica',
-        elevation: '1,600 – 1,900 MASL',
-        roastLevel: 'Medium-Dark',
-        cuppingScore: 86.0,
-        harvestYear: 'Current Fresh Crop',
-        tastingNotes: ['Dark Chocolate Fudge', 'Caramelized Sugar', 'Toasted Almond', 'Ripe Cherry'],
-        description: 'Clean, sweet, and comforting. Designed for those who crave deep chocolate richness with modern roasting clarity.',
-        brewMethod: 'espresso',
-        recommendedRatio: 2.0,
-        dryDoseGrams: 18.5,
-        waterGrams: 37,
-        tempF: 201,
-        tempC: 93.9,
-        recommendedGrind: 'Fine (Espresso Spec)',
-        brewTime: '28 - 32s',
-        pourSchedule: [
-          { phase: '9-Bar Extraction', time: '0:00 - 0:30', water: '37g liquid', note: 'Silky crema, syrupy chocolate body' }
-        ],
-        upc: '850034567026',
-        price: '$18.50',
-        bagSize: '12 oz (340g)',
-        directUrl: 'https://blackwhiteroasters.com/collections/coffee/products/the-classic',
-        badge: 'Everyday Espresso'
-      }
-    ]
-  },
-
-  {
-    id: 'brookmill-roaster',
-    slug: 'brookmill-roaster',
-    aliases: ['brookmill', 'brookmill-roasters', 'brookmill-roaster-alpharetta'],
-    name: 'Brookmill Coffee Roasters',
-    shortName: 'Brookmill',
-    ownerEmail: 'clpicken@live.com',
-    ownerEmails: ['clpicken@live.com', 'clpicke@live.com', 'christian@brookmillcoffee.com'],
-    ownerUsername: 'clpicken',
-    ownerUid: 'user_clpicken',
-    isDemoExample: false,
-    tagline: 'Artisan Small-Batch Roasting & Precision Dial-In Labs',
-    founded: '2020',
-    city: 'Alpharetta',
-    state: 'Georgia',
-    country: 'USA',
-    location: 'Alpharetta, GA',
-    website: 'https://thebrew.app/roasters/brookmill-roaster',
-    shopUrl: 'https://thebrew.app/roasters/brookmill-roaster',
-    brandColor: '#8C5A32',
-    accentColor: '#D4A373',
-    roasterMachines: 'San Franciscan Drum Roaster & Precision Convection Profiling',
-    sourcingPhilosophy: 'Ethically Sourced Single-Origin & Micro-Lot Direct Trade',
-    carbonFootprint: 'High-Efficiency Micro-Batch Drum Roasting',
-    monogram: 'B',
-    emblemSubtitle: 'ALPHARETTA, GA • ARTISAN ROASTERY',
-    stats: [
-      { label: 'Active Craft Lots', value: '6 Lots' },
-      { label: 'Roast Technology', value: 'San Franciscan Drum' },
-      { label: 'Dial-In Standard', value: 'Golden Ratio 1:16.5' },
-      { label: 'Average Cup Score', value: '88.0+ SCA' }
-    ],
-    originStory: [
-      "Brookmill Roaster is an artisan craft roastery based in Alpharetta, Georgia, dedicated to precision small-batch coffee roasting and scientific dial-in excellence.",
-      "Every single lot is meticulously profiled on our San Franciscan drum roasters to unlock deep aromatic sweetness, clean acidity, and rich confectionery finishes. Every physical bag packaged in our roastery features our certified Smart Bag dial-in specifications, providing home baristas with the exact extraction ratio, water temperature, and grind size to brew the ideal cup."
-    ],
-    roastingPhilosophy:
-      "We believe roasting is the bridge between the farmer's craft and the barista's cup. By balancing gentle conduction with precise airflow, we caramelize natural sugars without imparting charred or bitter astringency, highlighting vibrant terroir and silky chocolate body.",
-    cafes: [
-      {
-        name: 'Brookmill Roastery & Dial-In Lab',
-        address: 'Alpharetta, GA 30009',
-        description: 'Our primary roasting facility, QA cupping lab, and precision dial-in bar.',
-        hours: 'Mon–Sat: 7am – 4pm'
-      }
-    ],
-    recommendedWater: {
-      targetTds: 140,
-      gh: 70,
-      kh: 30,
-      ph: 7.0,
-      philosophy: 'Balanced mineral water with a 2:1 magnesium-to-calcium ratio accentuating dark cocoa sweetness and velvety mouthfeel.',
-      lotusFormula: { calcium: 2, magnesium: 4, buffer: 1 },
-      diyFormula: { epsomMl: 15.0, bakingSodaMl: 5.5 },
-      bottledWaterPairing: 'Crystal Geyser or Volvic Natural Spring Water'
-    },
-    coffees: [
-      {
-        id: 'brookmill_caffe_choco',
-        beanName: 'Caffe Choco / 13',
-        origin: 'Specialty Single Origin & Craft Lot',
-        process: 'Washed & Honey Process',
-        varietal: 'Bourbon & Caturra',
-        elevation: '1,750 – 1,950 MASL',
-        roastLevel: 'Medium Roast',
-        cuppingScore: 88.5,
-        harvestYear: '2025/2026 Micro-Batch',
-        tastingNotes: ['Dark Chocolate', 'Cocoa Nibs', 'Sweet Caramel', 'Velvety Body'],
-        description: 'Brookmill signature roast featuring intense notes of artisan dark chocolate, warm cocoa nibs, and rich caramelized brown sugar. Dialed in to perfection at 1:16.5 and 202°F.',
-        brewMethod: 'pour_over',
-        recommendedRatio: 16.5,
-        dryDoseGrams: 18.8,
-        waterGrams: 310,
-        tempF: 202,
-        tempC: 94.4,
-        recommendedGrind: 'Medium-Fine (650µm)',
-        brewTime: '3m 30s',
-        pourSchedule: [
-          { phase: 'Bloom', time: '0:00 - 0:45', water: '60g', note: 'Even saturation, gentle de-gas' },
-          { phase: 'Main Pour', time: '0:45 - 2:15', water: '188g', note: 'Concentric spiral pours' },
-          { phase: 'Drawdown', time: '2:15 - 3:30', water: '62g', note: 'Gentle swirl, clean flat-bed drawdown' }
-        ],
-        upc: 'LOT-749038',
-        price: '$21.00',
-        bagSize: '12 oz (340g)',
-        directUrl: 'https://thebrew.app/roasters/brookmill-roaster',
-        badge: 'Signature Craft Roast'
-      },
-      {
-        id: 'brookmill_belly_warmer',
-        beanName: 'Belly Warmer / 13',
-        origin: 'Central & South American Specialty Lots',
-        process: 'Washed & Natural',
-        varietal: 'Catuai & Typica',
-        elevation: '1,600 – 1,850 MASL',
-        roastLevel: 'Medium-Dark Roast',
-        cuppingScore: 87.5,
-        harvestYear: 'Current Fresh Crop',
-        tastingNotes: ['Toasted Hazelnut', 'Molasses', 'Baking Spices', 'Rich Cocoa'],
-        description: 'A comforting, full-bodied artisan cup with warming spice aromatics, toasted hazelnut, and deep molasses finish.',
-        brewMethod: 'pour_over',
-        recommendedRatio: 16.0,
-        dryDoseGrams: 19.0,
-        waterGrams: 304,
-        tempF: 200,
-        tempC: 93.3,
-        recommendedGrind: 'Medium (750µm)',
-        brewTime: '3m 15s',
-        pourSchedule: [
-          { phase: 'Bloom', time: '0:00 - 0:40', water: '58g', note: 'Thorough saturation' },
-          { phase: 'Body Pour', time: '0:40 - 2:00', water: '150g', note: 'Steady center pour' },
-          { phase: 'Final Pour', time: '2:00 - 3:15', water: '96g', note: 'Gentle edge rinse' }
-        ],
-        upc: 'LOT-749039',
-        price: '$20.00',
-        bagSize: '12 oz (340g)',
-        directUrl: 'https://thebrew.app/roasters/brookmill-roaster',
-        badge: 'Comfort Blend'
-      }
-    ]
   }
 ];
 
 export const SHOWCASE_ROASTERS = [
-  ...US_SHOWCASE_ROASTERS,
-  ...COSTA_RICA_ROASTERS
+  ...US_SHOWCASE_ROASTERS
 ];
+
 
 export { COSTA_RICA_ROASTERS, COSTA_RICA_OUTREACH_DIRECTORY } from './costaRicaRoasters.js';
 
@@ -608,13 +188,20 @@ import { getCustomRoasters, getCustomRoasterCoffees, saveCustomRoasterProfile, s
 
 
 export function formatCustomRoasterAsShowcase(custom, coffees = []) {
-  const name = custom.name || custom.roaster || 'Specialty Roastery';
-  const slug = String(custom.slug || custom.id || name || 'specialty-roastery')
+  let name = custom.name || custom.roaster || 'Specialty Roastery';
+  if (typeof name !== 'string' || name.includes('[object')) {
+    name = 'Specialty Roastery';
+  }
+  let slug = String(custom.slug || custom.id || name || 'specialty-roastery')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+  if (slug.includes('object') || !slug) {
+    slug = 'specialty-roastery';
+  }
 
-  const monogram = name.charAt(0).toUpperCase() || 'R';
+  const cleanLetter = name.replace(/^[^a-zA-Z0-9]+/, '');
+  const monogram = cleanLetter.charAt(0).toUpperCase() || 'R';
   const location = custom.location || 'Artisan Craft Roastery';
 
   const coffeesSource = (Array.isArray(coffees) && coffees.length > 0)
@@ -740,17 +327,11 @@ export function formatCustomRoasterAsShowcase(custom, coffees = []) {
  * Canonical normalization for roaster identification across all forms (id, slug, name, alias).
  */
 export function normalizeRoasterKey(input) {
-  if (!input) return '';
+  if (!input || typeof input !== 'string' || input.includes('[object')) return '';
   let clean = String(input).toLowerCase().trim();
   const KNOWN_ALIASES = {
-    'bw': 'black-white',
-    'b-w': 'black-white',
-    'b&w': 'black-white',
-    'bandw': 'black-white',
     'mth': 'methodical',
-    'onx': 'onyx',
-    'brookmill': 'brookmill-roaster',
-    'brookmill-roasters': 'brookmill-roaster'
+    'methodical-coffee': 'methodical'
   };
   if (KNOWN_ALIASES[clean]) return KNOWN_ALIASES[clean];
 
@@ -913,6 +494,7 @@ export function getAllShowcaseRoasters() {
   // 3. Process any custom coffees with roaster names not yet captured
   const coffeeRoasterNames = Array.from(new Set(allCustomCoffees.map((c) => c.roaster).filter(Boolean)));
   coffeeRoasterNames.forEach((rName) => {
+    if (typeof rName !== 'string' || rName.includes('[object') || rName.toLowerCase().includes('brookmill')) return;
     const canonical = normalizeRoasterKey(rName);
     if (!canonical || seenKeys.has(canonical)) return; // Skip if already present
 
@@ -933,7 +515,7 @@ export function getAllShowcaseRoasters() {
 }
 
 export function slugToTitle(slug) {
-  if (!slug) return 'Specialty Roaster';
+  if (!slug || typeof slug !== 'string' || slug.includes('[object')) return 'Specialty Roastery';
   return slug
     .split(/[-_]+/)
     .filter(Boolean)
@@ -945,8 +527,19 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
   const all = getAllShowcaseRoasters();
   if (!idOrSlug) return all[0];
 
+  // Defensive: Guard against Object/Event leaking in
+  if (typeof idOrSlug !== 'string' && typeof idOrSlug !== 'number') {
+    if (typeof idOrSlug === 'object' && idOrSlug !== null) {
+      if (typeof idOrSlug.slug === 'string') return getShowcaseRoaster(idOrSlug.slug);
+      if (typeof idOrSlug.id === 'string') return getShowcaseRoaster(idOrSlug.id);
+      if (typeof idOrSlug.name === 'string') return getShowcaseRoaster(idOrSlug.name);
+      if (typeof idOrSlug.roaster === 'string') return getShowcaseRoaster(idOrSlug.roaster);
+    }
+    return all[0];
+  }
+
   const rawSlug = String(idOrSlug).trim().toLowerCase().replace(/^\/+|\/+$/g, '');
-  if (!rawSlug || ['roasters', 'roaster', 'registered', 'showcase', 'partner', 'info'].includes(rawSlug)) {
+  if (!rawSlug || ['roasters', 'roaster', 'registered', 'showcase', 'partner', 'info'].includes(rawSlug) || rawSlug.includes('[object')) {
     return all[0];
   }
 
@@ -964,7 +557,8 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
   if (matched) return matched;
 
   // If not in pre-defined or cached roasters, dynamically synthesize on-the-fly from slug & URL parameters
-  if (rawSlug && rawSlug !== 'methodical') {
+  // ONLY if rawSlug is a valid, clean roaster slug (not [object or empty or non-alphanumeric)
+  if (rawSlug && rawSlug !== 'methodical' && !rawSlug.includes('[object') && /^[a-z0-9-_]+$/i.test(rawSlug)) {
     let urlParams = null;
     if (typeof window !== 'undefined' && window.location && window.location.search) {
       try {

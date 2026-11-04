@@ -63,8 +63,8 @@ export default function Footer({ trackMode = 'coffee', onOpenRoasterInfo, onOpen
 
           {onOpenRoasterShowcase && (
             <button
-              onClick={onOpenRoasterShowcase}
-              className="py-2 px-3.5 rounded-xl bg-[#D69550]/15 hover:bg-[#D69550]/25 text-[#A25A24] border border-[#D69550]/30 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow-xs"
+              onClick={() => onOpenRoasterShowcase && onOpenRoasterShowcase()}
+              className="py-2 px-3.5 rounded-xl bg-[#D69550]/15 hover:bg-[#D69550]/25 text-[#A25A24] border border-[#D69550]/30 text-xs font-mono font-bold flex items-center gap-1.5 transition shadow-xs cursor-pointer"
             >
               <Store className="w-3.5 h-3.5" />
               <span>Roaster Showcase</span>

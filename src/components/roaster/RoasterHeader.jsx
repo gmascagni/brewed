@@ -50,6 +50,10 @@ export default function RoasterHeader({
     ? `Back to Recipe: ${activeCoffee.beanName.length > 20 ? `${activeCoffee.beanName.slice(0, 18)}…` : activeCoffee.beanName}`
     : 'Brewing Station';
 
+  const selectedRoasterValue = filteredRoasters.some((r) => r.id === activeRoasterId || r.slug === activeRoasterId)
+    ? activeRoasterId
+    : (filteredRoasters[0]?.id || 'methodical');
+
   return (
     <header className="sticky top-0 z-40 bg-[#0A0604]/85 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 py-3.5">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
@@ -116,7 +120,7 @@ export default function RoasterHeader({
 
           {/* Direct Select Dropdown Picker */}
           <select
-            value={activeRoasterId}
+            value={selectedRoasterValue}
             onChange={(e) => setActiveRoasterId(e.target.value)}
             className="bg-[#18110D] text-amber-gold border border-white/20 hover:border-amber-gold/50 rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold focus:border-amber-gold focus:outline-none cursor-pointer shadow-sm transition"
             aria-label="Select coffee roaster"

@@ -53,21 +53,6 @@ import { saveActiveBrewSession, createNextIterationSession, startOrGetActiveBrew
 import { ChevronRight, ChevronLeft, Sparkles, Coffee, Clock, Play, BookOpen, Store } from 'lucide-react';
 import { getCoffeeProvenance } from './utils/roasterVerification';
 
-// Pre-configured Verified Roaster Profile for CL Pickens (Brookmill Roaster)
-export const CL_PICKEN_ROASTER_USER = {
-  uid: 'user_clpicken',
-  email: 'clpicken@live.com',
-  username: '@clpicken',
-  displayName: 'CL Pickens',
-  role: 'roaster',
-  isVerifiedRoaster: true,
-  accountType: 'roaster',
-  roasterName: 'Brookmill Coffee Roasters',
-  roasterSlug: 'brookmill-roaster',
-  avatar: '/avatar_roast_beans.jpg',
-  bio: 'Founder & Head Artisan Roaster at Brookmill Coffee Roasters in Alpharetta, GA. Dialing in precision extraction profiles.'
-};
-
 const DEFAULT_LOCAL_PROFILES = [];
 
 export default function App() {
@@ -87,14 +72,16 @@ export default function App() {
       const saved = localStorage.getItem('the_brew_app_local_users');
       let list = saved ? JSON.parse(saved) : [];
       // Clean up any historical fake personas
-      list = list.filter((u) => u && u.username !== '@barista_pro' && u.email !== 'alex@specialtybrew.org');
-      // Ensure CL Pickens Brookmill Roaster profile is always available
-      if (!list.some((u) => u && (u.username === '@clpicken' || u.email === 'clpicken@live.com' || u.roasterSlug === 'brookmill-roaster'))) {
-        list.unshift(CL_PICKEN_ROASTER_USER);
-      }
+      list = list.filter((u) => u && 
+        u.username !== '@barista_pro' && 
+        u.email !== 'alex@specialtybrew.org' &&
+        u.username !== '@clpicken' &&
+        u.email !== 'clpicken@live.com' &&
+        u.roasterSlug !== 'brookmill-roaster'
+      );
       return list;
     } catch {
-      return [CL_PICKEN_ROASTER_USER];
+      return [];
     }
   });
 
@@ -103,7 +90,13 @@ export default function App() {
     try {
       const saved = localStorage.getItem('the_brew_app_active_user') || localStorage.getItem('the_brew_app_current_user');
       const user = saved ? JSON.parse(saved) : null;
-      if (user && (user.username === '@barista_pro' || user.email === 'alex@specialtybrew.org')) {
+      if (user && (
+        user.username === '@barista_pro' || 
+        user.email === 'alex@specialtybrew.org' ||
+        user.username === '@clpicken' ||
+        user.email === 'clpicken@live.com' ||
+        user.roasterSlug === 'brookmill-roaster'
+      )) {
         localStorage.removeItem('the_brew_app_active_user');
         localStorage.removeItem('the_brew_app_current_user');
         return null;
@@ -266,18 +259,21 @@ export default function App() {
       const p = window.location.pathname.replace(/^\/brewed/, '');
       if (p.startsWith('/roasters') || p.startsWith('/roaster')) {
         const parts = p.split('/').filter(Boolean);
-        if (parts.length > 1 && !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(parts[1].toLowerCase())) {
-          return parts[1];
+        if (parts.length > 1) {
+          const raw = decodeURIComponent(parts[1]).trim().toLowerCase();
+          if (!['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(raw) && !raw.includes('[object') && /^[a-z0-9-_]+$/i.test(raw)) {
+            return raw.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+          }
         }
         return 'methodical';
       }
       const searchParams = new URLSearchParams(window.location.search);
       const querySlug = searchParams.get('roaster') || searchParams.get('slug');
-      if (querySlug) {
+      if (querySlug && !querySlug.includes('[object')) {
         return querySlug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
       }
     }
-    return null;
+    return 'methodical';
   });
 
   // Backward compatible alias flags
@@ -391,11 +387,14 @@ export default function App() {
   // Handler for Specialty Roaster Showcase Navigation
   const handleOpenRoasterShowcase = (slug = null) => {
     setCurrentArea('discover');
-    if (slug) {
-      setSelectedRoasterSlug(slug);
-      navigate(`/roasters/${slug}`);
+    const validSlug = typeof slug === 'string' && slug.trim() && !slug.includes('[object') && !['[object', 'null', 'undefined'].includes(slug.trim().toLowerCase())
+      ? slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+      : null;
+    if (validSlug) {
+      setSelectedRoasterSlug(validSlug);
+      navigate(`/roasters/${validSlug}`);
     } else {
-      setSelectedRoasterSlug(null);
+      setSelectedRoasterSlug('methodical');
       navigate('/roasters');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -573,18 +572,22 @@ export default function App() {
   // Handler for clicking the roaster profile from a recipe to learn about the roaster
   const handleViewRoasterProfile = (coffeeOrRoaster) => {
     if (!coffeeOrRoaster) return;
-    const roasterName = typeof coffeeOrRoaster === 'string'
-      ? coffeeOrRoaster
-      : (coffeeOrRoaster.roaster || coffeeOrRoaster.roasterName || coffeeOrRoaster.roasterSlug || 'methodical');
-    const slug = typeof coffeeOrRoaster === 'object' && coffeeOrRoaster.roasterSlug
+    let roasterName = 'methodical';
+    if (typeof coffeeOrRoaster === 'string') {
+      if (!coffeeOrRoaster.includes('[object')) roasterName = coffeeOrRoaster;
+    } else if (typeof coffeeOrRoaster === 'object') {
+      roasterName = coffeeOrRoaster.roaster || coffeeOrRoaster.roasterName || coffeeOrRoaster.roasterSlug || 'methodical';
+      if (typeof roasterName !== 'string' || roasterName.includes('[object')) roasterName = 'methodical';
+    }
+    const slug = typeof coffeeOrRoaster === 'object' && typeof coffeeOrRoaster.roasterSlug === 'string' && !coffeeOrRoaster.roasterSlug.includes('[object')
       ? coffeeOrRoaster.roasterSlug
       : normalizeRoasterKey(roasterName);
     const roasterObj = getShowcaseRoaster(slug) || getShowcaseRoaster(roasterName);
-    const targetSlug = roasterObj?.slug || roasterObj?.id || slug;
+    const targetSlug = roasterObj?.slug || roasterObj?.id || slug || 'methodical';
 
     setCurrentArea('discover');
     setSelectedRoasterSlug(targetSlug);
-    const beanName = typeof coffeeOrRoaster === 'object' && coffeeOrRoaster.beanName ? coffeeOrRoaster.beanName : '';
+    const beanName = typeof coffeeOrRoaster === 'object' && typeof coffeeOrRoaster.beanName === 'string' ? coffeeOrRoaster.beanName : '';
     navigate(`/roasters/${targetSlug}${beanName ? `?bean=${encodeURIComponent(beanName)}` : ''}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -1198,7 +1201,7 @@ export default function App() {
           onOpenRoasterPortal={() => { setRoasterPrefillBarcode(''); setRoasterPrefillBean(null); setIsRoasterPortalOpen(true); }}
           onOpenCafePortal={() => { setCurrentArea('cafes'); setIsCafePartnerPortalOpen(true); }}
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
-          onOpenRoasterShowcase={handleOpenRoasterShowcase}
+          onOpenRoasterShowcase={() => handleOpenRoasterShowcase()}
           onOpenMobileTools={() => setIsMobileToolsOpen(true)}
           isRoasterShowcaseView={currentArea === 'discover'}
           isShopsView={currentArea === 'cafes'}
@@ -1984,7 +1987,7 @@ export default function App() {
         <Footer
           trackMode={trackMode}
           onOpenRoasterInfo={() => setIsRoasterInfoOpen(true)}
-          onOpenRoasterShowcase={handleOpenRoasterShowcase}
+          onOpenRoasterShowcase={() => handleOpenRoasterShowcase()}
           onOpenVideoAcademy={() => setIsVideoAcademyOpen(true)}
           onOpenVersionHistory={() => setIsVersionHistoryOpen(true)}
         />
@@ -2010,6 +2013,7 @@ export default function App() {
               navigate(currentStep > 1 && currentActiveMethod ? `/methods/${currentActiveMethod.id}` : '/');
             } else if (v === 'discover' || v === 'roasters') {
               setCurrentArea('discover');
+              setSelectedRoasterSlug('methodical');
               navigate('/roasters');
             } else if (v === 'cafes') {
               setCurrentArea('cafes');

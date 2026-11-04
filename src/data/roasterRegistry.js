@@ -162,7 +162,19 @@ export function getCustomRoasterCoffees(filterOwnerEmail = null, currentUser = n
     }
 
     const raw = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
-    const list = raw ? JSON.parse(raw) : [];
+    let list = raw ? JSON.parse(raw) : [];
+    if (Array.isArray(list)) {
+      list = list.filter((c) => {
+        if (!c || typeof c !== 'object') return false;
+        const rName = String(c.roaster || '').toLowerCase();
+        const bName = String(c.beanName || '').toLowerCase();
+        if (rName.includes('brookmill') || bName.includes('brookmill')) return false;
+        if (rName.includes('[object') || bName.includes('[object')) return false;
+        return true;
+      });
+    } else {
+      list = [];
+    }
 
     if (filterOwnerEmail) {
       const cleanEmail = String(filterOwnerEmail).trim().toLowerCase();
@@ -343,7 +355,17 @@ export function getCustomRoasters() {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') return [];
   try {
     const raw = localStorage.getItem(ROASTER_PROFILES_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const list = JSON.parse(raw);
+    if (!Array.isArray(list)) return [];
+    return list.filter((r) => {
+      if (!r || typeof r !== 'object') return false;
+      const name = String(r.name || r.roaster || '').trim();
+      const slug = String(r.slug || r.id || '').trim();
+      if (!name || name.includes('[object') || slug.includes('[object')) return false;
+      if (name.toLowerCase().includes('brookmill') || slug.toLowerCase().includes('brookmill')) return false;
+      return true;
+    });
   } catch (err) {
     console.warn('Error reading custom roasters from localStorage:', err);
     return [];
@@ -554,7 +576,6 @@ export function getCoffeeCustomerUrl(coffee, baseUrl) {
   if (!coffee) return `${base}/`;
 
   let rSlug = coffee.roasterSlug || slugify(coffee.roaster || 'specialty-roaster');
-  if (rSlug.includes('brookmill')) rSlug = 'brookmill-roaster';
 
   const cSlug = coffee.coffeeSlug || coffee.slug || coffee.beanSlug || slugify(coffee.beanName || 'single-origin');
   return `${base}/${rSlug}/${cSlug}`;
@@ -580,15 +601,12 @@ export function generateSmartBagUrl(coffee, baseUrl, options = {}) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
-  if (roasterSlug.includes('brookmill')) {
-    roasterSlug = 'brookmill-roaster';
-  }
 
   const params = new URLSearchParams();
   params.set('recipe', '1');
   params.set('roaster', roasterSlug);
 
-  const roasterDisplayName = coffee.roaster || (roasterSlug.includes('brookmill') ? 'Brookmill Coffee Roasters' : roasterSlug);
+  const roasterDisplayName = coffee.roaster || roasterSlug;
   if (roasterDisplayName && roasterDisplayName !== roasterSlug) {
     params.set('roasterName', roasterDisplayName);
   }

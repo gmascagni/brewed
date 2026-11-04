@@ -43,7 +43,20 @@ export default function RoasterProfilePage({
   onOpenAuth = null,
   activeCoffee = null
 }) {
-  const [activeRoasterId, setActiveRoasterId] = useState(initialRoasterId);
+  const cleanInitialRoasterId = useMemo(() => {
+    if (typeof initialRoasterId === 'string' && initialRoasterId.trim() && !initialRoasterId.includes('[object')) {
+      return initialRoasterId.trim();
+    }
+    if (typeof initialRoasterId === 'object' && initialRoasterId !== null) {
+      const candidate = initialRoasterId.slug || initialRoasterId.id || initialRoasterId.roaster;
+      if (typeof candidate === 'string' && candidate && !candidate.includes('[object')) {
+        return candidate;
+      }
+    }
+    return 'methodical';
+  }, [initialRoasterId]);
+
+  const [activeRoasterId, setActiveRoasterId] = useState(cleanInitialRoasterId);
   const roasterScrollRef = useRef(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [scannedBeanName, setScannedBeanName] = useState(() => {
@@ -111,10 +124,10 @@ export default function RoasterProfilePage({
   );
 
   useEffect(() => {
-    if (initialRoasterId) {
-      setActiveRoasterId(initialRoasterId);
+    if (cleanInitialRoasterId) {
+      setActiveRoasterId(cleanInitialRoasterId);
     }
-  }, [initialRoasterId]);
+  }, [cleanInitialRoasterId]);
 
   useEffect(() => {
     try {

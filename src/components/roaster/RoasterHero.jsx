@@ -68,7 +68,7 @@ export default function RoasterHero({
     }
   };
 
-  const isDemo = Boolean(roaster.isDemoExample || ['onyx', 'onyx-coffee-lab'].includes(String(roaster.slug || roaster.id || '').toLowerCase()));
+  const isDemo = Boolean(roaster.isDemoExample || ['methodical', 'methodical-coffee', 'onyx', 'onyx-coffee-lab'].includes(String(roaster.slug || roaster.id || '').toLowerCase()));
 
   return (
     <div className="space-y-6">
@@ -80,11 +80,11 @@ export default function RoasterHero({
             <div className="font-mono font-bold tracking-wider uppercase text-amber-300 text-xs flex items-center gap-2">
               <span>Demonstration Showcase Profile</span>
               <span className="text-[10px] bg-amber-500/30 text-amber-200 px-2 py-0.5 rounded border border-amber-400/40 font-semibold">
-                Not Onboarded Partner
+                Example Roaster
               </span>
             </div>
             <p className="text-stone-300 text-xs sm:text-sm leading-relaxed">
-              {roaster.demoNotice || 'This is an illustrative demonstration example showcasing how a roastery profile, bag QR codes, and recipe dial-in guides appear on The Brew. Onyx Coffee Lab is not an official onboarded partner.'}
+              {roaster.demoNotice || 'This is an illustrative demonstration example showcasing how a roastery profile, bag QR codes, and recipe dial-in guides appear on The Brew App. Methodical Coffee is presented as an example reference.'}
             </p>
           </div>
         </div>

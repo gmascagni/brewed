@@ -90,10 +90,8 @@ export function saveRoasterClaim(claimData) {
   // Check automated domain verification
   if (cleanEmail && roasterWebsite) {
     const isDomainMatch = isDomainVerifiedRoaster(cleanEmail, roasterWebsite);
-    const isKnownAlias = areEmailAliases(cleanEmail, 'christian@brookmillcoffee.com') && 
-                         (normalizedSlug.includes('brookmill') || (roasterName && roasterName.toLowerCase().includes('brookmill')));
 
-    if (isDomainMatch || isKnownAlias) {
+    if (isDomainMatch) {
       status = 'verified';
       verificationMessage = `Official Brand Ownership Verified with @${emailDomain || roasterDomain}`;
     }

@@ -140,11 +140,6 @@ export function checkRoasterBrandOwnership(roaster, currentUser) {
   if (roaster.ownerUsername && userName && roaster.ownerUsername.toLowerCase() === userName) {
     return true;
   }
-  const brookmillEmails = ['clpicken@live.com', 'clpicke@live.com', 'christian@brookmillcoffee.com'];
-  if ((userName === 'clpicken' || brookmillEmails.includes(userEmail)) &&
-      (roaster.slug === 'brookmill-roaster' || roaster.id === 'brookmill-roaster')) {
-    return true;
-  }
   if (currentUser.roasterSlug && (roaster.slug === currentUser.roasterSlug || roaster.id === currentUser.roasterSlug)) {
     return true;
   }

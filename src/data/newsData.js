@@ -1,25 +1,187 @@
 // World Coffee News Dispatch
 // Automatically synced from live RSS feeds: Daily Coffee News, Perfect Daily Grind, Sprudge, Specialty Coffee Press.
-// Last Synced: Oct 31, 2026, 11:08 AM
+// Last Synced: Nov 4, 2026, 3:28 PM
 
-export const LAST_UPDATED = "Oct 31, 2026, 11:08 AM";
+export const LAST_UPDATED = "Nov 4, 2026, 3:28 PM";
 
 export const WORLD_BREW_NEWS = [
   {
-    "id": "news_24153128371",
-    "title": "Dubai-trained barista brings specialty coffee to Bukidnon - Philstar.com",
-    "source": "Philstar.com",
+    "id": "news_1357595685",
+    "title": "Hundreds of Cuppers to Help Build a Kenya Coffee Flavor Atlas",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/04/hundreds-of-cuppers-to-help-build-a-kenya-coffee-flavor-atlas/",
+    "publishedDate": "Nov 4, 2026",
+    "dateIso": "2026-11-04",
+    "category": "coffee",
+    "tag": "Farm & Origin",
+    "readTime": "2 min read",
+    "featured": true,
+    "summary": "A new initiative in Kenya plans to document the country's diverse coffee flavors through a coordinated tasting effort involving more than 500 samples from 34 counties. The Kenya Coffee Flavor...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Nov 4, 2026",
+      "Direct coverage covering farm & origin"
+    ]
+  },
+  {
+    "id": "news_2281230233",
+    "title": "Kraft Heinz Selling North American Coffee Business for $650 Million",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/04/kraft-heinz-selling-north-american-coffee-business-for-650-million/",
+    "publishedDate": "Nov 4, 2026",
+    "dateIso": "2026-11-04",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Food and beverage giant Kraft Heinz is selling its North American coffee business — including Maxwell House, Gevalia and five other coffee brands — to private equity firm One Rock...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Nov 4, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_10843593179",
+    "title": "Good Trouble is Brewing at Its New Roastery in Arlington, Virginia",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/04/good-trouble-is-brewing-at-its-new-roastery-in-arlington-virginia/",
+    "publishedDate": "Nov 4, 2026",
+    "dateIso": "2026-11-04",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Coffee isn't all that's brewing at Good Trouble Roasters, a new roastery cafe that opened in Arlington, Virginia, in late October, but it does form the heart of the business....",
+    "keyPoints": [
+      "Published by Daily Coffee News on Nov 4, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_6075089289",
+    "title": "“The Center of Specialty”: World of Coffee Dubai brings every link in the coffee chain under one roof in January 2027 - Zawya",
+    "source": "Zawya",
     "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxOLTRLRTJSbU1XalFfcHRSS0J1MUpaT2FHdVdYTmJ3b3gtQ2t1VnZndkxPX2drR1pvZUhkZlVVbGFVWUZqYzBKYjdWRnd4a1p6aDEtQVZ1OTdPTGIwbHItcmdZejVvMXJMQXZ2X3BUSnJ0RzJOVURreDUtejBrTmx0Y2NvR3d3WkVPWElSdHFwM0pnbG4yU3BDOS1vTWNrZEhlX3JKWkhTNzBLWF93TlZsa2tGaTd4UnpsOGtSbkxPSdIBxgFBVV95cUxNaVgtOXF0RXd3elRnM2pycVVmak5JMmlCMHI4bEQ5Mjl3LWtpTFNVVEZlVjhSTXNZN2pVdGFmR0dDbnlwcng1bldhOVdzY3U5VU1ZbU9NZzQycVc1SHcxUzVTdndWNTVNU1hCUkNCNDVsQWNlLVJoVDNkblo5VzVxaVNJczB4S3dtTkRmYkQwRjhUblNWcXlHeXpPNU1rNU9uS2h5WGNTSVRNTUNpTGgtbGhidlpzQ1FPUVBtTy10eHB2dkpXSnc?oc=5",
-    "publishedDate": "Oct 31, 2026",
-    "dateIso": "2026-10-31",
+    "url": "https://news.google.com/rss/articles/CBMihwJBVV95cUxPLW92WDZYTVc4Nm1yOVp5MHUzNEt6VXhmRm1TWGxmeVNBVXVpYTZGdVBXOUdQMGZJZDJlUFhsa3E5OGFFN2lETlhVQnVUN0hTT0UydmZyX29LZHNBdlJiUlRMZVU2RDFzdkprZmhuWGplR3l4WGIwaXJyaERqXzR4UGwyMElTVXB5eExDU3dIZFpDRlN3Q2RIcU1jUnhNTEM4UEJBS095RC10SEVUUDE3TGRKeDRIOWxwQmhXLVI1eDFUeFBkRUpCaGlYWXNqMzJDbjJHNEdZVmUyLUpxTUNJYUt3ME82ZE9STVhyLXRNdTdYSHdmR0lUWWp5Q09sdmpBY2NKeUVqYw?oc=5",
+    "publishedDate": "Nov 4, 2026",
+    "dateIso": "2026-11-04",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "“The Center of Specialty”: World of Coffee Dubai brings every link in the coffee chain under one roof in January 2027&nbsp;&nbsp;",
+    "keyPoints": [
+      "Published by Zawya on Nov 4, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_23856400710",
+    "title": "A flat white future? Northland puts coffee to the test - Stuff",
+    "source": "Stuff",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOVHF6S0JsNUw4NGNScDJHd2VkZjEwMWlpUkNsbm5BWUx3XzZuZkg3MkZjTURuektYeDZnSmY2Wm55MEVpbWJOdXg3djFDVWlfSVk1aWF0R3A1V3B6TFpQQVdSZ29aOXhVWUVFdXRKYVFORm0xWnI3cm5EUEVOSzhHY0lCMWotQXM5Ri1zUjNYR3JhNms?oc=5",
+    "publishedDate": "Nov 4, 2026",
+    "dateIso": "2026-11-04",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "A flat white future? Northland puts coffee to the test&nbsp;&nbsp;",
+    "keyPoints": [
+      "Published by Stuff on Nov 4, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_12392050901",
+    "title": "Keurig and Luckin Report Growth Amid Coffee Market Shifts",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/03/keurig-and-luckin-report-growth-amid-coffee-market-shifts/",
+    "publishedDate": "Nov 3, 2026",
+    "dateIso": "2026-11-03",
+    "category": "coffee",
+    "tag": "Market & Trade",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Two of the world's largest coffee companies, Keurig Dr Pepper and Luckin Coffee, reported quarterly financial results today, Nov. 3, revealing strong overall growth alongside noticeable challenges in key parts...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Nov 3, 2026",
+      "Direct coverage covering market & trade"
+    ]
+  },
+  {
+    "id": "news_2520840617",
+    "title": "Design Details: The Performance of Pastry and Coffee at Moden Café in Athens",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/03/design-details-the-performance-of-pastry-and-coffee-at-moden-cafe-in-athens/",
+    "publishedDate": "Nov 3, 2026",
+    "dateIso": "2026-11-03",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Welcome to Design Details, an ongoing editorial feature in Daily Coffee News focused on individual examples of coffee shop architecture, interior design, packaging design or branding. If you are a...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Nov 3, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_480879235",
+    "title": "Diedrich Caps Roaster Line Transition with New DR-140",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/03/diedrich-caps-roaster-line-transition-with-new-dr-140/",
+    "publishedDate": "Nov 3, 2026",
+    "dateIso": "2026-11-03",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Idaho-based coffee roaster manufacturer Diedrich Roasters capped off the new generation of its roasting equipment in October with the launch of the DR-140, designed to handle green coffee batches from...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Nov 3, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_1783795214",
+    "title": "Wilfa Establishes US Operations, Introduces New Home Coffee Equipment",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/02/wilfa-establishes-us-operations-introduces-new-home-coffee-equipment/",
+    "publishedDate": "Nov 2, 2026",
+    "dateIso": "2026-11-02",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Norwegian home appliance brand Wilfa is reintroducing itself to the United States, establishing Wilfa USA operations and rolling out new products as part of a broader U.S. expansion. Wilfa presented...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Nov 2, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_8701203090",
+    "title": "Keurig Must Face Antitrust Claims Over Coffee Pods, Judge Rules",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/02/keurig-must-face-antitrust-claims-over-coffee-pods-judge-rules/",
+    "publishedDate": "Nov 2, 2026",
+    "dateIso": "2026-11-02",
     "category": "coffee",
     "tag": "Competitions",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "Dubai-trained barista brings specialty coffee to Bukidnon&nbsp;&nbsp;",
+    "summary": "A federal judge has allowed some major antitrust and false advertising claims against Keurig Green Mountain to proceed toward trial in a 12-year-old dispute over competition in the single-serve coffee...",
     "keyPoints": [
-      "Published by Philstar.com on Oct 31, 2026",
+      "Published by Daily Coffee News on Nov 2, 2026",
       "Direct coverage covering competitions"
     ]
   },
@@ -34,7 +196,7 @@ export const WORLD_BREW_NEWS = [
     "category": "coffee",
     "tag": "Industry & News",
     "readTime": "2 min read",
-    "featured": true,
+    "featured": false,
     "summary": "Three-year-old San Francisco specialty coffee company Outset Coffee has closed both of its cafes after separate landlord disputes, one ending in a $200,196 court judgment and the other in a...",
     "keyPoints": [
       "Published by Daily Coffee News on Oct 30, 2026",
@@ -56,168 +218,6 @@ export const WORLD_BREW_NEWS = [
     "summary": "Welcome to DCN’s Weekly Coffee News! Subscribe here for all the latest coffee industry news. Also, check out the latest career opportunities at CoffeeIndustryJobs.com. FAO Opens Grants for Coffee Enterprises...",
     "keyPoints": [
       "Published by Daily Coffee News on Oct 30, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_10271088474",
-    "title": "'No one can really afford anything anymore': Shuttered cafe owners lament city's coffee industry - Village Report",
-    "source": "Village Report",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPNF9BZkw1UnRnc0l3R0NTX3dIYzZqdFkzWHNmMHNOM3UwUDVHQnppaC12bVU2RkFfR1lEWWJNTzF6cWtLck5ORnotbXp2d05rcDk1eWJBWldYSWp1aU54Sk1TcWlvQ2RjaUlGeGdLc2RaWk94c0dzQ3lldnVuUW1jUkF6bFZHQnRHOWJjM3hHX0ZTYkREbDJEc3k2QVZRUkxYR1c0bVgxUWN3a3Ft?oc=5",
-    "publishedDate": "Oct 29, 2026",
-    "dateIso": "2026-10-30",
-    "category": "coffee",
-    "tag": "Market & Trade",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "'No one can really afford anything anymore': Shuttered cafe owners lament city's coffee industry&nbsp;&nbsp;",
-    "keyPoints": [
-      "Published by Village Report on Oct 29, 2026",
-      "Direct coverage covering market & trade"
-    ]
-  },
-  {
-    "id": "news_10873401017",
-    "title": "French Press Coffee Roasters earns six medals at international competition - Parksville Qualicum News",
-    "source": "Parksville Qualicum News",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPTTJlQXIyYzVid2RBZXBrSHJuc1JvM1lvYXRYN0JudkF2MWozdERBVWZLc0FYcHh4eV95UW1KX255Y0V4azE4ZGQwdGtEbWVhSlJ5TFNHbzZiZDg0TGdzak5iMWJzSktiYVVXdGV3RklZR2ZpQkhleVhYRV83djJiRmVHN0c5RHdvRHZFUUFWUTg2VktrNEhxa25wMTA4QzVncHM0amN5akJEUQ?oc=5",
-    "publishedDate": "Oct 29, 2026",
-    "dateIso": "2026-10-30",
-    "category": "coffee",
-    "tag": "Competitions",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "French Press Coffee Roasters earns six medals at international competition&nbsp;&nbsp;",
-    "keyPoints": [
-      "Published by Parksville Qualicum News on Oct 29, 2026",
-      "Direct coverage covering competitions"
-    ]
-  },
-  {
-    "id": "news_641477174",
-    "title": "Bodum Recalls 5.9 Million French Presses After Burn Reports",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/29/bodum-recalls-5-9-million-french-presses-after-burn-reports/",
-    "publishedDate": "Oct 29, 2026",
-    "dateIso": "2026-10-29",
-    "category": "coffee",
-    "tag": "Market & Trade",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Bodum USA is recalling approximately 5.9 million French press coffee makers in the United States sold during a 52-year span. The recall follows 70 reports of glass carafes breaking during...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 29, 2026",
-      "Direct coverage covering market & trade"
-    ]
-  },
-  {
-    "id": "news_10584872148",
-    "title": "Kerry Opens Massive Roasting and Extraction Plant in Pennsylvania",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/29/kerry-opens-massive-roasting-and-extraction-plant-in-pennsylvania/",
-    "publishedDate": "Oct 29, 2026",
-    "dateIso": "2026-10-29",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Global taste and nutrition company Kerry cut the ribbon on a 48,600-square-foot coffee roasting and extraction facility near Bethlehem, Pennsylvania, in September, significantly expanding the company's North American coffee production...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 29, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_6034755260",
-    "title": "Design Details: The Calming Mesh Tunnel at % Arabica Shanghai",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/28/design-details-the-calming-mesh-tunnel-at-arabica-shanghai/",
-    "publishedDate": "Oct 28, 2026",
-    "dateIso": "2026-10-28",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Welcome to Design Details, an ongoing editorial feature in Daily Coffee News focused on individual examples of coffee shop architecture, interior design, packaging design or branding. If you are a...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 28, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_10561743440",
-    "title": "Questions to Ask Before Buying a Used Coffee Roaster",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/28/questions-to-ask-before-buying-a-used-coffee-roaster/",
-    "publishedDate": "Oct 28, 2026",
-    "dateIso": "2026-10-28",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Used roasters have quietly become one of the most common ways smaller roasters and cafes get their first serious machine. They typically cost less than new equipment, they show up...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 28, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_3478038177",
-    "title": "Kilo Coffee Weighs Every Detail at New Dallas Cafe",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/28/kilo-coffee-weighs-every-detail-at-new-dallas-cafe/",
-    "publishedDate": "Oct 28, 2026",
-    "dateIso": "2026-10-28",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Meticulously measured approaches to brewing and service are at the center of Kilo Coffee, a new high-end specialty coffee bar that opened in September in Dallas. At the Snider Plaza...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 28, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_5366235168",
-    "title": "AI Coffee Defect Detector Gets Much Smarter When It Flips the Beans",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/27/ai-coffee-defect-detector-gets-much-smarter-when-it-flips-the-beans/",
-    "publishedDate": "Oct 27, 2026",
-    "dateIso": "2026-10-27",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "A new prototype coffee inspection system combines AI and a simple mechanical idea — flipping coffee beans over — to capture more data to improve defect detection. The prototype was...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 27, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_12588754015",
-    "title": "Lovr Boys Cafe & Roastery is Pouring Hearts in Bonita Springs, Florida",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/27/lovr-boys-cafe-roastery-is-pouring-hearts-in-bonita-springs-florida/",
-    "publishedDate": "Oct 27, 2026",
-    "dateIso": "2026-10-27",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Home is where the hearts are for Lovr Boys Cafe &#38; Roastery in Bonita Springs, Florida. Between Adirondack-green walls, the 2,000-square-foot coffee shop that opened in late August includes a...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 27, 2026",
       "Direct coverage covering industry & news"
     ]
   }
