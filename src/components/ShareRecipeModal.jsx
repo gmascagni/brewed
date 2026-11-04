@@ -11,7 +11,6 @@ import {
   ExternalLink,
   Sparkles
 } from 'lucide-react';
-import QRCode from 'qrcode';
 import { encodeRecipeToShareUrl } from '../utils/recipeParser';
 import { trackEvent } from '../utils/analytics';
 import { hapticTap, hapticSuccess } from '../utils/haptics';
@@ -29,18 +28,21 @@ export default function ShareRecipeModal({
 
   useEffect(() => {
     let isMounted = true;
-    QRCode.toDataURL(shareUrl, {
-      width: 280,
-      margin: 2,
-      color: {
-        dark: '#14110F',
-        light: '#FAF7F2'
-      }
-    }).then(url => {
-      if (isMounted) setQrCodeDataUrl(url);
-    }).catch(err => {
-      console.warn('Failed to render QR Code:', err);
-    });
+    import('qrcode')
+      .then(m => (m.default || m).toDataURL(shareUrl, {
+        width: 280,
+        margin: 2,
+        color: {
+          dark: '#14110F',
+          light: '#FAF7F2'
+        }
+      }))
+      .then(url => {
+        if (isMounted) setQrCodeDataUrl(url);
+      })
+      .catch(err => {
+        console.warn('Failed to render QR Code:', err);
+      });
 
     return () => {
       isMounted = false;

@@ -10,7 +10,6 @@ import {
   Coffee,
   X
 } from 'lucide-react';
-import QRCode from 'qrcode';
 import { generateSmartBagUrl } from '../../data/roasterRegistry';
 import {
   downloadCompleteStickerPng,
@@ -65,6 +64,8 @@ export function useCoffeeLabelQrCodes(coffees = [], roaster = null) {
     }
 
     async function generateUncached() {
+      const qrcodeModule = await import('qrcode');
+      const QRCode = qrcodeModule.default || qrcodeModule;
       for (const coffee of uncached) {
         if (isCancelled || !coffee || !coffee.id) continue;
         try {

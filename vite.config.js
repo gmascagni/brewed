@@ -13,7 +13,8 @@ export default defineConfig({
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           'vendor-icons': ['lucide-react'],
           'vendor-firebase': ['firebase/app', 'firebase/firestore', 'firebase/auth'],
-          'vendor-scanner': ['@zxing/browser', '@zxing/library', 'jsqr', 'jsbarcode', 'qrcode'],
+          'vendor-qrcode': ['qrcode'],
+          'vendor-scanner': ['@zxing/browser', '@zxing/library', 'jsqr'],
         }
       }
     }

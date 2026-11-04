@@ -3,41 +3,12 @@
 
 const TELEMETRY_STORAGE_KEY = 'thebrewapp_telemetry_v1';
 
-// Initial baseline metrics structure if empty
+// Initial baseline metrics structure (100% authentic, no fabricated numbers per GEMINI.md)
 const getInitialTelemetry = () => ({
-  version: '1.0.0',
+  version: '2.0.0',
   events: [],
-  roasterStats: {
-    methodical: {
-      totalDialIns: 84,
-      methodsUsed: { pour_over: 48, aeropress: 22, chemex: 14 },
-      avgRatio: 16.1,
-      topBeans: { 'Blue Danube': 52, 'Bellyache': 32 },
-      weeklyViews: 196
-    },
-    onyx: {
-      totalDialIns: 128,
-      methodsUsed: { espresso: 62, pour_over: 46, aeropress: 20 },
-      avgRatio: 15.8,
-      topBeans: { 'Southern Weather': 74, 'Geometry': 54 },
-      weeklyViews: 285
-    },
-    black_and_white: {
-      totalDialIns: 92,
-      methodsUsed: { pour_over: 58, aeropress: 24, drip_brewer: 10 },
-      avgRatio: 16.4,
-      topBeans: { 'The Classic': 58, 'The Natural': 34 },
-      weeklyViews: 210
-    }
-  },
-  cafeStats: {
-    default: {
-      menuImpressions: 145,
-      directionClicks: 38,
-      popularOnBar: 'Methodical Blue Danube (Natural Process)',
-      searchRadiusMiles: 4.2
-    }
-  }
+  roasterStats: {},
+  cafeStats: {}
 });
 
 export const getTelemetryData = () => {
@@ -49,7 +20,14 @@ export const getTelemetryData = () => {
       localStorage.setItem(TELEMETRY_STORAGE_KEY, JSON.stringify(initial));
       return initial;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    // Purge historical fabricated seed telemetry if found
+    if (parsed.version === '1.0.0' || parsed?.roasterStats?.methodical?.totalDialIns === 84) {
+      const cleaned = getInitialTelemetry();
+      localStorage.setItem(TELEMETRY_STORAGE_KEY, JSON.stringify(cleaned));
+      return cleaned;
+    }
+    return parsed;
   } catch (e) {
     console.error('Error reading telemetry data:', e);
     return getInitialTelemetry();
@@ -116,21 +94,21 @@ export const recordTelemetryEvent = (eventType, payload = {}) => {
 export const getRoasterTelemetry = (roasterKey = 'methodical') => {
   const data = getTelemetryData();
   const key = roasterKey.toLowerCase();
-  return data.roasterStats[key] || {
-    totalDialIns: 42,
-    methodsUsed: { pour_over: 28, aeropress: 10, espresso: 4 },
-    avgRatio: 16.0,
-    topBeans: { 'Single Origin': 30 },
-    weeklyViews: 110
+  return data.roasterStats?.[key] || {
+    totalDialIns: 0,
+    methodsUsed: {},
+    avgRatio: 0,
+    topBeans: {},
+    weeklyViews: 0
   };
 };
 
 export const getCafeTelemetry = (shopId = 'default') => {
   const data = getTelemetryData();
-  return data.cafeStats[shopId] || data.cafeStats['default'] || {
-    menuImpressions: 95,
-    directionClicks: 24,
-    popularOnBar: 'Specialty Espresso',
-    searchRadiusMiles: 5.0
+  return data.cafeStats?.[shopId] || {
+    menuImpressions: 0,
+    directionClicks: 0,
+    popularOnBar: 'Specialty Coffee',
+    searchRadiusMiles: 0
   };
 };

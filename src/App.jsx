@@ -5,37 +5,9 @@ import StepIndicator from './components/StepIndicator';
 import MethodSelectorGrid from './components/MethodSelectorGrid';
 import PrecisionCalculator from './components/PrecisionCalculator';
 import HeroBanner from './components/HeroBanner';
-import GrindVisualGuide from './components/GrindVisualGuide';
-import MasterclassHub from './components/MasterclassHub';
-import MultiPhaseTimer from './components/MultiPhaseTimer';
-import KnowledgeBaseDrawer from './components/KnowledgeBaseDrawer';
-import DiagnosticsDrawer from './components/DiagnosticsDrawer';
-import BrewJournal from './components/BrewJournal';
-import UserProfileDashboard from './components/UserProfileDashboard';
-import GlobalSearchModal from './components/GlobalSearchModal';
-import AuthModal from './components/AuthModal';
-import LocalCoffeeFinderModal from './components/LocalCoffeeFinderModal';
-import ShopDrawer from './components/ShopDrawer';
-import WorldNewsSection from './components/WorldNewsSection';
-import RoasterInfoPage from './components/RoasterInfoPage';
-import RoasterProfilePage from './components/RoasterProfilePage';
-import CoffeeLandingPage from './components/CoffeeLandingPage';
-import ConsumerDiscoveryFeed from './components/ConsumerDiscoveryFeed';
-import CafePartnerPortal from './components/CafePartnerPortal';
 import { getShowcaseRoaster, normalizeRoasterKey } from './data/roasterShowcaseData';
 
-// Code-split heavy on-demand modals with React.lazy
-const BarcodeScannerModal = lazy(() => import('./components/BarcodeScannerModal'));
-const WaterChemistryModal = lazy(() => import('./components/WaterChemistryModal'));
-const RoasterPortalModal = lazy(() => import('./components/RoasterPortalModal'));
-const CoffeeVideoAcademyModal = lazy(() => import('./components/CoffeeVideoAcademyModal'));
-const RecipeBuilderModal = lazy(() => import('./components/RecipeBuilderModal'));
-const CommunityHubModal = lazy(() => import('./components/CommunityHubModal'));
-const VersionHistoryModal = lazy(() => import('./components/VersionHistoryModal'));
-import LearnSection from './components/LearnSection';
-import RecipeExplorer from './components/RecipeExplorer';
 import BrewCoffeeSelector from './components/BrewCoffeeSelector';
-import MyCoffeeHub from './components/MyCoffeeHub';
 import MobileBottomNav from './components/MobileBottomNav';
 import MobileToolsDrawer from './components/MobileToolsDrawer';
 import Footer from './components/Footer';
@@ -45,13 +17,35 @@ import { initGA, trackEvent } from './utils/analytics';
 import { recordTelemetryEvent } from './utils/telemetry';
 import { getMethodJsonLd, updatePageSeo } from './utils/seo';
 import { syncCloudCatalog, findCoffeeBySlugs, slugify } from './data/roasterRegistry';
-import { signOutRoasterAccount } from './services/firebase';
 import { parseRecipePayload } from './utils/recipeParser';
 import { getAssetUrl } from './utils/assetUrl';
 import { getRecentBrews, JOURNAL_UPDATED_EVENT, JOURNAL_STORAGE_KEY, logBrewSession } from './utils/journalStorage';
 import { saveActiveBrewSession, createNextIterationSession, startOrGetActiveBrewSession, OPEN_JOURNAL_EVENT } from './utils/brewSessionManager';
 import { ChevronRight, ChevronLeft, Sparkles, Coffee, Clock, Play, BookOpen, Store } from 'lucide-react';
 import { getCoffeeProvenance } from './utils/roasterVerification';
+
+// Code-split heavy views and on-demand modals with React.lazy
+const BarcodeScannerModal = lazy(() => import('./components/BarcodeScannerModal'));
+const WaterChemistryModal = lazy(() => import('./components/WaterChemistryModal'));
+const RoasterPortalModal = lazy(() => import('./components/RoasterPortalModal'));
+const CoffeeVideoAcademyModal = lazy(() => import('./components/CoffeeVideoAcademyModal'));
+const RecipeBuilderModal = lazy(() => import('./components/RecipeBuilderModal'));
+const CommunityHubModal = lazy(() => import('./components/CommunityHubModal'));
+const VersionHistoryModal = lazy(() => import('./components/VersionHistoryModal'));
+
+const LocalCoffeeFinderModal = lazy(() => import('./components/LocalCoffeeFinderModal'));
+const MultiPhaseTimer = lazy(() => import('./components/MultiPhaseTimer'));
+const BrewJournal = lazy(() => import('./components/BrewJournal'));
+const UserProfileDashboard = lazy(() => import('./components/UserProfileDashboard'));
+const GlobalSearchModal = lazy(() => import('./components/GlobalSearchModal'));
+const AuthModal = lazy(() => import('./components/AuthModal'));
+const RoasterInfoPage = lazy(() => import('./components/RoasterInfoPage'));
+const RoasterProfilePage = lazy(() => import('./components/RoasterProfilePage'));
+const CoffeeLandingPage = lazy(() => import('./components/CoffeeLandingPage'));
+const ConsumerDiscoveryFeed = lazy(() => import('./components/ConsumerDiscoveryFeed'));
+const CafePartnerPortal = lazy(() => import('./components/CafePartnerPortal'));
+const LearnSection = lazy(() => import('./components/LearnSection'));
+const MyCoffeeHub = lazy(() => import('./components/MyCoffeeHub'));
 
 const DEFAULT_LOCAL_PROFILES = [];
 
@@ -178,7 +172,7 @@ export default function App() {
   }, []);
 
   const handleLogout = () => {
-    signOutRoasterAccount().catch(() => {});
+    import('./services/firebase').then(m => m.signOutRoasterAccount?.()).catch(() => {});
     setCurrentUser(null);
   };
   const [isLocalCoffeeOpen, setIsLocalCoffeeOpen] = useState(false);
@@ -1274,6 +1268,7 @@ export default function App() {
       <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 pb-24 md:pb-8 relative">
 
         <main className="mt-4 space-y-10">
+          <Suspense fallback={<div className="min-h-[360px] flex items-center justify-center p-8 text-stone-400 font-mono text-xs">Loading experience...</div>}>
 
           {/* AREA 0: COFFEE CUSTOMER LANDING PAGE (SCAN BAG QR DESTINATION) */}
           {currentArea === 'coffee' && activeCustomerCoffee && (
@@ -1790,46 +1785,47 @@ export default function App() {
               )}
             </div>
           )}
-
-          {/* Tasting Journal Modal */}
-          <BrewJournal
-            isOpen={isJournalOpen}
-            onClose={() => setIsJournalOpen(false)}
-            trackMode={trackMode}
-            activeMethod={currentActiveMethod}
-            cupCount={cupCount}
-            cupMl={cupMl}
-            customRatio={customRatio}
-            customGrind={customGrind}
-            customWaterMl={calculatedTotalWaterMl}
-            unitSystem={unitSystem}
-            onOpenScanner={() => setIsScannerOpen(true)}
-            currentUser={currentUser}
-            onBrewAgain={handleBrewAgain}
-          />
-
-          {/* Multi-Index Global Search Modal */}
-          <GlobalSearchModal
-            isOpen={isSearchOpen}
-            onClose={() => setIsSearchOpen(false)}
-            onSelectMethod={(method) => {
-              handleSelectMethodFromGrid(method);
-            }}
-            onSelectRecipe={(recipe) => {
-              handleApplyRecipe(recipe, 3);
-            }}
-            onSelectOrigin={(origin) => {
-              setCurrentStep(3);
-              setIsSearchOpen(false);
-              setTimeout(() => {
-                const el = document.getElementById('step-3');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }, 100);
-            }}
-          />
+          </Suspense>
 
           {/* Code-Split Lazy Loaded Interactive Modals */}
           <Suspense fallback={null}>
+            {/* Tasting Journal Modal */}
+            <BrewJournal
+              isOpen={isJournalOpen}
+              onClose={() => setIsJournalOpen(false)}
+              trackMode={trackMode}
+              activeMethod={currentActiveMethod}
+              cupCount={cupCount}
+              cupMl={cupMl}
+              customRatio={customRatio}
+              customGrind={customGrind}
+              customWaterMl={calculatedTotalWaterMl}
+              unitSystem={unitSystem}
+              onOpenScanner={() => setIsScannerOpen(true)}
+              currentUser={currentUser}
+              onBrewAgain={handleBrewAgain}
+            />
+
+            {/* Multi-Index Global Search Modal */}
+            <GlobalSearchModal
+              isOpen={isSearchOpen}
+              onClose={() => setIsSearchOpen(false)}
+              onSelectMethod={(method) => {
+                handleSelectMethodFromGrid(method);
+              }}
+              onSelectRecipe={(recipe) => {
+                handleApplyRecipe(recipe, 3);
+              }}
+              onSelectOrigin={(origin) => {
+                setCurrentStep(3);
+                setIsSearchOpen(false);
+                setTimeout(() => {
+                  const el = document.getElementById('step-3');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
+            />
+
             {/* Community Hub Modal */}
             <CommunityHubModal
               isOpen={isCommunityOpen}
@@ -1915,71 +1911,71 @@ export default function App() {
               isOpen={isVersionHistoryOpen}
               onClose={() => setIsVersionHistoryOpen(false)}
             />
+
+            {/* Barista & Roaster User Profile Modal */}
+            <UserProfileDashboard
+              isOpen={isProfileOpen}
+              onClose={() => setIsProfileOpen(false)}
+              trackMode={trackMode}
+              currentUser={currentUser}
+              onOpenAuth={handleOpenAuth}
+              onOpenRoasterPortal={(bean = null, initialTab = 'catalog') => {
+                setIsProfileOpen(false);
+                setRoasterPrefillBean(bean || null);
+                if (bean?.upc) setRoasterPrefillBarcode(bean.upc);
+                setRoasterPortalInitialTab(initialTab);
+                setIsRoasterPortalOpen(true);
+              }}
+              onNavigateToRoaster={(slug) => {
+                setIsProfileOpen(false);
+                setCurrentArea('discover');
+                setSelectedRoasterSlug(slug);
+                navigate(`/roasters/${slug}`);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onSelectBeanToBrew={(coffee) => {
+                setIsProfileOpen(false);
+                handleSelectBeanToBrew(coffee);
+              }}
+              onOpenWaterLab={() => {
+                setIsProfileOpen(false);
+                setIsWaterLabOpen(true);
+              }}
+              onLogout={handleLogout}
+            />
+
+            {/* Sign In / Auth Modal */}
+            <AuthModal
+              isOpen={isAuthModalOpen}
+              onClose={() => setIsAuthModalOpen(false)}
+              currentUser={currentUser}
+              usersList={usersList}
+              initialRole={authInitialRole}
+              initialMode={authInitialMode}
+              onSaveProfile={(updatedUser) => {
+                setCurrentUser(updatedUser);
+                setUsersList([updatedUser, ...usersList.filter((u) => u.username !== updatedUser.username)]);
+              }}
+              onLogout={handleLogout}
+            />
+
+            {/* Specialty Coffee Shop Finder Modal */}
+            <LocalCoffeeFinderModal
+              isOpen={isLocalCoffeeOpen}
+              onClose={() => setIsLocalCoffeeOpen(false)}
+              trackMode={trackMode}
+            />
+
+            {/* Specialty Roaster Partner Information & Contact HQ Page */}
+            <RoasterInfoPage
+              isOpen={isRoasterInfoOpen}
+              onClose={() => setIsRoasterInfoOpen(false)}
+              onOpenStudio={() => {
+                setIsRoasterInfoOpen(false);
+                setIsRoasterPortalOpen(true);
+              }}
+            />
           </Suspense>
-
-          {/* Barista & Roaster User Profile Modal */}
-          <UserProfileDashboard
-            isOpen={isProfileOpen}
-            onClose={() => setIsProfileOpen(false)}
-            trackMode={trackMode}
-            currentUser={currentUser}
-            onOpenAuth={handleOpenAuth}
-            onOpenRoasterPortal={(bean = null, initialTab = 'catalog') => {
-              setIsProfileOpen(false);
-              setRoasterPrefillBean(bean || null);
-              if (bean?.upc) setRoasterPrefillBarcode(bean.upc);
-              setRoasterPortalInitialTab(initialTab);
-              setIsRoasterPortalOpen(true);
-            }}
-            onNavigateToRoaster={(slug) => {
-              setIsProfileOpen(false);
-              setCurrentArea('discover');
-              setSelectedRoasterSlug(slug);
-              navigate(`/roasters/${slug}`);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onSelectBeanToBrew={(coffee) => {
-              setIsProfileOpen(false);
-              handleSelectBeanToBrew(coffee);
-            }}
-            onOpenWaterLab={() => {
-              setIsProfileOpen(false);
-              setIsWaterLabOpen(true);
-            }}
-            onLogout={handleLogout}
-          />
-
-          {/* Sign In / Auth Modal */}
-          <AuthModal
-            isOpen={isAuthModalOpen}
-            onClose={() => setIsAuthModalOpen(false)}
-            currentUser={currentUser}
-            usersList={usersList}
-            initialRole={authInitialRole}
-            initialMode={authInitialMode}
-            onSaveProfile={(updatedUser) => {
-              setCurrentUser(updatedUser);
-              setUsersList([updatedUser, ...usersList.filter((u) => u.username !== updatedUser.username)]);
-            }}
-            onLogout={handleLogout}
-          />
-
-          {/* Specialty Coffee Shop Finder Modal */}
-          <LocalCoffeeFinderModal
-            isOpen={isLocalCoffeeOpen}
-            onClose={() => setIsLocalCoffeeOpen(false)}
-            trackMode={trackMode}
-          />
-
-          {/* Specialty Roaster Partner Information & Contact HQ Page */}
-          <RoasterInfoPage
-            isOpen={isRoasterInfoOpen}
-            onClose={() => setIsRoasterInfoOpen(false)}
-            onOpenStudio={() => {
-              setIsRoasterInfoOpen(false);
-              setIsRoasterPortalOpen(true);
-            }}
-          />
 
         </main>
 

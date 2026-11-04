@@ -1,11 +1,26 @@
 // Roaster Registry & Smart Bag Packaging Code Generator
 // Manages verified partner roasters, custom bean profiles, and packaging QR generation.
 
-import QRCode from 'qrcode';
-import { doc, setDoc, deleteDoc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
-import { db } from '../services/firebase.js';
 import { deduplicateCoffees, normalizeRoasterKey, SHOWCASE_ROASTERS, getAllShowcaseRoasters } from './roasterShowcaseData.js';
 import { checkRoasterBrandOwnership, areEmailAliases } from '../utils/roasterVerification.js';
+
+// Lazy loader for Cloud Firestore services to prevent bundle bloat on initial page load
+async function getFirestoreContext() {
+  try {
+    const { db } = await import('../services/firebase.js');
+    if (!db) return null;
+    const firestore = await import('firebase/firestore');
+    return { db, firestore };
+  } catch {
+    return null;
+  }
+}
+
+// Lazy loader for QR code generator
+async function getQRCode() {
+  const mod = await import('qrcode');
+  return mod.default || mod;
+}
 
 const STORAGE_KEY = 'thebrewapp_roaster_registry_v1';
 
@@ -289,20 +304,20 @@ export function saveRoasterCoffee(coffee, currentUser = null) {
   }
 
   // Asynchronous Cloud Firestore Persistence
-  try {
-    if (db) {
-      const cloudRecord = { ...record };
-      if (cloudRecord.logoImage && cloudRecord.logoImage.length > 50000) delete cloudRecord.logoImage;
-      setDoc(doc(db, 'coffees', id), cloudRecord, { merge: true }).catch(e => {
-        console.warn('Firestore coffee sync error:', e);
-      });
-      if (record.upc) {
-        setDoc(doc(db, 'coffees', `upc_${record.upc}`), cloudRecord, { merge: true }).catch(() => {});
-      }
+  getFirestoreContext().then((ctx) => {
+    if (!ctx) return;
+    const { db, firestore } = ctx;
+    const cloudRecord = { ...record };
+    if (cloudRecord.logoImage && cloudRecord.logoImage.length > 50000) delete cloudRecord.logoImage;
+    firestore.setDoc(firestore.doc(db, 'coffees', id), cloudRecord, { merge: true }).catch(e => {
+      console.warn('Firestore coffee sync error:', e);
+    });
+    if (record.upc) {
+      firestore.setDoc(firestore.doc(db, 'coffees', `upc_${record.upc}`), cloudRecord, { merge: true }).catch(() => {});
     }
-  } catch (syncErr) {
+  }).catch((syncErr) => {
     console.warn('Firestore sync failed:', syncErr);
-  }
+  });
 
   return record;
 }
@@ -337,11 +352,11 @@ export function deleteRoasterCoffee(id, currentUser = null) {
     console.error('Failed to delete coffee from localStorage:', err);
   }
 
-  try {
-    if (db) {
-      deleteDoc(doc(db, 'coffees', id)).catch(() => {});
-    }
-  } catch (e) {}
+  getFirestoreContext().then((ctx) => {
+    if (!ctx) return;
+    const { db, firestore } = ctx;
+    firestore.deleteDoc(firestore.doc(db, 'coffees', id)).catch(() => {});
+  }).catch(() => {});
 
   return filtered;
 }
@@ -423,18 +438,18 @@ export function saveCustomRoasterProfile(profile, currentUser = null) {
   }
 
   // Asynchronous Cloud Firestore Persistence
-  try {
-    if (db) {
-      const cloudProfile = { ...record };
-      if (cloudProfile.logoImage && cloudProfile.logoImage.length > 50000) delete cloudProfile.logoImage;
-      if (cloudProfile.backgroundImage && cloudProfile.backgroundImage.length > 50000) delete cloudProfile.backgroundImage;
-      setDoc(doc(db, 'roasters', slug), cloudProfile, { merge: true }).catch(e => {
-        console.warn('Firestore roaster profile sync error:', e);
-      });
-    }
-  } catch (syncErr) {
+  getFirestoreContext().then((ctx) => {
+    if (!ctx) return;
+    const { db, firestore } = ctx;
+    const cloudProfile = { ...record };
+    if (cloudProfile.logoImage && cloudProfile.logoImage.length > 50000) delete cloudProfile.logoImage;
+    if (cloudProfile.backgroundImage && cloudProfile.backgroundImage.length > 50000) delete cloudProfile.backgroundImage;
+    firestore.setDoc(firestore.doc(db, 'roasters', slug), cloudProfile, { merge: true }).catch(e => {
+      console.warn('Firestore roaster profile sync error:', e);
+    });
+  }).catch((syncErr) => {
     console.warn('Firestore roaster sync failed:', syncErr);
-  }
+  });
 
   return record;
 }
@@ -443,22 +458,25 @@ export function saveCustomRoasterProfile(profile, currentUser = null) {
  * Asynchronously query Cloud Firestore for a coffee by UPC barcode or coffee ID
  */
 export async function fetchRemoteCoffeeByCode(code) {
-  if (!code || !db) return null;
+  if (!code) return null;
+  const ctx = await getFirestoreContext();
+  if (!ctx) return null;
+  const { db, firestore } = ctx;
   const cleanCode = String(code).trim();
   try {
     // 1. Direct O(1) alias check (upc_...)
-    const aliasRef = doc(db, 'coffees', `upc_${cleanCode}`);
-    const aliasSnap = await getDoc(aliasRef);
+    const aliasRef = firestore.doc(db, 'coffees', `upc_${cleanCode}`);
+    const aliasSnap = await firestore.getDoc(aliasRef);
     if (aliasSnap.exists()) return aliasSnap.data();
 
     // 2. Direct ID check
-    const directRef = doc(db, 'coffees', cleanCode);
-    const directSnap = await getDoc(directRef);
+    const directRef = firestore.doc(db, 'coffees', cleanCode);
+    const directSnap = await firestore.getDoc(directRef);
     if (directSnap.exists()) return directSnap.data();
 
     // 3. Query by upc field
-    const q = query(collection(db, 'coffees'), where('upc', '==', cleanCode));
-    const qSnap = await getDocs(q);
+    const q = firestore.query(firestore.collection(db, 'coffees'), firestore.where('upc', '==', cleanCode));
+    const qSnap = await firestore.getDocs(q);
     if (!qSnap.empty) {
       return qSnap.docs[0].data();
     }
@@ -468,8 +486,6 @@ export async function fetchRemoteCoffeeByCode(code) {
   return null;
 }
 
-/**
- * Sync Cloud Firestore catalog with local cache
 /**
  * Purge stale duplicate roasters and duplicate coffees from local storage
  */
@@ -509,11 +525,14 @@ export function cleanupLocalRegistry() {
  * Sync Cloud Firestore catalog with local cache (with strict deduplication)
  */
 export async function syncCloudCatalog() {
-  if (!db || typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return;
   cleanupLocalRegistry();
+  const ctx = await getFirestoreContext();
+  if (!ctx) return;
+  const { db, firestore } = ctx;
   try {
     // 1. Sync Roasters
-    const roasterSnap = await getDocs(collection(db, 'roasters'));
+    const roasterSnap = await firestore.getDocs(firestore.collection(db, 'roasters'));
     if (!roasterSnap.empty) {
       const remoteRoasters = roasterSnap.docs.map(d => d.data());
       const localRoasters = getCustomRoasters();
@@ -532,7 +551,7 @@ export async function syncCloudCatalog() {
     }
 
     // 2. Sync Coffees
-    const coffeeSnap = await getDocs(collection(db, 'coffees'));
+    const coffeeSnap = await firestore.getDocs(firestore.collection(db, 'coffees'));
     if (!coffeeSnap.empty) {
       const remoteCoffees = coffeeSnap.docs
         .filter(d => !d.id.startsWith('upc_'))
@@ -746,6 +765,7 @@ export const ROASTER_PLANS = {
  */
 export async function generateQrCodeDataUrl(text, options = {}) {
   try {
+    const QRCode = await getQRCode();
     return await QRCode.toDataURL(text, {
       errorCorrectionLevel: options.errorCorrectionLevel || 'H',
       margin: options.margin !== undefined ? options.margin : 2,
@@ -766,6 +786,7 @@ export async function generateQrCodeDataUrl(text, options = {}) {
  */
 export async function generateQrCodeSvg(text, options = {}) {
   try {
+    const QRCode = await getQRCode();
     return await QRCode.toString(text, {
       type: 'svg',
       errorCorrectionLevel: options.errorCorrectionLevel || 'H',

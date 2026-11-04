@@ -14,7 +14,6 @@ import {
   Flame,
   CheckCircle2
 } from 'lucide-react';
-import QRCode from 'qrcode';
 import { trackEvent } from '../../utils/analytics';
 import { hapticTap, hapticSuccess } from '../../utils/haptics';
 import { toggleEntryPublicStatus } from '../../utils/journalStorage';
@@ -52,18 +51,21 @@ export default function ShareBrewCardModal({
 
   useEffect(() => {
     let isMounted = true;
-    QRCode.toDataURL(shareUrl, {
-      width: 160,
-      margin: 1,
-      color: {
-        dark: '#14100D',
-        light: '#F8F5EE'
-      }
-    }).then((dataUrl) => {
-      if (isMounted) setQrCodeDataUrl(dataUrl);
-    }).catch((err) => {
-      console.warn('QR code generation warning:', err);
-    });
+    import('qrcode')
+      .then(m => (m.default || m).toDataURL(shareUrl, {
+        width: 160,
+        margin: 1,
+        color: {
+          dark: '#14100D',
+          light: '#F8F5EE'
+        }
+      }))
+      .then((dataUrl) => {
+        if (isMounted) setQrCodeDataUrl(dataUrl);
+      })
+      .catch((err) => {
+        console.warn('QR code generation warning:', err);
+      });
 
     return () => { isMounted = false; };
   }, [shareUrl]);

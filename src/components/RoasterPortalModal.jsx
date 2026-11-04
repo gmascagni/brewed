@@ -11,7 +11,6 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import QRCode from 'qrcode';
 import {
   getCustomRoasterCoffees,
   getRoasterOwnedBrandsAndCoffees,
@@ -355,20 +354,23 @@ export default function RoasterPortalModal({
     const effectiveEcc = isBrotherLayout ? 'M' : qrEcc;
     const effectiveMargin = isBrotherLayout ? 1 : 2;
 
-    Promise.all([
-      QRCode.toDataURL(targetUrl, {
-        width: 1200,
-        margin: effectiveMargin,
-        errorCorrectionLevel: effectiveEcc,
-        color: { dark: darkColor, light: lightColor }
-      }),
-      QRCode.toString(targetUrl, {
-        type: 'svg',
-        margin: effectiveMargin,
-        errorCorrectionLevel: effectiveEcc,
-        color: { dark: darkColor, light: lightColor }
-      })
-    ]).then(([pngUrl, svgStr]) => {
+    import('qrcode').then(mod => {
+      const QRCode = mod.default || mod;
+      return Promise.all([
+        QRCode.toDataURL(targetUrl, {
+          width: 1200,
+          margin: effectiveMargin,
+          errorCorrectionLevel: effectiveEcc,
+          color: { dark: darkColor, light: lightColor }
+        }),
+        QRCode.toString(targetUrl, {
+          type: 'svg',
+          margin: effectiveMargin,
+          errorCorrectionLevel: effectiveEcc,
+          color: { dark: darkColor, light: lightColor }
+        })
+      ]);
+    }).then(([pngUrl, svgStr]) => {
       if (isMounted) {
         setQrDataUrl(pngUrl);
         setQrSvgString(svgStr);

@@ -23,7 +23,6 @@ import {
   Download,
   Copy
 } from 'lucide-react';
-import QRCode from 'qrcode';
 import { getCoffeeCustomerUrl } from '../data/roasterRegistry';
 import { logBrewSession } from '../utils/journalStorage';
 import { trackEvent } from '../utils/analytics';
@@ -97,17 +96,25 @@ export default function CoffeeLandingPage({
 
   // Generate high-res QR code pointing to this exact customer URL
   useEffect(() => {
-    QRCode.toDataURL(customerUrl, {
-      width: 512,
-      margin: 2,
-      errorCorrectionLevel: 'H',
-      color: {
-        dark: '#14110F',
-        light: '#FFFFFF'
-      }
-    })
-      .then((url) => setQrDataUrl(url))
+    let isMounted = true;
+    import('qrcode')
+      .then((m) => {
+        const QRCode = m.default || m;
+        return QRCode.toDataURL(customerUrl, {
+          width: 512,
+          margin: 2,
+          errorCorrectionLevel: 'H',
+          color: {
+            dark: '#14110F',
+            light: '#FFFFFF'
+          }
+        });
+      })
+      .then((url) => {
+        if (isMounted) setQrDataUrl(url);
+      })
       .catch((err) => console.warn('Error generating QR code:', err));
+    return () => { isMounted = false; };
   }, [customerUrl]);
 
   const handleCopyLink = () => {

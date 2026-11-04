@@ -3,8 +3,17 @@
  * Supports offline localStorage for guests and seamless Cloud Firestore synchronization for signed-in accounts.
  */
 
-import { db } from '../services/firebase.js';
-import { doc, setDoc, getDocs, collection } from 'firebase/firestore';
+// Lazy loader for Cloud Firestore services to avoid static bundle coupling on initial page load
+async function getFirestoreContext() {
+  try {
+    const { db } = await import('../services/firebase.js');
+    if (!db) return null;
+    const firestore = await import('firebase/firestore');
+    return { db, firestore };
+  } catch {
+    return null;
+  }
+}
 
 export const JOURNAL_STORAGE_KEY = 'the_brew_app_journal_v1';
 export const JOURNAL_UPDATED_EVENT = 'the_brew_app_journal_updated';
@@ -41,7 +50,7 @@ export function saveJournalLogs(logs, userId = null) {
 
   // Cloud sync if userId is provided or active user is in localStorage
   const activeUid = userId || getActiveUserUid();
-  if (activeUid && db && Array.isArray(logs) && logs.length > 0) {
+  if (activeUid && Array.isArray(logs) && logs.length > 0) {
     // Sync the top 20 most recent logs to avoid heavy payloads
     syncEntriesToFirestore(activeUid, logs.slice(0, 20)).catch((err) => {
       console.warn('Background Firestore journal sync non-blocking warning:', err);
@@ -66,12 +75,15 @@ function getActiveUserUid() {
  * Syncs entries to Cloud Firestore subcollection `users/{uid}/brews`
  */
 async function syncEntriesToFirestore(uid, entries) {
-  if (!db || !uid || !Array.isArray(entries)) return;
+  if (!uid || !Array.isArray(entries)) return;
+  const ctx = await getFirestoreContext();
+  if (!ctx) return;
+  const { db, firestore } = ctx;
   for (const entry of entries) {
     if (!entry || !entry.id) continue;
     try {
-      const brewRef = doc(db, 'users', uid, 'brews', entry.id);
-      await setDoc(brewRef, {
+      const brewRef = firestore.doc(db, 'users', uid, 'brews', entry.id);
+      await firestore.setDoc(brewRef, {
         ...entry,
         userId: uid,
         updatedAt: new Date().toISOString()
@@ -89,12 +101,15 @@ async function syncEntriesToFirestore(uid, entries) {
  * @returns {Promise<Array<Object>>}
  */
 export async function syncJournalWithCloud(uid) {
-  if (!db || !uid) return getJournalLogs();
+  if (!uid) return getJournalLogs();
+  const ctx = await getFirestoreContext();
+  if (!ctx) return getJournalLogs();
+  const { db, firestore } = ctx;
 
   try {
     const localLogs = getJournalLogs();
-    const brewsCol = collection(db, 'users', uid, 'brews');
-    const snapshot = await getDocs(brewsCol);
+    const brewsCol = firestore.collection(db, 'users', uid, 'brews');
+    const snapshot = await firestore.getDocs(brewsCol);
     
     const cloudMap = new Map();
     snapshot.forEach(docSnap => {

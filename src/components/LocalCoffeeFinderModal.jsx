@@ -829,8 +829,9 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
       if (!window.L || !mapContainerRef.current) return;
 
       if (leafletInstanceRef.current) {
-        leafletInstanceRef.current.remove();
-        leafletInstanceRef.current = null;
+        leafletInstanceRef.current.setView([userLocation.lat, userLocation.lng], leafletInstanceRef.current.getZoom() || 13);
+        renderLeafletMarkers();
+        return;
       }
 
       const map = window.L.map(mapContainerRef.current, {
@@ -861,11 +862,11 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
     }
 
     return () => {
-      if (leafletInstanceRef.current) {
+      if (!isOpen && leafletInstanceRef.current) {
         leafletInstanceRef.current.remove();
         leafletInstanceRef.current = null;
+        markersGroupRef.current = null;
       }
-      markersGroupRef.current = null;
     };
   }, [isOpen, userLocation.lat, userLocation.lng]);
 

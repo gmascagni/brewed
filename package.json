@@ -15,7 +15,6 @@
     "@zxing/browser": "^0.2.1",
     "@zxing/library": "^0.23.0",
     "firebase": "^12.18.0",
-    "jsbarcode": "^3.12.3",
     "jsqr": "^1.4.0",
     "lucide-react": "^0.344.0",
     "qrcode": "^1.5.4",

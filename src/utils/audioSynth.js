@@ -5,6 +5,8 @@ let sharedAudioCtx = null;
 let activeAudioElement = null;
 let currentCompletionTimeout = null;
 let activeSpeechUtterance = null;
+let clickAudioInstance = null;
+let chimeAudioInstance = null;
 
 /**
  * Get or lazily create a shared Web Audio AudioContext singleton.
@@ -66,11 +68,15 @@ export async function ensureAudioContextRunning() {
 export function playMechanicalClick(isMuted = false) {
   if (isMuted) return;
   
-  // 1. Direct HTML5 audio playback (immune to AudioContext suspension)
+  // 1. Direct HTML5 audio playback (pooled instance, immune to AudioContext suspension)
   try {
-    const audio = new Audio(getAssetUrl('/audio/timer/mechanical_click.wav'));
-    audio.volume = 0.9;
-    const p = audio.play();
+    if (!clickAudioInstance) {
+      clickAudioInstance = new Audio(getAssetUrl('/audio/timer/mechanical_click.wav'));
+      clickAudioInstance.volume = 0.9;
+    } else {
+      clickAudioInstance.currentTime = 0;
+    }
+    const p = clickAudioInstance.play();
     if (p !== undefined) p.catch(() => {});
   } catch (e) {}
 
@@ -168,11 +174,15 @@ export function playClockTick(isMuted = false, tickNumber = 0) {
 export function playTimerStartChime(isMuted = false) {
   if (isMuted) return;
 
-  // 1. Direct HTML5 audio playback (Guaranteed on mobile phone & computer speakers)
+  // 1. Direct HTML5 audio playback (pooled instance, guaranteed on mobile phone & computer speakers)
   try {
-    const audio = new Audio(getAssetUrl('/audio/timer/timer_chime.wav'));
-    audio.volume = 1.0;
-    const p = audio.play();
+    if (!chimeAudioInstance) {
+      chimeAudioInstance = new Audio(getAssetUrl('/audio/timer/timer_chime.wav'));
+      chimeAudioInstance.volume = 1.0;
+    } else {
+      chimeAudioInstance.currentTime = 0;
+    }
+    const p = chimeAudioInstance.play();
     if (p !== undefined) p.catch(() => {});
   } catch (e) {}
 

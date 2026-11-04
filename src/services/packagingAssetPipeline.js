@@ -8,9 +8,13 @@
  * - Universal deep links
  */
 
-import QRCode from 'qrcode';
 import { createCoffeeProfile, slugify } from '../models/coffeeProfile';
 import { generateSmartBagUrl } from '../data/roasterRegistry';
+
+async function getQRCode() {
+  const mod = await import('qrcode');
+  return mod.default || mod;
+}
 
 /**
  * Generates the full 300-DPI composite packaging sticker canvas.
@@ -104,6 +108,7 @@ export async function generateCompositeStickerCanvas(rawCoffee = {}) {
 
   // 11. Centered High-Res QR Code
   const qrCanvas = document.createElement('canvas');
+  const QRCode = await getQRCode();
   await QRCode.toCanvas(qrCanvas, targetUrl, {
     width: 700,
     margin: 1,
@@ -305,6 +310,7 @@ export async function generateBrotherQlStickerCanvas(rawCoffee = {}) {
   const qrY = 70;
 
   const qrCanvas = document.createElement('canvas');
+  const QRCode = await getQRCode();
   await QRCode.toCanvas(qrCanvas, targetUrl, {
     width: qrSize,
     margin: 1,
@@ -472,6 +478,7 @@ export async function generateBrotherQlMinimalStickerCanvas(rawCoffee = {}) {
   const qrY = 70;
 
   const qrCanvas = document.createElement('canvas');
+  const QRCode = await getQRCode();
   await QRCode.toCanvas(qrCanvas, targetUrl, {
     width: qrSize,
     margin: 1,
@@ -568,6 +575,7 @@ export async function downloadVectorQrSvg(rawCoffee = {}) {
   const coffee = createCoffeeProfile(rawCoffee);
   const targetUrl = coffee.packaging?.customUrl?.trim() || generateSmartBagUrl(coffee);
 
+  const QRCode = await getQRCode();
   const svgString = await QRCode.toString(targetUrl, {
     type: 'svg',
     margin: 2,
@@ -598,6 +606,7 @@ export async function downloadHighResQrPng(rawCoffee = {}, width = 1200) {
   const coffee = createCoffeeProfile(rawCoffee);
   const targetUrl = coffee.packaging?.customUrl?.trim() || generateSmartBagUrl(coffee);
 
+  const QRCode = await getQRCode();
   const dataUrl = await QRCode.toDataURL(targetUrl, {
     width,
     margin: 2,
