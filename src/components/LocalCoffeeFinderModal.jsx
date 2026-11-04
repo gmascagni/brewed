@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MapPin, Navigation, Star, Search, Coffee, Compass, ExternalLink, X, Sparkles, Clock, AlertCircle, Map as MapIcon, Loader2, RefreshCw, Store, CheckCircle2, ShieldCheck, ChevronLeft } from 'lucide-react';
+import { MapPin, Navigation, Star, Search, Coffee, Compass, ExternalLink, X, Sparkles, Clock, AlertCircle, Map as MapIcon, Loader2, RefreshCw, Store, CheckCircle2, ShieldCheck, ChevronLeft, ChevronUp, ChevronDown } from 'lucide-react';
 import { trackEvent } from '../utils/analytics';
 import { recordTelemetryEvent } from '../utils/telemetry';
 import {
@@ -401,109 +401,101 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
   const [checkInTrigger, setCheckInTrigger] = useState(0);
   const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
 
+  // Mobile Viewport State
+  const [mobileView, setMobileView] = useState('map'); // 'map' or 'list'
+  const [isCardCollapsed, setIsCardCollapsed] = useState(true);
+  const [isCardDismissed, setIsCardDismissed] = useState(false);
+
   // Map DOM & Leaflet References
   const mapContainerRef = useRef(null);
   const leafletInstanceRef = useRef(null);
   const markersGroupRef = useRef(null);
   const searchTimeoutRef = useRef(null);
 
-  // Live Overpass API Query Engine to discover ALL real nearby coffee shops
+  // Live POI Query Engine via OpenStreetMap Nominatim Bounded Viewbox Search
   const fetchLiveNearbyShops = useCallback(async (lat, lng, radiusInMiles) => {
     setIsSearchingApi(true);
-    setSearchStatusText(`Scanning live satellite radar for coffee shops within ${radiusInMiles} miles...`);
+    setSearchStatusText(`Scanning live radar for coffee shops within ${radiusInMiles} miles...`);
 
-    const radiusMeters = Math.min(Math.round(radiusInMiles * 1609.34), 25000); // Cap at 25km for performance
-    const query = `[out:json][timeout:12];(
-      node["amenity"="cafe"](around:${radiusMeters},${lat},${lng});
-      node["shop"="coffee"](around:${radiusMeters},${lat},${lng});
-      way["amenity"="cafe"](around:${radiusMeters},${lat},${lng});
-      way["shop"="coffee"](around:${radiusMeters},${lat},${lng});
-    );out center 45;`;
+    const dLat = radiusInMiles / 69.0;
+    const dLng = radiusInMiles / (69.0 * Math.max(0.1, Math.cos((lat * Math.PI) / 180)));
+    const minLon = (lng - dLng).toFixed(5);
+    const maxLat = (lat + dLat).toFixed(5);
+    const maxLon = (lng + dLng).toFixed(5);
+    const minLat = (lat - dLat).toFixed(5);
 
-    let data = null;
+    let liveList = [];
 
-    for (const endpoint of OVERPASS_ENDPOINTS) {
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 9000);
-        const res = await fetch(`${endpoint}?data=${encodeURIComponent(query)}`, {
-          signal: controller.signal,
-          headers: { 'Accept': 'application/json' }
-        });
-        clearTimeout(timer);
+    try {
+      const nominatimUrl = `https://nominatim.openstreetmap.org/search?amenity=cafe&viewbox=${minLon},${maxLat},${maxLon},${minLat}&bounded=1&format=json&addressdetails=1&limit=50`;
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 7000);
+      const res = await fetch(nominatimUrl, {
+        signal: controller.signal,
+        headers: { 'Accept': 'application/json' }
+      });
+      clearTimeout(timer);
 
-        if (res.ok) {
-          data = await res.json();
-          break;
+      if (res.ok) {
+        const items = await res.json();
+        if (Array.isArray(items) && items.length > 0) {
+          liveList = items
+            .filter((item) => item.name || (item.address && (item.address.amenity || item.address.cafe)))
+            .map((item, idx) => {
+              const shopLat = parseFloat(item.lat);
+              const shopLng = parseFloat(item.lon);
+              const addr = item.address || {};
+              const name = item.name || addr.amenity || addr.cafe || 'Local Artisan Cafe';
+
+              const street = [addr.house_number, addr.road].filter(Boolean).join(' ');
+              const city = addr.city || addr.town || addr.village || addr.suburb || '';
+              const state = addr.state || '';
+              const zip = addr.postcode || '';
+              const fullAddress = [street, city, state, zip].filter(Boolean).join(', ') || item.display_name;
+
+              const isStarbucksOrDunkin = /starbucks|dunkin|tim hortons/i.test(name);
+
+              return {
+                id: `live_osm_${item.osm_id || item.place_id || idx}`,
+                name,
+                city,
+                state,
+                zip,
+                address: fullAddress,
+                lat: shopLat,
+                lng: shopLng,
+                rating: isStarbucksOrDunkin ? 4.3 : (4.7 + (idx % 3) * 0.1),
+                hours: 'Open Daily • 7:00 AM - 6:00 PM',
+                phone: 'Directions & Info via Maps',
+                website: '',
+                specialtyGrade: isStarbucksOrDunkin ? 'Commercial Espresso' : 'Artisan Espresso Bar & Roastery',
+                isCurated: false,
+                description: `${name} serves handcrafted espresso, drip coffee, and cafe beverages in ${city || 'the local area'}.`
+              };
+            });
         }
-      } catch (err) {
-        console.warn(`Overpass mirror ${endpoint} failed, trying fallback...`, err);
       }
+    } catch (err) {
+      console.warn('Live cafe radar query error:', err);
     }
 
-    if (data && data.elements && data.elements.length > 0) {
-      const liveList = data.elements
-        .filter(el => el.tags && (el.tags.name || el.tags.brand))
-        .map((el, index) => {
-          const tags = el.tags;
-          const elLat = el.lat || (el.center && el.center.lat);
-          const elLng = el.lon || (el.center && el.center.lon);
-          const name = tags.name || tags.brand || 'Specialty Coffee Spot';
-          
-          let addressParts = [
-            tags['addr:housenumber'],
-            tags['addr:street'],
-            tags['addr:city'] || tags['addr:suburb'],
-            tags['addr:state'],
-            tags['addr:postcode']
-          ].filter(Boolean);
-
-          const address = addressParts.length > 0 ? addressParts.join(' ') : `${name}, Local Area`;
-          const isStarbucksOrDunkin = /starbucks|dunkin/i.test(name);
-
-          return {
-            id: `live_osm_${el.id || index}_${Date.now()}`,
-            name: name,
-            city: tags['addr:city'] || '',
-            state: tags['addr:state'] || '',
-            zip: tags['addr:postcode'] || '',
-            address: address,
-            lat: elLat,
-            lng: elLng,
-            rating: isStarbucksOrDunkin ? 4.4 : (4.7 + (index % 3) * 0.1),
-            hours: tags.opening_hours || 'Open Daily • 7:00 AM - 6:00 PM',
-            phone: tags.phone || tags['contact:phone'] || 'Call for hours',
-            website: tags.website || tags['contact:website'] || '',
-            specialtyGrade: tags.cuisine || (tags.shop === 'coffee' ? 'Specialty Coffee Roaster' : 'Local Artisan Cafe'),
-            isCurated: false,
-            description: tags.description || `${name} offers fresh roasted espresso, pour-overs, cold brew, and coffee drinks in the local area.`
-          };
-        });
-
-      // Merge with any curated shops that are in range, avoiding exact duplicate coordinates
-      const combined = [...liveList];
-      CURATED_SPECIALTY_SHOPS.forEach(curated => {
-        const dist = getHaversineDistanceMiles(lat, lng, curated.lat, curated.lng);
-        if (dist <= radiusInMiles && !combined.some(s => s.name.toLowerCase() === curated.name.toLowerCase())) {
-          combined.unshift(curated);
-        }
-      });
-
-      setShops(combined);
-      if (combined.length > 0) {
-        setSelectedShopId(combined[0].id);
+    // Merge with any curated showcase shops located within this physical radius
+    const combined = [...liveList];
+    CURATED_SPECIALTY_SHOPS.forEach((curated) => {
+      const dist = getHaversineDistanceMiles(lat, lng, curated.lat, curated.lng);
+      if (dist <= radiusInMiles && !combined.some((s) => s.name.toLowerCase() === curated.name.toLowerCase())) {
+        combined.unshift(curated);
       }
-      setSearchStatusText(`Found ${combined.length} coffee shops & cafes nearby!`);
+    });
+
+    setShops(combined);
+    if (combined.length > 0) {
+      setSelectedShopId(combined[0].id);
+      setIsCardDismissed(false);
+      setSearchStatusText(`Found ${combined.length} coffee shops & cafes within ${radiusInMiles} miles!`);
     } else {
-      // If live query had no results, show curated shops sorted by distance to current coordinates
-      const sortedCurated = [...CURATED_SPECIALTY_SHOPS].sort((a, b) => {
-        return getHaversineDistanceMiles(lat, lng, a.lat, a.lng) - getHaversineDistanceMiles(lat, lng, b.lat, b.lng);
-      });
-      setShops(sortedCurated);
-      if (sortedCurated.length > 0) {
-        setSelectedShopId(sortedCurated[0].id);
-      }
-      setSearchStatusText(`Radar scan completed. Displaying verified specialty coffee destinations.`);
+      setSelectedShopId(null);
+      setSearchStatusText(`No coffee shops found within ${radiusInMiles} miles. Try expanding your search radius.`);
     }
 
     setIsSearchingApi(false);
@@ -644,11 +636,20 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
   // Sort shops by distance ascending
   shopsWithDistances.sort((a, b) => a.calculatedDistanceMiles - b.calculatedDistanceMiles);
 
-  // Filter shops by radius, with guaranteed fallback so user is never left with an empty list
-  const radiusFiltered = shopsWithDistances.filter((shop) => shop.calculatedDistanceMiles <= radiusMiles * 1.5);
-  const filteredShops = radiusFiltered.length > 0 ? radiusFiltered : shopsWithDistances.slice(0, 8);
+  // Filter shops strictly within the selected radius (with 15% boundary margin for geo-box curvature)
+  const filteredShops = shopsWithDistances.filter((shop) => shop.calculatedDistanceMiles <= radiusMiles * 1.15);
 
-  const activeShop = shopsWithDistances.find((s) => s.id === selectedShopId) || filteredShops[0] || shopsWithDistances[0];
+  const activeShop = filteredShops.find((s) => s.id === selectedShopId) || filteredShops[0] || null;
+
+  // Recalibrate Leaflet map viewport dimensions when toggling mobile tabs
+  useEffect(() => {
+    if (mobileView === 'map' && leafletInstanceRef.current) {
+      const timer = setTimeout(() => {
+        leafletInstanceRef.current?.invalidateSize();
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [mobileView]);
 
   // Map Navigation Helpers
   const handleCenterGPS = () => {
@@ -937,6 +938,8 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
 
       marker.on('click', () => {
         setSelectedShopId(shop.id);
+        setIsCardDismissed(false);
+        setIsCardCollapsed(true);
         map.flyTo([shop.lat, shop.lng], 15, { animate: true, duration: 1 });
       });
 
@@ -960,17 +963,17 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
       }`}
     >
       {/* Modal / Card Header */}
-      <div className="p-5 md:p-6 bg-gradient-to-r from-amber-950/60 via-[#1A1613] to-espresso-950 border-b border-white/10 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-3 rounded-2xl bg-amber-gold text-espresso-950 shadow-lg shadow-amber-gold/20 flex items-center justify-center font-bold">
-            <Compass className="w-6 h-6 animate-spin-slow" />
+      <div className="p-3 sm:p-5 md:p-6 bg-gradient-to-r from-amber-950/60 via-[#1A1613] to-espresso-950 border-b border-white/10 flex items-center justify-between">
+        <div className="flex items-center space-x-2.5 sm:space-x-3">
+          <div className="p-2 sm:p-3 rounded-2xl bg-amber-gold text-espresso-950 shadow-lg shadow-amber-gold/20 flex items-center justify-center font-bold">
+            <Compass className="w-4 h-4 sm:w-6 sm:h-6 animate-spin-slow" />
           </div>
           <div>
-            <div className="inline-flex items-center space-x-2 text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold">
+            <div className="hidden sm:inline-flex items-center space-x-2 text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-gold">
               <Sparkles className="w-3.5 h-3.5 animate-pulse" />
               <span>Live GPS Satellite Radar • Global Coffee Directory</span>
             </div>
-            <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-cream-light">
+            <h2 className="font-serif text-base sm:text-2xl md:text-3xl font-extrabold text-cream-light">
               Find Coffee Shops Near Me 📍
             </h2>
           </div>
@@ -978,29 +981,40 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
 
         <button
           onClick={onClose}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white/10 text-stone-300 hover:bg-white/20 hover:text-cream-light transition-all text-xs font-mono font-bold border border-white/10"
+          className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-white/10 text-stone-300 hover:bg-white/20 hover:text-cream-light transition-all text-xs font-mono font-bold border border-white/10 cursor-pointer"
           title={isModal ? "Close Finder" : "Return to Brewing Station"}
           aria-label={isModal ? "Close Finder" : "Return to Brewing Station"}
         >
           <ChevronLeft className="w-4 h-4 text-amber-gold" />
           <span className="hidden sm:inline">Brew Station</span>
-          <X className="w-4 h-4 text-stone-400 hover:text-white" />
+          <X className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-stone-400 hover:text-white" />
         </button>
       </div>
 
         {/* Filter & Live Search Controls Bar */}
-        <div className="p-4 bg-[#181411] border-b border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="p-2.5 sm:p-4 bg-[#181411] border-b border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3">
           
-          {/* Search Input */}
+          {/* Search Input with Integrated GPS Button on mobile */}
           <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-amber-gold absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-amber-gold absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="Search any City, Zip Code (e.g. 30004), or Town..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-cream-light focus:outline-none focus:border-amber-gold placeholder:text-stone-500"
+              placeholder="Search City, Zip Code (e.g. 30004)..."
+              className="w-full pl-10 pr-24 sm:pr-4 py-2 sm:py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-cream-light focus:outline-none focus:border-amber-gold placeholder:text-stone-500"
             />
+            {/* Quick GPS Icon Button inside search bar on mobile */}
+            <button
+              type="button"
+              onClick={handleGetLocation}
+              disabled={isLocating}
+              className="sm:hidden absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg bg-amber-500/20 text-amber-gold text-[10px] font-mono font-bold flex items-center gap-1 border border-amber-gold/40 cursor-pointer active:scale-95"
+              title="Use current GPS location"
+            >
+              <Navigation className={`w-3 h-3 ${isLocating ? 'animate-spin' : ''}`} />
+              <span>GPS</span>
+            </button>
           </div>
 
           {/* Location Trigger & Radius Controls */}
@@ -1008,14 +1022,15 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
             <button
               onClick={handleGetLocation}
               disabled={isLocating}
-              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-amber-500/20 border border-amber-gold/40 text-amber-gold font-bold hover:bg-amber-500/30 transition-all active:scale-95 disabled:opacity-50"
+              className="hidden sm:flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-amber-500/20 border border-amber-gold/40 text-amber-gold font-bold hover:bg-amber-500/30 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
               <span>{isLocating ? 'Locating...' : '📍 Use My Exact GPS'}</span>
             </button>
 
             {/* Radius Selector */}
-            <div className="flex items-center space-x-1 p-1 rounded-xl bg-black/40 border border-white/10 text-[11px] font-bold">
+            <div className="flex items-center space-x-1 p-0.5 sm:p-1 rounded-xl bg-black/40 border border-white/10 text-[11px] font-bold w-full sm:w-auto justify-around sm:justify-start">
+              <span className="text-[10px] font-mono text-stone-400 px-1 sm:hidden">Range:</span>
               {[5, 10, 25, 50].map((miles) => (
                 <button
                   key={miles}
@@ -1023,7 +1038,7 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
                     setRadiusMiles(miles);
                     fetchLiveNearbyShops(userLocation.lat, userLocation.lng, miles);
                   }}
-                  className={`px-2.5 py-1 rounded-lg transition-all ${
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                     radiusMiles === miles
                       ? 'bg-amber-gold text-espresso-950 font-extrabold shadow-sm'
                       : 'text-stone-400 hover:text-cream-light'
@@ -1038,10 +1053,10 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
         </div>
 
         {/* Quick Regional Coffee Capitals Bar */}
-        <div className="px-4 py-2.5 bg-[#120F0D] border-b border-white/10 flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
+        <div className="px-3 sm:px-4 py-1.5 sm:py-2.5 bg-[#120F0D] border-b border-white/10 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar text-xs">
           <span className="text-[10px] font-mono uppercase tracking-wider text-amber-gold/90 font-bold shrink-0 flex items-center gap-1">
             <Coffee className="w-3 h-3" />
-            <span>Capitals:</span>
+            <span className="hidden sm:inline">Capitals:</span>
           </span>
           {SPECIALTY_COFFEE_CAPITALS.map((cap) => {
             const isSelected = userLocation.label.includes(cap.name.split(',')[0]);
@@ -1050,7 +1065,7 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
                 key={cap.id}
                 type="button"
                 onClick={() => handleSelectCapital(cap)}
-                className={`px-3 py-1 rounded-xl text-xs font-mono transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                className={`px-2.5 sm:px-3 py-1 rounded-xl text-[11px] sm:text-xs font-mono transition-all shrink-0 flex items-center gap-1 cursor-pointer ${
                   isSelected
                     ? 'bg-amber-gold text-espresso-950 font-bold shadow-md ring-1 ring-amber-gold/50'
                     : 'bg-white/5 hover:bg-white/10 text-stone-300 hover:text-white border border-white/10'
@@ -1074,11 +1089,46 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
           </div>
         )}
 
+        {/* Mobile View Switcher (Map vs List) */}
+        <div className="flex lg:hidden items-center justify-center p-2.5 bg-[#120F0D] border-b border-white/10">
+          <div className="inline-flex rounded-xl bg-black/60 p-1 border border-white/15 w-full max-w-xs shadow-inner">
+            <button
+              type="button"
+              onClick={() => {
+                setMobileView('map');
+                setTimeout(() => leafletInstanceRef.current?.invalidateSize(), 150);
+              }}
+              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                mobileView === 'map'
+                  ? 'bg-amber-gold text-espresso-950 shadow-md font-extrabold'
+                  : 'text-stone-400 hover:text-white'
+              }`}
+            >
+              <MapIcon className="w-3.5 h-3.5" />
+              <span>Map View</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileView('list')}
+              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                mobileView === 'list'
+                  ? 'bg-amber-gold text-espresso-950 shadow-md font-extrabold'
+                  : 'text-stone-400 hover:text-white'
+              }`}
+            >
+              <Store className="w-3.5 h-3.5" />
+              <span>List ({filteredShops.length})</span>
+            </button>
+          </div>
+        </div>
+
         {/* Modal Main Workspace: Left List + Right Real Street Map Container */}
         <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
           
           {/* LEFT SIDE: Real-Time Specialty Coffee Shops List */}
-          <div className="lg:col-span-5 p-4 overflow-y-auto space-y-3 max-h-[45vh] lg:max-h-none border-b lg:border-b-0 lg:border-r border-white/10 bg-[#0E0C0A]">
+          <div className={`lg:col-span-5 p-4 overflow-y-auto space-y-3 border-b lg:border-b-0 lg:border-r border-white/10 bg-[#0E0C0A] ${
+            mobileView === 'list' ? 'block max-h-[75vh]' : 'hidden lg:block lg:max-h-none'
+          }`}>
             
             {/* B2C Cafe Owner Placement Product Banner (Large Free Tier + Spotlight) */}
             <div className="p-3 rounded-2xl bg-gradient-to-r from-[#1E1712] via-[#2A1E16] to-[#1E1712] border border-amber-gold/30 shadow-md flex items-center justify-between gap-3 text-xs mb-3">
@@ -1246,22 +1296,24 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
           </div>
 
           {/* RIGHT SIDE: Real Streets, Roads & Neighborhoods Interactive Map Canvas */}
-          <div className="lg:col-span-7 relative bg-[#070605] flex flex-col min-h-[420px]">
+          <div className={`lg:col-span-7 relative bg-[#070605] flex-col min-h-[440px] h-[64vh] sm:h-[70vh] lg:h-auto ${
+            mobileView === 'map' ? 'flex' : 'hidden lg:flex'
+          }`}>
             
             {/* Map Canvas Header Bar */}
-            <div className="p-3 bg-black/85 backdrop-blur-md border-b border-white/15 text-xs flex flex-wrap items-center justify-between gap-2 relative z-20">
+            <div className="p-2.5 sm:p-3 bg-black/85 backdrop-blur-md border-b border-white/15 text-xs flex flex-wrap items-center justify-between gap-2 relative z-20">
               <div className="flex items-center space-x-2">
                 <MapIcon className="w-4 h-4 text-amber-gold" />
-                <span className="font-mono font-bold text-cream-light truncate max-w-[200px]">
+                <span className="font-mono font-bold text-cream-light truncate max-w-[180px] sm:max-w-[260px]">
                   Map • <strong className="text-amber-gold">{activeShop?.name || 'Selected Shop'}</strong>
                 </span>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1.5 sm:space-x-2">
                 <button
                   onClick={handleCenterGPS}
                   title="Center map on your GPS coordinates"
-                  className="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 hover:bg-sky-500/30 border border-sky-400/40 flex items-center gap-1 font-bold transition-all active:scale-95"
+                  className="text-[10px] font-mono px-2 sm:px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 hover:bg-sky-500/30 border border-sky-400/40 flex items-center gap-1 font-bold transition-all active:scale-95 cursor-pointer"
                 >
                   <span>🎯 My GPS</span>
                 </button>
@@ -1269,7 +1321,7 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
                 <button
                   onClick={handleFitAllShops}
                   title="Fit all coffee locations and your GPS on the map"
-                  className="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-400/40 flex items-center gap-1 font-bold transition-all active:scale-95"
+                  className="text-[10px] font-mono px-2 sm:px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border border-emerald-400/40 flex items-center gap-1 font-bold transition-all active:scale-95 cursor-pointer"
                 >
                   <span>🗺️ View All ({filteredShops.length})</span>
                 </button>
@@ -1278,7 +1330,7 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
                   href={`https://www.google.com/maps/search/coffee+shops/@${userLocation.lat},${userLocation.lng},14z`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-amber-gold/20 text-amber-gold hover:bg-amber-gold/30 border border-amber-gold/40 flex items-center gap-1 font-bold transition-all"
+                  className="text-[10px] font-mono px-2 sm:px-2.5 py-1 rounded-lg bg-amber-gold/20 text-amber-gold hover:bg-amber-gold/30 border border-amber-gold/40 flex items-center gap-1 font-bold transition-all"
                   title="Search coffee shops directly in Google Maps"
                 >
                   <span>Google Maps 🗺️</span>
@@ -1293,59 +1345,64 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
               {/* Leaflet Map Div Target */}
               <div ref={mapContainerRef} className="w-full h-full min-h-[380px] z-10" />
 
+              {/* Empty Results In Range Overlay */}
+              {filteredShops.length === 0 && (
+                <div className="absolute bottom-4 left-4 right-4 z-20 p-4 rounded-2xl bg-black/92 backdrop-blur-xl border border-amber-gold/40 shadow-2xl text-center space-y-2 text-xs">
+                  <div className="font-bold text-amber-gold flex items-center justify-center gap-1.5">
+                    <AlertCircle className="w-4 h-4" />
+                    <span>No Coffee Shops Found Within {radiusMiles} Miles</span>
+                  </div>
+                  <p className="text-stone-300 text-[11px]">
+                    No specialty cafes recorded nearby within this distance. Try expanding your search radius or view on Google Maps.
+                  </p>
+                  <div className="flex items-center justify-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRadiusMiles(25);
+                        fetchLiveNearbyShops(userLocation.lat, userLocation.lng, 25);
+                      }}
+                      className="py-1.5 px-3 rounded-xl btn-tactile-amber text-espresso-950 font-bold text-xs shadow-md cursor-pointer active:scale-95"
+                    >
+                      Expand to 25 mi 📡
+                    </button>
+                    <a
+                      href={`https://www.google.com/maps/search/coffee+shops/@${userLocation.lat},${userLocation.lng},14z`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-1.5 px-3 rounded-xl bg-blue-600/30 border border-blue-400/50 text-blue-300 font-bold text-xs flex items-center gap-1"
+                    >
+                      <span>Google Maps</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              )}
+
               {/* Active Selected Shop Detailed Info Banner Overlay at Bottom of Map */}
-              {activeShop && (
-                <div className="absolute bottom-4 left-4 right-4 z-20 p-4 rounded-2xl bg-black/90 backdrop-blur-xl border-2 border-amber-gold/60 shadow-2xl">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div>
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-gold/20 text-amber-gold border border-amber-gold/40">
+              {activeShop && !isCardDismissed && (
+                <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-20 rounded-2xl bg-[#14110E] border-2 border-amber-gold/60 shadow-2xl transition-all">
+                  {/* Compact Header Bar (Always Visible) */}
+                  <div className="p-3 sm:p-4 flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center space-x-2 mb-0.5">
+                        <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-gold/20 text-amber-gold border border-amber-gold/40 truncate max-w-[140px]">
                           {activeShop.specialtyGrade}
                         </span>
-                        <span className="text-xs text-stone-400 font-mono">{activeShop.phone}</span>
+                        <span className="text-xs font-mono font-bold text-emerald-400 shrink-0">
+                          {activeShop.calculatedDistanceMiles} mi
+                        </span>
                       </div>
-
-                      <h3 className="font-serif text-lg font-extrabold text-cream-light flex items-center gap-2">
-                        <span>{activeShop.name}</span>
-                        <span className="text-xs font-mono text-emerald-400">({activeShop.calculatedDistanceMiles} mi away)</span>
+                      <h3 className="font-serif text-sm sm:text-base font-bold text-white truncate">
+                        {activeShop.name}
                       </h3>
-                      <p className="text-xs text-stone-300">{activeShop.address}</p>
-                      {activeShop.equipment && (
-                        <p className="text-xs text-amber-gold/90 font-mono mt-1">
-                          Bar Setup: {activeShop.equipment}
-                        </p>
-                      )}
+                      <p className="text-[11px] text-stone-300 truncate sm:block">
+                        {activeShop.address}
+                      </p>
                     </div>
 
-                    <div className="flex items-center space-x-2 w-full sm:w-auto">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const isAlready = hasUserCheckedIn(activeShop.id);
-                          if (!isAlready) {
-                            recordCafeCheckIn(activeShop.id, activeShop.name, {
-                              city: activeShop.city,
-                              state: activeShop.state
-                            });
-                            trackEvent('cafe_checkin_button_click', { cafeId: activeShop.id, name: activeShop.name });
-                            setCheckInTrigger((v) => v + 1);
-                          }
-                        }}
-                        className={`w-full sm:w-auto py-2.5 px-4 rounded-xl text-xs font-bold font-mono flex items-center justify-center space-x-1.5 shadow-md whitespace-nowrap active:scale-95 transition cursor-pointer ${
-                          hasUserCheckedIn(activeShop.id)
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-default'
-                            : 'bg-white/10 hover:bg-white/15 text-cream-light border border-white/20'
-                        }`}
-                        title="Check in and signal that you brewed or visited here"
-                      >
-                        <Coffee className="w-3.5 h-3.5 text-amber-gold" />
-                        <span>
-                          {hasUserCheckedIn(activeShop.id)
-                            ? `Brewed Here (${getCafeSocialStats(activeShop.id, 18).totalCheckIns} ★)`
-                            : `I Brewed Here (${getCafeSocialStats(activeShop.id, 18).totalCheckIns})`}
-                        </span>
-                      </button>
-
+                    {/* Quick Action Buttons */}
+                    <div className="flex items-center space-x-1.5 shrink-0">
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activeShop.name + ' ' + activeShop.address)}`}
                         target="_blank"
@@ -1358,13 +1415,82 @@ export default function LocalCoffeeFinderModal({ isOpen = true, onClose, isModal
                             onBar: activeShop.onBar
                           });
                         }}
-                        className="w-full sm:w-auto py-2.5 px-5 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-extrabold flex items-center justify-center space-x-2 shadow-xl whitespace-nowrap active:scale-95"
+                        className="py-1.5 px-2.5 sm:px-3 rounded-xl btn-tactile-amber text-espresso-950 text-xs font-bold flex items-center gap-1 shadow-md active:scale-95"
+                        title="Get directions in Google Maps"
                       >
-                        <Navigation className="w-4 h-4" />
-                        <span>Get Directions 🗺️</span>
+                        <Navigation className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Directions</span>
                       </a>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsCardCollapsed(!isCardCollapsed)}
+                        className="p-1.5 sm:p-2 rounded-xl bg-white/10 hover:bg-white/20 text-stone-300 hover:text-white transition-colors cursor-pointer"
+                        title={isCardCollapsed ? "Show more cafe details" : "Collapse details"}
+                      >
+                        {isCardCollapsed ? <ChevronUp className="w-4 h-4 text-amber-gold" /> : <ChevronDown className="w-4 h-4 text-stone-300" />}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsCardDismissed(true)}
+                        className="p-1.5 sm:p-2 rounded-xl bg-white/5 hover:bg-white/15 text-stone-400 hover:text-white transition-colors cursor-pointer"
+                        title="Hide details banner"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
+
+                  {/* Expanded Details Body */}
+                  {!isCardCollapsed && (
+                    <div className="px-3 pb-3 sm:px-4 sm:pb-4 pt-1 border-t border-white/10 space-y-2 text-xs animate-fade-in">
+                      {activeShop.phone && (
+                        <div className="flex items-center gap-2 text-stone-300">
+                          <span className="font-mono text-stone-400">Phone:</span>
+                          <span className="font-mono text-cream-light">{activeShop.phone}</span>
+                        </div>
+                      )}
+                      {activeShop.equipment && (
+                        <p className="text-amber-gold/90 font-mono text-[11px]">
+                          Bar Setup: {activeShop.equipment}
+                        </p>
+                      )}
+                      {activeShop.description && (
+                        <p className="text-stone-300 text-[11px] leading-relaxed">
+                          {activeShop.description}
+                        </p>
+                      )}
+                      <div className="pt-2 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const isAlready = hasUserCheckedIn(activeShop.id);
+                            if (!isAlready) {
+                              recordCafeCheckIn(activeShop.id, activeShop.name, {
+                                city: activeShop.city,
+                                state: activeShop.state
+                              });
+                              trackEvent('cafe_checkin_button_click', { cafeId: activeShop.id, name: activeShop.name });
+                              setCheckInTrigger((v) => v + 1);
+                            }
+                          }}
+                          className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold font-mono flex items-center justify-center space-x-1.5 shadow-md active:scale-95 transition cursor-pointer ${
+                            hasUserCheckedIn(activeShop.id)
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-default'
+                              : 'bg-white/10 hover:bg-white/15 text-cream-light border border-white/20'
+                          }`}
+                        >
+                          <Coffee className="w-3.5 h-3.5 text-amber-gold" />
+                          <span>
+                            {hasUserCheckedIn(activeShop.id)
+                              ? `Brewed Here (${getCafeSocialStats(activeShop.id, 18).totalCheckIns} ★)`
+                              : `I Brewed Here (${getCafeSocialStats(activeShop.id, 18).totalCheckIns})`}
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

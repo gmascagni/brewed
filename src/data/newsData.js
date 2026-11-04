@@ -1,8 +1,8 @@
 // World Coffee News Dispatch
 // Automatically synced from live RSS feeds: Daily Coffee News, Perfect Daily Grind, Sprudge, Specialty Coffee Press.
-// Last Synced: Nov 4, 2026, 3:28 PM
+// Last Synced: Nov 4, 2026, 3:52 PM
 
-export const LAST_UPDATED = "Nov 4, 2026, 3:28 PM";
+export const LAST_UPDATED = "Nov 4, 2026, 3:52 PM";
 
 export const WORLD_BREW_NEWS = [
   {
