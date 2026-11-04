@@ -264,6 +264,14 @@ export function logBrewSession({
 
   const updated = [newEntry, ...currentLogs];
   saveJournalLogs(updated, userId);
+
+  // Asynchronously back up photo into IndexedDB to protect localStorage quota
+  if (photoUrl) {
+    import('./indexedDbStorage.js')
+      .then((m) => m.savePhotoToIndexedDb(newEntry.id, photoUrl))
+      .catch(() => {});
+  }
+
   return newEntry;
 }
 

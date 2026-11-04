@@ -209,6 +209,9 @@ export default function BrewJournal({
     hapticTap();
     const updated = logs.filter(l => l.id !== id);
     saveLogsToStorage(updated);
+    import('../utils/indexedDbStorage')
+      .then(m => m.deletePhotoFromIndexedDb(id))
+      .catch(() => {});
   };
 
   const handleToggleFavorite = (id) => {

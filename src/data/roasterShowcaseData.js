@@ -2,8 +2,6 @@
 // Comprehensive, authentic reference profile datasets for specialty coffee roasters.
 // Abides strictly by RULE[user_global] (zero mock data, authentic bios, real origins, real coordinates).
 
-import { COSTA_RICA_ROASTERS } from './costaRicaRoasters.js';
-
 export const US_SHOWCASE_ROASTERS = [
   {
     id: 'methodical',
@@ -182,7 +180,15 @@ export const SHOWCASE_ROASTERS = [
 ];
 
 
-export { COSTA_RICA_ROASTERS, COSTA_RICA_OUTREACH_DIRECTORY } from './costaRicaRoasters.js';
+export const getCostaRicaRoasters = async () => {
+  const mod = await import('./costaRicaRoasters.js');
+  return mod.COSTA_RICA_ROASTERS;
+};
+
+export const getCostaRicaOutreachDirectory = async () => {
+  const mod = await import('./costaRicaRoasters.js');
+  return mod.COSTA_RICA_OUTREACH_DIRECTORY;
+};
 
 import { getCustomRoasters, getCustomRoasterCoffees, saveCustomRoasterProfile, saveRoasterCoffee } from './roasterRegistry.js';
 

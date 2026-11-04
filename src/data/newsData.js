@@ -1,8 +1,8 @@
 // World Coffee News Dispatch
 // Automatically synced from live RSS feeds: Daily Coffee News, Perfect Daily Grind, Sprudge, Specialty Coffee Press.
-// Last Synced: Nov 4, 2026, 5:28 PM
+// Last Synced: Nov 4, 2026, 6:41 PM
 
-export const LAST_UPDATED = "Nov 4, 2026, 5:28 PM";
+export const LAST_UPDATED = "Nov 4, 2026, 6:41 PM";
 
 export const WORLD_BREW_NEWS = [
   {
@@ -74,6 +74,24 @@ export const WORLD_BREW_NEWS = [
     "summary": "“The Center of Specialty”: World of Coffee Dubai brings every link in the coffee chain under one roof in January 2027&nbsp;&nbsp;",
     "keyPoints": [
       "Published by Zawya on Nov 4, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_23856400710",
+    "title": "A flat white future? Northland puts coffee to the test - Stuff",
+    "source": "Stuff",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOVHF6S0JsNUw4NGNScDJHd2VkZjEwMWlpUkNsbm5BWUx3XzZuZkg3MkZjTURuektYeDZnSmY2Wm55MEVpbWJOdXg3djFDVWlfSVk1aWF0R3A1V3B6TFpQQVdSZ29aOXhVWUVFdXRKYVFORm0xWnI3cm5EUEVOSzhHY0lCMWotQXM5Ri1zUjNYR3JhNms?oc=5",
+    "publishedDate": "Nov 4, 2026",
+    "dateIso": "2026-11-04",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "A flat white future? Northland puts coffee to the test&nbsp;&nbsp;",
+    "keyPoints": [
+      "Published by Stuff on Nov 4, 2026",
       "Direct coverage covering industry & news"
     ]
   },
@@ -200,24 +218,6 @@ export const WORLD_BREW_NEWS = [
     "summary": "Welcome to DCN’s Weekly Coffee News! Subscribe here for all the latest coffee industry news. Also, check out the latest career opportunities at CoffeeIndustryJobs.com. FAO Opens Grants for Coffee Enterprises...",
     "keyPoints": [
       "Published by Daily Coffee News on Oct 30, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_6740170267",
-    "title": "Topic: Coffee shops and cafés in the U.S. - Statista",
-    "source": "Statista",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE9zYmplY3BNdWwxUVVmNE4ySjI3MFdhQ0x5Z0FlMXJFbGQwSnQ1aGhRS1Q5cjJaeUZrMXFDX29Va2RBWGlZTEZvYm5DQjZCN0NxVGhxMUFWVVZZNmVXeWlrRW53V1VnQzREU2FBc1FEbw?oc=5",
-    "publishedDate": "Aug 5, 2026",
-    "dateIso": "2026-08-05",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Topic: Coffee shops and cafés in the U.S.&nbsp;&nbsp;",
-    "keyPoints": [
-      "Published by Statista on Aug 5, 2026",
       "Direct coverage covering industry & news"
     ]
   }
