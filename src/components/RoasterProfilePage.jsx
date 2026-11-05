@@ -44,12 +44,12 @@ export default function RoasterProfilePage({
   activeCoffee = null
 }) {
   const cleanInitialRoasterId = useMemo(() => {
-    if (typeof initialRoasterId === 'string' && initialRoasterId.trim() && !initialRoasterId.includes('[object')) {
+    if (typeof initialRoasterId === 'string' && initialRoasterId.trim() && !initialRoasterId.toLowerCase().includes('object') && !initialRoasterId.includes('%')) {
       return initialRoasterId.trim();
     }
     if (typeof initialRoasterId === 'object' && initialRoasterId !== null) {
       const candidate = initialRoasterId.slug || initialRoasterId.id || initialRoasterId.roaster;
-      if (typeof candidate === 'string' && candidate && !candidate.includes('[object')) {
+      if (typeof candidate === 'string' && candidate && !candidate.toLowerCase().includes('object') && !candidate.includes('%')) {
         return candidate;
       }
     }

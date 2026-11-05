@@ -134,8 +134,8 @@ export async function registerRoasterAccount({ email, password, roasterName, dis
         updatedAt: new Date().toISOString()
       }, { merge: true });
 
-      // Save email -> roaster mapping for fast cross-device lookups
-      await setDoc(doc(db, 'roaster_accounts', cleanEmail), {
+      // Save authenticated UID -> roaster profile mapping (never email document ID)
+      await setDoc(doc(db, 'roaster_accounts', firebaseUid), {
         uid: firebaseUid,
         email: cleanEmail,
         roasterName: cleanRoasterName,
@@ -175,17 +175,47 @@ export async function signInRoasterAccount({ email, password }) {
 
   // Retrieve roastery profile from Firestore
   let roasterData = null;
-  if (db) {
+  if (db && firebaseUid) {
     try {
-      const snap = await getDoc(doc(db, 'roaster_accounts', cleanEmail));
-      if (snap.exists()) {
-        roasterData = snap.data();
+      // 1. Primary secure lookup by authenticated Firebase Auth UID
+      const uidSnap = await getDoc(doc(db, 'roaster_accounts', firebaseUid));
+      if (uidSnap.exists()) {
+        roasterData = uidSnap.data();
       } else {
-        const querySnap = await getDocs(
-          query(collection(db, 'roasters'), where('ownerEmail', '==', cleanEmail), limit(1))
+        // 2. Query roasters by ownerUid
+        const roasterUidSnap = await getDocs(
+          query(collection(db, 'roasters'), where('ownerUid', '==', firebaseUid), limit(1))
         );
-        if (!querySnap.empty) {
-          roasterData = querySnap.docs[0].data();
+        if (!roasterUidSnap.empty) {
+          roasterData = roasterUidSnap.docs[0].data();
+        } else {
+          // 3. Fallback for pre-migration roasters by ownerEmail
+          const querySnap = await getDocs(
+            query(collection(db, 'roasters'), where('ownerEmail', '==', cleanEmail), limit(1))
+          );
+          if (!querySnap.empty) {
+            roasterData = querySnap.docs[0].data();
+            // Auto-migrate legacy roaster document to attach ownerUid
+            if (!roasterData.ownerUid && roasterData.slug) {
+              setDoc(doc(db, 'roasters', roasterData.slug), {
+                ownerUid: firebaseUid
+              }, { merge: true }).catch(() => {});
+            }
+          }
+        }
+
+        // Auto-seed the authenticated UID mapping to complete migration
+        if (roasterData) {
+          const derivedName = roasterData.roasterName || roasterData.name || displayName || cleanEmail.split('@')[0];
+          const derivedSlug = roasterData.roasterSlug || roasterData.slug || derivedName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+          setDoc(doc(db, 'roaster_accounts', firebaseUid), {
+            uid: firebaseUid,
+            email: cleanEmail,
+            roasterName: derivedName,
+            roasterSlug: derivedSlug,
+            displayName: displayName || roasterData.displayName || derivedName,
+            updatedAt: new Date().toISOString()
+          }, { merge: true }).catch(() => {});
         }
       }
     } catch (e) {

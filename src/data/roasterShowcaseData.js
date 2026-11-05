@@ -195,19 +195,19 @@ import { getCustomRoasters, getCustomRoasterCoffees, saveCustomRoasterProfile, s
 
 export function formatCustomRoasterAsShowcase(custom, coffees = []) {
   let name = custom.name || custom.roaster || 'Specialty Roastery';
-  if (typeof name !== 'string' || name.includes('[object')) {
+  if (typeof name !== 'string' || name.toLowerCase().includes('object') || name.includes('%')) {
     name = 'Specialty Roastery';
   }
   let slug = String(custom.slug || custom.id || name || 'specialty-roastery')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
-  if (slug.includes('object') || !slug) {
+  if (slug.includes('object') || slug.includes('%') || !slug) {
     slug = 'specialty-roastery';
   }
 
   const cleanLetter = name.replace(/^[^a-zA-Z0-9]+/, '');
-  const monogram = cleanLetter.charAt(0).toUpperCase() || 'R';
+  const monogram = /^[A-Z0-9]$/i.test(cleanLetter.charAt(0)) ? cleanLetter.charAt(0).toUpperCase() : 'R';
   const location = custom.location || 'Artisan Craft Roastery';
 
   const coffeesSource = (Array.isArray(coffees) && coffees.length > 0)
@@ -333,7 +333,7 @@ export function formatCustomRoasterAsShowcase(custom, coffees = []) {
  * Canonical normalization for roaster identification across all forms (id, slug, name, alias).
  */
 export function normalizeRoasterKey(input) {
-  if (!input || typeof input !== 'string' || input.includes('[object')) return '';
+  if (!input || typeof input !== 'string' || input.toLowerCase().includes('object') || input.includes('%')) return '';
   let clean = String(input).toLowerCase().trim();
   const KNOWN_ALIASES = {
     'mth': 'methodical',
@@ -521,7 +521,7 @@ export function getAllShowcaseRoasters() {
 }
 
 export function slugToTitle(slug) {
-  if (!slug || typeof slug !== 'string' || slug.includes('[object')) return 'Specialty Roastery';
+  if (!slug || typeof slug !== 'string' || slug.toLowerCase().includes('object') || slug.includes('%')) return 'Specialty Roastery';
   return slug
     .split(/[-_]+/)
     .filter(Boolean)
@@ -545,7 +545,7 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
   }
 
   const rawSlug = String(idOrSlug).trim().toLowerCase().replace(/^\/+|\/+$/g, '');
-  if (!rawSlug || ['roasters', 'roaster', 'registered', 'showcase', 'partner', 'info'].includes(rawSlug) || rawSlug.includes('[object')) {
+  if (!rawSlug || ['roasters', 'roaster', 'registered', 'showcase', 'partner', 'info'].includes(rawSlug) || rawSlug.includes('object') || rawSlug.includes('%')) {
     return all[0];
   }
 
@@ -563,8 +563,8 @@ export function getShowcaseRoaster(idOrSlug = 'methodical') {
   if (matched) return matched;
 
   // If not in pre-defined or cached roasters, dynamically synthesize on-the-fly from slug & URL parameters
-  // ONLY if rawSlug is a valid, clean roaster slug (not [object or empty or non-alphanumeric)
-  if (rawSlug && rawSlug !== 'methodical' && !rawSlug.includes('[object') && /^[a-z0-9-_]+$/i.test(rawSlug)) {
+  // ONLY if rawSlug is a valid, clean roaster slug (not object or empty or non-alphanumeric)
+  if (rawSlug && rawSlug !== 'methodical' && !rawSlug.includes('object') && !rawSlug.includes('%') && /^[a-z0-9-_]+$/i.test(rawSlug)) {
     let urlParams = null;
     if (typeof window !== 'undefined' && window.location && window.location.search) {
       try {

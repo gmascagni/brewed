@@ -377,7 +377,7 @@ export function getCustomRoasters() {
       if (!r || typeof r !== 'object') return false;
       const name = String(r.name || r.roaster || '').trim();
       const slug = String(r.slug || r.id || '').trim();
-      if (!name || name.includes('[object') || slug.includes('[object')) return false;
+      if (!name || name.toLowerCase().includes('object') || slug.toLowerCase().includes('object') || name.includes('%') || slug.includes('%')) return false;
       if (name.toLowerCase().includes('brookmill') || slug.toLowerCase().includes('brookmill')) return false;
       return true;
     });
@@ -500,6 +500,10 @@ export function cleanupLocalRegistry() {
       const cleaned = [];
       for (const r of roasters) {
         if (!r) continue;
+        const name = String(r.name || r.roaster || '').toLowerCase();
+        const slug = String(r.slug || r.id || '').toLowerCase();
+        if (name.includes('object') || slug.includes('object') || name.includes('%') || slug.includes('%')) continue;
+        if (name.includes('brookmill') || slug.includes('brookmill')) continue;
         const k = normalizeRoasterKey(r.id || r.slug || r.name);
         if (k && !seen.has(k)) {
           seen.add(k);

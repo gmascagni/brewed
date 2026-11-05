@@ -1,34 +1,288 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+
+    // ===============================================================
+    // Assumed Data Model & Security Schema
+    // ===============================================================
+    //
+    // Collection: coffees
+    // Document ID: {coffeeId} (e.g. coffee_173000000, upc_012345678905)
+    // Fields:
+    //   - beanName: string (required, 1-120 chars) - Coffee bean / lot title
+    //   - roaster: string (required, 1-120 chars) - Roastery / brand name
+    //   - ownerUid: string (required, 1-128 chars) - Firebase Auth UID of owner
+    //   - ownerEmail: string (optional, <= 254 chars) - Owner contact email
+    //   - roasterSlug: string (optional, <= 120 chars) - URL-safe roaster slug
+    //   - coffeeSlug: string (optional, <= 120 chars) - URL-safe coffee slug
+    //   - slug: string (optional, <= 120 chars) - URL-safe slug alias
+    //   - farm: string (optional, <= 200 chars) - Farm or estate provenance
+    //   - region: string (optional, <= 200 chars) - Growing region
+    //   - country: string (optional, <= 100 chars) - Origin country
+    //   - origin: string (optional, <= 100 chars) - Origin summary
+    //   - process: string (optional, <= 100 chars) - Processing method
+    //   - processLabel: string (optional, <= 100 chars) - Display process label
+    //   - roastLevel: string (optional, <= 100 chars) - Roast degree
+    //   - elevation: string (optional, <= 100 chars) - Growing altitude
+    //   - varietal: string (optional, <= 100 chars) - Botanical cultivar
+    //   - bloom: string (optional, <= 200 chars) - Bloom guidance
+    //   - brewTime: string (optional, <= 50 chars) - Target extraction time
+    //   - brewMethod: string (optional, <= 50 chars) - Brew method identifier
+    //   - recommendedGrind: string (optional, <= 100 chars) - Grind description
+    //   - upc: string (optional, <= 50 chars) - Barcode UPC / EAN code
+    //   - about: string (optional, <= 5000 chars) - Lot description / notes
+    //   - originStory: string (optional, <= 5000 chars) - Origin background
+    //   - instagram: string (optional, <= 200 chars) - Social handle / link
+    //   - shopLink: string (optional, <= 1000 chars) - E-commerce link
+    //   - directUrl: string (optional, <= 1000 chars) - Direct web URL
+    //   - logoImage: string (optional, <= 100000 chars) - Logo / artwork data
+    //   - imageUrl: string (optional, <= 2000 chars) - Image URL
+    //   - tastingNotes: list (<= 30 items) or string (<= 500 chars)
+    //   - doseGrams: number (optional, 0-500) - Dry dose weight
+    //   - dryDoseGrams: number (optional, 0-500) - Dry dose weight
+    //   - waterGrams: number (optional, 0-5000) - Water brew weight
+    //   - waterMl: number (optional, 0-5000) - Water brew volume
+    //   - ratio: number (optional, 0-100) - Brew ratio
+    //   - recommendedRatio: number (optional, 0-100) - Brew ratio
+    //   - tempF: number (optional, 32-250) - Water temperature Fahrenheit
+    //   - tempC: number (optional, 0-120) - Water temperature Celsius
+    //   - isCustom: bool (optional) - Custom partner flag
+    //   - isDemoExample: bool (optional) - Showcase demo flag
+    //   - updatedAt: string (optional, <= 100 chars) - ISO timestamp
+    //   - createdAt: string (optional, <= 100 chars) - ISO timestamp
+    //
+    // Collection: roasters
+    // Document ID: {roasterSlug} (e.g. methodical, onyx-coffee-lab)
+    // Fields:
+    //   - name: string (required, 1-120 chars) - Brand / Roastery name
+    //   - ownerUid: string (required, 1-128 chars) - Firebase Auth UID of owner
+    //   - slug: string (optional, <= 120 chars) - URL-safe roaster slug
+    //   - id: string (optional, <= 120 chars) - Roaster slug ID
+    //   - displayName: string (optional, <= 120 chars) - Display name
+    //   - ownerEmail: string (optional, <= 254 chars) - Owner contact email
+    //   - tagline: string (optional, <= 300 chars) - Brand tagline
+    //   - founded: string (optional, <= 50 chars) - Founding year / date
+    //   - city: string (optional, <= 100 chars) - Roastery city
+    //   - state: string (optional, <= 100 chars) - Roastery state/province
+    //   - country: string (optional, <= 100 chars) - Roastery country
+    //   - location: string (optional, <= 200 chars) - Location display string
+    //   - website: string (optional, <= 1000 chars) - Website URL
+    //   - shopUrl: string (optional, <= 1000 chars) - Web shop URL
+    //   - headRoaster: string (optional, <= 120 chars) - Lead roaster name
+    //   - founderName: string (optional, <= 120 chars) - Founder name
+    //   - founders: list (optional, <= 20 items) - Founders list
+    //   - logoImage: string (optional, <= 100000 chars) - Logo data URL
+    //   - backgroundImage: string (optional, <= 100000 chars) - Header hero image
+    //   - about: string (optional, <= 5000 chars) - Roastery story / bio
+    //   - updatedAt: string (optional, <= 100 chars) - ISO timestamp
+    //   - createdAt: string (optional, <= 100 chars) - ISO timestamp
+    //
+    // Collection: roaster_accounts
+    // Document ID: {accountKey} (Firebase Auth UID, or legacy verified email)
+    // Fields:
+    //   - uid: string (required, 1-128 chars) - Firebase Auth UID
+    //   - email: string (required, 1-254 chars) - Account email
+    //   - roasterName: string (optional, <= 120 chars) - Associated roaster name
+    //   - roasterSlug: string (optional, <= 120 chars) - Associated roaster slug
+    //   - displayName: string (optional, <= 120 chars) - Account display name
+    //   - updatedAt: string (optional, <= 100 chars) - ISO timestamp
+    //
+    // Collection: users/{uid} and subcollections ({allSubcollections=**})
+    // Document ID: {uid} and nested docs (e.g. users/{uid}/brews/{brewId}, users/{uid}/inventory/{bagId})
+    // Access: Strictly private to authenticated owner matching {uid}.
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Check if the request is from an authenticated Firebase Auth session
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the authenticated user matches the specified UID
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Verify authenticated user sets themselves as owner on document creation
+    function canCreateOwnedDoc() {
+      return isAuthenticated() &&
+        ('ownerUid' in request.resource.data) &&
+        request.resource.data.ownerUid == request.auth.uid;
+    }
+
+    // Verify document update preserves ownership or securely claims legacy unowned documents
+    function canUpdateOwnedDoc() {
+      return isAuthenticated() && (
+        (('ownerUid' in resource.data) &&
+          resource.data.ownerUid == request.auth.uid &&
+          request.resource.data.ownerUid == resource.data.ownerUid) ||
+        (!('ownerUid' in resource.data) &&
+          ('ownerUid' in request.resource.data) &&
+          request.resource.data.ownerUid == request.auth.uid)
+      );
+    }
+
+    // Verify only the verified owner can delete a document
+    function canDeleteOwnedDoc() {
+      return isAuthenticated() &&
+        ('ownerUid' in resource.data) &&
+        resource.data.ownerUid == request.auth.uid;
+    }
+
+    // ===============================================================
+    // Domain Validators (Applied to both create and update operations)
+    // ===============================================================
+
+    function isValidCoffee(data) {
+      return data.beanName is string &&
+        data.beanName.size() > 0 &&
+        data.beanName.size() <= 120 &&
+        data.roaster is string &&
+        data.roaster.size() > 0 &&
+        data.roaster.size() <= 120 &&
+        data.ownerUid is string &&
+        data.ownerUid.size() > 0 &&
+        data.ownerUid.size() <= 128 &&
+        (!('roasterSlug' in data) || (data.roasterSlug is string && data.roasterSlug.size() <= 120)) &&
+        (!('coffeeSlug' in data) || (data.coffeeSlug is string && data.coffeeSlug.size() <= 120)) &&
+        (!('slug' in data) || (data.slug is string && data.slug.size() <= 120)) &&
+        (!('ownerEmail' in data) || (data.ownerEmail is string && data.ownerEmail.size() <= 254)) &&
+        (!('farm' in data) || (data.farm is string && data.farm.size() <= 200)) &&
+        (!('region' in data) || (data.region is string && data.region.size() <= 200)) &&
+        (!('country' in data) || (data.country is string && data.country.size() <= 100)) &&
+        (!('origin' in data) || (data.origin is string && data.origin.size() <= 100)) &&
+        (!('process' in data) || (data.process is string && data.process.size() <= 100)) &&
+        (!('processLabel' in data) || (data.processLabel is string && data.processLabel.size() <= 100)) &&
+        (!('roastLevel' in data) || (data.roastLevel is string && data.roastLevel.size() <= 100)) &&
+        (!('varietal' in data) || (data.varietal is string && data.varietal.size() <= 100)) &&
+        (!('elevation' in data) || (data.elevation is string && data.elevation.size() <= 100)) &&
+        (!('bloom' in data) || (data.bloom is string && data.bloom.size() <= 200)) &&
+        (!('brewTime' in data) || (data.brewTime is string && data.brewTime.size() <= 50)) &&
+        (!('brewMethod' in data) || (data.brewMethod is string && data.brewMethod.size() <= 50)) &&
+        (!('recommendedGrind' in data) || (data.recommendedGrind is string && data.recommendedGrind.size() <= 100)) &&
+        (!('upc' in data) || (data.upc is string && data.upc.size() <= 50)) &&
+        (!('about' in data) || (data.about is string && data.about.size() <= 5000)) &&
+        (!('originStory' in data) || (data.originStory is string && data.originStory.size() <= 5000)) &&
+        (!('instagram' in data) || (data.instagram is string && data.instagram.size() <= 200)) &&
+        (!('shopLink' in data) || (data.shopLink is string && data.shopLink.size() <= 1000)) &&
+        (!('directUrl' in data) || (data.directUrl is string && data.directUrl.size() <= 1000)) &&
+        (!('logoImage' in data) || (data.logoImage is string && data.logoImage.size() <= 100000)) &&
+        (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 2000)) &&
+        (!('tastingNotes' in data) || (data.tastingNotes is list && data.tastingNotes.size() <= 30) || (data.tastingNotes is string && data.tastingNotes.size() <= 500)) &&
+        (!('doseGrams' in data) || (data.doseGrams is number && data.doseGrams >= 0 && data.doseGrams <= 500)) &&
+        (!('dryDoseGrams' in data) || (data.dryDoseGrams is number && data.dryDoseGrams >= 0 && data.dryDoseGrams <= 500)) &&
+        (!('waterGrams' in data) || (data.waterGrams is number && data.waterGrams >= 0 && data.waterGrams <= 5000)) &&
+        (!('waterMl' in data) || (data.waterMl is number && data.waterMl >= 0 && data.waterMl <= 5000)) &&
+        (!('ratio' in data) || (data.ratio is number && data.ratio >= 0 && data.ratio <= 100)) &&
+        (!('recommendedRatio' in data) || (data.recommendedRatio is number && data.recommendedRatio >= 0 && data.recommendedRatio <= 100)) &&
+        (!('tempF' in data) || (data.tempF is number && data.tempF >= 32 && data.tempF <= 250)) &&
+        (!('tempC' in data) || (data.tempC is number && data.tempC >= 0 && data.tempC <= 120)) &&
+        (!('isCustom' in data) || data.isCustom is bool) &&
+        (!('isDemoExample' in data) || data.isDemoExample is bool) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 100));
+    }
+
+    function isValidRoaster(data) {
+      return data.name is string &&
+        data.name.size() > 0 &&
+        data.name.size() <= 120 &&
+        data.ownerUid is string &&
+        data.ownerUid.size() > 0 &&
+        data.ownerUid.size() <= 128 &&
+        (!('slug' in data) || (data.slug is string && data.slug.size() <= 120)) &&
+        (!('id' in data) || (data.id is string && data.id.size() <= 120)) &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 120)) &&
+        (!('ownerEmail' in data) || (data.ownerEmail is string && data.ownerEmail.size() <= 254)) &&
+        (!('tagline' in data) || (data.tagline is string && data.tagline.size() <= 300)) &&
+        (!('founded' in data) || (data.founded is string && data.founded.size() <= 50)) &&
+        (!('city' in data) || (data.city is string && data.city.size() <= 100)) &&
+        (!('state' in data) || (data.state is string && data.state.size() <= 100)) &&
+        (!('country' in data) || (data.country is string && data.country.size() <= 100)) &&
+        (!('location' in data) || (data.location is string && data.location.size() <= 200)) &&
+        (!('website' in data) || (data.website is string && data.website.size() <= 1000)) &&
+        (!('shopUrl' in data) || (data.shopUrl is string && data.shopUrl.size() <= 1000)) &&
+        (!('headRoaster' in data) || (data.headRoaster is string && data.headRoaster.size() <= 120)) &&
+        (!('founderName' in data) || (data.founderName is string && data.founderName.size() <= 120)) &&
+        (!('founders' in data) || (data.founders is list && data.founders.size() <= 20)) &&
+        (!('logoImage' in data) || (data.logoImage is string && data.logoImage.size() <= 100000)) &&
+        (!('backgroundImage' in data) || (data.backgroundImage is string && data.backgroundImage.size() <= 100000)) &&
+        (!('about' in data) || (data.about is string && data.about.size() <= 5000)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 100));
+    }
+
+    function isValidRoasterAccount(data) {
+      return data.uid is string &&
+        data.uid.size() > 0 &&
+        data.uid.size() <= 128 &&
+        data.email is string &&
+        data.email.size() > 0 &&
+        data.email.size() <= 254 &&
+        (!('roasterName' in data) || (data.roasterName is string && data.roasterName.size() <= 120)) &&
+        (!('roasterSlug' in data) || (data.roasterSlug is string && data.roasterSlug.size() <= 120)) &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 120)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100));
+    }
+
+    // ===============================================================
+    // Rules Match Blocks
+    // ===============================================================
+
     // Coffees collection: Public read for all app users and barcode scans
     match /coffees/{coffeeId} {
       allow read: if true;
-      allow create, update: if request.resource.data.beanName is string &&
-                               request.resource.data.beanName.size() > 0 &&
-                               request.resource.data.roaster is string &&
-                               request.resource.data.roaster.size() > 0;
-      allow delete: if false;
+      allow create: if canCreateOwnedDoc() && isValidCoffee(request.resource.data);
+      allow update: if canUpdateOwnedDoc() && isValidCoffee(request.resource.data);
+      allow delete: if canDeleteOwnedDoc();
     }
 
-    // Roasters collection: Public read for directory and profile pages
+    // Roasters collection: Public read for directory showcase and roaster profile pages
     match /roasters/{roasterSlug} {
       allow read: if true;
-      allow create, update: if request.resource.data.name is string &&
-                               request.resource.data.name.size() > 0;
-      allow delete: if false;
+      allow create: if canCreateOwnedDoc() && isValidRoaster(request.resource.data);
+      allow update: if canUpdateOwnedDoc() && isValidRoaster(request.resource.data);
+      allow delete: if canDeleteOwnedDoc();
     }
 
-    // Roaster accounts collection: Multi-device roaster identity link
-    match /roaster_accounts/{email} {
-      allow read: if true;
-      allow create, update: if request.resource.data.email is string &&
-                               request.resource.data.email.size() > 0;
-      allow delete: if false;
+    // Roaster accounts collection: Private roaster identity mapping (UID and legacy email migration)
+    // NEVER publicly readable - prevents enumeration of roaster emails and metadata
+    match /roaster_accounts/{accountKey} {
+      allow read: if isAuthenticated() && (
+        accountKey == request.auth.uid ||
+        (request.auth.token.email != null && accountKey == request.auth.token.email) ||
+        (resource != null && resource.data.uid == request.auth.uid)
+      );
+      allow create: if isAuthenticated() && (
+        (accountKey == request.auth.uid || (request.auth.token.email != null && accountKey == request.auth.token.email)) &&
+        request.resource.data.uid == request.auth.uid &&
+        isValidRoasterAccount(request.resource.data)
+      );
+      allow update: if isAuthenticated() && (
+        (accountKey == request.auth.uid || (request.auth.token.email != null && accountKey == request.auth.token.email) || resource.data.uid == request.auth.uid) &&
+        request.resource.data.uid == resource.data.uid &&
+        isValidRoasterAccount(request.resource.data)
+      );
+      allow delete: if isAuthenticated() && (
+        accountKey == request.auth.uid ||
+        (resource != null && resource.data.uid == request.auth.uid)
+      );
     }
 
-    // Default deny for all other collections
+    // Private user profiles and nested personal subcollections (brews journal, bag inventory)
+    match /users/{uid} {
+      allow read, write: if isAuthenticated() && request.auth.uid == uid;
+
+      match /{allSubcollections=**} {
+        allow read, write: if isAuthenticated() && request.auth.uid == uid;
+      }
+    }
+
+    // Default deny for all other collections and documents
     match /{document=**} {
       allow read, write: if false;
     }

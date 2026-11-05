@@ -1,10 +1,28 @@
 // World Coffee News Dispatch
 // Automatically synced from live RSS feeds: Daily Coffee News, Perfect Daily Grind, Sprudge, Specialty Coffee Press.
-// Last Synced: Nov 4, 2026, 6:41 PM
+// Last Synced: Nov 5, 2026, 9:22 AM
 
-export const LAST_UPDATED = "Nov 4, 2026, 6:41 PM";
+export const LAST_UPDATED = "Nov 5, 2026, 9:22 AM";
 
 export const WORLD_BREW_NEWS = [
+  {
+    "id": "news_5701672194",
+    "title": "Sabah targets premium coffee market with Ranau plantation - KLSE Screener",
+    "source": "KLSE Screener",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPT1dRWHhyX1lOcmhxcFFFaWxxMHlQbXhrRVFHSVY0ZmxSMTZaWTlEbnJYeDJjOEVjSjNSYVZldVlONkNMWXBVbVBQUXVncjJXUkgwMlJlel92NE1VeWRSMkp2WG44TUk0NHlaMUNZWTFXQmQyanNlak55dFliU0xXSkVqSllnMDhPU1IxaUFDWDBHTS1FRzR3TEJDRUE0YlM5eGpTZExfdTlnZ1k?oc=5",
+    "publishedDate": "Nov 5, 2026",
+    "dateIso": "2026-11-05",
+    "category": "coffee",
+    "tag": "Market & Trade",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Sabah targets premium coffee market with Ranau plantation&nbsp;&nbsp;",
+    "keyPoints": [
+      "Published by KLSE Screener on Nov 5, 2026",
+      "Direct coverage covering market & trade"
+    ]
+  },
   {
     "id": "news_1357595685",
     "title": "Hundreds of Cuppers to Help Build a Kenya Coffee Flavor Atlas",
@@ -56,42 +74,6 @@ export const WORLD_BREW_NEWS = [
     "summary": "Coffee isn't all that's brewing at Good Trouble Roasters, a new roastery cafe that opened in Arlington, Virginia, in late October, but it does form the heart of the business....",
     "keyPoints": [
       "Published by Daily Coffee News on Nov 4, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_6075089289",
-    "title": "“The Center of Specialty”: World of Coffee Dubai brings every link in the coffee chain under one roof in January 2027 - Zawya",
-    "source": "Zawya",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMihwJBVV95cUxPLW92WDZYTVc4Nm1yOVp5MHUzNEt6VXhmRm1TWGxmeVNBVXVpYTZGdVBXOUdQMGZJZDJlUFhsa3E5OGFFN2lETlhVQnVUN0hTT0UydmZyX29LZHNBdlJiUlRMZVU2RDFzdkprZmhuWGplR3l4WGIwaXJyaERqXzR4UGwyMElTVXB5eExDU3dIZFpDRlN3Q2RIcU1jUnhNTEM4UEJBS095RC10SEVUUDE3TGRKeDRIOWxwQmhXLVI1eDFUeFBkRUpCaGlYWXNqMzJDbjJHNEdZVmUyLUpxTUNJYUt3ME82ZE9STVhyLXRNdTdYSHdmR0lUWWp5Q09sdmpBY2NKeUVqYw?oc=5",
-    "publishedDate": "Nov 4, 2026",
-    "dateIso": "2026-11-04",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "“The Center of Specialty”: World of Coffee Dubai brings every link in the coffee chain under one roof in January 2027&nbsp;&nbsp;",
-    "keyPoints": [
-      "Published by Zawya on Nov 4, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_23856400710",
-    "title": "A flat white future? Northland puts coffee to the test - Stuff",
-    "source": "Stuff",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOVHF6S0JsNUw4NGNScDJHd2VkZjEwMWlpUkNsbm5BWUx3XzZuZkg3MkZjTURuektYeDZnSmY2Wm55MEVpbWJOdXg3djFDVWlfSVk1aWF0R3A1V3B6TFpQQVdSZ29aOXhVWUVFdXRKYVFORm0xWnI3cm5EUEVOSzhHY0lCMWotQXM5Ri1zUjNYR3JhNms?oc=5",
-    "publishedDate": "Nov 4, 2026",
-    "dateIso": "2026-11-04",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "A flat white future? Northland puts coffee to the test&nbsp;&nbsp;",
-    "keyPoints": [
-      "Published by Stuff on Nov 4, 2026",
       "Direct coverage covering industry & news"
     ]
   },
@@ -218,6 +200,24 @@ export const WORLD_BREW_NEWS = [
     "summary": "Welcome to DCN’s Weekly Coffee News! Subscribe here for all the latest coffee industry news. Also, check out the latest career opportunities at CoffeeIndustryJobs.com. FAO Opens Grants for Coffee Enterprises...",
     "keyPoints": [
       "Published by Daily Coffee News on Oct 30, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_6740170267",
+    "title": "Topic: Coffee shops and cafés in the U.S. - Statista",
+    "source": "Statista",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE9zYmplY3BNdWwxUVVmNE4ySjI3MFdhQ0x5Z0FlMXJFbGQwSnQ1aGhRS1Q5cjJaeUZrMXFDX29Va2RBWGlZTEZvYm5DQjZCN0NxVGhxMUFWVVZZNmVXeWlrRW53V1VnQzREU2FBc1FEbw?oc=5",
+    "publishedDate": "Aug 5, 2026",
+    "dateIso": "2026-08-05",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "Topic: Coffee shops and cafés in the U.S.&nbsp;&nbsp;",
+    "keyPoints": [
+      "Published by Statista on Aug 5, 2026",
       "Direct coverage covering industry & news"
     ]
   }

@@ -255,7 +255,12 @@ export default function App() {
         const parts = p.split('/').filter(Boolean);
         if (parts.length > 1) {
           const raw = decodeURIComponent(parts[1]).trim().toLowerCase();
-          if (!['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(raw) && !raw.includes('[object') && /^[a-z0-9-_]+$/i.test(raw)) {
+          if (
+            !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(raw) &&
+            !raw.includes('object') &&
+            !raw.includes('%') &&
+            /^[a-z0-9-_]+$/i.test(raw)
+          ) {
             return raw.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
           }
         }
@@ -263,8 +268,11 @@ export default function App() {
       }
       const searchParams = new URLSearchParams(window.location.search);
       const querySlug = searchParams.get('roaster') || searchParams.get('slug');
-      if (querySlug && !querySlug.includes('[object')) {
-        return querySlug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      if (querySlug) {
+        const rawQuery = decodeURIComponent(querySlug).trim().toLowerCase();
+        if (!rawQuery.includes('object') && !rawQuery.includes('%') && /^[a-z0-9-_]+$/i.test(rawQuery)) {
+          return rawQuery.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'methodical';
+        }
       }
     }
     return 'methodical';
@@ -934,11 +942,26 @@ export default function App() {
         const fullPath = (typeof window !== 'undefined' ? window.location.pathname : path).replace(/^\/brewed/, '');
         const parts = fullPath.split('/').filter(Boolean);
         const querySlug = searchParams.get('roaster') || searchParams.get('slug');
-        if (parts.length > 1 && !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(parts[1].toLowerCase())) {
-          setSelectedRoasterSlug(parts[1]);
+        if (parts.length > 1) {
+          const raw = decodeURIComponent(parts[1]).trim().toLowerCase();
+          if (
+            !['showcase', 'partner', 'info', 'roasters', 'roaster', 'registered'].includes(raw) &&
+            !raw.includes('object') &&
+            !raw.includes('%') &&
+            /^[a-z0-9-_]+$/i.test(raw)
+          ) {
+            setSelectedRoasterSlug(raw.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+          } else {
+            setSelectedRoasterSlug('methodical');
+          }
         } else if (querySlug) {
-          const formattedSlug = querySlug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-          setSelectedRoasterSlug(formattedSlug);
+          const rawQuery = decodeURIComponent(querySlug).trim().toLowerCase();
+          if (!rawQuery.includes('object') && !rawQuery.includes('%') && /^[a-z0-9-_]+$/i.test(rawQuery)) {
+            const formattedSlug = rawQuery.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            setSelectedRoasterSlug(formattedSlug || 'methodical');
+          } else {
+            setSelectedRoasterSlug('methodical');
+          }
         } else {
           setSelectedRoasterSlug('methodical');
         }
