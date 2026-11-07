@@ -23,6 +23,7 @@ import {
   Wrench,
   Bookmark
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import BrandLogo from './BrandLogo';
 
 export default function Header({ 
@@ -44,6 +45,7 @@ export default function Header({
   onOpenVideoAcademy,
   onOpenNews,
   onSelectView,
+  onNavigateHome,
   currentView = 'discovery', // 'discovery' | 'brew_station' | 'roasters' | 'cafe_portal' | 'learn' | 'recipes' | 'shops'
   isMuted = false,
   onToggleMute,
@@ -67,25 +69,42 @@ export default function Header({
     <div className="relative z-40 px-3 sm:px-6 lg:px-8 py-2.5 sm:py-4 transition-colors duration-400 bg-white/95 backdrop-blur-md border-b border-[#ECE6DC] text-[#14110F]">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2.5 md:gap-4 min-h-[48px] md:min-h-[52px]">
         
-        {/* 1. Left: Editorial Logo & Brand Title */}
+        {/* 1. Left: Editorial Logo & Brand Title (Link to Home Page) */}
         <div className="flex items-center space-x-2.5 sm:space-x-3 w-full md:w-auto justify-between md:justify-start">
           <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
-            <div 
-              onClick={() => onSelectView && onSelectView('discovery')}
+            <Link 
+              to="/"
+              onClick={(e) => {
+                if (onNavigateHome) {
+                  onNavigateHome();
+                } else if (onSelectView) {
+                  onSelectView('home');
+                }
+              }}
               className="cursor-pointer p-1.5 rounded-2xl transition-all duration-300 flex items-center justify-center bg-[#FAF7F2] border border-[#ECE6DC] shadow-xs hover:border-[#D69550] shrink-0"
+              title="Return to The Brew App Home"
+              aria-label="The Brew App Home"
             >
               <BrandLogo size={30} />
-            </div>
+            </Link>
             <div className="min-w-0">
-              <h1 
-                onClick={() => onSelectView && onSelectView('discovery')}
-                className="font-editorial text-lg sm:text-2xl font-bold tracking-tight text-[#14110F] flex items-center gap-1.5 sm:gap-2 cursor-pointer leading-normal py-0.5 truncate"
+              <Link 
+                to="/"
+                onClick={(e) => {
+                  if (onNavigateHome) {
+                    onNavigateHome();
+                  } else if (onSelectView) {
+                    onSelectView('home');
+                  }
+                }}
+                className="font-editorial text-lg sm:text-2xl font-bold tracking-tight text-[#14110F] flex items-center gap-1.5 sm:gap-2 cursor-pointer leading-normal py-0.5 truncate hover:text-[#A25A24] transition-colors"
+                title="Return to The Brew App Home"
               >
                 <span>TheBrew.App</span>
                 <span className="whitespace-nowrap text-[9px] uppercase font-mono px-1.5 sm:px-2 py-0.5 rounded-full border bg-[#FAF0E6] text-[#A25A24] border-[#ECD4BD] font-bold shrink-0">
                   Master
                 </span>
-              </h1>
+              </Link>
               <p className="text-[10px] sm:text-[10.5px] text-[#766A62] font-sans leading-tight truncate">Precision Specialty Coffee Guide</p>
             </div>
           </div>

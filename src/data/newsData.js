@@ -1,25 +1,79 @@
 // World Coffee News Dispatch
 // Automatically synced from live RSS feeds: Daily Coffee News, Perfect Daily Grind, Sprudge, Specialty Coffee Press.
-// Last Synced: Nov 5, 2026, 9:22 AM
+// Last Synced: Nov 7, 2026, 8:09 AM
 
-export const LAST_UPDATED = "Nov 5, 2026, 9:22 AM";
+export const LAST_UPDATED = "Nov 7, 2026, 8:09 AM";
 
 export const WORLD_BREW_NEWS = [
   {
-    "id": "news_5701672194",
-    "title": "Sabah targets premium coffee market with Ranau plantation - KLSE Screener",
-    "source": "KLSE Screener",
+    "id": "news_2748716511",
+    "title": "Weekly Coffee News: Costa Rica Harvest Concerns + Restoring Iconic Coffee Sign",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/06/weekly-coffee-news-costa-rica-harvest-concerns-restoring-iconic-coffee-sign/",
+    "publishedDate": "Nov 6, 2026",
+    "dateIso": "2026-11-06",
+    "category": "coffee",
+    "tag": "Farm & Origin",
+    "readTime": "2 min read",
+    "featured": true,
+    "summary": "Welcome to DCN’s Weekly Coffee News! Subscribe here for all the latest coffee industry news. Also, check out the latest career opportunities at CoffeeIndustryJobs.com. El Niño Prompts Lower Harvest Estimates...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Nov 6, 2026",
+      "Direct coverage covering farm & origin"
+    ]
+  },
+  {
+    "id": "news_14615886375",
+    "title": "Researchers Challenge the Climate-Resilient Robusta Narrative",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/05/researchers-challenge-the-climate-resilient-robusta-narrative/",
+    "publishedDate": "Nov 5, 2026",
+    "dateIso": "2026-11-05",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "A major new literature review challenges the popular assumption that robusta offers a climate-resilient solution for sustaining global coffee production as climate change continues to disrupt the arabica landscape. Led...",
+    "keyPoints": [
+      "Published by Daily Coffee News on Nov 5, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_9897612855",
+    "title": "Le Mil’s Connects San Francisco to a Five-Generation Indian Coffee Farm",
+    "source": "Daily Coffee News",
+    "sourceDomain": "dailycoffeenews.com",
+    "url": "https://dailycoffeenews.com/2026/11/05/le-mils-connects-san-francisco-to-a-five-generation-indian-coffee-farm/",
+    "publishedDate": "Nov 5, 2026",
+    "dateIso": "2026-11-05",
+    "category": "coffee",
+    "tag": "Farm & Origin",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "A new cafe called Le Mil's Coffee is now open in San Francisco's bustling Lower Nob Hill neighborhood, showcasing coffees from the owner's family farm and neighboring producers in India....",
+    "keyPoints": [
+      "Published by Daily Coffee News on Nov 5, 2026",
+      "Direct coverage covering farm & origin"
+    ]
+  },
+  {
+    "id": "news_10919629844",
+    "title": "Sabah targets premium coffee market with Ranau plantation [WATCH] - NST Online",
+    "source": "NST Online",
     "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxPT1dRWHhyX1lOcmhxcFFFaWxxMHlQbXhrRVFHSVY0ZmxSMTZaWTlEbnJYeDJjOEVjSjNSYVZldVlONkNMWXBVbVBQUXVncjJXUkgwMlJlel92NE1VeWRSMkp2WG44TUk0NHlaMUNZWTFXQmQyanNlak55dFliU0xXSkVqSllnMDhPU1IxaUFDWDBHTS1FRzR3TEJDRUE0YlM5eGpTZExfdTlnZ1k?oc=5",
+    "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPTFA5cWFwVjZuYS13X3ZlSllwc3g4QWxtNnhtRktJMjZSU0hwbnROVDlkNnRDMEg2NHIxM3JGdzFjV3BPX1ViLTg4WWJmRE9MZ1RDZEtvdDY0Vmk3SXpRWWtuVklrMENVbEo0SF9fWnloUWlpaHhIQUE4SUxiWDdPOXlsLVJyVUxQUE9oa0U2M2lDaUUxYzFLVzlFeU9uT1NuY25UeEVjTXFLWklHSkJCak1sSkIyNEXSAbwBQVVfeXFMUG5JQkpIc2txVHp5NGUwaFV0Z1dUejBLYWtMZWZUR0N3aFE4UWdLc21LQUV4dzROb1hWVjNhTE54cktNdmdLaFEyM3MwMU54c1dwZUd0NlJKMlFNbW80UGhMNHM0bGNZSHE2R0R0VF9XTWpPemV6WkVtTnZpWFNZNzkwa0pCTFE3ZUtveG4yRUZvOEVjZ19tbEpBSzRuUGE3VFZYTDBfVGRhYkRZalRFOUlzOGFHcjZScG9Mbm8?oc=5",
     "publishedDate": "Nov 5, 2026",
     "dateIso": "2026-11-05",
     "category": "coffee",
     "tag": "Market & Trade",
     "readTime": "2 min read",
     "featured": false,
-    "summary": "Sabah targets premium coffee market with Ranau plantation&nbsp;&nbsp;",
+    "summary": "Sabah targets premium coffee market with Ranau plantation [WATCH]&nbsp;&nbsp;",
     "keyPoints": [
-      "Published by KLSE Screener on Nov 5, 2026",
+      "Published by NST Online on Nov 5, 2026",
       "Direct coverage covering market & trade"
     ]
   },
@@ -34,7 +88,7 @@ export const WORLD_BREW_NEWS = [
     "category": "coffee",
     "tag": "Farm & Origin",
     "readTime": "2 min read",
-    "featured": true,
+    "featured": false,
     "summary": "A new initiative in Kenya plans to document the country's diverse coffee flavors through a coordinated tasting effort involving more than 500 samples from 34 counties. The Kenya Coffee Flavor...",
     "keyPoints": [
       "Published by Daily Coffee News on Nov 4, 2026",
@@ -74,6 +128,24 @@ export const WORLD_BREW_NEWS = [
     "summary": "Coffee isn't all that's brewing at Good Trouble Roasters, a new roastery cafe that opened in Arlington, Virginia, in late October, but it does form the heart of the business....",
     "keyPoints": [
       "Published by Daily Coffee News on Nov 4, 2026",
+      "Direct coverage covering industry & news"
+    ]
+  },
+  {
+    "id": "news_23856400710",
+    "title": "A flat white future? Northland puts coffee to the test - Stuff",
+    "source": "Stuff",
+    "sourceDomain": "news.google.com",
+    "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxOVHF6S0JsNUw4NGNScDJHd2VkZjEwMWlpUkNsbm5BWUx3XzZuZkg3MkZjTURuektYeDZnSmY2Wm55MEVpbWJOdXg3djFDVWlfSVk1aWF0R3A1V3B6TFpQQVdSZ29aOXhVWUVFdXRKYVFORm0xWnI3cm5EUEVOSzhHY0lCMWotQXM5Ri1zUjNYR3JhNms?oc=5",
+    "publishedDate": "Nov 4, 2026",
+    "dateIso": "2026-11-04",
+    "category": "coffee",
+    "tag": "Industry & News",
+    "readTime": "2 min read",
+    "featured": false,
+    "summary": "A flat white future? Northland puts coffee to the test&nbsp;&nbsp;",
+    "keyPoints": [
+      "Published by Stuff on Nov 4, 2026",
       "Direct coverage covering industry & news"
     ]
   },
@@ -146,78 +218,6 @@ export const WORLD_BREW_NEWS = [
     "summary": "Norwegian home appliance brand Wilfa is reintroducing itself to the United States, establishing Wilfa USA operations and rolling out new products as part of a broader U.S. expansion. Wilfa presented...",
     "keyPoints": [
       "Published by Daily Coffee News on Nov 2, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_8701203090",
-    "title": "Keurig Must Face Antitrust Claims Over Coffee Pods, Judge Rules",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/11/02/keurig-must-face-antitrust-claims-over-coffee-pods-judge-rules/",
-    "publishedDate": "Nov 2, 2026",
-    "dateIso": "2026-11-02",
-    "category": "coffee",
-    "tag": "Competitions",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "A federal judge has allowed some major antitrust and false advertising claims against Keurig Green Mountain to proceed toward trial in a 12-year-old dispute over competition in the single-serve coffee...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Nov 2, 2026",
-      "Direct coverage covering competitions"
-    ]
-  },
-  {
-    "id": "news_8290404388",
-    "title": "Popular San Francisco Coffee Company Closes Both Cafes After Landlord Disputes",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/30/popular-san-francisco-coffee-company-closes-both-cafes-after-landlord-disputes/",
-    "publishedDate": "Oct 30, 2026",
-    "dateIso": "2026-10-30",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Three-year-old San Francisco specialty coffee company Outset Coffee has closed both of its cafes after separate landlord disputes, one ending in a $200,196 court judgment and the other in a...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 30, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_9956177326",
-    "title": "Weekly Coffee News: FAO Grant Opportunity + Multiple Home Brewer Launches",
-    "source": "Daily Coffee News",
-    "sourceDomain": "dailycoffeenews.com",
-    "url": "https://dailycoffeenews.com/2026/10/30/weekly-coffee-news-fao-grant-opportunity-multiple-home-brewer-launches/",
-    "publishedDate": "Oct 30, 2026",
-    "dateIso": "2026-10-30",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Welcome to DCN’s Weekly Coffee News! Subscribe here for all the latest coffee industry news. Also, check out the latest career opportunities at CoffeeIndustryJobs.com. FAO Opens Grants for Coffee Enterprises...",
-    "keyPoints": [
-      "Published by Daily Coffee News on Oct 30, 2026",
-      "Direct coverage covering industry & news"
-    ]
-  },
-  {
-    "id": "news_6740170267",
-    "title": "Topic: Coffee shops and cafés in the U.S. - Statista",
-    "source": "Statista",
-    "sourceDomain": "news.google.com",
-    "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE9zYmplY3BNdWwxUVVmNE4ySjI3MFdhQ0x5Z0FlMXJFbGQwSnQ1aGhRS1Q5cjJaeUZrMXFDX29Va2RBWGlZTEZvYm5DQjZCN0NxVGhxMUFWVVZZNmVXeWlrRW53V1VnQzREU2FBc1FEbw?oc=5",
-    "publishedDate": "Aug 5, 2026",
-    "dateIso": "2026-08-05",
-    "category": "coffee",
-    "tag": "Industry & News",
-    "readTime": "2 min read",
-    "featured": false,
-    "summary": "Topic: Coffee shops and cafés in the U.S.&nbsp;&nbsp;",
-    "keyPoints": [
-      "Published by Statista on Aug 5, 2026",
       "Direct coverage covering industry & news"
     ]
   }

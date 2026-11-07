@@ -402,6 +402,23 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Handler to return cleanly to Home (Brewing Station Step 1)
+  const handleNavigateHome = () => {
+    setIsCommunityOpen(false);
+    setIsRoasterPortalOpen(false);
+    setIsLocalCoffeeOpen(false);
+    setIsWaterLabOpen(false);
+    setIsVideoAcademyOpen(false);
+    setIsJournalOpen(false);
+    setIsProfileOpen(false);
+    setIsSearchOpen(false);
+    setIsMobileToolsOpen(false);
+    setCurrentArea('brew');
+    setCurrentStep(1);
+    navigate('/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Handler for Selecting Coffee from Discover Feed or Roaster Page
   const handleSelectBeanToBrew = (bean) => {
     if (!bean) return;
@@ -1224,6 +1241,7 @@ export default function App() {
           isShopsView={currentArea === 'cafes'}
           currentView={currentArea}
           onStartBrew={() => handleStartBrew()}
+          onNavigateHome={handleNavigateHome}
           onSelectView={(v) => {
             // Dismiss all open modals when navigating primary views
             setIsCommunityOpen(false);
@@ -1235,7 +1253,10 @@ export default function App() {
             setIsProfileOpen(false);
             setIsSearchOpen(false);
 
-            if (v === 'brew') {
+            if (v === 'home' || v === 'discovery') {
+              handleNavigateHome();
+              return;
+            } else if (v === 'brew') {
               setCurrentArea('brew');
               navigate(currentStep > 1 && currentActiveMethod ? `/methods/${currentActiveMethod.id}` : '/');
             } else if (v === 'discover' || v === 'roasters') {
